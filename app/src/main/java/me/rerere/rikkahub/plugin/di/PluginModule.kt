@@ -1,0 +1,36 @@
+package me.rerere.rikkahub.plugin.di
+
+import me.rerere.rikkahub.data.service.MemoryBankService
+import me.rerere.rikkahub.plugin.loader.PluginLoader
+import me.rerere.rikkahub.plugin.manager.PluginManager
+import me.rerere.rikkahub.plugin.provider.PluginToolProvider
+import me.rerere.rikkahub.plugin.repository.PluginRepository
+import me.rerere.rikkahub.plugin.scanner.PluginScanner
+import me.rerere.rikkahub.plugin.ui.PluginViewModel
+import okhttp3.OkHttpClient
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
+
+/**
+ * 插件模块依赖注入
+ */
+val pluginModule = module {
+    // Scanner
+    single { PluginScanner(androidContext()) }
+    
+    // Repository
+    single { PluginRepository(androidContext()) }
+    
+    // Loader - 需要OkHttpClient和MemoryBankService
+    single { PluginLoader(androidContext(), get<OkHttpClient>(), get<MemoryBankService>()) }
+    
+    // Manager
+    single { PluginManager(androidContext(), get(), get(), get()) }
+    
+    // Provider
+    single { PluginToolProvider(get()) }
+    
+    // ViewModel
+    viewModel { PluginViewModel(get()) }
+}

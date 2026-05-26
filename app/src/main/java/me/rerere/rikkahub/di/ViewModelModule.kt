@@ -9,6 +9,7 @@ import me.rerere.rikkahub.ui.pages.debug.DebugVM
 import me.rerere.rikkahub.ui.pages.developer.DeveloperVM
 import me.rerere.rikkahub.ui.pages.favorite.FavoriteVM
 import me.rerere.rikkahub.ui.pages.health.HealthVM
+import me.rerere.rikkahub.ui.pages.memory.MemoryBankVM
 import me.rerere.rikkahub.ui.pages.search.SearchVM
 import me.rerere.rikkahub.ui.pages.history.HistoryVM
 import me.rerere.rikkahub.ui.pages.stats.StatsVM
@@ -70,4 +71,5 @@ val viewModelModule = module {
     viewModelOf(::SearchVM)
     viewModelOf(::StatsVM)
     viewModelOf(::HealthVM)
+    viewModelOf(::MemoryBankVM)
 }

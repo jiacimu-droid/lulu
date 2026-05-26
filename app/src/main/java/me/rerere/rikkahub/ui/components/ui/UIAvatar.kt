@@ -11,20 +11,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,8 +43,12 @@ import coil3.compose.AsyncImage
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Edit03
 import me.rerere.rikkahub.R
+import me.rerere.rikkahub.Screen
+import me.rerere.rikkahub.data.event.AppEvent
+import me.rerere.rikkahub.data.event.AppEventBus
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.model.Avatar
+import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.hooks.rememberAvatarShape
 import org.koin.compose.koinInject
 
@@ -89,10 +91,23 @@ fun UIAvatar(
     onClick: (() -> Unit)? = null
 ) {
     val filesManager: FilesManager = koinInject()
+    val eventBus: AppEventBus = koinInject()
+    val navController = LocalNavController.current
     var showPickOption by remember { mutableStateOf(false) }
-    var showEmojiPicker by remember { mutableStateOf(false) }
     var showUrlInput by remember { mutableStateOf(false) }
     var urlInput by remember { mutableStateOf("") }
+
+    // 监听 EmojiSelected 事件
+    LaunchedEffect(Unit) {
+        eventBus.events.collect { event ->
+            when (event) {
+                is AppEvent.EmojiSelected -> {
+                    onUpdate?.invoke(Avatar.Emoji(content = event.emoji))
+                }
+                else -> {}
+            }
+        }
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -203,7 +218,7 @@ fun UIAvatar(
                     Button(
                         onClick = {
                             showPickOption = false
-                            showEmojiPicker = true
+                            navController.navigate(Screen.EmojiPicker)
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -240,26 +255,6 @@ fun UIAvatar(
                 }
             }
         )
-    }
-
-    if (showEmojiPicker) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showEmojiPicker = false
-            },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ) {
-            EmojiPicker(
-                onEmojiSelected = { emoji ->
-                    onUpdate?.invoke(Avatar.Emoji(content = emoji.emoji))
-                    showEmojiPicker = false
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(16.dp)
-            )
-        }
     }
 
     if (showUrlInput) {

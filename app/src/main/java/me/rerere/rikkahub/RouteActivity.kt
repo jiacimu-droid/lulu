@@ -117,6 +117,9 @@ import me.rerere.rikkahub.ui.pages.setting.SettingSpeechPage
 import me.rerere.rikkahub.ui.pages.setting.SettingWebPage
 import me.rerere.rikkahub.ui.pages.setting.SettingSystemToolsPage
 import me.rerere.rikkahub.ui.pages.setting.SettingProactiveMessagePage
+import me.rerere.rikkahub.plugin.webview.PluginWebViewPage
+import me.rerere.rikkahub.ui.pages.memory.MemoryBankPage
+import me.rerere.rikkahub.ui.components.ui.EmojiPickerPage
 import me.rerere.rikkahub.ui.pages.share.handler.ShareHandlerPage
 import me.rerere.rikkahub.ui.pages.stats.StatsPage
 import me.rerere.rikkahub.ui.pages.translator.TranslatorPage
@@ -256,6 +259,7 @@ class RouteActivity : ComponentActivity() {
             eventBus.events.collect { event ->
                 when (event) {
                     is AppEvent.Speak -> tts.speak(event.text)
+                    is AppEvent.EmojiSelected -> { /* handled in UIAvatar */ }
                 }
             }
         }
@@ -519,9 +523,52 @@ class RouteActivity : ComponentActivity() {
                             }
 
                             entry<Screen.PluginDetail> { key ->
+                                val nav = LocalNavController.current
                                 me.rerere.rikkahub.plugin.ui.PluginDetailPage(
                                     pluginId = key.pluginId,
+                                    onNavigateBack = { backStack.removeLastOrNull() },
+                                    onNavigateToCustomPage = { customPage ->
+                                        when (customPage) {
+                                            "memory_bank" -> nav.navigate(Screen.MemoryBank)
+                                        }
+                                    },
+                                    onNavigateToWebView = { pluginId, entryPath ->
+                                        nav.navigate(Screen.PluginWebView(pluginId, entryPath))
+                                    },
+                                    onNavigateToDeclarativeUI = { pluginId ->
+                                        nav.navigate(Screen.PluginDeclarativeUI(pluginId))
+                                    }
+                                )
+                            }
+
+                            entry<Screen.PluginDeclarativeUI> { key ->
+                                val pluginManager = koinInject<me.rerere.rikkahub.plugin.manager.PluginManager>()
+                                me.rerere.rikkahub.plugin.ui.PluginUIDeclarativePage(
+                                    pluginId = key.pluginId,
+                                    pluginManager = pluginManager,
                                     onNavigateBack = { backStack.removeLastOrNull() }
+                                )
+                            }
+
+                            entry<Screen.PluginWebView> { key ->
+                                val pluginManager = koinInject<me.rerere.rikkahub.plugin.manager.PluginManager>()
+                                PluginWebViewPage(
+                                    pluginId = key.pluginId,
+                                    htmlEntryPath = key.entryPath,
+                                    pluginManager = pluginManager,
+                                    onNavigateBack = { backStack.removeLastOrNull() }
+                                )
+                            }
+
+                            entry<Screen.MemoryBank> {
+                                MemoryBankPage(
+                                    onBack = { backStack.removeLastOrNull() }
+                                )
+                            }
+
+                            entry<Screen.EmojiPicker> {
+                                EmojiPickerPage(
+                                    onBack = { backStack.removeLastOrNull() }
                                 )
                             }
 
@@ -705,4 +752,16 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data class PluginDetail(val pluginId: String) : Screen
+
+    @Serializable
+    data class PluginWebView(val pluginId: String, val entryPath: String) : Screen
+
+    @Serializable
+    data class PluginDeclarativeUI(val pluginId: String) : Screen
+
+    @Serializable
+    data object MemoryBank : Screen
+
+    @Serializable
+    data object EmojiPicker : Screen
 }

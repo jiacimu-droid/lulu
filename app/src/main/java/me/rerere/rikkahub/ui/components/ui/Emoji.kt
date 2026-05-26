@@ -25,11 +25,15 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -50,8 +54,11 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.launch
 import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.ArrowLeft01
 import me.rerere.hugeicons.stroke.Search01
 import me.rerere.rikkahub.R
+import me.rerere.rikkahub.data.event.AppEvent
+import me.rerere.rikkahub.data.event.AppEventBus
 import me.rerere.rikkahub.utils.Emoji
 import me.rerere.rikkahub.utils.EmojiData
 import org.koin.compose.koinInject
@@ -78,8 +85,7 @@ fun EmojiPicker(
         Box(modifier = modifier) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height.dp)
+                    .then(if (height == Int.MAX_VALUE) Modifier.fillMaxSize() else Modifier.fillMaxWidth().height(height.dp))
                     .background(
                         MaterialTheme.colorScheme.surface,
                         RoundedCornerShape(12.dp)
@@ -188,7 +194,7 @@ fun EmojiPicker(
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 40.dp),
                     state = lazyListState,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
                     contentPadding = PaddingValues(4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -315,5 +321,41 @@ private fun EmojiModifierPicker(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EmojiPickerPage(
+    onBack: () -> Unit,
+) {
+    val eventBus = koinInject<AppEventBus>()
+    val coroutineScope = rememberCoroutineScope()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("选择表情") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(HugeIcons.ArrowLeft01, contentDescription = "返回")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        EmojiPicker(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            onEmojiSelected = { emoji ->
+                coroutineScope.launch {
+                    eventBus.emit(AppEvent.EmojiSelected(emoji.emoji))
+                }
+                onBack()
+            },
+            showSearch = true,
+            height = Int.MAX_VALUE
+        )
     }
 }

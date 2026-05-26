@@ -77,6 +77,7 @@ class GenerationHandler(
         maxSteps: Int = 256,
         processingStatus: MutableStateFlow<String?> = MutableStateFlow(null),
         conversationSystemPrompt: String? = null,
+        pluginPromptInjections: List<String> = emptyList(),
     ): Flow<GenerationChunk> = flow {
         val provider = model.findProvider(settings.providers) ?: error("Provider not found")
         val providerImpl = providerManager.getProviderByType(provider)
@@ -123,6 +124,7 @@ class GenerationHandler(
                     assistant = assistant,
                     settings = settings,
                     messages = messages,
+                    pluginPromptInjections = pluginPromptInjections,
                     onUpdateMessages = {
                         messages = it.transforms(
                             transformers = outputTransformers,
@@ -332,6 +334,7 @@ class GenerationHandler(
         assistant: Assistant,
         settings: Settings,
         messages: List<UIMessage>,
+        pluginPromptInjections: List<String> = emptyList(),
         onUpdateMessages: suspend (List<UIMessage>) -> Unit,
         transformers: List<MessageTransformer>,
         model: Model,
@@ -373,6 +376,15 @@ class GenerationHandler(
                 tools.forEach { tool ->
                     appendLine()
                     append(tool.systemPrompt(model, messages))
+                }
+
+                // 插件提示词注入
+                if (pluginPromptInjections.isNotEmpty()) {
+                    pluginPromptInjections.forEach { injection ->
+                        appendLine()
+                        appendLine()
+                        append(injection)
+                    }
                 }
             }
             if (system.isNotBlank()) add(UIMessage.system(prompt = system))
