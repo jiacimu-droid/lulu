@@ -88,7 +88,22 @@ data class PluginManifest(
      * 插件通过此字段声明需要监听的事件和对应的处理函数
      * 支持的事件: message_sent, message_received, daily_cron
      */
-    val hooks: List<PluginHook> = emptyList()
+    val hooks: List<PluginHook> = emptyList(),
+
+    /**
+     * 插件权限声明
+     * 支持的权限:
+     * - "ai_chat": 允许插件调用 AI 生成文本（Bridge.callAI）
+     * - "disable_native_selection": 禁用 WebView 原生长按选择菜单，由 JS 自行处理选区
+     */
+    val permissions: List<String> = emptyList(),
+
+    /**
+     * 插件事件钩子配置（结构化版本）
+     * key 为事件名，如 "onPageTurn", "onAnnotationAdded"
+     * value 为该事件的配置，支持 call_js_function 或 call_ai 两种 action
+     */
+    val hookConfigs: Map<String, PluginHookConfig> = emptyMap()
 )
 
 /**
@@ -234,4 +249,40 @@ data class PluginHook(
      * 例如: "0 3 * * *" 表示每天凌晨3点
      */
     val schedule: String? = null
+)
+
+/**
+ * 插件事件钩子配置（结构化版本）
+ * 用于 WebView 插件的页面事件（如翻页、添加批注等）
+ */
+@Serializable
+data class PluginHookConfig(
+    /**
+     * 动作类型
+     * - "call_js_function": 调用插件 JS 导出的函数
+     * - "call_ai": 调用 AI 生成文本
+     */
+    val action: String,
+
+    /**
+     * JS 函数名（当 action = "call_js_function" 时必填）
+     */
+    val function: String? = null,
+
+    /**
+     * 是否自动触发（当事件发生时自动执行，无需用户手动触发）
+     */
+    val autoTrigger: Boolean = false,
+
+    /**
+     * AI 提示模板（当 action = "call_ai" 时必填）
+     * 支持变量替换: {book}, {chapter}, {page}, {quote}, {note}
+     * 例如: "用户在《{book}》第{chapter}章第{page}页写了一条批注：\n引用：「{quote}」\n心得：{note}"
+     */
+    val promptTemplate: String? = null,
+
+    /**
+     * 额外参数
+     */
+    val params: Map<String, String> = emptyMap()
 )
