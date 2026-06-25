@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - "website/**"
-      - ".github/workflows/deploy-website.yml"
   workflow_dispatch:
     inputs:
       release_tag:
