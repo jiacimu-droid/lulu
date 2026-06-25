@@ -1,6 +1,12 @@
 name: Signed APK Build
 
 on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "website/**"
+      - ".github/workflows/deploy-website.yml"
   workflow_dispatch:
     inputs:
       release_tag:
@@ -83,7 +89,7 @@ jobs:
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || '' }}
         run: |
           set -euo pipefail
 
