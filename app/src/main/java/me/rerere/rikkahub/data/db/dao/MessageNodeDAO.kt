@@ -46,6 +46,9 @@ interface MessageNodeDAO {
 
     @RawQuery
     suspend fun getMessageCountPerDayRaw(query: SupportSQLiteQuery): List<MessageDayCount>
+
+    @RawQuery
+    suspend fun getCacheRecordsRaw(query: SupportSQLiteQuery): List<MessageCacheRecord>
 }
 
 data class MessageTokenStats(
@@ -57,6 +60,18 @@ data class MessageTokenStats(
 
 data class MessageDayCount(val day: String, val count: Int)
 
+data class MessageCacheRecord(
+    val conversationId: String = "",
+    val title: String = "",
+    val messageId: String = "",
+    val createdAt: String = "",
+    val model: String = "",
+    val role: String = "",
+    val promptTokens: Long = 0,
+    val completionTokens: Long = 0,
+    val cachedTokens: Long = 0,
+)
+
 // SQLite json_each() 展开 messages JSON 数组，json_extract() 提取 Token 字段并聚合
 private val TOKEN_STATS_SQL = SimpleSQLiteQuery(
     "SELECT COUNT(*) AS totalMessages, " +
@@ -67,6 +82,28 @@ private val TOKEN_STATS_SQL = SimpleSQLiteQuery(
 )
 
 suspend fun MessageNodeDAO.getTokenStats(): MessageTokenStats = getTokenStatsRaw(TOKEN_STATS_SQL)
+
+suspend fun MessageNodeDAO.getCacheRecords(limit: Int = 80): List<MessageCacheRecord> =
+    getCacheRecordsRaw(
+        SimpleSQLiteQuery(
+            "SELECT mn.conversation_id AS conversationId, " +
+                "COALESCE(c.title, '') AS title, " +
+                "COALESCE(json_extract(j.value, '$.id'), '') AS messageId, " +
+                "COALESCE(json_extract(j.value, '$.createdAt'), '') AS createdAt, " +
+                "COALESCE(json_extract(j.value, '$.model'), '') AS model, " +
+                "COALESCE(json_extract(j.value, '$.role'), '') AS role, " +
+                "COALESCE(CAST(json_extract(j.value, '$.usage.promptTokens') AS INTEGER), 0) AS promptTokens, " +
+                "COALESCE(CAST(json_extract(j.value, '$.usage.completionTokens') AS INTEGER), 0) AS completionTokens, " +
+                "COALESCE(CAST(json_extract(j.value, '$.usage.cachedTokens') AS INTEGER), 0) AS cachedTokens " +
+                "FROM message_node mn " +
+                "LEFT JOIN ConversationEntity c ON c.id = mn.conversation_id, json_each(mn.messages) j " +
+                "WHERE COALESCE(CAST(json_extract(j.value, '$.usage.promptTokens') AS INTEGER), 0) > 0 " +
+                "OR COALESCE(CAST(json_extract(j.value, '$.usage.completionTokens') AS INTEGER), 0) > 0 " +
+                "OR COALESCE(CAST(json_extract(j.value, '$.usage.cachedTokens') AS INTEGER), 0) > 0 " +
+                "ORDER BY COALESCE(json_extract(j.value, '$.createdAt'), '') DESC LIMIT ?",
+            arrayOf(limit),
+        )
+    )
 
 // 按用户消息的 createdAt 字段（LocalDateTime ISO 字符串前10位即日期）统计每日消息数
 suspend fun MessageNodeDAO.getMessageCountPerDay(startDate: String): List<MessageDayCount> =

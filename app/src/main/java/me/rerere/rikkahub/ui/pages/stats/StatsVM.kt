@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.rerere.rikkahub.data.db.dao.ConversationDAO
+import me.rerere.rikkahub.data.db.dao.MessageCacheRecord
 import me.rerere.rikkahub.data.db.dao.MessageNodeDAO
+import me.rerere.rikkahub.data.db.dao.getCacheRecords
 import me.rerere.rikkahub.data.db.dao.getMessageCountPerDay
 import me.rerere.rikkahub.data.db.dao.getTokenStats
 import me.rerere.rikkahub.data.datastore.SettingsStore
@@ -24,6 +26,7 @@ data class AppStats(
     val totalPromptTokens: Long = 0L,
     val totalCompletionTokens: Long = 0L,
     val totalCachedTokens: Long = 0L,
+    val cacheRecords: List<MessageCacheRecord> = emptyList(),
     val conversationsPerDay: Map<LocalDate, Int> = emptyMap(),
     val launchCount: Int = 0,
 )
@@ -66,6 +69,7 @@ class StatsVM(
 
         // json_each() + json_extract() 在 SQLite 侧聚合，不再加载完整 JSON 到 Kotlin
         val tokenStats = messageNodeDAO.getTokenStats()
+        val cacheRecords = messageNodeDAO.getCacheRecords()
 
         val launchCount = settingsStore.settingsFlow.value.launchCount
 
@@ -76,6 +80,7 @@ class StatsVM(
             totalPromptTokens = tokenStats.promptTokens,
             totalCompletionTokens = tokenStats.completionTokens,
             totalCachedTokens = tokenStats.cachedTokens,
+            cacheRecords = cacheRecords,
             conversationsPerDay = conversationsPerDay,
             launchCount = launchCount,
         )

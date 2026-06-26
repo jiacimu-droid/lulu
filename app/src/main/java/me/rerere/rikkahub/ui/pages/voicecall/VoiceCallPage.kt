@@ -170,8 +170,13 @@ fun VoiceCallPage(
         scope.launch {
             delay(1_800)
             stage = CallStage.Active
+            val opening = chatService.sendVoiceCallTurn(
+                conversationId = Uuid.parse(conversationId),
+                text = "电话接通了，你先和我说句话吧。",
+            )
             assistantSay(
-                text = "I picked up. I am here with you. Take your time and talk to me when you are ready.",
+                text = opening?.takeIf { it.isNotBlank() }
+                    ?: "${assistantName}接到电话了。我在这里陪着你，慢慢说就好。",
                 replayable = true,
             )
         }
@@ -300,7 +305,7 @@ fun VoiceCallPage(
     Scaffold(
         topBar = {
             LargeFlexibleTopAppBar(
-                title = { Text(if (isHistoryOnly) "Call record" else "Voice call") },
+                title = { Text(if (isHistoryOnly) "通话记录" else "语音通话") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(HugeIcons.ArrowLeft02, contentDescription = null)
@@ -333,7 +338,7 @@ fun VoiceCallPage(
     ) { padding ->
         if (currentSession == null) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Preparing call...")
+                Text("准备通话中...")
             }
             return@Scaffold
         }
@@ -447,7 +452,7 @@ fun VoiceCallHistoryPage(
     ) { padding ->
         if (sessions.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("No call history yet")
+                Text("还没有通话记录")
             }
             return@Scaffold
         }
@@ -516,11 +521,11 @@ private fun IdleCallPanel(
             tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(Modifier.height(14.dp))
-        Text("Ready to call $assistantName", style = MaterialTheme.typography.titleMedium)
+        Text("准备呼叫 $assistantName", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(18.dp))
         FilledTonalButton(onClick = onStartCall) {
             Icon(HugeIcons.Call02, contentDescription = null)
-            Text("Start call")
+            Text("开始通话")
         }
     }
 }
@@ -555,9 +560,9 @@ private fun ConnectingPanel(assistantName: String) {
             )
         }
         Spacer(Modifier.height(16.dp))
-        Text("Calling $assistantName...", style = MaterialTheme.typography.titleMedium)
+        Text("正在呼叫 $assistantName...", style = MaterialTheme.typography.titleMedium)
         Text(
-            "Connecting",
+            "正在接通",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -621,9 +626,9 @@ private fun TranscriptLine(
     ) {
         Text(
             text = when (line.role) {
-                VoiceCallRole.User -> "Me"
-                VoiceCallRole.Assistant -> "Assistant"
-                VoiceCallRole.System -> "System"
+                VoiceCallRole.User -> "我"
+                VoiceCallRole.Assistant -> "对方"
+                VoiceCallRole.System -> "系统"
             },
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -669,7 +674,7 @@ private fun SleepModePanel(
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(HugeIcons.Moon02, contentDescription = null)
-                    Text("Sleep call mode", fontWeight = FontWeight.Medium)
+                    Text("哄睡通话模式", fontWeight = FontWeight.Medium)
                 }
                 Switch(checked = enabled, onCheckedChange = onEnabledChange)
             }
@@ -716,7 +721,7 @@ private fun VoiceCallHistoryItem(
                 )
             }
             Text(
-                "${session.transcript.count { it.role != VoiceCallRole.System }} lines",
+                "${session.transcript.count { it.role != VoiceCallRole.System }} 条记录",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -766,18 +771,18 @@ private fun statusText(
     sleepMode: Boolean,
     isHistoryOnly: Boolean,
 ): String {
-    if (isHistoryOnly) return "Saved call record"
-    if (stage == CallStage.Idle) return "Ready"
+    if (isHistoryOnly) return "已保存的通话记录"
+    if (stage == CallStage.Idle) return "准备通话"
     if (sleepMode) return "Sleep mode"
-    if (stage == CallStage.Connecting) return "Connecting"
-    if (stage == CallStage.Ended) return "Ended"
+    if (stage == CallStage.Connecting) return "正在接通"
+    if (stage == CallStage.Ended) return "已挂断"
     if (isSpeaking) return "Speaking"
     return when (asrStatus) {
-        ASRStatus.Connecting -> "Preparing microphone"
+        ASRStatus.Connecting -> "正在准备麦克风"
         ASRStatus.Listening -> "Listening"
         ASRStatus.Stopping -> "Thinking"
         ASRStatus.Error -> "Mic error"
-        ASRStatus.Idle -> "Ready"
+        ASRStatus.Idle -> "准备倾听"
     }
 }
 
@@ -798,14 +803,14 @@ private suspend fun waitForTtsPlayback(tts: CustomTtsState) {
 
 private fun buildSleepTalkSegments(assistantName: String): List<String> {
     return listOf(
-        "$assistantName is here with you. You do not need to answer.",
+        "$assistantName在这里陪着你。你不需要回答，闭上眼睛听就好。",
         "Tonight you can stop trying so hard. You are safe, and you are loved.",
         "Breathe in gently. Hold it for a small moment. Now breathe out a little longer.",
         "You made it through today. That is enough. Let the bed take more of your weight.",
         "Imagine a warm room with quiet rain outside.",
         "The blanket is pulled up to your shoulder, and a small light is still on.",
         "If there are unfinished things in your head, let them wait at the door.",
-        "They do not need to come into bed with you.",
+        "不需要急着睡着，也不需要回应我。",
         "Relax your forehead. Let your jaw loosen. Let your shoulders fall.",
         "Your hands can unclench. Your chest can soften. Your legs and feet can become heavy.",
         "Let me tell you a little scene. We are walking beside a calm lake at night.",

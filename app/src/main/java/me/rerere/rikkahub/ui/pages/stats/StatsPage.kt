@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
@@ -40,9 +41,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.rerere.rikkahub.R
+import me.rerere.rikkahub.data.db.dao.MessageCacheRecord
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.utils.plus
@@ -93,6 +96,12 @@ fun StatsPage(vm: StatsVM = koinViewModel()) {
                     )
                 }
                 item {
+                    CacheRecordsCard(
+                        records = stats.cacheRecords,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    )
+                }
+                item {
                     HeatmapCard(
                         conversationsPerDay = stats.conversationsPerDay,
                         modifier = Modifier.padding(horizontal = 8.dp),
@@ -116,9 +125,6 @@ private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
     } else {
         0f
     }
-    val cachedDiscount = 0.15f
-    val savedTokenEquivalent = (stats.totalCachedTokens * (1f - cachedDiscount)).toLong()
-
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CustomColors.cardColorsOnSurfaceContainer,
@@ -152,7 +158,7 @@ private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
             }
 
             LinearProgressIndicator(
-                progress = cacheRate.coerceIn(0f, 1f),
+                progress = { cacheRate.coerceIn(0f, 1f) },
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -172,17 +178,116 @@ private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
                 )
                 CacheMetric(
                     modifier = Modifier.weight(1f),
-                    label = "约省",
-                    value = formatTokens(savedTokenEquivalent),
+                    label = "记录数",
+                    value = stats.cacheRecords.size.toString(),
                 )
             }
 
             Text(
-                text = "按缓存 1.5 折估算；普通聊天和电话通话只要走同一聊天链路，都会被统计进来。",
+                text = "下面按每次 AI 回复记录缓存读取量和缓存率，最新记录排在最前。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+@Composable
+private fun CacheRecordsCard(records: List<MessageCacheRecord>, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CustomColors.cardColorsOnSurfaceContainer,
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("缓存明细", style = MaterialTheme.typography.titleMedium)
+                Text("最新 ${records.size} 条", style = MaterialTheme.typography.bodySmall)
+            }
+
+            if (records.isEmpty()) {
+                Text(
+                    text = "还没有带 token 用量的记录。聊天或电话回复完成后会自动出现在这里。",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                records.forEachIndexed { index, record ->
+                    CacheRecordRow(record = record)
+                    if (index != records.lastIndex) {
+                        HorizontalDivider()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CacheRecordRow(record: MessageCacheRecord) {
+    val cacheRate = if (record.promptTokens > 0) {
+        record.cachedTokens.toFloat() / record.promptTokens.toFloat() * 100
+    } else {
+        0f
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = record.title.ifBlank { "聊天/电话请求" },
+                style = MaterialTheme.typography.titleSmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = record.createdAt.asShortTime(),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            CachePill("输入", formatTokens(record.promptTokens))
+            CachePill("输出", formatTokens(record.completionTokens))
+            CachePill("缓存", formatTokens(record.cachedTokens))
+            CachePill("缓存率", "${cacheRate.formatPercent()}%")
+        }
+        if (record.model.isNotBlank()) {
+            Text(
+                text = record.model,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CachePill(label: String, value: String) {
+    Column(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(text = value, style = MaterialTheme.typography.labelMedium)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -478,3 +583,10 @@ private fun formatTokens(count: Long): String = when {
 }
 
 private fun Float.formatPercent(): String = "%.1f".format(this)
+
+private fun String.asShortTime(): String {
+    if (isBlank()) return "--"
+    val date = take(10)
+    val time = substringAfter('T', "").take(5)
+    return if (time.isBlank()) date else "$date $time"
+}
