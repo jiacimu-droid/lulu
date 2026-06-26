@@ -27,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFlexibleTopAppBar
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -86,6 +87,12 @@ fun StatsPage(vm: StatsVM = koinViewModel()) {
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 item {
+                    CacheStatsCard(
+                        stats = stats,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    )
+                }
+                item {
                     HeatmapCard(
                         conversationsPerDay = stats.conversationsPerDay,
                         modifier = Modifier.padding(horizontal = 8.dp),
@@ -99,6 +106,102 @@ fun StatsPage(vm: StatsVM = koinViewModel()) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
+    val cacheRate = if (stats.totalPromptTokens > 0) {
+        stats.totalCachedTokens.toFloat() / stats.totalPromptTokens.toFloat()
+    } else {
+        0f
+    }
+    val cachedDiscount = 0.15f
+    val savedTokenEquivalent = (stats.totalCachedTokens * (1f - cachedDiscount)).toLong()
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CustomColors.cardColorsOnSurfaceContainer,
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = HugeIcons.Zap,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(22.dp),
+                    )
+                    Text("缓存统计", style = MaterialTheme.typography.titleMedium)
+                }
+                Text(
+                    text = "${(cacheRate * 100).formatPercent()}%",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
+            LinearProgressIndicator(
+                progress = cacheRate.coerceIn(0f, 1f),
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                CacheMetric(
+                    modifier = Modifier.weight(1f),
+                    label = "输入",
+                    value = formatTokens(stats.totalPromptTokens),
+                )
+                CacheMetric(
+                    modifier = Modifier.weight(1f),
+                    label = "缓存读取",
+                    value = formatTokens(stats.totalCachedTokens),
+                )
+                CacheMetric(
+                    modifier = Modifier.weight(1f),
+                    label = "约省",
+                    value = formatTokens(savedTokenEquivalent),
+                )
+            }
+
+            Text(
+                text = "按缓存 1.5 折估算；普通聊天和电话通话只要走同一聊天链路，都会被统计进来。",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CacheMetric(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(value, style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -373,3 +476,5 @@ private fun formatTokens(count: Long): String = when {
     count >= 1_000 -> "%.1fK".format(count / 1_000.0)
     else -> count.toString()
 }
+
+private fun Float.formatPercent(): String = "%.1f".format(this)
