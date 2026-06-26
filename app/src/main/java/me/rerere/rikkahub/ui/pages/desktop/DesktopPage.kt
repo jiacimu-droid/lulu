@@ -91,7 +91,7 @@ fun DesktopPage() {
 
     val apps = remember {
         listOf(
-            DesktopApp("考研", HugeIcons.BookOpen02, "study") {},
+            DesktopApp("考研", HugeIcons.BookOpen02, "study") { navController.navigate(Screen.Study) },
             DesktopApp("聊天", HugeIcons.BubbleChat, "chat") { navController.navigate(Screen.ChatRooms) },
             DesktopApp("我的", HugeIcons.User, "user") { navController.navigate(Screen.UserProfile) },
             DesktopApp("缓存统计", HugeIcons.Chart, "stats") { navController.navigate(Screen.Stats) },

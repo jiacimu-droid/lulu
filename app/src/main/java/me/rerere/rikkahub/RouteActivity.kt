@@ -122,6 +122,8 @@ import me.rerere.rikkahub.plugin.webview.PluginWebViewPage
 import me.rerere.rikkahub.ui.pages.memory.MemoryBankPage
 import me.rerere.rikkahub.ui.components.ui.EmojiPickerPage
 import me.rerere.rikkahub.ui.pages.share.handler.ShareHandlerPage
+import me.rerere.rikkahub.ui.pages.study.StudyPage
+import me.rerere.rikkahub.ui.pages.study.StudyPomodoroPage
 import me.rerere.rikkahub.ui.pages.stats.StatsPage
 import me.rerere.rikkahub.ui.pages.translator.TranslatorPage
 import me.rerere.rikkahub.ui.pages.voicecall.VoiceCallHistoryPage
@@ -337,6 +339,14 @@ class RouteActivity : ComponentActivity() {
 
                             entry<Screen.ChatRooms> {
                                 ChatRoomsPage()
+                            }
+
+                            entry<Screen.Study> {
+                                StudyPage()
+                            }
+
+                            entry<Screen.StudyPomodoro> {
+                                StudyPomodoroPage()
                             }
 
                             entry<Screen.UserProfile> {
@@ -646,6 +656,12 @@ class RouteActivity : ComponentActivity() {
 sealed interface Screen : NavKey {
     @Serializable
     data object Desktop : Screen
+
+    @Serializable
+    data object Study : Screen
+
+    @Serializable
+    data object StudyPomodoro : Screen
 
     @Serializable
     data object ChatRooms : Screen
