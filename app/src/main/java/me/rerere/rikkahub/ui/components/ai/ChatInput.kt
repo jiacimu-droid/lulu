@@ -93,8 +93,10 @@ import me.rerere.common.android.appTempFolder
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Add01
 import me.rerere.hugeicons.stroke.ArrowUp02
+import me.rerere.hugeicons.stroke.Call02
 import me.rerere.hugeicons.stroke.Cancel01
 import me.rerere.hugeicons.stroke.FullScreen
+import me.rerere.hugeicons.stroke.TransactionHistory
 import me.rerere.hugeicons.stroke.Zap
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.ai.mcp.McpManager
@@ -144,6 +146,8 @@ fun ChatInput(
     onSendClick: () -> Unit,
     onLongSendClick: () -> Unit,
     onVoiceMessage: ((url: String, duration: Long, transcript: String) -> Unit)? = null,
+    onStartVoiceCall: (() -> Unit)? = null,
+    onOpenVoiceCallHistory: (() -> Unit)? = null,
     autoStartVoice: Boolean = false,
 ) {
     val toaster = LocalToaster.current
@@ -598,6 +602,26 @@ fun ChatInput(
                                     imageVector = if (expand == ExpandState.Files) HugeIcons.Cancel01 else HugeIcons.Add01,
                                     contentDescription = stringResource(R.string.more_options)
                                 )
+                            }
+
+                            if (onStartVoiceCall != null) {
+                                ActionIconButton(onClick = onStartVoiceCall) {
+                                    Icon(
+                                        imageVector = HugeIcons.Call02,
+                                        contentDescription = "Voice call",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+
+                            if (onOpenVoiceCallHistory != null) {
+                                ActionIconButton(onClick = onOpenVoiceCallHistory) {
+                                    Icon(
+                                        imageVector = HugeIcons.TransactionHistory,
+                                        contentDescription = "Voice call history",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
 
                             // Voice button: click to record, click again to stop and insert transcript

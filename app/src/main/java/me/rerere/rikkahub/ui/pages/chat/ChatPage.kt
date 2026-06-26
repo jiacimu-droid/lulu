@@ -332,6 +332,22 @@ private fun ChatPageContent(
                             chatListState.requestScrollToItem(conversation.currentMessages.size + 5)
                         }
                     },
+                    onStartVoiceCall = {
+                        navController.navigate(
+                            me.rerere.rikkahub.Screen.VoiceCall(
+                                conversationId = conversation.id.toString(),
+                                assistantId = conversation.assistantId.toString(),
+                            )
+                        )
+                    },
+                    onOpenVoiceCallHistory = {
+                        navController.navigate(
+                            me.rerere.rikkahub.Screen.VoiceCallHistory(
+                                conversationId = conversation.id.toString(),
+                                assistantId = conversation.assistantId.toString(),
+                            )
+                        )
+                    },
                     onLongSendClick = {
                         if (inputState.isEditing()) {
                             vm.handleMessageEdit(

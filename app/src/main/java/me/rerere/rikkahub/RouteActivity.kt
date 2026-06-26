@@ -123,6 +123,8 @@ import me.rerere.rikkahub.ui.components.ui.EmojiPickerPage
 import me.rerere.rikkahub.ui.pages.share.handler.ShareHandlerPage
 import me.rerere.rikkahub.ui.pages.stats.StatsPage
 import me.rerere.rikkahub.ui.pages.translator.TranslatorPage
+import me.rerere.rikkahub.ui.pages.voicecall.VoiceCallHistoryPage
+import me.rerere.rikkahub.ui.pages.voicecall.VoiceCallPage
 import me.rerere.rikkahub.ui.pages.webview.WebViewPage
 import me.rerere.rikkahub.ui.theme.LocalDarkMode
 import me.rerere.rikkahub.ui.theme.RikkahubTheme
@@ -344,6 +346,21 @@ class RouteActivity : ComponentActivity() {
                                     files = key.files.map { it.toUri() },
                                     nodeId = key.nodeId?.let { Uuid.parse(it) },
                                     autoStartVoice = key.autoStartVoice,
+                                )
+                            }
+
+                            entry<Screen.VoiceCall> { key ->
+                                VoiceCallPage(
+                                    conversationId = key.conversationId,
+                                    assistantId = key.assistantId,
+                                    sessionId = key.sessionId,
+                                )
+                            }
+
+                            entry<Screen.VoiceCallHistory> { key ->
+                                VoiceCallHistoryPage(
+                                    conversationId = key.conversationId,
+                                    assistantId = key.assistantId,
                                 )
                             }
 
@@ -627,6 +644,19 @@ sealed interface Screen : NavKey {
         val files: List<String> = emptyList(),
         val nodeId: String? = null,
         val autoStartVoice: Boolean = false,
+    ) : Screen
+
+    @Serializable
+    data class VoiceCall(
+        val conversationId: String,
+        val assistantId: String,
+        val sessionId: String? = null,
+    ) : Screen
+
+    @Serializable
+    data class VoiceCallHistory(
+        val conversationId: String,
+        val assistantId: String,
     ) : Screen
 
     @Serializable
