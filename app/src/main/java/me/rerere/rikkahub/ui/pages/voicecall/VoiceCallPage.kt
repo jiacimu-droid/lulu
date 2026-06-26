@@ -803,7 +803,7 @@ private suspend fun waitForTtsPlayback(tts: CustomTtsState) {
 
 private fun buildSleepTalkSegments(assistantName: String): List<String> {
     return listOf(
-        "$assistantName在这里陪着你。你不需要回答，闭上眼睛听就好。",
+        "${assistantName}在这里陪着你。你不需要回答，闭上眼睛听就好。",
         "Tonight you can stop trying so hard. You are safe, and you are loved.",
         "Breathe in gently. Hold it for a small moment. Now breathe out a little longer.",
         "You made it through today. That is enough. Let the bed take more of your weight.",
