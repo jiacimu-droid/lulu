@@ -24,6 +24,7 @@ object TimeReminderTransformer : InputMessageTransformer {
     ): List<UIMessage> {
         return applyTimeReminder(
             messages = messages,
+            requestInstant = Clock.System.now(),
             includeHistoricalGaps = ctx.assistant.enableTimeReminder
         )
     }
