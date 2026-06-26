@@ -21,11 +21,37 @@ class TTSProviderSettingMiniMaxTest {
     }
 
     @Test
-    fun minimax_normalizes_old_unknown_default_model() {
+    fun minimax_normalizes_blank_model_to_default() {
         assertEquals(
             TTSProviderSetting.MiniMax.DEFAULT_MODEL,
+            TTSProviderSetting.MiniMax.normalizeModel(" ")
+        )
+    }
+
+    @Test
+    fun minimax_preserves_supported_speech_2_6_model() {
+        assertEquals(
+            "speech-2.6-turbo",
             TTSProviderSetting.MiniMax.normalizeModel("speech-2.6-turbo")
         )
+    }
+
+    @Test
+    fun minimax_supported_models_include_current_official_models() {
+        val supportedModels = TTSProviderSetting.MiniMax.SUPPORTED_MODELS
+
+        listOf(
+            "speech-2.8-hd",
+            "speech-2.8-turbo",
+            "speech-2.6-hd",
+            "speech-2.6-turbo",
+            "speech-02-hd",
+            "speech-02-turbo",
+            "speech-01-hd",
+            "speech-01-turbo",
+        ).forEach { model ->
+            assertTrue("Missing MiniMax model: $model", supportedModels.contains(model))
+        }
     }
 
     @Test

@@ -65,14 +65,12 @@ internal class MiniMaxSseProcessor(
     fun process(event: SseEvent): AudioChunk? {
         return when (event) {
             is SseEvent.Open -> {
-                Log.i(TAG, "SSE connection opened")
                 null
             }
 
             is SseEvent.Event -> processData(event.data)
 
             is SseEvent.Closed -> {
-                Log.i(TAG, "SSE connection closed")
                 if (!hasAudio) {
                     throw IllegalStateException(
                         "MiniMax TTS returned no audio. Check API Key, Group ID, model, and voice ID."

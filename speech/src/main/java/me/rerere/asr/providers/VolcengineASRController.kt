@@ -64,6 +64,14 @@ class VolcengineASRController(
 
     override fun start(onTranscriptChange: (String) -> Unit) {
         if (state.value.isRecording) return
+        if (provider.apiKey.isBlank()) {
+            setError("Volcengine API Key is required")
+            return
+        }
+        if (provider.resourceId.isBlank()) {
+            setError("Volcengine X-Api-Resource-Id is required")
+            return
+        }
         if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.RECORD_AUDIO
@@ -113,7 +121,7 @@ class VolcengineASRController(
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 Log.e(TAG, "Volcengine ASR websocket failed", t)
                 releaseRecorder()
-                setError(t.message ?: "ASR websocket failed")
+                setError(buildFailureMessage(t, response))
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
@@ -350,6 +358,30 @@ class VolcengineASRController(
 
         private fun gzipDecompress(data: ByteArray): ByteArray {
             return GZIPInputStream(data.inputStream()).use { it.readBytes() }
+        }
+
+        private fun buildFailureMessage(t: Throwable, response: Response?): String {
+            val baseMessage = t.message ?: "ASR websocket failed"
+            if (response == null) return baseMessage
+
+            val responseBody = runCatching {
+                response.body?.string()?.take(500)
+            }.getOrNull()
+
+            return buildString {
+                append(baseMessage)
+                append(" (HTTP ")
+                append(response.code)
+                if (response.message.isNotBlank()) {
+                    append(' ')
+                    append(response.message)
+                }
+                append(')')
+                if (!responseBody.isNullOrBlank()) {
+                    append(": ")
+                    append(responseBody)
+                }
+            }
         }
     }
 }
