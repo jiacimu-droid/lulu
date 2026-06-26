@@ -10,17 +10,20 @@ import me.rerere.rikkahub.utils.toLocalTime
 import java.io.Reader
 import java.io.StringReader
 import java.io.StringWriter
+import java.time.Clock
 import java.time.Instant
 
 class TemplateTransformer(
     private val engine: PebbleEngine,
-    private val settingsStore: SettingsStore
+    private val settingsStore: SettingsStore,
+    private val clock: Clock = Clock.systemDefaultZone(),
 ) : InputMessageTransformer {
     override suspend fun transform(
         ctx: TransformerContext,
         messages: List<UIMessage>,
     ): List<UIMessage> {
         val template = engine.getTemplate(ctx.assistant.id.toString())
+        val now = Instant.now(clock)
         return messages.map { message ->
             message.copy(
                 parts = message.parts.map { part ->
@@ -31,8 +34,8 @@ class TemplateTransformer(
                                 result, mapOf(
                                     "message" to part.text,
                                     "role" to message.role.name.lowercase(),
-                                    "time" to Instant.now().toLocalTime(),
-                                    "date" to Instant.now().toLocalDate(),
+                                    "time" to now.toLocalTime(),
+                                    "date" to now.toLocalDate(),
                                 )
                             )
                             part.copy(
