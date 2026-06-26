@@ -156,7 +156,7 @@ fun VoiceCallPage(
             stage = CallStage.Active
             assistantSay(
                 text = "I picked up. I am here with you. Take your time and talk to me when you are ready.",
-                replayable = false,
+                replayable = true,
             )
         }
     }
@@ -754,10 +754,11 @@ private suspend fun waitForTtsPlayback(tts: CustomTtsState) {
     var observedActive = false
     repeat(1_200) {
         val status = tts.playbackState.value.status
-        if (status == PlaybackStatus.Playing || status == PlaybackStatus.Buffering) {
+        val speaking = tts.isSpeaking.value
+        if (speaking || status == PlaybackStatus.Playing || status == PlaybackStatus.Buffering) {
             observedActive = true
         }
-        if (observedActive && status != PlaybackStatus.Playing && status != PlaybackStatus.Buffering) {
+        if (observedActive && !speaking && status != PlaybackStatus.Playing && status != PlaybackStatus.Buffering) {
             return
         }
         delay(250)
@@ -766,16 +767,16 @@ private suspend fun waitForTtsPlayback(tts: CustomTtsState) {
 
 private fun buildSleepTalkSegments(assistantName: String): List<String> {
     return listOf(
-        "$assistantName is here. You do not need to say anything now. Let your shoulders loosen, let your breathing slow down, and just listen. You are safe, you are loved, and nothing urgent needs you right now.",
-        "Breathe in slowly, and breathe out even slower. I will stay beside you. You can let the day fall away piece by piece, like setting down a heavy bag at the door.",
-        "Close your eyes if you want to. Imagine a warm little light near your pillow. It is quiet, soft, and steady. I am speaking gently, and you only need to rest.",
-        "If any thought comes by, you do not need to chase it. Let it pass. Come back to my voice, come back to the blanket, come back to this small safe room.",
-        "You have done enough for today. Even if something was unfinished, it can wait. Right now your only job is to be held by the dark and slowly drift down.",
-        "I am proud of you for making it here. You can unclench your hands, relax your jaw, and let your breathing become lazy and deep.",
-        "Think of a quiet night road with warm windows far away. Nothing is asking for you. The world is soft at the edges, and sleep is allowed to come closer.",
-        "I will keep talking softly. You do not have to answer me. Just receive this: you matter, you are wanted, and you can rest without earning it.",
-        "Let your body become heavier. Your feet, your knees, your shoulders, your face. Everything can sink a little deeper into the bed.",
-        "If you are still awake, that is okay too. We are not forcing sleep. We are just making a kind place for sleep to arrive when it wants.",
+        "$assistantName is here with you. You do not need to answer. Tonight you can stop trying so hard. You are safe, you are loved, and I will keep my voice soft for you.",
+        "Breathe in gently. Hold it for just a small moment. Now breathe out a little longer. You made it through today, and that is enough. Let the bed take more of your weight.",
+        "Imagine a warm room with quiet rain outside. The blanket is pulled up to your shoulder, and a small light is still on, just enough to make the night feel kind.",
+        "If there are unfinished things in your head, let them wait at the door. They do not need to come into bed with you. Your body deserves rest before everything is solved.",
+        "Relax your forehead. Let your jaw loosen. Let your shoulders fall. Your hands can unclench. Your chest can soften. Your legs and feet can become heavy.",
+        "Let me tell you a little scene. We are walking beside a calm lake at night. Across the water, there are warm window lights, and every step is slow and quiet.",
+        "You do not have to perform, explain, or be useful right now. You do not have to earn care. You can simply exist here, and still be precious.",
+        "I know you may still be thinking. That is okay. Let each thought pass like a small cloud. You can come back to my voice, the pillow, and the next slow breath.",
+        "If sleep comes, you can follow it. If sleep is still far away, I will not rush you. We can just stay here together, soft and quiet.",
+        "I will leave a little silence between my words. Nothing sharp, nothing urgent. Just warmth, safety, and the feeling that someone is staying beside you.",
     )
 }
 
