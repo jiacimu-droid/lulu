@@ -30,6 +30,7 @@ class VoiceCallRepository(
         assistantId: String,
         assistantName: String,
         initialLines: List<VoiceCallLine> = emptyList(),
+        persistImmediately: Boolean = true,
     ): VoiceCallSession {
         val now = System.currentTimeMillis()
         val session = VoiceCallSession(
@@ -44,11 +45,12 @@ class VoiceCallRepository(
                         role = VoiceCallRole.System,
                         text = "Voice call started",
                         timestamp = now,
+                        replayable = false,
                     )
                 )
             },
         )
-        upsertSession(session)
+        if (persistImmediately) upsertSession(session)
         return session
     }
 
@@ -63,18 +65,48 @@ class VoiceCallRepository(
         upsertSession(session.copy(transcript = session.transcript + line))
     }
 
+    fun appendLine(session: VoiceCallSession, line: VoiceCallLine): VoiceCallSession {
+        val updated = session.copy(transcript = session.transcript + line)
+        upsertSession(updated)
+        return updated
+    }
+
+    fun replaceSession(session: VoiceCallSession): VoiceCallSession {
+        upsertSession(session)
+        return session
+    }
+
     fun endSession(sessionId: String) {
         val session = getSession(sessionId) ?: return
-        if (session.status == VoiceCallStatus.Ended) return
-        upsertSession(
-            session.copy(
-                status = VoiceCallStatus.Ended,
-                endedAt = System.currentTimeMillis(),
-                transcript = session.transcript + VoiceCallLine(
-                    role = VoiceCallRole.System,
-                    text = "Voice call ended",
-                ),
-            )
-        )
+        endSession(session)
     }
+
+    fun endSession(session: VoiceCallSession): VoiceCallSession? {
+        if (!session.hasUserFacingContent()) {
+            deleteSession(session.id)
+            return null
+        }
+        if (session.status == VoiceCallStatus.Ended) return session
+        val updated = session.copy(
+            status = VoiceCallStatus.Ended,
+            endedAt = System.currentTimeMillis(),
+            transcript = session.transcript + VoiceCallLine(
+                role = VoiceCallRole.System,
+                text = "Voice call ended",
+                replayable = false,
+            ),
+        )
+        upsertSession(updated)
+        return updated
+    }
+
+    fun deleteSession(sessionId: String) {
+        val sessions = getSessions().filterNot { it.id == sessionId }
+        storageFile.parentFile?.mkdirs()
+        storageFile.writeText(JsonInstant.encodeToString(sessions.sortedByDescending { it.startedAt }))
+    }
+}
+
+fun VoiceCallSession.hasUserFacingContent(): Boolean {
+    return sleepMode || transcript.any { it.role == VoiceCallRole.User && it.text.isNotBlank() }
 }

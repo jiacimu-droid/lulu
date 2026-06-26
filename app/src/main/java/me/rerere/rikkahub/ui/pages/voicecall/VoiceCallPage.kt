@@ -1,6 +1,7 @@
 package me.rerere.rikkahub.ui.pages.voicecall
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -23,39 +26,67 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import me.rerere.asr.ASRStatus
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.ArrowLeft02
 import me.rerere.hugeicons.stroke.Call02
 import me.rerere.hugeicons.stroke.Cancel01
+import me.rerere.hugeicons.stroke.Moon02
+import me.rerere.hugeicons.stroke.PlayCircle
+import me.rerere.hugeicons.stroke.StopCircle
 import me.rerere.hugeicons.stroke.TransactionHistory
+import me.rerere.hugeicons.stroke.VolumeHigh
+import me.rerere.rikkahub.Screen
 import me.rerere.rikkahub.data.datastore.getAssistantById
+import me.rerere.rikkahub.data.model.Avatar
 import me.rerere.rikkahub.data.voicecall.VoiceCallLine
 import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
 import me.rerere.rikkahub.data.voicecall.VoiceCallRole
 import me.rerere.rikkahub.data.voicecall.VoiceCallSession
 import me.rerere.rikkahub.data.voicecall.VoiceCallStatus
+import me.rerere.rikkahub.data.voicecall.hasUserFacingContent
+import me.rerere.rikkahub.ui.components.ui.FloatingWindow
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
+import me.rerere.rikkahub.ui.context.LocalASRState
 import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.context.LocalSettings
+import me.rerere.rikkahub.ui.context.LocalTTSState
 import me.rerere.rikkahub.ui.theme.CustomColors
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.uuid.Uuid
+
+private enum class CallStage {
+    Connecting,
+    Active,
+    Ended,
+}
 
 @Composable
 fun VoiceCallPage(
@@ -67,11 +98,74 @@ fun VoiceCallPage(
     val settings = LocalSettings.current
     val context = androidx.compose.ui.platform.LocalContext.current
     val repository = remember(context) { VoiceCallRepository(context.applicationContext) }
+    val tts = LocalTTSState.current
+    val asr = LocalASRState.current
+    val asrState by asr.state.collectAsState()
+    val isSpeaking by tts.isSpeaking.collectAsState()
+    val scope = rememberCoroutineScope()
     val assistant = remember(settings, assistantId) {
         runCatching { settings.getAssistantById(Uuid.parse(assistantId)) }.getOrNull()
     }
     val assistantName = assistant?.name?.ifBlank { "Lulu" } ?: "Lulu"
+    val isHistoryOnly = sessionId != null
     var session by remember(sessionId, conversationId, assistantId) { mutableStateOf<VoiceCallSession?>(null) }
+    var stage by remember(sessionId) { mutableStateOf(if (isHistoryOnly) CallStage.Ended else CallStage.Connecting) }
+    var showMiniWindow by remember { mutableStateOf(false) }
+    var sleepMode by remember { mutableStateOf(false) }
+    var sleepMinutes by remember { mutableLongStateOf(20L) }
+    var lastTranscript by remember { mutableStateOf("") }
+    var silenceJob by remember { mutableStateOf<Job?>(null) }
+    val latestSession by rememberUpdatedState(session)
+    val latestStage by rememberUpdatedState(stage)
+
+    fun saveLine(line: VoiceCallLine, speak: Boolean = false) {
+        val current = session ?: return
+        val updated = repository.appendLine(current, line)
+        session = updated
+        if (speak && line.replayable) tts.speak(line.text, flushCalled = true)
+    }
+
+    fun assistantSay(text: String, replayable: Boolean = true) {
+        saveLine(
+            VoiceCallLine(
+                role = VoiceCallRole.Assistant,
+                text = text,
+                replayable = replayable,
+            ),
+            speak = true,
+        )
+    }
+
+    fun startListening() {
+        if (isHistoryOnly || sleepMode || stage != CallStage.Active) return
+        if (asrState.status != ASRStatus.Idle && asrState.status != ASRStatus.Error) return
+        lastTranscript = ""
+        asr.start { transcript ->
+            val text = transcript.trim()
+            if (text.isBlank() || text == lastTranscript) return@start
+            lastTranscript = text
+            silenceJob?.cancel()
+            silenceJob = scope.launch {
+                delay(2_000)
+                asr.stop()
+                val finalText = lastTranscript.trim()
+                if (finalText.isNotBlank()) {
+                    saveLine(VoiceCallLine(role = VoiceCallRole.User, text = finalText))
+                    assistantSay(buildAssistantReply(finalText))
+                }
+            }
+        }
+    }
+
+    fun endCall() {
+        silenceJob?.cancel()
+        asr.stop()
+        tts.stop()
+        val ended = session?.let { repository.endSession(it) }
+        session = ended ?: session?.copy(status = VoiceCallStatus.Ended, endedAt = System.currentTimeMillis())
+        stage = CallStage.Ended
+        if (ended == null) navController.popBackStack()
+    }
 
     LaunchedEffect(sessionId, conversationId, assistantId) {
         session = sessionId
@@ -83,31 +177,91 @@ fun VoiceCallPage(
                 initialLines = listOf(
                     VoiceCallLine(
                         role = VoiceCallRole.System,
-                        text = "Calling $assistantName",
-                    ),
-                    VoiceCallLine(
-                        role = VoiceCallRole.Assistant,
-                        text = "I am here. This page now saves the call transcript. Realtime ASR, AI replies, and voice playback can be wired into this frame next.",
+                        text = "Connecting call",
+                        replayable = false,
                     ),
                 ),
+                persistImmediately = false,
             )
+    }
+
+    LaunchedEffect(session?.id, isHistoryOnly) {
+        if (session == null || isHistoryOnly) return@LaunchedEffect
+        stage = CallStage.Connecting
+        delay(1_200)
+        stage = CallStage.Active
+        assistantSay(
+            text = "I picked up. I am here with you. Take your time and talk to me when you are ready.",
+            replayable = false,
+        )
+    }
+
+    LaunchedEffect(isSpeaking, stage, sleepMode) {
+        if (!isSpeaking && stage == CallStage.Active && !sleepMode) {
+            delay(350)
+            startListening()
+        }
+    }
+
+    LaunchedEffect(sleepMode, sleepMinutes, stage) {
+        if (!sleepMode || stage != CallStage.Active) return@LaunchedEffect
+        asr.stop()
+        val current = session ?: return@LaunchedEffect
+        val updated = repository.replaceSession(current.copy(sleepMode = true))
+        session = updated
+        assistantSay(buildSleepTalk(assistantName, sleepMinutes))
+        delay(sleepMinutes * 60_000)
+        if (stage == CallStage.Active && sleepMode) endCall()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            silenceJob?.cancel()
+            if (!isHistoryOnly) asr.stop()
+            if (!isHistoryOnly && latestStage != CallStage.Ended) {
+                latestSession?.let {
+                    if (it.hasUserFacingContent()) {
+                        repository.endSession(it)
+                    } else {
+                        repository.deleteSession(it.id)
+                    }
+                }
+            }
+        }
+    }
+
+    if (showMiniWindow && !isHistoryOnly) {
+        FloatingWindow(tag = "voice_call_mini", visibility = true) {
+            MiniCallWindow(
+                assistantName = assistantName,
+                stage = stage,
+                isSpeaking = isSpeaking,
+                onOpen = { showMiniWindow = false },
+                onEnd = { endCall() },
+            )
+        }
     }
 
     val currentSession = session
     Scaffold(
         topBar = {
             LargeFlexibleTopAppBar(
-                title = { Text("Voice call") },
+                title = { Text(if (isHistoryOnly) "Call record" else "Voice call") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(HugeIcons.ArrowLeft02, contentDescription = null)
                     }
                 },
                 actions = {
+                    if (!isHistoryOnly) {
+                        IconButton(onClick = { showMiniWindow = !showMiniWindow }) {
+                            Icon(HugeIcons.Call02, contentDescription = null)
+                        }
+                    }
                     IconButton(
                         onClick = {
                             navController.navigate(
-                                me.rerere.rikkahub.Screen.VoiceCallHistory(
+                                Screen.VoiceCallHistory(
                                     conversationId = conversationId,
                                     assistantId = assistantId,
                                 )
@@ -133,13 +287,13 @@ fun VoiceCallPage(
         Column(
             modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Spacer(Modifier.height(4.dp))
             UIAvatar(
                 name = assistantName,
-                value = assistant?.avatar ?: me.rerere.rikkahub.data.model.Avatar.Dummy,
-                modifier = Modifier.size(88.dp),
+                value = assistant?.avatar ?: Avatar.Dummy,
+                modifier = Modifier.size(84.dp),
             )
             Text(
                 text = assistantName,
@@ -148,44 +302,55 @@ fun VoiceCallPage(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = if (currentSession.status == VoiceCallStatus.Active) "Calling" else "Ended",
+                text = statusText(stage, asrState.status, isSpeaking, sleepMode, isHistoryOnly),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
-            TranscriptCard(
-                session = currentSession,
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-            )
+            if (stage == CallStage.Connecting && !isHistoryOnly) {
+                ConnectingPanel(
+                    assistantName = assistantName,
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                )
+            } else {
+                TranscriptCard(
+                    session = currentSession,
+                    onReplay = { line -> tts.speak(line.text, flushCalled = true) },
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                )
+            }
 
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                FilledTonalButton(
-                    onClick = {
-                        repository.appendLine(
-                            currentSession.id,
-                            VoiceCallLine(
-                                role = VoiceCallRole.User,
-                                text = "This is where my speech transcript will appear",
-                            )
-                        )
-                        session = repository.getSession(currentSession.id)
+            if (!isHistoryOnly) {
+                SleepModePanel(
+                    enabled = sleepMode,
+                    minutes = sleepMinutes,
+                    onEnabledChange = { sleepMode = it },
+                    onMinutesChange = { sleepMinutes = it },
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    FilledTonalButton(
+                        onClick = {
+                            if (asrState.status == ASRStatus.Idle || asrState.status == ASRStatus.Error) {
+                                startListening()
+                            } else {
+                                asr.stop()
+                            }
+                        },
+                        enabled = stage == CallStage.Active && !sleepMode,
+                    ) {
+                        Icon(HugeIcons.VolumeHigh, contentDescription = null)
+                        Text(if (asrState.status == ASRStatus.Listening) "Stop listen" else "Listen")
                     }
-                ) {
-                    Icon(HugeIcons.Call02, contentDescription = null)
-                    Text("Add line")
-                }
-                FilledIconButton(
-                    onClick = {
-                        repository.endSession(currentSession.id)
-                        session = repository.getSession(currentSession.id)
-                    },
-                    modifier = Modifier.size(58.dp),
-                ) {
-                    Icon(HugeIcons.Cancel01, contentDescription = null)
+                    FilledIconButton(
+                        onClick = { endCall() },
+                        modifier = Modifier.size(58.dp),
+                    ) {
+                        Icon(HugeIcons.Cancel01, contentDescription = null)
+                    }
                 }
             }
         }
@@ -203,14 +368,14 @@ fun VoiceCallHistoryPage(
     var sessions by remember(conversationId, assistantId) {
         mutableStateOf(
             repository.getSessions().filter {
-                it.conversationId == conversationId && it.assistantId == assistantId
+                it.conversationId == conversationId && it.assistantId == assistantId && it.hasUserFacingContent()
             }
         )
     }
 
     LaunchedEffect(conversationId, assistantId) {
         sessions = repository.getSessions().filter {
-            it.conversationId == conversationId && it.assistantId == assistantId
+            it.conversationId == conversationId && it.assistantId == assistantId && it.hasUserFacingContent()
         }
     }
 
@@ -245,7 +410,7 @@ fun VoiceCallHistoryPage(
                     session = item,
                     onClick = {
                         navController.navigate(
-                            me.rerere.rikkahub.Screen.VoiceCall(
+                            Screen.VoiceCall(
                                 conversationId = conversationId,
                                 assistantId = assistantId,
                                 sessionId = item.id,
@@ -259,8 +424,37 @@ fun VoiceCallHistoryPage(
 }
 
 @Composable
+private fun ConnectingPanel(
+    assistantName: String,
+    modifier: Modifier = Modifier,
+) {
+    Card(modifier = modifier, colors = CustomColors.cardColorsOnSurfaceContainer) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                HugeIcons.Call02,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.height(12.dp))
+            Text("Calling $assistantName...", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Waiting for pickup",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
 private fun TranscriptCard(
     session: VoiceCallSession,
+    onReplay: (VoiceCallLine) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier, colors = CustomColors.cardColorsOnSurfaceContainer) {
@@ -270,14 +464,17 @@ private fun TranscriptCard(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             items(session.transcript) { line ->
-                TranscriptLine(line)
+                TranscriptLine(line = line, onReplay = { onReplay(line) })
             }
         }
     }
 }
 
 @Composable
-private fun TranscriptLine(line: VoiceCallLine) {
+private fun TranscriptLine(
+    line: VoiceCallLine,
+    onReplay: () -> Unit,
+) {
     val isUser = line.role == VoiceCallRole.User
     val color = when (line.role) {
         VoiceCallRole.User -> MaterialTheme.colorScheme.primaryContainer
@@ -297,13 +494,60 @@ private fun TranscriptLine(line: VoiceCallLine) {
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Box(
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.medium)
-                .background(color)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(line.text, style = MaterialTheme.typography.bodyMedium)
+            if (!isUser && line.replayable && line.text.isNotBlank()) {
+                IconButton(onClick = onReplay, modifier = Modifier.size(34.dp)) {
+                    Icon(HugeIcons.PlayCircle, contentDescription = null)
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .widthIn(max = 280.dp)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(color)
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+            ) {
+                Text(line.text, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SleepModePanel(
+    enabled: Boolean,
+    minutes: Long,
+    onEnabledChange: (Boolean) -> Unit,
+    onMinutesChange: (Long) -> Unit,
+) {
+    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(HugeIcons.Moon02, contentDescription = null)
+                    Text("Sleep call mode", fontWeight = FontWeight.Medium)
+                }
+                Switch(checked = enabled, onCheckedChange = onEnabledChange)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(10L, 20L, 30L, 45L).forEach { item ->
+                    FilterChip(
+                        selected = minutes == item,
+                        onClick = { onMinutesChange(item) },
+                        label = { Text("${item}m") },
+                    )
+                }
+            }
         }
     }
 }
@@ -313,7 +557,10 @@ private fun VoiceCallHistoryItem(
     session: VoiceCallSession,
     onClick: () -> Unit,
 ) {
-    Card(onClick = onClick, colors = CustomColors.cardColorsOnSurfaceContainer) {
+    Card(
+        modifier = Modifier.clickable(onClick = onClick),
+        colors = CustomColors.cardColorsOnSurfaceContainer,
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -324,7 +571,7 @@ private fun VoiceCallHistoryItem(
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(HugeIcons.Call02, contentDescription = null)
+                Icon(if (session.sleepMode) HugeIcons.Moon02 else HugeIcons.Call02, contentDescription = null)
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(session.assistantName, style = MaterialTheme.typography.titleSmall)
@@ -341,6 +588,71 @@ private fun VoiceCallHistoryItem(
             )
         }
     }
+}
+
+@Composable
+private fun MiniCallWindow(
+    assistantName: String,
+    stage: CallStage,
+    isSpeaking: Boolean,
+    onOpen: () -> Unit,
+    onEnd: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.clickable(onClick = onOpen),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        tonalElevation = 6.dp,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(HugeIcons.Call02, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Column {
+                Text(assistantName, style = MaterialTheme.typography.labelLarge)
+                Text(
+                    if (isSpeaking) "Speaking" else stage.name.lowercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            IconButton(onClick = onEnd, modifier = Modifier.size(34.dp)) {
+                Icon(HugeIcons.StopCircle, contentDescription = null)
+            }
+        }
+    }
+}
+
+private fun statusText(
+    stage: CallStage,
+    asrStatus: ASRStatus,
+    isSpeaking: Boolean,
+    sleepMode: Boolean,
+    isHistoryOnly: Boolean,
+): String {
+    if (isHistoryOnly) return "Saved call record"
+    if (sleepMode) return "Sleep mode"
+    if (stage == CallStage.Connecting) return "Connecting"
+    if (stage == CallStage.Ended) return "Ended"
+    if (isSpeaking) return "Speaking"
+    return when (asrStatus) {
+        ASRStatus.Connecting -> "Preparing microphone"
+        ASRStatus.Listening -> "Listening"
+        ASRStatus.Stopping -> "Thinking"
+        ASRStatus.Error -> "Mic error"
+        ASRStatus.Idle -> "Ready"
+    }
+}
+
+private fun buildAssistantReply(userText: String): String {
+    val trimmed = userText.take(80)
+    return "I heard you say: $trimmed. I am staying with you, and I will answer more naturally once this call is connected to the chat model."
+}
+
+private fun buildSleepTalk(assistantName: String, minutes: Long): String {
+    return "$assistantName is here. You do not need to say anything now. Let your shoulders loosen, let your breathing slow down, and just listen. I will stay with you for about $minutes minutes. You are safe, you are loved, and nothing urgent needs you right now. Close your eyes. I will keep my voice soft and gentle, like a small warm light beside you."
 }
 
 private fun formatTime(value: Long): String {

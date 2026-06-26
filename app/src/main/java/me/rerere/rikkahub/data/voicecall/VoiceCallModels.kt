@@ -12,6 +12,7 @@ data class VoiceCallSession(
     val endedAt: Long? = null,
     val status: VoiceCallStatus = VoiceCallStatus.Active,
     val transcript: List<VoiceCallLine> = emptyList(),
+    val sleepMode: Boolean = false,
 )
 
 @Serializable
@@ -26,6 +27,7 @@ data class VoiceCallLine(
     val role: VoiceCallRole,
     val text: String,
     val timestamp: Long = System.currentTimeMillis(),
+    val replayable: Boolean = true,
 )
 
 @Serializable
