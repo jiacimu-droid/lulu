@@ -37,6 +37,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Add01
 import me.rerere.hugeicons.stroke.Clock02
@@ -64,8 +66,11 @@ import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.context.LocalTTSState
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.utils.plus
+import me.rerere.rikkahub.service.ChatService
+import org.koin.compose.koinInject
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import kotlin.uuid.Uuid
 
 private data class StudyTask(
     val id: Int,
@@ -93,6 +98,7 @@ fun StudyPage() {
     }
     var newTask by remember { mutableStateOf("") }
     var kudos by remember { mutableIntStateOf(0) }
+    var selectedScope by remember { mutableStateOf(StudyScope.Today) }
     val daysLeft = remember {
         ChronoUnit.DAYS.between(LocalDate.now(), nextPostgraduateExamDate()).coerceAtLeast(0)
     }
@@ -128,6 +134,8 @@ fun StudyPage() {
             item {
                 StudyPlanCard(
                     tasks = tasks,
+                    selectedScope = selectedScope,
+                    onSelectedScopeChange = { selectedScope = it },
                     newTask = newTask,
                     onNewTaskChange = { newTask = it },
                     onToggle = { task ->
@@ -261,15 +269,21 @@ fun StudyPomodoroFocusPage(
     voiceEnabled: Boolean,
 ) {
     val settings = LocalSettings.current
+    val chatService: ChatService = koinInject()
     val tts = LocalTTSState.current
     val assistant = settings.getCurrentAssistant()
+    val scope = rememberCoroutineScope()
+    val studyConversationId = remember { Uuid.random() }
     val safeMinutes = minutes.coerceAtLeast(1)
     var remainingSeconds by remember(safeMinutes) { mutableIntStateOf(safeMinutes * 60) }
     var chatText by remember { mutableStateOf("") }
     var coachReply by remember { mutableStateOf(buildEncourageLine(task, assistant)) }
+    var userLine by remember { mutableStateOf("") }
+    var waitingReply by remember { mutableStateOf(false) }
     var kudos by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(safeMinutes) {
+        chatService.initializeConversation(studyConversationId)
         if (voiceEnabled) tts.speak(coachReply, flushCalled = true)
         while (remainingSeconds > 0) {
             delay(1_000)
@@ -313,6 +327,7 @@ fun StudyPomodoroFocusPage(
                 .padding(horizontal = 18.dp, vertical = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(modifier = Modifier.height(52.dp))
             Text(
                 text = secondsText(remainingSeconds),
                 style = MaterialTheme.typography.displayLarge,
@@ -324,23 +339,33 @@ fun StudyPomodoroFocusPage(
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.82f),
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.72f))
             FocusChatPanel(
                 assistant = assistant,
+                userLine = userLine,
                 reply = coachReply,
+                waitingReply = waitingReply,
                 chatText = chatText,
                 onChatChange = { chatText = it },
                 onSend = {
                     val text = chatText.trim()
                     if (text.isNotBlank()) {
-                        val line = buildChatReply(text, task, assistant)
-                        coachReply = line
+                        userLine = text
                         chatText = ""
-                        if (voiceEnabled) tts.speak(line, flushCalled = true)
+                        waitingReply = true
+                        scope.launch {
+                            val line = chatService.sendVoiceCallTurn(
+                                conversationId = studyConversationId,
+                                text = buildStudyChatPrompt(text, task),
+                            ) ?: buildEncourageLine(task, assistant)
+                            coachReply = line
+                            waitingReply = false
+                            if (voiceEnabled) tts.speak(line, flushCalled = true)
+                        }
                     }
                 },
             )
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(36.dp))
         }
     }
 }
@@ -397,6 +422,8 @@ private fun LevelCard(kudos: Int) {
 @Composable
 private fun StudyPlanCard(
     tasks: List<StudyTask>,
+    selectedScope: StudyScope,
+    onSelectedScopeChange: (StudyScope) -> Unit,
     newTask: String,
     onNewTaskChange: (String) -> Unit,
     onToggle: (StudyTask) -> Unit,
@@ -408,35 +435,53 @@ private fun StudyPlanCard(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text("学习计划", style = MaterialTheme.typography.titleMedium)
-            StudyScope.entries.forEach { scope ->
-                Text(scope.label, style = MaterialTheme.typography.labelLarge)
-                tasks.filter { it.scope == scope }.forEach { task ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Checkbox(checked = task.done, onCheckedChange = { onToggle(task) })
-                        Text(
-                            text = task.text,
-                            modifier = Modifier.weight(1f),
-                            textDecoration = if (task.done) TextDecoration.LineThrough else null,
-                        )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                StudyScope.entries.forEach { scope ->
+                    FilterChip(
+                        selected = selectedScope == scope,
+                        onClick = { onSelectedScopeChange(scope) },
+                        label = { Text(scope.label) },
+                    )
+                }
+            }
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    tasks.filter { it.scope == selectedScope }.forEach { task ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Checkbox(checked = task.done, onCheckedChange = { onToggle(task) })
+                            Text(
+                                text = task.text,
+                                modifier = Modifier.weight(1f),
+                                textDecoration = if (task.done) TextDecoration.LineThrough else null,
+                            )
+                        }
+                    }
+                    if (tasks.none { it.scope == selectedScope }) {
+                        Text("这里还没有计划。", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                OutlinedTextField(
-                    value = newTask,
-                    onValueChange = onNewTaskChange,
-                    modifier = Modifier.weight(1f),
-                    label = { Text("新增今日任务") },
-                    singleLine = true,
-                )
-                IconButton(onClick = onAddTask) {
-                    Icon(HugeIcons.Add01, contentDescription = "添加")
+            if (selectedScope == StudyScope.Today) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    OutlinedTextField(
+                        value = newTask,
+                        onValueChange = onNewTaskChange,
+                        modifier = Modifier.weight(1f),
+                        label = { Text("新增今日任务") },
+                        singleLine = true,
+                    )
+                    IconButton(onClick = onAddTask) {
+                        Icon(HugeIcons.Add01, contentDescription = "添加")
+                    }
                 }
             }
         }
@@ -557,24 +602,29 @@ private fun CompanionImageBackdrop(modifier: Modifier = Modifier, assistant: Ass
 @Composable
 private fun FocusChatPanel(
     assistant: Assistant,
+    userLine: String,
     reply: String,
+    waitingReply: Boolean,
     chatText: String,
     onChatChange: (String) -> Unit,
     onSend: () -> Unit,
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 UIAvatar(name = assistant.name, value = assistant.avatar, modifier = Modifier.size(32.dp))
-                Text("${assistant.name} 的陪伴回复", style = MaterialTheme.typography.titleMedium)
+                Text(assistant.name, style = MaterialTheme.typography.titleSmall)
             }
-            Text(reply, style = MaterialTheme.typography.bodyMedium)
+            if (userLine.isNotBlank()) {
+                Text("我：$userLine", style = MaterialTheme.typography.bodySmall)
+            }
+            Text(if (waitingReply) "正在回复..." else reply, style = MaterialTheme.typography.bodyMedium)
             OutlinedTextField(
                 value = chatText,
                 onValueChange = onChatChange,
@@ -620,16 +670,16 @@ private fun buildEncourageLine(taskText: String, assistant: Assistant): String {
     return "${assistant.name}在看着你：先别急着跑，我们把“$target”再往前推一点点。"
 }
 
-private fun buildChatReply(userText: String, taskText: String, assistant: Assistant): String {
-    val target = taskText.ifBlank { "今天的计划" }
-    return "${assistant.name}听到了：$userText。先深呼吸一下，我陪你继续做“$target”，只要再坚持几分钟就好。"
-}
-
 private fun studyImagePromptHint(kudos: Int): String = when {
     kudos >= 12 -> "角色靠在你肩上陪读，画面亲密、安心、有互动感。"
     kudos >= 7 -> "角色趴在桌边牵住你的手，鼓励你继续学习。"
     kudos >= 3 -> "角色托腮看着屏幕，离你更近，陪你复习。"
     else -> "角色坐在你面前半身陪读，桌面干净，氛围温柔。"
+}
+
+private fun buildStudyChatPrompt(userText: String, taskText: String): String {
+    val target = taskText.ifBlank { "这一轮学习任务" }
+    return "我正在番茄钟学习，任务是“$target”。我想对你说：$userText\n请按你的角色人设自然回复，短一点，像真的在陪我学习。"
 }
 
 private fun focusBackgroundBrush(kudos: Int): Brush {
