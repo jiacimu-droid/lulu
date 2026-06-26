@@ -420,7 +420,7 @@ private fun MessagePartsBlock(
                                     }
                                 } else {
                                     if (settings.displaySetting.showAssistantBubble) {
-                                        val visualSegments = remember(displayText) { displayText.splitIntoVisualBubbles() }
+                                        val visualSegments = remember(displayText) { displayText.parseRoleReplySegments() }
                                         var visibleSegmentCount by remember(animateAssistantSegments) {
                                             mutableIntStateOf(
                                                 if (!animateAssistantSegments) {
@@ -458,12 +458,23 @@ private fun MessagePartsBlock(
                                                     Surface(
                                                         modifier = Modifier.animateContentSize(),
                                                         shape = RoundedCornerShape(16.dp),
-                                                        color = (settings.displaySetting.assistantBubbleColor?.let { it.toComposeColor() }
-                                                            ?: MaterialTheme.colorScheme.surfaceContainerHigh).copy(alpha = bubbleAlpha),
+                                                        color = if (segment.kind == RoleReplyKind.Speech) {
+                                                            (settings.displaySetting.assistantBubbleColor?.let { it.toComposeColor() }
+                                                                ?: MaterialTheme.colorScheme.surfaceContainerHigh).copy(alpha = bubbleAlpha)
+                                                        } else {
+                                                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = bubbleAlpha)
+                                                        },
                                                     ) {
                                                         Column(modifier = Modifier.padding(8.dp)) {
+                                                            if (segment.kind != RoleReplyKind.Speech) {
+                                                                Text(
+                                                                    text = segment.kind.label,
+                                                                    style = MaterialTheme.typography.labelSmall,
+                                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                                )
+                                                            }
                                                             MarkdownBlock(
-                                                                content = segment.replaceRegexes(
+                                                                content = segment.text.replaceRegexes(
                                                                     assistant = assistant,
                                                                     scope = AssistantAffectScope.ASSISTANT,
                                                                     visual = true,
@@ -674,32 +685,6 @@ private fun MessagePartsBlock(
             }
         }
     }
-}
-
-private fun String.splitIntoVisualBubbles(): List<String> {
-    val text = trim()
-    if (text.isBlank()) return listOf("")
-    if (text.contains("```") || text.contains("\n- ") || text.contains("\n1. ")) return listOf(text)
-
-    val paragraphSegments = text.split(Regex("\\n\\s*\\n+"))
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-    if (paragraphSegments.size > 1) return paragraphSegments
-
-    if (text.length < 120) return listOf(text)
-    return text.split(Regex("(?<=[.!?\\u3002\\uFF01\\uFF1F])\\s+|(?<=[.!?\\u3002\\uFF01\\uFF1F])"))
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-        .fold(mutableListOf<String>()) { acc, part ->
-            val last = acc.lastOrNull()
-            if (last == null || last.length + part.length > 90) {
-                acc += part
-            } else {
-                acc[acc.lastIndex] = "$last$part"
-            }
-            acc
-        }
-        .ifEmpty { listOf(text) }
 }
 
 @Composable

@@ -137,8 +137,10 @@ fun ColumnScope.ChatMessageActionButtons(
                                     text.extractQuotedContentAsText() ?: text
                                 } else {
                                     text
+                                }.extractSpeakableRoleText()
+                                if (textToSpeak.isNotBlank()) {
+                                    tts.speak(textToSpeak)
                                 }
-                                tts.speak(textToSpeak)
                             } else {
                                 tts.stop()
                             }

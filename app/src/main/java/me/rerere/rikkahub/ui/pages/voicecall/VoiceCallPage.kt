@@ -80,6 +80,9 @@ import me.rerere.rikkahub.data.voicecall.VoiceCallStatus
 import me.rerere.rikkahub.data.voicecall.hasUserFacingContent
 import me.rerere.rikkahub.ui.components.ui.FloatingWindow
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
+import me.rerere.rikkahub.ui.components.message.RoleReplyKind
+import me.rerere.rikkahub.ui.components.message.extractSpeakableRoleText
+import me.rerere.rikkahub.ui.components.message.parseRoleReplySegments
 import me.rerere.rikkahub.ui.context.LocalASRState
 import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.context.LocalSettings
@@ -138,7 +141,11 @@ fun VoiceCallPage(
         val current = session ?: return
         val updated = repository.appendLine(current, line)
         session = updated
-        if (speak) tts.speak(line.text, flushCalled = true)
+        if (speak) {
+            line.text.extractSpeakableRoleText().takeIf { it.isNotBlank() }?.let {
+                tts.speak(it, flushCalled = true)
+            }
+        }
     }
 
     fun saveAssistantSleepLine(text: String) {
@@ -169,11 +176,11 @@ fun VoiceCallPage(
         stage = CallStage.Connecting
         scope.launch {
             delay(1_800)
-            stage = CallStage.Active
             val opening = chatService.sendVoiceCallTurn(
                 conversationId = Uuid.parse(conversationId),
-                text = "电话接通了，你先和我说句话吧。",
+                text = buildVoiceCallPrompt("电话接通了，你先和我说句话吧。"),
             )
+            stage = CallStage.Active
             assistantSay(
                 text = opening?.takeIf { it.isNotBlank() }
                     ?: "${assistantName}接到电话了。我在这里陪着你，慢慢说就好。",
@@ -199,7 +206,7 @@ fun VoiceCallPage(
                     saveLine(VoiceCallLine(role = VoiceCallRole.User, text = finalText))
                     val reply = chatService.sendVoiceCallTurn(
                         conversationId = Uuid.parse(conversationId),
-                        text = finalText,
+                        text = buildVoiceCallPrompt(finalText),
                     )
                     assistantSay(
                         text = reply ?: "我刚刚有点没接住，你再轻轻说一遍，好不好？",
@@ -262,7 +269,9 @@ fun VoiceCallPage(
                 if (stage != CallStage.Active || !sleepMode) return@launch
                 val segment = segments[index % segments.size]
                 saveAssistantSleepLine(segment)
-                tts.speak(segment, flushCalled = true)
+                segment.extractSpeakableRoleText().takeIf { it.isNotBlank() }?.let {
+                    tts.speak(it, flushCalled = true)
+                }
                 waitForTtsPlayback(tts)
                 delay(180)
                 index++
@@ -372,7 +381,11 @@ fun VoiceCallPage(
                 assistantName = assistantName,
                 session = currentSession,
                 onStartCall = { startCall() },
-                onReplay = { line -> tts.speak(line.text, flushCalled = true) },
+                onReplay = { line ->
+                    line.text.extractSpeakableRoleText().takeIf { it.isNotBlank() }?.let {
+                        tts.speak(it, flushCalled = true)
+                    }
+                },
                 modifier = Modifier.weight(1f).fillMaxWidth(),
             )
 
@@ -399,7 +412,7 @@ fun VoiceCallPage(
                         enabled = stage == CallStage.Active && !sleepMode,
                     ) {
                         Icon(HugeIcons.VolumeHigh, contentDescription = null)
-                        Text(if (asrState.status == ASRStatus.Listening) "Stop listen" else "Listen")
+                        Text(if (asrState.status == ASRStatus.Listening) "停止倾听" else "开始倾听")
                     }
                     FilledIconButton(
                         onClick = { endCall() },
@@ -599,7 +612,7 @@ private fun TranscriptList(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        "No transcript yet",
+                        "等待通话内容...",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -615,10 +628,8 @@ private fun TranscriptLine(
     onReplay: () -> Unit,
 ) {
     val isUser = line.role == VoiceCallRole.User
-    val color = when (line.role) {
-        VoiceCallRole.User -> MaterialTheme.colorScheme.primaryContainer
-        VoiceCallRole.Assistant -> MaterialTheme.colorScheme.secondaryContainer
-        VoiceCallRole.System -> Color.Transparent
+    val segments = remember(line.text, line.role) {
+        if (line.role == VoiceCallRole.Assistant) line.text.parseRoleReplySegments() else emptyList()
     }
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -642,15 +653,66 @@ private fun TranscriptLine(
                     Icon(HugeIcons.PlayCircle, contentDescription = null)
                 }
             }
-            Box(
-                modifier = Modifier
-                    .widthIn(max = 280.dp)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(color)
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-            ) {
-                Text(line.text, style = MaterialTheme.typography.bodyMedium)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (line.role == VoiceCallRole.Assistant && segments.isNotEmpty()) {
+                    segments.forEach { segment ->
+                        TranscriptSegmentBubble(
+                            text = segment.text,
+                            kind = segment.kind,
+                            isUser = false,
+                        )
+                    }
+                } else {
+                    TranscriptSegmentBubble(
+                        text = line.text,
+                        kind = RoleReplyKind.Speech,
+                        isUser = isUser,
+                    )
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun TranscriptSegmentBubble(
+    text: String,
+    kind: RoleReplyKind,
+    isUser: Boolean,
+) {
+    val color = when {
+        isUser -> MaterialTheme.colorScheme.primaryContainer
+        kind == RoleReplyKind.Speech -> MaterialTheme.colorScheme.secondaryContainer
+        else -> MaterialTheme.colorScheme.surfaceVariant
+    }
+    Box(
+        modifier = Modifier
+            .widthIn(max = 280.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(color)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            if (!isUser && kind != RoleReplyKind.Speech) {
+                Text(
+                    text = kind.label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(
+                text = text,
+                style = if (kind == RoleReplyKind.Speech) {
+                    MaterialTheme.typography.bodyMedium
+                } else {
+                    MaterialTheme.typography.bodySmall
+                },
+                color = if (!isUser && kind != RoleReplyKind.Speech) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    Color.Unspecified
+                },
+            )
         }
     }
 }
@@ -779,7 +841,7 @@ private fun statusText(
     if (isSpeaking) return "Speaking"
     return when (asrStatus) {
         ASRStatus.Connecting -> "正在准备麦克风"
-        ASRStatus.Listening -> "Listening"
+        ASRStatus.Listening -> "正在倾听"
         ASRStatus.Stopping -> "Thinking"
         ASRStatus.Error -> "Mic error"
         ASRStatus.Idle -> "准备倾听"
@@ -825,6 +887,9 @@ private fun buildSleepTalkSegments(assistantName: String): List<String> {
         "Just warmth, safety, and the feeling that someone is staying beside you.",
     )
 }
+
+private fun buildVoiceCallPrompt(userText: String): String =
+    userText + "\n\n请按角色人设自然回复。可以使用这些标签分段：语言、动作、环境、心理、感受。只有“语言”会被朗读；动作、环境、心理、感受会显示成非语言气泡。"
 
 private fun formatTime(value: Long): String {
     return SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(value))
