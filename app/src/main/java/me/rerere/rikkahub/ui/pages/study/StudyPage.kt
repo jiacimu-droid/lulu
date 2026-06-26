@@ -59,6 +59,8 @@ import me.rerere.hugeicons.stroke.VolumeHigh
 import me.rerere.rikkahub.Screen
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.model.Assistant
+import me.rerere.rikkahub.data.model.Conversation
+import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.context.LocalNavController
@@ -270,10 +272,11 @@ fun StudyPomodoroFocusPage(
 ) {
     val settings = LocalSettings.current
     val chatService: ChatService = koinInject()
+    val conversationRepository = koinInject<ConversationRepository>()
     val tts = LocalTTSState.current
     val assistant = settings.getCurrentAssistant()
     val scope = rememberCoroutineScope()
-    val studyConversationId = remember { Uuid.random() }
+    var studyConversationId by remember { mutableStateOf<Uuid?>(null) }
     val safeMinutes = minutes.coerceAtLeast(1)
     var remainingSeconds by remember(safeMinutes) { mutableIntStateOf(safeMinutes * 60) }
     var chatText by remember { mutableStateOf("") }
@@ -283,7 +286,15 @@ fun StudyPomodoroFocusPage(
     var kudos by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(safeMinutes) {
-        chatService.initializeConversation(studyConversationId)
+        val target = conversationRepository.getRecentConversations(assistant.id, limit = 1)
+            .firstOrNull()
+            ?: Conversation.ofId(
+                id = Uuid.random(),
+                assistantId = assistant.id,
+                newConversation = true,
+            )
+        studyConversationId = target.id
+        chatService.initializeConversation(target.id)
         if (voiceEnabled) tts.speak(coachReply, flushCalled = true)
         while (remainingSeconds > 0) {
             delay(1_000)
@@ -354,8 +365,13 @@ fun StudyPomodoroFocusPage(
                         chatText = ""
                         waitingReply = true
                         scope.launch {
+                            val conversationId = studyConversationId
+                            if (conversationId == null) {
+                                waitingReply = false
+                                return@launch
+                            }
                             val line = chatService.sendVoiceCallTurn(
-                                conversationId = studyConversationId,
+                                conversationId = conversationId,
                                 text = buildStudyChatPrompt(text, task),
                             ) ?: buildEncourageLine(task, assistant)
                             coachReply = line
@@ -679,7 +695,7 @@ private fun studyImagePromptHint(kudos: Int): String = when {
 
 private fun buildStudyChatPrompt(userText: String, taskText: String): String {
     val target = taskText.ifBlank { "这一轮学习任务" }
-    return "我正在番茄钟学习，任务是“$target”。我想对你说：$userText\n请按你的角色人设自然回复，短一点，像真的在陪我学习。"
+    return "我正在番茄钟学习，任务是“$target”。我想对你说：$userText\n请按你的角色人设自然回复，短一点，像真的在陪我学习。请只输出你要说出口的话。"
 }
 
 private fun focusBackgroundBrush(kudos: Int): Brush {

@@ -80,9 +80,8 @@ import me.rerere.rikkahub.data.voicecall.VoiceCallStatus
 import me.rerere.rikkahub.data.voicecall.hasUserFacingContent
 import me.rerere.rikkahub.ui.components.ui.FloatingWindow
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
-import me.rerere.rikkahub.ui.components.message.RoleReplyKind
 import me.rerere.rikkahub.ui.components.message.extractSpeakableRoleText
-import me.rerere.rikkahub.ui.components.message.parseRoleReplySegments
+import me.rerere.rikkahub.ui.components.message.splitIntoVisualBubbles
 import me.rerere.rikkahub.ui.context.LocalASRState
 import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.context.LocalSettings
@@ -176,11 +175,11 @@ fun VoiceCallPage(
         stage = CallStage.Connecting
         scope.launch {
             delay(1_800)
+            stage = CallStage.Active
             val opening = chatService.sendVoiceCallTurn(
                 conversationId = Uuid.parse(conversationId),
-                text = buildVoiceCallPrompt("电话接通了，你先和我说句话吧。"),
+                text = "电话接通了，你先和我说句话吧。请只输出你要说出口的话，不要输出动作、心理、环境、感受，也不要加标签。",
             )
-            stage = CallStage.Active
             assistantSay(
                 text = opening?.takeIf { it.isNotBlank() }
                     ?: "${assistantName}接到电话了。我在这里陪着你，慢慢说就好。",
@@ -206,7 +205,7 @@ fun VoiceCallPage(
                     saveLine(VoiceCallLine(role = VoiceCallRole.User, text = finalText))
                     val reply = chatService.sendVoiceCallTurn(
                         conversationId = Uuid.parse(conversationId),
-                        text = buildVoiceCallPrompt(finalText),
+                        text = "$finalText\n\n请只输出你要说出口的话，不要输出动作、心理、环境、感受，也不要加标签。",
                     )
                     assistantSay(
                         text = reply ?: "我刚刚有点没接住，你再轻轻说一遍，好不好？",
@@ -629,7 +628,7 @@ private fun TranscriptLine(
 ) {
     val isUser = line.role == VoiceCallRole.User
     val segments = remember(line.text, line.role) {
-        if (line.role == VoiceCallRole.Assistant) line.text.parseRoleReplySegments() else emptyList()
+        if (line.role == VoiceCallRole.Assistant) line.text.splitIntoVisualBubbles() else emptyList()
     }
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -656,18 +655,10 @@ private fun TranscriptLine(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (line.role == VoiceCallRole.Assistant && segments.isNotEmpty()) {
                     segments.forEach { segment ->
-                        TranscriptSegmentBubble(
-                            text = segment.text,
-                            kind = segment.kind,
-                            isUser = false,
-                        )
+                        TranscriptSegmentBubble(text = segment, isUser = false)
                     }
                 } else {
-                    TranscriptSegmentBubble(
-                        text = line.text,
-                        kind = RoleReplyKind.Speech,
-                        isUser = isUser,
-                    )
+                    TranscriptSegmentBubble(text = line.text, isUser = isUser)
                 }
             }
         }
@@ -677,14 +668,9 @@ private fun TranscriptLine(
 @Composable
 private fun TranscriptSegmentBubble(
     text: String,
-    kind: RoleReplyKind,
     isUser: Boolean,
 ) {
-    val color = when {
-        isUser -> MaterialTheme.colorScheme.primaryContainer
-        kind == RoleReplyKind.Speech -> MaterialTheme.colorScheme.secondaryContainer
-        else -> MaterialTheme.colorScheme.surfaceVariant
-    }
+    val color = if (isUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
     Box(
         modifier = Modifier
             .widthIn(max = 280.dp)
@@ -692,28 +678,7 @@ private fun TranscriptSegmentBubble(
             .background(color)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            if (!isUser && kind != RoleReplyKind.Speech) {
-                Text(
-                    text = kind.label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Text(
-                text = text,
-                style = if (kind == RoleReplyKind.Speech) {
-                    MaterialTheme.typography.bodyMedium
-                } else {
-                    MaterialTheme.typography.bodySmall
-                },
-                color = if (!isUser && kind != RoleReplyKind.Speech) {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                } else {
-                    Color.Unspecified
-                },
-            )
-        }
+        Text(text = text, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
@@ -888,8 +853,6 @@ private fun buildSleepTalkSegments(assistantName: String): List<String> {
     )
 }
 
-private fun buildVoiceCallPrompt(userText: String): String =
-    userText + "\n\n请按角色人设自然回复。可以使用这些标签分段：语言、动作、环境、心理、感受。只有“语言”会被朗读；动作、环境、心理、感受会显示成非语言气泡。"
 
 private fun formatTime(value: Long): String {
     return SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(value))
