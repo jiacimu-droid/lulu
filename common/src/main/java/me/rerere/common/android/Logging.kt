@@ -1,6 +1,11 @@
 package me.rerere.common.android
 
+import android.content.Context
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.io.File
 import kotlin.uuid.Uuid
 
 private const val MAX_RECENT_LOGS = 100
@@ -37,6 +42,23 @@ sealed class LogEntry {
 
 object Logging {
     private val recentLogs = arrayListOf<LogEntry>()
+    private var storageFile: File? = null
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
+
+    fun init(context: Context) {
+        synchronized(recentLogs) {
+            storageFile = File(context.filesDir, "error_logs.json")
+            val file = storageFile ?: return
+            if (!file.exists()) return
+            runCatching {
+                recentLogs.clear()
+                recentLogs.addAll(json.decodeFromString<List<LogEntry>>(file.readText()))
+            }
+        }
+    }
 
     fun log(tag: String, message: String) {
         addLog(LogEntry.TextLog(tag = tag, message = message))
@@ -52,6 +74,7 @@ object Logging {
             if (recentLogs.size > MAX_RECENT_LOGS) {
                 recentLogs.removeLastOrNull()
             }
+            persistLocked()
         }
     }
 
@@ -76,6 +99,15 @@ object Logging {
     fun clear() {
         synchronized(recentLogs) {
             recentLogs.clear()
+            persistLocked()
+        }
+    }
+
+    private fun persistLocked() {
+        val file = storageFile ?: return
+        runCatching {
+            file.parentFile?.mkdirs()
+            file.writeText(json.encodeToString(recentLogs))
         }
     }
 }

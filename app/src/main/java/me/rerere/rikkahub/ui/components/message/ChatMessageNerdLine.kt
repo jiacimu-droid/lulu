@@ -60,12 +60,14 @@ fun ChatMessageNerdLine(
                         },
                         content = {
                             Text(text = "${usage.promptTokens.formatNumber()} tokens")
-                            // Cached tokens
-                            if (usage.cachedTokens > 0) {
-                                Text(
-                                    text = "(${message.usage?.cachedTokens?.formatNumber() ?: "0"} cached)"
-                                )
+                            val cacheRate = if (usage.promptTokens > 0) {
+                                usage.cachedTokens.toFloat() / usage.promptTokens * 100
+                            } else {
+                                0f
                             }
+                            Text(
+                                text = "缓存 ${usage.cachedTokens.formatNumber()} / ${cacheRate.toFixed(1)}%"
+                            )
                         }
                     )
                     // Output tokens

@@ -23,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 import me.rerere.common.android.appTempFolder
+import me.rerere.common.android.Logging
 import com.whl.quickjs.android.QuickJSLoader
 import me.rerere.rikkahub.di.appModule
 import me.rerere.rikkahub.di.dataSourceModule
@@ -69,6 +70,7 @@ class RikkaHubApp : Application() {
             modules(appModule, viewModelModule, dataSourceModule, repositoryModule, pluginModule)
         }
         this.createNotificationChannel()
+        Logging.init(this)
 
         // set cursor window size to 32MB
         DatabaseUtil.setCursorWindowSize(32 * 1024 * 1024)

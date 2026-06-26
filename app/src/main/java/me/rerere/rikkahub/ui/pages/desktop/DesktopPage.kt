@@ -45,6 +45,7 @@ import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.BookOpen02
 import me.rerere.hugeicons.stroke.Bot
 import me.rerere.hugeicons.stroke.BubbleChat
+import me.rerere.hugeicons.stroke.Bug01
 import me.rerere.hugeicons.stroke.Chart
 import me.rerere.hugeicons.stroke.Favourite
 import me.rerere.hugeicons.stroke.Setting07
@@ -95,6 +96,7 @@ fun DesktopPage() {
             DesktopApp("我的", HugeIcons.User, "user") { navController.navigate(Screen.UserProfile) },
             DesktopApp("统计", HugeIcons.Chart, "stats") { navController.navigate(Screen.Stats) },
             DesktopApp("收藏", HugeIcons.Favourite, "favorite") { navController.navigate(Screen.Favorite) },
+            DesktopApp("日志", HugeIcons.Bug01, "logs") { navController.navigate(Screen.Log) },
             DesktopApp("角色", HugeIcons.Bot, "assistant") { navController.navigate(Screen.Assistant) },
             DesktopApp("设置", HugeIcons.Setting07, "setting") { navController.navigate(Screen.Setting) },
         )
