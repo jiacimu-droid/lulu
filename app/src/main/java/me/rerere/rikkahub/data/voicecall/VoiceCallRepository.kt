@@ -81,11 +81,6 @@ class VoiceCallRepository(
         val updated = session.copy(
             status = VoiceCallStatus.Ended,
             endedAt = System.currentTimeMillis(),
-            transcript = session.transcript + VoiceCallLine(
-                role = VoiceCallRole.System,
-                text = "Voice call ended",
-                replayable = false,
-            ),
         )
         upsertSession(updated)
         return updated

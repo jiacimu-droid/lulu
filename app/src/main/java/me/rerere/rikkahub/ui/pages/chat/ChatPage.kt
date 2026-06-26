@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import me.rerere.ai.provider.Model
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.ArrowLeft02
 import me.rerere.hugeicons.stroke.Cancel01
 import me.rerere.hugeicons.stroke.LeftToRightListBullet
 import me.rerere.rikkahub.R
@@ -184,6 +185,7 @@ private fun ChatPageContent(
                 TopBar(
                     settings = setting,
                     conversation = conversation,
+                    navController = navController,
                     previewMode = previewMode,
                     onClickMenu = {
                         previewMode = !previewMode
@@ -388,6 +390,7 @@ private fun ChatPageContent(
 private fun TopBar(
     settings: Settings,
     conversation: Conversation,
+    navController: Navigator,
     previewMode: Boolean,
     onClickMenu: () -> Unit,
     onUpdateTitle: (String) -> Unit,
@@ -399,7 +402,11 @@ private fun TopBar(
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-        navigationIcon = {},
+        navigationIcon = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(HugeIcons.ArrowLeft02, contentDescription = null)
+            }
+        },
         title = {
             val editTitleWarning = stringResource(R.string.chat_page_edit_title_warning)
             Surface(

@@ -137,6 +137,17 @@ fun VoiceCallPage(
         if (speak) tts.speak(line.text, flushCalled = true)
     }
 
+    fun saveAssistantSleepLine(text: String) {
+        saveLine(
+            VoiceCallLine(
+                role = VoiceCallRole.Assistant,
+                text = text,
+                replayable = true,
+            ),
+            speak = false,
+        )
+    }
+
     fun assistantSay(text: String, replayable: Boolean = true) {
         saveLine(
             VoiceCallLine(
@@ -190,7 +201,16 @@ fun VoiceCallPage(
         val ended = session?.let { repository.endSession(it) }
         session = ended ?: session?.copy(status = VoiceCallStatus.Ended, endedAt = System.currentTimeMillis())
         stage = CallStage.Ended
-        if (ended == null) navController.popBackStack()
+        navController.navigate(
+            Screen.VoiceCallHistory(
+                conversationId = conversationId,
+                assistantId = assistantId,
+            )
+        ) {
+            popUpTo(Screen.VoiceCall(conversationId = conversationId, assistantId = assistantId)) {
+                inclusive = true
+            }
+        }
     }
 
     LaunchedEffect(sessionId, conversationId, assistantId) {
@@ -225,9 +245,11 @@ fun VoiceCallPage(
             var index = 0
             while (isActive && System.currentTimeMillis() < deadline) {
                 if (stage != CallStage.Active || !sleepMode) return@launch
-                assistantSay(segments[index % segments.size])
+                val segment = segments[index % segments.size]
+                saveAssistantSleepLine(segment)
+                tts.speak(segment, flushCalled = true)
                 waitForTtsPlayback(tts)
-                delay(700)
+                delay(180)
                 index++
             }
             if (stage == CallStage.Active && sleepMode) endCall()
@@ -537,9 +559,12 @@ private fun TranscriptList(
     onReplay: (VoiceCallLine) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    LaunchedEffect(session.transcript.size) {
-        if (session.transcript.isNotEmpty()) {
-            listState.animateScrollToItem(session.transcript.lastIndex)
+    val visibleTranscript = remember(session.transcript) {
+        session.transcript.filter { it.role != VoiceCallRole.System }
+    }
+    LaunchedEffect(visibleTranscript.size) {
+        if (visibleTranscript.isNotEmpty()) {
+            listState.animateScrollToItem(visibleTranscript.lastIndex)
         }
     }
     LazyColumn(
@@ -548,10 +573,10 @@ private fun TranscriptList(
         contentPadding = PaddingValues(14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(session.transcript) { line ->
+        items(visibleTranscript) { line ->
             TranscriptLine(line = line, onReplay = { onReplay(line) })
         }
-        if (session.transcript.isEmpty()) {
+        if (visibleTranscript.isEmpty()) {
             item {
                 Box(
                     modifier = Modifier.fillParentMaxSize(),
@@ -767,16 +792,26 @@ private suspend fun waitForTtsPlayback(tts: CustomTtsState) {
 
 private fun buildSleepTalkSegments(assistantName: String): List<String> {
     return listOf(
-        "$assistantName is here with you. You do not need to answer. Tonight you can stop trying so hard. You are safe, you are loved, and I will keep my voice soft for you.",
-        "Breathe in gently. Hold it for just a small moment. Now breathe out a little longer. You made it through today, and that is enough. Let the bed take more of your weight.",
-        "Imagine a warm room with quiet rain outside. The blanket is pulled up to your shoulder, and a small light is still on, just enough to make the night feel kind.",
-        "If there are unfinished things in your head, let them wait at the door. They do not need to come into bed with you. Your body deserves rest before everything is solved.",
-        "Relax your forehead. Let your jaw loosen. Let your shoulders fall. Your hands can unclench. Your chest can soften. Your legs and feet can become heavy.",
-        "Let me tell you a little scene. We are walking beside a calm lake at night. Across the water, there are warm window lights, and every step is slow and quiet.",
-        "You do not have to perform, explain, or be useful right now. You do not have to earn care. You can simply exist here, and still be precious.",
-        "I know you may still be thinking. That is okay. Let each thought pass like a small cloud. You can come back to my voice, the pillow, and the next slow breath.",
-        "If sleep comes, you can follow it. If sleep is still far away, I will not rush you. We can just stay here together, soft and quiet.",
-        "I will leave a little silence between my words. Nothing sharp, nothing urgent. Just warmth, safety, and the feeling that someone is staying beside you.",
+        "$assistantName is here with you. You do not need to answer.",
+        "Tonight you can stop trying so hard. You are safe, and you are loved.",
+        "Breathe in gently. Hold it for a small moment. Now breathe out a little longer.",
+        "You made it through today. That is enough. Let the bed take more of your weight.",
+        "Imagine a warm room with quiet rain outside.",
+        "The blanket is pulled up to your shoulder, and a small light is still on.",
+        "If there are unfinished things in your head, let them wait at the door.",
+        "They do not need to come into bed with you.",
+        "Relax your forehead. Let your jaw loosen. Let your shoulders fall.",
+        "Your hands can unclench. Your chest can soften. Your legs and feet can become heavy.",
+        "Let me tell you a little scene. We are walking beside a calm lake at night.",
+        "Across the water, there are warm window lights, and every step is slow and quiet.",
+        "You do not have to perform, explain, or be useful right now.",
+        "You do not have to earn care. You can simply exist here, and still be precious.",
+        "If a thought comes up, let it pass like a small cloud.",
+        "You can come back to my voice, the pillow, and the next slow breath.",
+        "If sleep comes, you can follow it.",
+        "If sleep is still far away, I will not rush you.",
+        "I will stay soft and close. Nothing sharp, nothing urgent.",
+        "Just warmth, safety, and the feeling that someone is staying beside you.",
     )
 }
 

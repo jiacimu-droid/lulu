@@ -71,6 +71,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -405,20 +406,48 @@ private fun MessagePartsBlock(
                                     }
                                 } else {
                                     if (settings.displaySetting.showAssistantBubble) {
-                                        Surface(
-                                            modifier = Modifier.animateContentSize(),
-                                            shape = RoundedCornerShape(16.dp),
-                                            color = (settings.displaySetting.assistantBubbleColor?.let { it.toComposeColor() } ?: MaterialTheme.colorScheme.surfaceContainerHigh).copy(alpha = bubbleAlpha),
-                                        ) {
-                                            Column(modifier = Modifier.padding(8.dp)) {
-                                                MarkdownBlock(
-                                                    content = displayText.replaceRegexes(
-                                                        assistant = assistant,
-                                                        scope = AssistantAffectScope.ASSISTANT,
-                                                        visual = true,
+                                        val visualSegments = remember(displayText) { displayText.splitIntoVisualBubbles() }
+                                        var visibleSegmentCount by remember(displayText, loading) {
+                                            mutableIntStateOf(if (loading) visualSegments.size else 0)
+                                        }
+                                        LaunchedEffect(displayText, loading, visualSegments.size) {
+                                            if (loading) {
+                                                visibleSegmentCount = visualSegments.size
+                                            } else {
+                                                visibleSegmentCount = 0
+                                                repeat(visualSegments.size) {
+                                                    delay(120)
+                                                    visibleSegmentCount = it + 1
+                                                }
+                                            }
+                                        }
+                                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            visualSegments.fastForEachIndexed { index, segment ->
+                                                AnimatedVisibility(
+                                                    visible = index < visibleSegmentCount,
+                                                    enter = fadeIn(tween(180)) + slideInVertically(
+                                                        animationSpec = tween(180),
+                                                        initialOffsetY = { it / 3 },
                                                     ),
-                                                    onClickCitation = handleClickCitation,
-                                                )
+                                                ) {
+                                                    Surface(
+                                                        modifier = Modifier.animateContentSize(),
+                                                        shape = RoundedCornerShape(16.dp),
+                                                        color = (settings.displaySetting.assistantBubbleColor?.let { it.toComposeColor() }
+                                                            ?: MaterialTheme.colorScheme.surfaceContainerHigh).copy(alpha = bubbleAlpha),
+                                                    ) {
+                                                        Column(modifier = Modifier.padding(8.dp)) {
+                                                            MarkdownBlock(
+                                                                content = segment.replaceRegexes(
+                                                                    assistant = assistant,
+                                                                    scope = AssistantAffectScope.ASSISTANT,
+                                                                    visual = true,
+                                                                ),
+                                                                onClickCitation = handleClickCitation,
+                                                            )
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     } else {
@@ -620,6 +649,32 @@ private fun MessagePartsBlock(
             }
         }
     }
+}
+
+private fun String.splitIntoVisualBubbles(): List<String> {
+    val text = trim()
+    if (text.isBlank()) return listOf("")
+    if (text.contains("```") || text.contains("\n- ") || text.contains("\n1. ")) return listOf(text)
+
+    val paragraphSegments = text.split(Regex("\\n\\s*\\n+"))
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+    if (paragraphSegments.size > 1) return paragraphSegments
+
+    if (text.length < 120) return listOf(text)
+    return text.split(Regex("(?<=[.!?\\u3002\\uFF01\\uFF1F])\\s+|(?<=[.!?\\u3002\\uFF01\\uFF1F])"))
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+        .fold(mutableListOf<String>()) { acc, part ->
+            val last = acc.lastOrNull()
+            if (last == null || last.length + part.length > 90) {
+                acc += part
+            } else {
+                acc[acc.lastIndex] = "$last$part"
+            }
+            acc
+        }
+        .ifEmpty { listOf(text) }
 }
 
 @Composable
