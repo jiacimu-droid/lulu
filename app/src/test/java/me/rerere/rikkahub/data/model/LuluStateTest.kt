@@ -46,4 +46,64 @@ class LuluStateTest {
         assertTrue(history.all { it.assistantId == targetAssistant })
         assertEquals("在想你", states.currentLuluState(targetAssistant).statusText)
     }
+
+    @Test
+    fun `sad user turn creates worried low energy state`() {
+        val assistantId = Uuid.parse("44444444-4444-4444-4444-444444444444")
+
+        val state = buildLuluStateFromTurn(
+            assistantId = assistantId,
+            userText = "I feel sad and tired tonight",
+            assistantText = "I am here with you.",
+            nowMillis = 1000L,
+            hourOfDay = 21,
+        )
+
+        assertEquals(assistantId, state.assistantId)
+        assertEquals(LuluMood.WORRIED, state.mood)
+        assertEquals(LuluEnergy.LOW, state.energy)
+        assertEquals(LuluMode.COMPANION, state.mode)
+        assertEquals(1000L, state.updatedAt)
+        assertTrue(state.reason.contains("I feel sad"))
+    }
+
+    @Test
+    fun `late night turn creates sleepy resting state`() {
+        val assistantId = Uuid.parse("55555555-5555-5555-5555-555555555555")
+
+        val state = buildLuluStateFromTurn(
+            assistantId = assistantId,
+            userText = "just chatting",
+            assistantText = "mm",
+            nowMillis = 2000L,
+            hourOfDay = 1,
+        )
+
+        assertEquals(LuluMood.SOFT, state.mood)
+        assertEquals(LuluEnergy.SLEEPY, state.energy)
+        assertEquals(LuluMode.RESTING, state.mode)
+    }
+
+    @Test
+    fun `append state keeps newest first and trims per assistant`() {
+        val assistantId = Uuid.parse("66666666-6666-6666-6666-666666666666")
+        val oldStates = (1..LULU_STATE_HISTORY_LIMIT).map { index ->
+            LuluState(
+                assistantId = assistantId,
+                statusText = "old-$index",
+                updatedAt = index.toLong(),
+            )
+        }
+        val newest = LuluState(
+            assistantId = assistantId,
+            statusText = "newest",
+            updatedAt = 999L,
+        )
+
+        val history = oldStates.appendLuluState(newest).luluStateHistory(assistantId)
+
+        assertEquals(LULU_STATE_HISTORY_LIMIT, history.size)
+        assertEquals("newest", history.first().statusText)
+        assertTrue(history.none { it.statusText == "old-1" })
+    }
 }

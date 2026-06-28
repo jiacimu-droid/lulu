@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import me.rerere.ai.core.MessageRole
 import me.rerere.ai.provider.Model
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
@@ -33,6 +34,8 @@ import me.rerere.rikkahub.data.model.Avatar
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.MessageNode
 import me.rerere.rikkahub.data.model.NodeFavoriteTarget
+import me.rerere.rikkahub.data.model.appendLuluState
+import me.rerere.rikkahub.data.model.buildLuluStateFromTurn
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.repository.FavoriteRepository
 import me.rerere.rikkahub.service.ChatError
@@ -88,6 +91,14 @@ class ChatVM(
         }
 
         // 记住对话ID, 方便下次启动恢复
+        viewModelScope.launch {
+            generationDoneFlow.collect { conversationId ->
+                if (conversationId == _conversationId) {
+                    recordLuluStateSnapshot()
+                }
+            }
+        }
+
         context.writeStringPreference("lastConversationId", _conversationId.toString())
     }
 
@@ -125,6 +136,27 @@ class ChatVM(
     val mcpManager = chatService.mcpManager
 
     // 更新设置
+    private suspend fun recordLuluStateSnapshot() {
+        val currentConversation = conversation.value
+        val latestUserMessage = currentConversation.currentMessages
+            .lastOrNull { message -> message.role == MessageRole.USER }
+            ?: return
+        val latestAssistantMessage = currentConversation.currentMessages
+            .lastOrNull { message -> message.role == MessageRole.ASSISTANT }
+            ?: return
+        val assistantText = latestAssistantMessage.toText().trim()
+        if (assistantText.isBlank()) return
+
+        val state = buildLuluStateFromTurn(
+            assistantId = currentConversation.assistantId,
+            userText = latestUserMessage.toText().trim(),
+            assistantText = assistantText,
+        )
+        settingsStore.update { settings ->
+            settings.copy(luluStates = settings.luluStates.appendLuluState(state))
+        }
+    }
+
     fun updateSettings(newSettings: Settings) {
         viewModelScope.launch {
             val oldSettings = settings.value
