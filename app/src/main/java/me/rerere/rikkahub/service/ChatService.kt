@@ -93,6 +93,7 @@ import me.rerere.rikkahub.data.model.replaceRegexes
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.repository.MemoryRepository
+import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.web.BadRequestException
 import me.rerere.rikkahub.web.NotFoundException
 import me.rerere.rikkahub.utils.applyPlaceholders
@@ -155,6 +156,7 @@ class ChatService(
     private val settingsStore: SettingsStore,
     private val conversationRepo: ConversationRepository,
     private val memoryRepository: MemoryRepository,
+    private val memoryBankService: MemoryBankService,
     private val generationHandler: GenerationHandler,
     private val templateTransformer: TemplateTransformer,
     private val providerManager: ProviderManager,
@@ -607,6 +609,7 @@ class ChatService(
             val conversation = getConversationFlow(conversationId).value
             val availableTools = buildAvailableTools(settings, assistant).deduplicateByToolName().withProactiveCooldown()
             val proactiveContext = collectProactiveToolContext(conversation.currentMessages, availableTools)
+            val memoryContext = memoryBankService.buildRecallContext(assistant.id.toString())
 
             // start generating
             val session = getOrCreateSession(conversationId)
@@ -620,7 +623,9 @@ class ChatService(
                     } else {
                         it
                     }
-                }.withProactiveToolInstruction(assistant, proactiveContext),
+                }
+                    .withMemoryRecallContext(memoryContext)
+                    .withProactiveToolInstruction(assistant, proactiveContext),
                 assistant = assistant,
                 conversationSystemPrompt = conversation.customSystemPrompt,
                 memories = if (assistant.useGlobalMemory) {
@@ -859,6 +864,11 @@ class ChatService(
             }
         }.trim()
         return listOf(UIMessage.system(instruction)) + this
+    }
+
+    private fun List<UIMessage>.withMemoryRecallContext(memoryContext: String): List<UIMessage> {
+        if (memoryContext.isBlank()) return this
+        return listOf(UIMessage.system(memoryContext)) + this
     }
 
     private fun List<Tool>.withProactiveCooldown(): List<Tool> {

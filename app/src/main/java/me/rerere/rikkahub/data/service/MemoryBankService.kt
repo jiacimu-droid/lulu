@@ -139,4 +139,58 @@ class MemoryBankService(
             memoryBankDAO.getRecentMemories(count)
         }
     }
+
+    suspend fun buildRecallContext(assistantId: String?): String = withContext(Dispatchers.IO) {
+        val memories = buildList {
+            addAll(getTodayPhaseSummaries(assistantId).take(2))
+            addAll(getDailySummaries(assistantId).take(2))
+            if (assistantId != null) {
+                addAll(memoryBankDAO.getMemoriesByAssistantAndTypeLimit(assistantId, "manual", 3))
+                addAll(memoryBankDAO.getMemoriesByAssistantAndTypeLimit(assistantId, "message", 3))
+            }
+            addAll(memoryBankDAO.getMemoriesByTypeLimit("manual", 3))
+        }
+            .distinctBy { it.id }
+            .sortedByDescending { it.createdAt }
+
+        buildMemoryRecallContext(memories)
+    }
+}
+
+internal fun buildMemoryRecallContext(
+    memories: List<MemoryBankEntity>,
+    maxItems: Int = 6,
+    maxContentLength: Int = 120,
+): String {
+    val selected = memories
+        .filter { it.content.isNotBlank() }
+        .sortedByDescending { it.createdAt }
+        .take(maxItems)
+    if (selected.isEmpty()) return ""
+
+    val grouped = selected.groupBy { memory ->
+        when (memory.type) {
+            "phase_summary" -> "阶段回忆"
+            "daily_summary" -> "近期总结"
+            "manual" -> "长期印象"
+            else -> "对话片段"
+        }
+    }
+
+    return buildString {
+        appendLine("<lulu_memory>")
+        appendLine("这些是露露想起的记忆，只作为自然联想参考。不要逐条复述，也不要说“我查到记忆”。")
+        grouped.forEach { (title, items) ->
+            appendLine("$title：")
+            items.forEach { memory ->
+                appendLine("- ${memory.content.trim().ellipsize(maxContentLength)}")
+            }
+        }
+        append("</lulu_memory>")
+    }
+}
+
+private fun String.ellipsize(maxLength: Int): String {
+    if (length <= maxLength) return this
+    return take(maxLength).trimEnd() + "..."
 }
