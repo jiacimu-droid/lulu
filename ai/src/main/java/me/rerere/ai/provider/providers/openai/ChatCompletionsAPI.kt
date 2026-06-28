@@ -335,6 +335,9 @@ class ChatCompletionsAPI(
         return buildJsonObject {
             put("model", params.model.modelId)
             put("messages", buildMessages(messages))
+            if (shouldSendOpenAIPromptCacheKey(host)) {
+                put("prompt_cache_key", providerSetting.promptCacheKey())
+            }
 
             if (isModelAllowTemperature(params.model)) {
                 if (params.temperature != null) put("temperature", params.temperature)

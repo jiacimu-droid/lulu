@@ -1,10 +1,14 @@
 package me.rerere.ai.provider.providers.openai
 
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import me.rerere.ai.provider.Model
+import me.rerere.ai.provider.ProviderSetting
+import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
@@ -14,6 +18,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.uuid.Uuid
 
 /**
  * Unit tests for ChatCompletionsAPI message building logic.
@@ -37,6 +42,60 @@ class ChatCompletionsAPIMessageTest {
         )
         method.isAccessible = true
         return method.invoke(api, messages) as JsonArray
+    }
+
+    private fun invokeBuildChatCompletionRequest(
+        providerSetting: ProviderSetting.OpenAI,
+        model: Model = Model(modelId = "gpt-4.1"),
+    ): JsonObject {
+        val method = ChatCompletionsAPI::class.java.getDeclaredMethod(
+            "buildChatCompletionRequest",
+            List::class.java,
+            TextGenerationParams::class.java,
+            ProviderSetting.OpenAI::class.java,
+            Boolean::class.javaPrimitiveType!!
+        )
+        method.isAccessible = true
+        return method.invoke(
+            api,
+            listOf(UIMessage.system("stable system"), UIMessage.user("hello")),
+            TextGenerationParams(model = model),
+            providerSetting,
+            false
+        ) as JsonObject
+    }
+
+    @Test
+    fun `official OpenAI requests should include stable prompt cache key`() {
+        val providerId = Uuid.random()
+        val providerSetting = ProviderSetting.OpenAI(
+            id = providerId,
+            baseUrl = "https://api.openai.com/v1"
+        )
+
+        val first = invokeBuildChatCompletionRequest(
+            providerSetting = providerSetting,
+            model = Model(modelId = "gpt-4.1")
+        )
+        val second = invokeBuildChatCompletionRequest(
+            providerSetting = providerSetting,
+            model = Model(modelId = "gpt-4.1-mini")
+        )
+
+        val promptCacheKey = first["prompt_cache_key"]?.jsonPrimitive?.content
+        assertEquals("provider:${providerId}", promptCacheKey)
+        assertEquals(promptCacheKey, second["prompt_cache_key"]?.jsonPrimitive?.content)
+    }
+
+    @Test
+    fun `non official OpenAI compatible requests should not include prompt cache key`() {
+        val providerSetting = ProviderSetting.OpenAI(
+            baseUrl = "https://gateway.example.com/v1"
+        )
+
+        val request = invokeBuildChatCompletionRequest(providerSetting = providerSetting)
+
+        assertTrue("prompt_cache_key should be absent", "prompt_cache_key" !in request)
     }
 
     @Test

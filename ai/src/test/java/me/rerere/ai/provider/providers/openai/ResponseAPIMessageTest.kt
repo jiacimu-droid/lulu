@@ -19,6 +19,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.uuid.Uuid
 
 /**
  * Unit tests for ResponseAPI message building logic.
@@ -60,6 +61,42 @@ class ResponseAPIMessageTest {
             ),
             reasoningLevel = reasoningLevel
         )
+    }
+
+    @Test
+    fun `official OpenAI responses requests should include stable prompt cache key`() {
+        val providerId = Uuid.random()
+        val providerSetting = ProviderSetting.OpenAI(
+            id = providerId,
+            baseUrl = "https://api.openai.com/v1"
+        )
+
+        val first = invokeBuildRequestBody(
+            providerSetting = providerSetting,
+            params = TextGenerationParams(model = Model(modelId = "gpt-4.1"))
+        )
+        val second = invokeBuildRequestBody(
+            providerSetting = providerSetting,
+            params = TextGenerationParams(model = Model(modelId = "gpt-4.1-mini"))
+        )
+
+        val promptCacheKey = first["prompt_cache_key"]?.jsonPrimitive?.content
+        assertEquals("provider:${providerId}", promptCacheKey)
+        assertEquals(promptCacheKey, second["prompt_cache_key"]?.jsonPrimitive?.content)
+    }
+
+    @Test
+    fun `non official OpenAI compatible responses requests should not include prompt cache key`() {
+        val providerSetting = ProviderSetting.OpenAI(
+            baseUrl = "https://gateway.example.com/v1"
+        )
+
+        val request = invokeBuildRequestBody(
+            providerSetting = providerSetting,
+            params = TextGenerationParams(model = Model(modelId = "gpt-4.1"))
+        )
+
+        assertFalse(request.containsKey("prompt_cache_key"))
     }
 
     @Test

@@ -193,6 +193,9 @@ class ResponseAPI(
         return buildJsonObject {
             put("model", params.model.modelId)
             put("stream", stream)
+            if (shouldSendOpenAIPromptCacheKey(host)) {
+                put("prompt_cache_key", providerSetting.promptCacheKey())
+            }
             if (!params.model.tools.contains(BuiltInTools.ImageGeneration)) {
                 put("store", false)
             }

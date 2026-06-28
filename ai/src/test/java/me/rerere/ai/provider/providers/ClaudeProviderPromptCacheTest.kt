@@ -28,6 +28,13 @@ class ClaudeProviderPromptCacheTest {
         provider = ClaudeProvider(OkHttpClient())
     }
 
+    @Test
+    fun `default Claude provider should enable prompt caching`() {
+        val providerSetting = ProviderSetting.Claude()
+
+        assertTrue(providerSetting.promptCaching)
+    }
+
     private fun buildRequest(
         providerSetting: ProviderSetting.Claude,
         messages: List<UIMessage>,
