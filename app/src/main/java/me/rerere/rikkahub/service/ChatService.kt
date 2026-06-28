@@ -119,6 +119,13 @@ enum class ChatErrorSolution {
     CheckTitleModelSettings,
 }
 
+internal fun persistChatError(error: ChatError) {
+    Logging.log(
+        tag = error.title ?: "ChatError",
+        message = error.error.stackTraceToString(),
+    )
+}
+
 private val inputTransformers by lazy {
     listOf(
         TimeReminderTransformer,
@@ -170,8 +177,10 @@ class ChatService(
         solution: ChatErrorSolution? = null,
     ) {
         if (error is CancellationException) return
+        val chatError = ChatError(title = title, error = error, conversationId = conversationId, solution = solution)
+        persistChatError(chatError)
         _errors.update {
-            it + ChatError(title = title, error = error, conversationId = conversationId, solution = solution)
+            it + chatError
         }
     }
 

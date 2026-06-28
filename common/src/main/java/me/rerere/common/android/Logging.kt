@@ -1,6 +1,9 @@
 package me.rerere.common.android
 
 import android.content.Context
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.Serializable
@@ -42,6 +45,7 @@ sealed class LogEntry {
 
 object Logging {
     private val recentLogs = arrayListOf<LogEntry>()
+    private val logsFlow = MutableStateFlow<List<LogEntry>>(emptyList())
     private var storageFile: File? = null
     private val json = Json {
         ignoreUnknownKeys = true
@@ -56,6 +60,7 @@ object Logging {
             runCatching {
                 recentLogs.clear()
                 recentLogs.addAll(json.decodeFromString<List<LogEntry>>(file.readText()))
+                logsFlow.value = recentLogs.toList()
             }
         }
     }
@@ -74,9 +79,12 @@ object Logging {
             if (recentLogs.size > MAX_RECENT_LOGS) {
                 recentLogs.removeLastOrNull()
             }
+            logsFlow.value = recentLogs.toList()
             persistLocked()
         }
     }
+
+    fun observeLogs(): StateFlow<List<LogEntry>> = logsFlow.asStateFlow()
 
     fun getRecentLogs(): List<LogEntry> {
         synchronized(recentLogs) {
@@ -99,6 +107,7 @@ object Logging {
     fun clear() {
         synchronized(recentLogs) {
             recentLogs.clear()
+            logsFlow.value = emptyList()
             persistLocked()
         }
     }

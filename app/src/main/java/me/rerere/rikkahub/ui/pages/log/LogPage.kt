@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import me.rerere.common.android.LogEntry
 import me.rerere.common.android.Logging
@@ -55,7 +56,7 @@ import java.util.Locale
 
 @Composable
 fun LogPage() {
-    var logs by remember { mutableStateOf(Logging.getRecentLogs()) }
+    val logs by Logging.observeLogs().collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -67,7 +68,6 @@ fun LogPage() {
                     IconButton(
                         onClick = {
                             Logging.clear()
-                            logs = Logging.getRecentLogs()
                         }
                     ) {
                         Icon(HugeIcons.Delete01, contentDescription = "清空日志")
