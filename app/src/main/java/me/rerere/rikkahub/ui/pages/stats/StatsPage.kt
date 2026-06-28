@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,7 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -195,6 +196,8 @@ private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
 
 @Composable
 private fun CacheRecordsCard(records: List<MessageCacheRecord>, modifier: Modifier = Modifier) {
+    val visibleRecords = remember(records) { records.visibleCacheRecords() }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CustomColors.cardColorsOnSurfaceContainer,
@@ -209,31 +212,39 @@ private fun CacheRecordsCard(records: List<MessageCacheRecord>, modifier: Modifi
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text("缓存明细", style = MaterialTheme.typography.titleMedium)
-                Text("最新 ${records.size} 条", style = MaterialTheme.typography.bodySmall)
+                Text("最新 ${visibleRecords.size} 条", style = MaterialTheme.typography.bodySmall)
             }
 
-            if (records.isEmpty()) {
+            if (visibleRecords.isEmpty()) {
                 Text(
                     text = "还没有带 token 用量的记录。聊天或电话回复完成后会自动出现在这里。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    records.forEach { record ->
-                        key(record.stableCacheRecordKey()) {
-                            CacheRecordRow(record = record)
-                            HorizontalDivider()
-                        }
+                    items(
+                        items = visibleRecords,
+                        key = { it.stableCacheRecordKey() },
+                    ) { record ->
+                        CacheRecordRow(record = record)
+                        HorizontalDivider()
                     }
                 }
             }
         }
     }
 }
+
+internal const val MAX_VISIBLE_CACHE_RECORDS = 15
+
+internal fun List<MessageCacheRecord>.visibleCacheRecords(): List<MessageCacheRecord> =
+    take(MAX_VISIBLE_CACHE_RECORDS)
 
 internal fun MessageCacheRecord.stableCacheRecordKey(): String =
     if (nodeId.isNotBlank()) {

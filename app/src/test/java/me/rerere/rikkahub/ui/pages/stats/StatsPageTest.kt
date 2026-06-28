@@ -7,6 +7,19 @@ import org.junit.Test
 
 class StatsPageTest {
     @Test
+    fun `visible cache records should keep only the latest fifteen records`() {
+        val records = (0 until 20).map { index ->
+            MessageCacheRecord(nodeId = "node-$index")
+        }
+
+        val visibleRecords = records.visibleCacheRecords()
+
+        assertEquals(15, visibleRecords.size)
+        assertEquals("node-0", visibleRecords.first().nodeId)
+        assertEquals("node-14", visibleRecords.last().nodeId)
+    }
+
+    @Test
     fun `cache record key should distinguish records with duplicate message fallback fields`() {
         val first = MessageCacheRecord(
             conversationId = "conversation-1",
