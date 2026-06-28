@@ -38,9 +38,11 @@ import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Avatar
 import me.rerere.rikkahub.data.model.InjectionPosition
 import me.rerere.rikkahub.data.model.Lorebook
+import me.rerere.rikkahub.data.model.LuluState
 import me.rerere.rikkahub.data.model.PromptInjection
 import me.rerere.rikkahub.data.model.QuickMessage
 import me.rerere.rikkahub.data.model.Tag
+import me.rerere.rikkahub.data.model.normalizedLuluStates
 import me.rerere.rikkahub.data.sync.s3.S3Config
 import me.rerere.rikkahub.data.datastore.SystemToolsSetting
 import me.rerere.rikkahub.ui.theme.PresetThemes
@@ -155,6 +157,8 @@ class SettingsStore(
         // 主动消息设置
         val PROACTIVE_MESSAGE_SETTING = stringPreferencesKey("proactive_message_setting")
 
+        val LULU_STATES = stringPreferencesKey("lulu_states")
+
     }
 
     private val dataStore = context.settingsStore
@@ -250,6 +254,9 @@ class SettingsStore(
                 proactiveMessageSetting = preferences[PROACTIVE_MESSAGE_SETTING]?.let {
                     JsonInstant.decodeFromString(it)
                 } ?: ProactiveMessageSetting(),
+                luluStates = preferences[LULU_STATES]?.let {
+                    JsonInstant.decodeFromString(it)
+                } ?: emptyList(),
             )
         }
         .map {
@@ -336,6 +343,9 @@ class SettingsStore(
                 modeInjections = settings.modeInjections.distinctBy { it.id },
                 lorebooks = settings.lorebooks.distinctBy { it.id },
                 quickMessages = settings.quickMessages.distinctBy { it.id },
+                luluStates = settings.luluStates.normalizedLuluStates(
+                    validAssistantIds = settings.assistants.map { assistant -> assistant.id }.toSet()
+                ),
             )
         }
         .onEach {
@@ -408,6 +418,7 @@ class SettingsStore(
             preferences[SPONSOR_ALERT_DISMISSED_AT] = settings.sponsorAlertDismissedAt
             preferences[SYSTEM_TOOLS_SETTING] = JsonInstant.encodeToString(settings.systemToolsSetting)
             preferences[PROACTIVE_MESSAGE_SETTING] = JsonInstant.encodeToString(settings.proactiveMessageSetting)
+            preferences[LULU_STATES] = JsonInstant.encodeToString(settings.luluStates)
         }
     }
 
@@ -537,6 +548,7 @@ data class Settings(
     val sponsorAlertDismissedAt: Int = 0,
     val systemToolsSetting: SystemToolsSetting = SystemToolsSetting(),
     val proactiveMessageSetting: ProactiveMessageSetting = ProactiveMessageSetting(),
+    val luluStates: List<LuluState> = emptyList(),
 ) {
     companion object {
         // 构造一个用于初始化的settings, 但它不能用于保存，防止使用初始值存储

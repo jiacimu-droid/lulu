@@ -54,6 +54,8 @@ import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.datastore.getCurrentChatModel
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.model.Conversation
+import me.rerere.rikkahub.data.model.currentLuluState
+import me.rerere.rikkahub.data.model.luluStateHistory
 import me.rerere.rikkahub.service.ChatError
 import me.rerere.rikkahub.ui.components.ai.ChatInput
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
@@ -399,6 +401,11 @@ private fun TopBar(
     val titleState = useEditState<String> {
         onUpdateTitle(it)
     }
+    var showLuluStatus by rememberSaveable { mutableStateOf(false) }
+    val assistant = settings.getAssistantById(conversation.assistantId) ?: settings.getCurrentAssistant()
+    val currentLuluState = settings.luluStates.currentLuluState(assistant.id)
+    val luluStateHistory = settings.luluStates.luluStateHistory(assistant.id)
+    val assistantDefaultName = stringResource(R.string.assistant_page_default_assistant)
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
@@ -409,29 +416,29 @@ private fun TopBar(
         },
         title = {
             val editTitleWarning = stringResource(R.string.chat_page_edit_title_warning)
-            Surface(
-                onClick = {
-                    if (conversation.messageNodes.isNotEmpty()) {
-                        titleState.open(conversation.title)
-                    } else {
-                        toaster.show(editTitleWarning, type = ToastType.Warning)
-                    }
-                },
-                color = Color.Transparent,
-            ) {
-                val assistant = settings.getAssistantById(conversation.assistantId) ?: settings.getCurrentAssistant()
-                val model = settings.getCurrentChatModel()
-                val provider = model?.findProvider(providers = settings.providers, checkOverwrite = false)
-                Row {
-                    UIAvatar(
-                        name = assistant.name.ifBlank { stringResource(R.string.assistant_page_default_assistant) },
-                        value = assistant.avatar,
-                        modifier = Modifier.size(40.dp),
-                    )
-                    androidx.compose.foundation.layout.Spacer(Modifier.width(10.dp))
+            val model = settings.getCurrentChatModel()
+            val provider = model?.findProvider(providers = settings.providers, checkOverwrite = false)
+            Row {
+                UIAvatar(
+                    name = assistant.name.ifBlank { assistantDefaultName },
+                    value = assistant.avatar,
+                    modifier = Modifier.size(40.dp),
+                    onClick = { showLuluStatus = true },
+                )
+                androidx.compose.foundation.layout.Spacer(Modifier.width(10.dp))
+                Surface(
+                    onClick = {
+                        if (conversation.messageNodes.isNotEmpty()) {
+                            titleState.open(conversation.title)
+                        } else {
+                            toaster.show(editTitleWarning, type = ToastType.Warning)
+                        }
+                    },
+                    color = Color.Transparent,
+                ) {
                     Column {
                         Text(
-                            text = assistant.name.ifBlank { stringResource(R.string.assistant_page_default_assistant) },
+                            text = assistant.name.ifBlank { assistantDefaultName },
                             maxLines = 1,
                             style = MaterialTheme.typography.bodyMedium,
                             overflow = TextOverflow.Ellipsis,
@@ -461,6 +468,14 @@ private fun TopBar(
             }
         },
     )
+    if (showLuluStatus) {
+        LuluStatusDialog(
+            assistant = assistant,
+            currentState = currentLuluState,
+            history = luluStateHistory,
+            onDismissRequest = { showLuluStatus = false },
+        )
+    }
     titleState.EditStateContent { title, onUpdate ->
         AlertDialog(
             onDismissRequest = {

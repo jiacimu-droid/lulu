@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.BookOpen02
 import me.rerere.hugeicons.stroke.Bot
+import me.rerere.hugeicons.stroke.Brain02
 import me.rerere.hugeicons.stroke.BubbleChat
 import me.rerere.hugeicons.stroke.Bug01
 import me.rerere.hugeicons.stroke.Chart
@@ -91,6 +92,7 @@ fun DesktopPage() {
 
     val apps = remember {
         listOf(
+            DesktopApp("记忆", HugeIcons.Brain02, "memory") { navController.navigate(Screen.MemoryBank) },
             DesktopApp("考研", HugeIcons.BookOpen02, "study") { navController.navigate(Screen.Study) },
             DesktopApp("聊天", HugeIcons.BubbleChat, "chat") { navController.navigate(Screen.ChatRooms) },
             DesktopApp("我的", HugeIcons.User, "user") { navController.navigate(Screen.UserProfile) },
