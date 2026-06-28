@@ -61,6 +61,8 @@ data class MessageTokenStats(
 data class MessageDayCount(val day: String, val count: Int)
 
 data class MessageCacheRecord(
+    val nodeId: String = "",
+    val messageIndex: Int = 0,
     val conversationId: String = "",
     val title: String = "",
     val messageId: String = "",
@@ -86,7 +88,9 @@ suspend fun MessageNodeDAO.getTokenStats(): MessageTokenStats = getTokenStatsRaw
 suspend fun MessageNodeDAO.getCacheRecords(limit: Int = 80): List<MessageCacheRecord> =
     getCacheRecordsRaw(
         SimpleSQLiteQuery(
-            "SELECT mn.conversation_id AS conversationId, " +
+            "SELECT mn.id AS nodeId, " +
+                "CAST(j.key AS INTEGER) AS messageIndex, " +
+                "mn.conversation_id AS conversationId, " +
                 "COALESCE(c.title, '') AS title, " +
                 "COALESCE(json_extract(j.value, '$.id'), '') AS messageId, " +
                 "COALESCE(json_extract(j.value, '$.createdAt'), '') AS createdAt, " +
