@@ -131,6 +131,7 @@ fun VoiceCallPage(
     var sleepMode by remember { mutableStateOf(false) }
     var sleepMinutes by remember { mutableLongStateOf(20L) }
     var lastTranscript by remember { mutableStateOf("") }
+    var assistantTurnInProgress by remember { mutableStateOf(false) }
     var silenceJob by remember { mutableStateOf<Job?>(null) }
     var sleepJob by remember { mutableStateOf<Job?>(null) }
     val latestSession by rememberUpdatedState(session)
@@ -141,8 +142,18 @@ fun VoiceCallPage(
         val updated = repository.appendLine(current, line)
         session = updated
         if (speak) {
-            line.text.extractSpeakableRoleText().takeIf { it.isNotBlank() }?.let {
-                scope.launch { speakInSegments(tts, it) }
+            val speakableText = line.text.extractSpeakableRoleText()
+            if (speakableText.isBlank()) {
+                assistantTurnInProgress = false
+            } else {
+                scope.launch {
+                    assistantTurnInProgress = true
+                    try {
+                        speakInSegments(tts, speakableText)
+                    } finally {
+                        assistantTurnInProgress = false
+                    }
+                }
             }
         }
     }
@@ -174,23 +185,31 @@ fun VoiceCallPage(
         VoiceCallForegroundService.start(context.applicationContext, assistantName)
         stage = CallStage.Connecting
         scope.launch {
-            delay(1_800)
-            stage = CallStage.Active
-            val opening = chatService.sendVoiceCallTurn(
-                conversationId = Uuid.parse(conversationId),
-                text = buildVoiceCallOpeningPrompt(assistantName),
-                visibleUserText = null,
-            )
-            assistantSay(
-                text = opening?.takeIf { it.isNotBlank() }
-                    ?: "${assistantName}接到电话了。我在这里陪着你，慢慢说就好。",
-                replayable = true,
-            )
+            assistantTurnInProgress = true
+            try {
+                val opening = chatService.sendVoiceCallTurn(
+                    conversationId = Uuid.parse(conversationId),
+                    text = buildVoiceCallOpeningPrompt(assistantName),
+                    visibleUserText = null,
+                )
+                stage = CallStage.Active
+                assistantSay(
+                    text = opening?.takeIf { it.isNotBlank() }
+                        ?: "${assistantName}接到电话了。我在这里陪着你，慢慢说就好。",
+                    replayable = true,
+                )
+            } catch (_: Throwable) {
+                stage = CallStage.Active
+                assistantSay(
+                    text = "${assistantName}接到电话了。我在这里陪着你，慢慢说就好。",
+                    replayable = true,
+                )
+            }
         }
     }
 
     fun startListening() {
-        if (isHistoryOnly || sleepMode || stage != CallStage.Active) return
+        if (isHistoryOnly || sleepMode || stage != CallStage.Active || assistantTurnInProgress || isSpeaking) return
         if (asrState.status != ASRStatus.Idle && asrState.status != ASRStatus.Error) return
         lastTranscript = ""
         asr.start { transcript ->
@@ -204,11 +223,16 @@ fun VoiceCallPage(
                 val finalText = lastTranscript.trim()
                 if (finalText.isNotBlank()) {
                     saveLine(VoiceCallLine(role = VoiceCallRole.User, text = finalText))
-                    val reply = chatService.sendVoiceCallTurn(
-                        conversationId = Uuid.parse(conversationId),
-                        text = "$finalText\n\n$VOICE_CALL_REPLY_PROMPT",
-                        visibleUserText = finalText,
-                    )
+                    assistantTurnInProgress = true
+                    val reply = try {
+                        chatService.sendVoiceCallTurn(
+                            conversationId = Uuid.parse(conversationId),
+                            text = "$finalText\n\n$VOICE_CALL_REPLY_PROMPT",
+                            visibleUserText = finalText,
+                        )
+                    } catch (_: Throwable) {
+                        null
+                    }
                     assistantSay(
                         text = reply ?: "我刚刚有点没接住，你再轻轻说一遍，好不好？",
                         replayable = true,
@@ -248,8 +272,16 @@ fun VoiceCallPage(
             )
     }
 
-    LaunchedEffect(isSpeaking, stage, sleepMode) {
-        if (!isSpeaking && stage == CallStage.Active && !sleepMode) {
+    LaunchedEffect(isSpeaking, stage, sleepMode, assistantTurnInProgress, asrState.status) {
+        if (shouldStartVoiceCallListening(
+                stageActive = stage == CallStage.Active,
+                isHistoryOnly = isHistoryOnly,
+                sleepMode = sleepMode,
+                assistantTurnInProgress = assistantTurnInProgress,
+                isSpeaking = isSpeaking,
+                asrStatus = asrState.status,
+            )
+        ) {
             delay(350)
             startListening()
         }
@@ -304,7 +336,7 @@ fun VoiceCallPage(
             MiniCallWindow(
                 assistantName = assistantName,
                 stage = stage,
-                isSpeaking = isSpeaking,
+                isSpeaking = isSpeaking || assistantTurnInProgress,
                 onOpen = { showMiniWindow = false },
                 onEnd = { endCall() },
             )
@@ -371,7 +403,14 @@ fun VoiceCallPage(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = statusText(stage, asrState.status, isSpeaking, sleepMode, isHistoryOnly),
+                text = statusText(
+                    stage = stage,
+                    asrStatus = asrState.status,
+                    isSpeaking = isSpeaking,
+                    assistantTurnInProgress = assistantTurnInProgress,
+                    sleepMode = sleepMode,
+                    isHistoryOnly = isHistoryOnly,
+                ),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -402,6 +441,14 @@ fun VoiceCallPage(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val canStartListening = shouldStartVoiceCallListening(
+                        stageActive = stage == CallStage.Active,
+                        isHistoryOnly = isHistoryOnly,
+                        sleepMode = sleepMode,
+                        assistantTurnInProgress = assistantTurnInProgress,
+                        isSpeaking = isSpeaking,
+                        asrStatus = asrState.status,
+                    )
                     FilledTonalButton(
                         onClick = {
                             if (asrState.status == ASRStatus.Idle || asrState.status == ASRStatus.Error) {
@@ -410,7 +457,7 @@ fun VoiceCallPage(
                                 asr.stop()
                             }
                         },
-                        enabled = stage == CallStage.Active && !sleepMode,
+                        enabled = asrState.status == ASRStatus.Listening || canStartListening,
                     ) {
                         Icon(HugeIcons.VolumeHigh, contentDescription = null)
                         Text(if (asrState.status == ASRStatus.Listening) "停止倾听" else "开始倾听")
@@ -797,6 +844,7 @@ private fun statusText(
     stage: CallStage,
     asrStatus: ASRStatus,
     isSpeaking: Boolean,
+    assistantTurnInProgress: Boolean,
     sleepMode: Boolean,
     isHistoryOnly: Boolean,
 ): String {
@@ -805,7 +853,7 @@ private fun statusText(
     if (sleepMode) return "哄睡中"
     if (stage == CallStage.Connecting) return "正在接通"
     if (stage == CallStage.Ended) return "已挂断"
-    if (isSpeaking) return "正在说话"
+    if (isSpeaking || assistantTurnInProgress) return "正在说话"
     return when (asrStatus) {
         ASRStatus.Connecting -> "正在准备麦克风"
         ASRStatus.Listening -> "正在倾听"
@@ -814,6 +862,21 @@ private fun statusText(
         ASRStatus.Idle -> "准备倾听"
     }
 }
+
+internal fun shouldStartVoiceCallListening(
+    stageActive: Boolean,
+    isHistoryOnly: Boolean,
+    sleepMode: Boolean,
+    assistantTurnInProgress: Boolean,
+    isSpeaking: Boolean,
+    asrStatus: ASRStatus,
+): Boolean =
+    stageActive &&
+        !isHistoryOnly &&
+        !sleepMode &&
+        !assistantTurnInProgress &&
+        !isSpeaking &&
+        (asrStatus == ASRStatus.Idle || asrStatus == ASRStatus.Error)
 
 private suspend fun waitForTtsPlayback(tts: CustomTtsState) {
     var observedActive = false

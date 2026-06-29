@@ -552,7 +552,7 @@ class ChatService(
 
         return generatedMessages
             .lastOrNull { it.role == MessageRole.ASSISTANT }
-            ?.let { message -> message.extractTextToSpeechToolText().ifBlank { message.toText() } }
+            ?.let { message -> message.toText().ifBlank { message.extractTextToSpeechToolText() } }
     }
 
     private fun UIMessage.extractTextToSpeechToolText(): String =

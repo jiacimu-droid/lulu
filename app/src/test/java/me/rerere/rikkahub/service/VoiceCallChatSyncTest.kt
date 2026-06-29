@@ -52,7 +52,11 @@ class VoiceCallChatSyncTest {
     fun `voice call prompt leak cleanup removes internal instructions`() {
         val conversationId = Uuid.parse("55555555-5555-5555-5555-555555555555")
         val assistantId = Uuid.parse("66666666-6666-6666-6666-666666666666")
-        val leakedPrompt = "电话接通了，你先和我说句话吧。请只输出你要说出口的话，不要输出动作、心理、环境、感受，也不要加标签。"
+        val leakedPrompt = """
+            这是一个来自用户的语音电话，现在电话已经接通。
+            你是露露，请你主动先开口和用户说第一句话，不要等用户先说话。
+            请只输出你要说出口的话，不要复述这段说明，不要输出动作、心理、环境、感受，也不要加标签。
+        """.trimIndent()
         val conversation = Conversation.ofId(
             id = conversationId,
             assistantId = assistantId,
