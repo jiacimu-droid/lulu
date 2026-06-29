@@ -1,7 +1,9 @@
 package me.rerere.rikkahub.ui.pages.setting
 
+import androidx.compose.foundation.text.KeyboardOptions
 import me.rerere.ai.core.ReasoningLevel
 import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.Database02
 import me.rerere.hugeicons.stroke.Earth
 import me.rerere.hugeicons.stroke.View
 import me.rerere.hugeicons.stroke.FileZip
@@ -36,6 +38,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.rerere.ai.provider.ModelType
@@ -98,6 +102,10 @@ fun SettingModelPage(vm: SettingVM = koinViewModel()) {
             }
 
             item {
+                DefaultMemoryEmbeddingModelSetting(settings = settings, vm = vm)
+            }
+
+            item {
                 DefaultTitleModelSetting(settings = settings, vm = vm)
             }
 
@@ -119,6 +127,161 @@ fun SettingModelPage(vm: SettingVM = koinViewModel()) {
         }
     }
 }
+
+@Composable
+private fun DefaultMemoryEmbeddingModelSetting(
+    settings: Settings,
+    vm: SettingVM
+) {
+    var showModal by remember { mutableStateOf(false) }
+    val config = settings.memoryEmbeddingConfig
+
+    ModelFeatureCard(
+        title = {
+            Text(
+                stringResource(R.string.setting_model_page_memory_embedding_model),
+                maxLines = 1
+            )
+        },
+        description = {
+            Text(stringResource(R.string.setting_model_page_memory_embedding_model_desc))
+        },
+        icon = {
+            Icon(HugeIcons.Database02, null)
+        },
+        actions = {
+            Switch(
+                checked = config.enabled,
+                onCheckedChange = { enabled ->
+                    vm.updateSettings(
+                        settings.copy(
+                            memoryEmbeddingConfig = config.copy(enabled = enabled)
+                        )
+                    )
+                }
+            )
+            Box(modifier = Modifier.weight(1f)) {
+                ModelSelector(
+                    modelId = config.modelId,
+                    type = ModelType.EMBEDDING,
+                    onSelect = { model ->
+                        vm.updateSettings(
+                            settings.copy(
+                                memoryEmbeddingConfig = config.copy(
+                                    modelId = model.id.takeUnless { model.modelId.isBlank() }
+                                )
+                            )
+                        )
+                    },
+                    providers = settings.providers,
+                    allowClear = true,
+                    modifier = Modifier.wrapContentWidth()
+                )
+            }
+            IconButton(
+                onClick = {
+                    showModal = true
+                },
+                colors = IconButtonDefaults.filledTonalIconButtonColors()
+            ) {
+                Icon(HugeIcons.Tools, null)
+            }
+        }
+    )
+
+    if (showModal) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showModal = false
+            },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                FormItem(
+                    label = {
+                        Text(stringResource(R.string.setting_model_page_memory_embedding_enabled))
+                    },
+                    description = {
+                        Text(stringResource(R.string.setting_model_page_memory_embedding_enabled_desc))
+                    },
+                    tail = {
+                        Switch(
+                            checked = config.enabled,
+                            onCheckedChange = { enabled ->
+                                vm.updateSettings(
+                                    settings.copy(
+                                        memoryEmbeddingConfig = config.copy(enabled = enabled)
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+
+                FormItem(
+                    label = {
+                        Text(stringResource(R.string.setting_model_page_memory_embedding_dimensions))
+                    },
+                    description = {
+                        Text(stringResource(R.string.setting_model_page_memory_embedding_dimensions_desc))
+                    }
+                ) {
+                    OutlinedTextField(
+                        value = config.dimensions?.toString().orEmpty(),
+                        onValueChange = { value ->
+                            vm.updateSettings(
+                                settings.copy(
+                                    memoryEmbeddingConfig = config.copy(
+                                        dimensions = parseMemoryEmbeddingDimensionsInput(value)
+                                    )
+                                )
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                    )
+                }
+
+                FormItem(
+                    label = {
+                        Text(stringResource(R.string.setting_model_page_memory_embedding_batch_size))
+                    },
+                    description = {
+                        Text(stringResource(R.string.setting_model_page_memory_embedding_batch_size_desc))
+                    }
+                ) {
+                    OutlinedTextField(
+                        value = config.batchSize.toString(),
+                        onValueChange = { value ->
+                            vm.updateSettings(
+                                settings.copy(
+                                    memoryEmbeddingConfig = config.copy(
+                                        batchSize = parseMemoryEmbeddingBatchSizeInput(value)
+                                    )
+                                )
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                    )
+                }
+            }
+        }
+    }
+}
+
+internal fun parseMemoryEmbeddingDimensionsInput(value: String): Int? =
+    value.trim().toIntOrNull()?.takeIf { it > 0 }
+
+internal fun parseMemoryEmbeddingBatchSizeInput(value: String): Int =
+    (value.trim().toIntOrNull() ?: 1).coerceIn(1, 64)
 
 @Composable
 private fun DefaultTranslationModelSetting(
