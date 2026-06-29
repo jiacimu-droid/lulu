@@ -129,13 +129,13 @@
   <string name="assistant_page_stream_output">流式输出</string>
   <string name="assistant_page_stream_output_desc">是否启用消息的流式输出</string>
   <string name="assistant_page_strict">严谨</string>
-  <string name="assistant_page_system_prompt">系统提示词</string>
+  <string name="assistant_page_system_prompt">系统人设</string>
   <string name="assistant_page_tab_basic">基础设定</string>
   <string name="assistant_page_tab_extensions">扩展管理</string>
   <string name="assistant_page_tab_local_tools">本地工具</string>
   <string name="assistant_page_tab_mcp">MCP</string>
   <string name="assistant_page_tab_memory">记忆</string>
-  <string name="assistant_page_tab_prompt">提示词</string>
+  <string name="assistant_page_tab_prompt">人设</string>
   <string name="assistant_page_tab_request">自定义请求</string>
   <string name="assistant_page_tags">标签</string>
   <string name="assistant_page_temperature">温度</string>

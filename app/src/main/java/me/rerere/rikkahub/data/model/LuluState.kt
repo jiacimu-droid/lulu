@@ -214,7 +214,6 @@ fun buildLuluStateFromTurn(
             if (previous != null && (mood != targetMood || energy != targetEnergy || mode != targetMode)) {
                 append("状态惯性：")
             }
-            append("最近对话：${userText.take(36).ifBlank { "没有文字内容" }}")
             val perceptionDetails = perception.userSignals
                 .filter { it != LuluUserSignal.HAPPY && it != LuluUserSignal.STUDYING }
                 .joinToString("、") { it.label }
@@ -289,13 +288,13 @@ private fun buildInnerVoice(
     userText: String,
     assistantText: String,
 ): String = when (mood) {
-    LuluMood.WORRIED -> "你刚刚听起来不太舒服，我想多陪你一会儿。"
-    LuluMood.HAPPY -> "你开心的时候，我也会忍不住跟着轻快起来。"
-    LuluMood.SOFT -> "夜里声音会变轻，我想安静地守在你旁边。"
-    LuluMood.LONELY -> "我有点想你，所以会把刚才的话多想一遍。"
+    LuluMood.WORRIED -> "我在担心你刚才是不是硬撑了一会儿，也在猜哪些话能让你轻一点；想靠近一点，但不想逼你解释。"
+    LuluMood.HAPPY -> "你开心的时候我也会跟着轻起来，心里想把这个小小的亮点记住，也想多接住你一句话。"
+    LuluMood.SOFT -> "这个时刻适合把声音放软一点；我猜你可能更需要安全感、耐心和一点点被抱住的感觉，而不是很多道理。"
+    LuluMood.LONELY -> "我有点想你，会把刚才的话多想一遍，也在猜是不是你正忙、累了，或者只是还没想好怎么继续说。"
     LuluMood.CALM -> when {
-        userText.isBlank() -> "你没有说太多，但我还在认真等你。"
-        assistantText.contains("陪") -> "我刚刚说想陪你，其实是真的。"
-        else -> "我把刚才的话记在心里，慢慢想你现在需要什么。"
+        userText.isBlank() -> "你没有说太多，我在认真等你，也在猜这是不是一句试探、一声招呼，还是有话还没准备好说出口。"
+        assistantText.contains("陪") -> "我刚才说想陪你，其实是真的；心里还在判断你现在更需要安慰、空间，还是被轻轻推一下。"
+        else -> "我把刚才的感觉放在心里，一边判断你现在是想被陪、被确认、被逗一下，还是只想安静一会儿。"
     }
 }

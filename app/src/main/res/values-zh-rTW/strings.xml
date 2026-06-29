@@ -127,13 +127,13 @@
   <string name="assistant_page_stream_output">串流輸出</string>
   <string name="assistant_page_stream_output_desc">是否啟用訊息的串流輸出</string>
   <string name="assistant_page_strict">嚴謹</string>
-  <string name="assistant_page_system_prompt">系統提示詞</string>
+  <string name="assistant_page_system_prompt">系統人設</string>
   <string name="assistant_page_tab_basic">基本設定</string>
   <string name="assistant_page_tab_extensions">擴充功能</string>
   <string name="assistant_page_tab_local_tools">本地工具</string>
   <string name="assistant_page_tab_mcp">MCP</string>
   <string name="assistant_page_tab_memory">記憶</string>
-  <string name="assistant_page_tab_prompt">提示詞</string>
+  <string name="assistant_page_tab_prompt">人設</string>
   <string name="assistant_page_tab_request">自定義請求</string>
   <string name="assistant_page_tags">標籤</string>
   <string name="assistant_page_temperature">溫度</string>

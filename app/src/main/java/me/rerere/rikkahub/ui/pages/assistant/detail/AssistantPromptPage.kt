@@ -139,6 +139,7 @@ private fun AssistantPromptContent(
 ) {
     val context = LocalContext.current
     val templateTransformer = koinInject<TemplateTransformer>()
+    var showSystemPromptVariables by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -175,23 +176,31 @@ private fun AssistantPromptContent(
                     maxLines = 10
                 )
 
-                Column {
-                    Text(
-                        text = stringResource(R.string.assistant_page_available_variables),
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
-                    ) {
-                        DefaultPlaceholderProvider.placeholders.forEach { (k, info) ->
-                            Tag(
-                                onClick = {
-                                    systemPromptValue.insertAtCursor("{{$k}}")
+                Column(
+                    modifier = Modifier.animateContentSize(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    TextButton(onClick = { showSystemPromptVariables = !showSystemPromptVariables }) {
+                        Text(stringResource(R.string.assistant_page_available_variables))
+                        Icon(
+                            imageVector = if (showSystemPromptVariables) HugeIcons.ArrowUp01 else HugeIcons.ArrowDown01,
+                            contentDescription = null,
+                        )
+                    }
+                    if (showSystemPromptVariables) {
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            DefaultPlaceholderProvider.placeholders.forEach { (k, info) ->
+                                Tag(
+                                    onClick = {
+                                        systemPromptValue.insertAtCursor("{{$k}}")
+                                    }
+                                ) {
+                                    info.displayName()
+                                    Text(": {{$k}}")
                                 }
-                            ) {
-                                info.displayName()
-                                Text(": {{$k}}")
                             }
                         }
                     }

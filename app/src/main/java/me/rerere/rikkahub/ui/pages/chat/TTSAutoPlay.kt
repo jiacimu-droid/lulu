@@ -49,7 +49,7 @@ fun TTSAutoPlay(vm: ChatVM, setting: Settings, conversation: Conversation) {
 private fun List<MessageNode>.latestAssistantMessageId(): Uuid? =
     asReversed()
         .map { it.currentMessage }
-        .firstOrNull { it.role == MessageRole.ASSISTANT }
+        .firstOrNull { it.role == MessageRole.ASSISTANT && it.finishedAt != null }
         ?.id
 
 internal fun findAutoPlayTTSMessage(
@@ -59,7 +59,11 @@ internal fun findAutoPlayTTSMessage(
     val message = nodes
         .asReversed()
         .map { it.currentMessage }
-        .firstOrNull { it.role == MessageRole.ASSISTANT && it.toText().isNotBlank() }
+        .firstOrNull {
+            it.role == MessageRole.ASSISTANT &&
+                it.finishedAt != null &&
+                it.toText().isNotBlank()
+        }
         ?: return null
     return message.takeIf { it.id != lastSpokenMessageId }
 }

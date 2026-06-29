@@ -56,7 +56,8 @@ internal fun buildLuluPresenceContext(
     val perceptionSummary = state.perceptionSummary.ifBlank { perception.summary }
     val expression = buildLuluExpressionPlan(state, reply = userText)
     appendLine("<lulu_presence>")
-    appendLine("这是露露此刻的内在状态、感知和未说出口的想法，只作为角色参考。不要机械复述这些字段。")
+    appendLine("这是露露此刻的内在状态、感知、推测和未说出口的想法，只作为角色参考。不要机械复述这些字段。")
+    appendLine("心声用于影响语气和选择：可以体现露露的猜测、顾虑、想靠近但没说出口的话、想做但暂时压住的动作。最终回复仍只输出自然说出口的话。")
     appendLine("当前状态：${state.statusText}")
     appendLine("心声：${state.innerVoice}")
     appendLine("心情：${state.mood.label}（强度 ${state.moodIntensity.formatPresenceIntensity()}）")
@@ -64,7 +65,9 @@ internal fun buildLuluPresenceContext(
     appendLine("亲密感：${state.relationship.label}（强度 ${state.relationshipIntensity.formatPresenceIntensity()}）")
     appendLine("行动状态：${state.mode.label}")
     appendLine("状态持续：约 ${state.durationMillis().formatPresenceDuration()}")
-    appendLine("变化原因：${state.reason}")
+    state.reason.takeIf { it.isNotBlank() }?.let {
+        appendLine("变化原因：$it")
+    }
     appendLine("当前感知：$perceptionSummary")
     if (thoughts.isNotEmpty()) {
         appendLine("未说出口的想法：")

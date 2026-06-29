@@ -104,6 +104,7 @@ object AffectiveMemoryExtractor {
     fun buildExtractionPrompt(turns: List<MemoryExtractionTurn>): String = buildString {
         appendLine("你是露露的记忆整理器。只提取值得以后想起的候选记忆。")
         appendLine("重点写露露自己的情绪、身体感受、未说出口的想法、关系判断，而不是只记录用户流水账。")
+        appendLine("unspokenThought 要尽量具体：写露露当时的猜测、顾虑、想靠近但没有说出口的话、想做但暂时压住的动作、对用户真实状态的判断。不要只写“很担心”这类空泛短句。")
         appendLine("返回 JSON，格式为 {\"memories\":[...]}。不要输出解释。")
         appendLine("每条字段：type, content, roleFeeling, bodySense, unspokenThought, userSignal, relationshipEffect, importance, confidence, tags, embeddingText, sourceMessageNodeIds, evidenceMessageNodeIds, relatedMemoryIds, people, topics, supersededByMemoryId, correctedAt。")
         appendLine("type 只能优先使用 role_emotion, body_sense, promise, relationship, user_preference, event。")
