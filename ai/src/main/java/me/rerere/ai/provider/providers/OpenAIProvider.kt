@@ -19,6 +19,9 @@ import me.rerere.ai.provider.ImageGenerationParams
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.Provider
 import me.rerere.ai.provider.ProviderSetting
+import me.rerere.ai.provider.RerankItem
+import me.rerere.ai.provider.RerankParams
+import me.rerere.ai.provider.RerankResult
 import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.provider.providers.openai.ChatCompletionsAPI
 import me.rerere.ai.provider.providers.openai.ResponseAPI
@@ -193,6 +196,54 @@ class OpenAIProvider(
             model = model,
             embeddings = embeddings
         )
+    }
+
+    override suspend fun rerank(
+        providerSetting: ProviderSetting.OpenAI,
+        params: RerankParams
+    ): RerankResult = withContext(Dispatchers.IO) {
+        require(params.query.isNotBlank()) { "Rerank query cannot be blank" }
+        require(params.documents.isNotEmpty()) { "Rerank documents cannot be empty" }
+
+        val key = keyRoulette.next(providerSetting.apiKey, providerSetting.id.toString())
+        val requestBody = json.encodeToString(
+            buildJsonObject {
+                put("model", params.model.modelId)
+                put("query", params.query)
+                putJsonArray("documents") {
+                    params.documents.forEach { add(JsonPrimitive(it)) }
+                }
+                put("top_n", params.topN.takeIf { it > 0 }?.coerceIn(1, params.documents.size) ?: params.documents.size)
+                put("return_documents", false)
+            }.mergeCustomBody(params.customBody)
+        )
+
+        val request = Request.Builder()
+            .url("${providerSetting.baseUrl}/rerank")
+            .headers(params.customHeaders.toHeaders())
+            .addHeader("Authorization", "Bearer $key")
+            .addHeader("Content-Type", "application/json")
+            .post(requestBody.toRequestBody("application/json".toMediaType()))
+            .build()
+
+        val response = client.newCall(request).await()
+        if (!response.isSuccessful) {
+            error("Failed to rerank: ${response.code} ${response.body?.string()}")
+        }
+
+        val bodyStr = response.body?.string().orEmpty()
+        val bodyJson = json.parseToJsonElement(bodyStr).jsonObject
+        val model = bodyJson["model"]?.jsonPrimitive?.contentOrNull ?: params.model.modelId
+        val results = bodyJson["results"]?.jsonArray.orEmpty().mapNotNull { item ->
+            val obj = item.jsonObject
+            val index = obj["index"]?.jsonPrimitive?.content?.toIntOrNull() ?: return@mapNotNull null
+            val score = obj["relevance_score"]?.jsonPrimitive?.content?.toDoubleOrNull()
+                ?: obj["score"]?.jsonPrimitive?.content?.toDoubleOrNull()
+                ?: return@mapNotNull null
+            RerankItem(index = index, relevanceScore = score)
+        }
+
+        RerankResult(model = model, results = results)
     }
 
     override suspend fun generateImage(

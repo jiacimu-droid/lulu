@@ -9,6 +9,8 @@ import kotlinx.serialization.builtins.serializer
 import me.rerere.ai.provider.EmbeddingGenerationParams
 import me.rerere.ai.provider.ModelType
 import me.rerere.ai.provider.ProviderManager
+import me.rerere.ai.provider.RerankItem
+import me.rerere.ai.provider.RerankParams
 import me.rerere.rikkahub.data.db.dao.MemoryBankDAO
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
 import me.rerere.rikkahub.data.datastore.SettingsStore
@@ -315,10 +317,19 @@ class MemoryBankService(
             .distinctBy { it.id }
 
         val queryVector = buildQueryEmbedding(query)
+        val rerankCandidateCount = memoryRerankCandidateCount()
+        val rerankCandidates = rankMemoryRecallCandidates(
+            memories = memories,
+            query = query,
+            queryVector = queryVector,
+        ).take(rerankCandidateCount)
+        val rerankResults = rerankRecallCandidates(query, rerankCandidates)
         val selected = selectMemoryRecallItems(
             memories = memories,
             query = query,
             queryVector = queryVector,
+            rerankCandidateCount = rerankCandidateCount,
+            reranker = { rerankResults },
         )
         val recalledIds = selected.map { it.id }.filter { it > 0 }
         if (recalledIds.isNotEmpty()) {
@@ -359,6 +370,45 @@ class MemoryBankService(
         }.getOrDefault(emptyList())
     }
 
+    private fun memoryRerankCandidateCount(): Int =
+        settingsStore?.settingsFlow?.value
+            ?.memoryEmbeddingConfig
+            ?.rerankCandidateCount
+            ?.coerceIn(5, 50)
+            ?: 20
+
+    private suspend fun rerankRecallCandidates(
+        query: String,
+        candidates: List<MemoryBankEntity>,
+    ): List<MemoryRerankResult> {
+        val settingsStore = settingsStore ?: return emptyList()
+        val providerManager = providerManager ?: return emptyList()
+        val trimmed = query.trim()
+        if (trimmed.isBlank() || candidates.size < 2) return emptyList()
+
+        val settings = settingsStore.settingsFlow.value
+        val config = settings.memoryEmbeddingConfig
+        val modelId = config.rerankModelId ?: return emptyList()
+        val model = settings.findModelById(modelId)?.takeIf { it.type == ModelType.RERANK } ?: return emptyList()
+        val provider = model.findProvider(settings.providers) ?: return emptyList()
+        val providerImpl = providerManager.getProviderByType(provider)
+        val documents = candidates.map { it.rerankDocumentText() }
+
+        return runCatching {
+            providerImpl.rerank(
+                providerSetting = provider,
+                params = RerankParams(
+                    model = model,
+                    query = trimmed,
+                    documents = documents,
+                    topN = documents.size,
+                    customHeaders = model.customHeaders,
+                    customBody = model.customBodies,
+                ),
+            ).results.toMemoryRerankResults()
+        }.getOrDefault(emptyList())
+    }
+
     private suspend fun learnRecallCooccurrence(memories: List<MemoryBankEntity>) {
         val validMemories = memories.filter { it.id > 0 }
         if (validMemories.size < 2) return
@@ -382,6 +432,11 @@ class MemoryBankService(
 private data class DuplicateMemoryDeprecation(
     val deprecated: MemoryBankEntity,
     val keep: MemoryBankEntity,
+)
+
+internal data class MemoryRerankResult(
+    val index: Int,
+    val relevanceScore: Double,
 )
 
 internal fun buildMemoryRecallContext(
@@ -433,15 +488,45 @@ internal fun selectMemoryRecallItems(
     query: String = "",
     queryVector: List<Float> = emptyList(),
     maxItems: Int? = null,
+    rerankCandidateCount: Int = 20,
+    reranker: (List<MemoryBankEntity>) -> List<MemoryRerankResult> = { emptyList() },
+): List<MemoryBankEntity> {
+    val sorted = rankMemoryRecallCandidates(memories, query, queryVector)
+    val limit = maxItems ?: sorted.dynamicRecallLimit(queryVector)
+    val candidateLimit = if (maxItems == null) sorted.size.coerceAtMost(rerankCandidateCount.coerceIn(5, 50)) else limit
+    val candidates = sorted.take(candidateLimit)
+    val direct = applyMemoryRerankResults(
+        memories = candidates,
+        results = runCatching { reranker(candidates) }.getOrDefault(emptyList()),
+    ).take(limit)
+    return direct.expandRelatedMemories(sorted, maxRelatedItems = 1)
+}
+
+private fun rankMemoryRecallCandidates(
+    memories: List<MemoryBankEntity>,
+    query: String,
+    queryVector: List<Float>,
 ): List<MemoryBankEntity> {
     val queryTerms = query.recallQueryTerms()
-    val sorted = memories
+    return memories
         .filter { it.content.isNotBlank() && !it.deprecated }
         .sortedByDescending { memory -> memory.recallScore(queryTerms, queryVector) }
         .deduplicateNearVectors()
-    val limit = maxItems ?: sorted.dynamicRecallLimit(queryVector)
-    val direct = sorted.take(limit)
-    return direct.expandRelatedMemories(sorted, maxRelatedItems = 1)
+}
+
+internal fun applyMemoryRerankResults(
+    memories: List<MemoryBankEntity>,
+    results: List<MemoryRerankResult>,
+): List<MemoryBankEntity> {
+    if (memories.size < 2 || results.isEmpty()) return memories
+    val rankedIndexes = results
+        .filter { it.index in memories.indices }
+        .sortedByDescending { it.relevanceScore }
+        .map { it.index }
+        .distinct()
+    val ranked = rankedIndexes.map { memories[it] }
+    val remaining = memories.filterIndexed { index, _ -> index !in rankedIndexes }
+    return ranked + remaining
 }
 
 private fun List<MemoryBankEntity>.expandRelatedMemories(
@@ -465,6 +550,29 @@ private fun MemoryBankEntity.relatedMemoryIds(): List<String> =
     runCatching {
         JsonInstant.decodeFromString(ListSerializer(String.serializer()), relatedMemoryIdsJson.orEmpty())
     }.getOrDefault(emptyList())
+
+private fun List<RerankItem>.toMemoryRerankResults(): List<MemoryRerankResult> =
+    map { item ->
+        MemoryRerankResult(
+            index = item.index,
+            relevanceScore = item.relevanceScore,
+        )
+    }
+
+private fun MemoryBankEntity.rerankDocumentText(): String =
+    listOfNotNull(
+        title,
+        content,
+        roleFeeling,
+        bodySense,
+        unspokenThought,
+        userSignal,
+        relationshipEffect,
+        embeddingText,
+        tagsJson,
+        peopleJson,
+        topicsJson,
+    ).joinToString("\n").take(1600)
 
 private fun List<MemoryBankEntity>.dynamicRecallLimit(queryVector: List<Float>): Int {
     if (queryVector.isEmpty()) return 6

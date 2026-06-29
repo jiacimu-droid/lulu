@@ -38,6 +38,13 @@ interface Provider<T : ProviderSetting> {
         error("Embedding generation is not supported")
     }
 
+    suspend fun rerank(
+        providerSetting: T,
+        params: RerankParams,
+    ): RerankResult {
+        error("Rerank is not supported")
+    }
+
     suspend fun generateImage(
         providerSetting: ProviderSetting,
         params: ImageGenerationParams,
@@ -97,6 +104,28 @@ data class EmbeddingGenerationParams(
 data class EmbeddingGenerationResult(
     val model: String,
     val embeddings: List<List<Float>>,
+)
+
+@Serializable
+data class RerankParams(
+    val model: Model,
+    val query: String,
+    val documents: List<String>,
+    val topN: Int = 0,
+    val customHeaders: List<CustomHeader> = emptyList(),
+    val customBody: List<CustomBody> = emptyList(),
+)
+
+@Serializable
+data class RerankResult(
+    val model: String,
+    val results: List<RerankItem>,
+)
+
+@Serializable
+data class RerankItem(
+    val index: Int,
+    val relevanceScore: Double,
 )
 
 @Serializable

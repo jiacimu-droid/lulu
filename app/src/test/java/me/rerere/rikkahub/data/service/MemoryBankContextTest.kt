@@ -335,4 +335,23 @@ class MemoryBankContextTest {
 
         assertEquals(listOf(1, 2), selected.map { it.id })
     }
+
+    @Test
+    fun `apply rerank results reorders candidate memories before final selection`() {
+        val memories = listOf(
+            MemoryBankEntity(id = 1, content = "memory-a", createdAt = 300L),
+            MemoryBankEntity(id = 2, content = "memory-b", createdAt = 200L),
+            MemoryBankEntity(id = 3, content = "memory-c", createdAt = 100L),
+        )
+
+        val reranked = applyMemoryRerankResults(
+            memories = memories,
+            results = listOf(
+                MemoryRerankResult(index = 2, relevanceScore = 0.95),
+                MemoryRerankResult(index = 0, relevanceScore = 0.70),
+            ),
+        )
+
+        assertEquals(listOf(3, 1, 2), reranked.map { it.id })
+    }
 }

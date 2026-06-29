@@ -567,8 +567,11 @@ data class Settings(
 data class MemoryEmbeddingConfig(
     val enabled: Boolean = false,
     val modelId: Uuid? = null,
+    val rerankModelId: Uuid? = null,
+    val extractionModelId: Uuid? = null,
     val dimensions: Int? = null,
     val batchSize: Int = 16,
+    val rerankCandidateCount: Int = 20,
 )
 
 @Serializable

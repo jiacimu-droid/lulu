@@ -43,6 +43,7 @@ import me.rerere.ai.core.ReasoningLevel
 import me.rerere.ai.core.Tool
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelAbility
+import me.rerere.ai.provider.ModelType
 import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.ui.ToolApprovalState
@@ -879,25 +880,29 @@ class ChatService(
                     processedSourceNodeIds = processedSourceNodeIds,
                 ) ?: return@runCatching
 
-                val provider = model.findProvider(settings.providers) ?: return@runCatching
+                val extractionModel = settings.memoryEmbeddingConfig.extractionModelId
+                    ?.let { settings.findModelById(it) }
+                    ?.takeIf { it.type == ModelType.CHAT }
+                    ?: model
+                val provider = extractionModel.findProvider(settings.providers) ?: return@runCatching
                 val providerImpl = providerManager.getProviderByType(provider)
                 val prompt = AffectiveMemoryExtractor.buildExtractionPrompt(plan.turns)
                 val chunk = providerImpl.generateText(
                     providerSetting = provider,
                     messages = listOf(UIMessage.user(prompt)),
                     params = TextGenerationParams(
-                        model = model,
+                        model = extractionModel,
                         temperature = 0.2f,
                         topP = 0.8f,
                         maxTokens = 1200,
                         reasoningLevel = ReasoningLevel.OFF,
                         customHeaders = buildList {
                             addAll(assistant.customHeaders)
-                            addAll(model.customHeaders)
+                            addAll(extractionModel.customHeaders)
                         },
                         customBody = buildList {
                             addAll(assistant.customBodies)
-                            addAll(model.customBodies)
+                            addAll(extractionModel.customBodies)
                         },
                     ),
                 )

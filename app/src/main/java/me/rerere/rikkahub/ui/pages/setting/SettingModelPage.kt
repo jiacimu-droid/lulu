@@ -56,6 +56,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.rerere.ai.provider.ModelType
+import kotlin.uuid.Uuid
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.ai.prompts.DEFAULT_COMPRESS_PROMPT
 import me.rerere.rikkahub.data.ai.prompts.DEFAULT_OCR_PROMPT
@@ -225,6 +226,81 @@ private fun DefaultMemoryEmbeddingModelSetting(
 
                 FormItem(
                     label = {
+                        Text(stringResource(R.string.setting_model_page_memory_extraction_model))
+                    },
+                    description = {
+                        Text(stringResource(R.string.setting_model_page_memory_extraction_model_desc))
+                    }
+                ) {
+                    ModelSelector(
+                        modelId = config.extractionModelId,
+                        type = ModelType.CHAT,
+                        onSelect = { model ->
+                            vm.updateSettings(
+                                settings.copy(
+                                    memoryEmbeddingConfig = config.copy(
+                                        extractionModelId = model.id.takeUnless { model.modelId.isBlank() }
+                                    )
+                                )
+                            )
+                        },
+                        providers = settings.providers,
+                        allowClear = true,
+                    )
+                }
+
+                FormItem(
+                    label = {
+                        Text(stringResource(R.string.setting_model_page_memory_rerank_model))
+                    },
+                    description = {
+                        Text(stringResource(R.string.setting_model_page_memory_rerank_model_desc))
+                    }
+                ) {
+                    ModelSelector(
+                        modelId = config.rerankModelId,
+                        type = ModelType.RERANK,
+                        onSelect = { model ->
+                            vm.updateSettings(
+                                settings.copy(
+                                    memoryEmbeddingConfig = config.copy(
+                                        rerankModelId = model.id.takeUnless { model.modelId.isBlank() }
+                                    )
+                                )
+                            )
+                        },
+                        providers = settings.providers,
+                        allowClear = true,
+                    )
+                }
+
+                FormItem(
+                    label = {
+                        Text(stringResource(R.string.setting_model_page_memory_rerank_candidates))
+                    },
+                    description = {
+                        Text(stringResource(R.string.setting_model_page_memory_rerank_candidates_desc))
+                    }
+                ) {
+                    OutlinedTextField(
+                        value = config.rerankCandidateCount.toString(),
+                        onValueChange = { value ->
+                            vm.updateSettings(
+                                settings.copy(
+                                    memoryEmbeddingConfig = config.copy(
+                                        rerankCandidateCount = parseMemoryRerankCandidateCountInput(value)
+                                    )
+                                )
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                    )
+                }
+
+                FormItem(
+                    label = {
                         Text(stringResource(R.string.setting_model_page_memory_embedding_dimensions))
                     },
                     description = {
@@ -272,6 +348,48 @@ private fun DefaultMemoryEmbeddingModelSetting(
                         singleLine = true,
                     )
                 }
+
+                MemoryEngineDiagnostics(
+                    lines = buildMemoryEngineDiagnostics(
+                        enabled = config.enabled,
+                        embeddingModel = settings.memoryModelName(config.modelId),
+                        rerankModel = settings.memoryModelName(config.rerankModelId),
+                        extractionModel = settings.memoryModelName(config.extractionModelId),
+                        candidateCount = config.rerankCandidateCount,
+                    )
+                )
+            }
+        }
+    }
+}
+
+private fun Settings.memoryModelName(modelId: Uuid?): String? =
+    modelId
+        ?.let { findModelById(it) }
+        ?.let { model -> model.displayName.ifBlank { model.modelId } }
+
+@Composable
+private fun MemoryEngineDiagnostics(lines: List<String>) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = CustomColors.listItemColors.containerColor
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.setting_model_page_memory_engine_diagnostics),
+                style = MaterialTheme.typography.titleSmall,
+            )
+            lines.forEach { line ->
+                Text(
+                    text = line,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = LocalContentColor.current.copy(alpha = 0.82f),
+                )
             }
         }
     }
@@ -282,6 +400,25 @@ internal fun parseMemoryEmbeddingDimensionsInput(value: String): Int? =
 
 internal fun parseMemoryEmbeddingBatchSizeInput(value: String): Int =
     (value.trim().toIntOrNull() ?: 1).coerceIn(1, 64)
+
+internal fun parseMemoryRerankCandidateCountInput(value: String): Int =
+    (value.trim().toIntOrNull() ?: 5).coerceIn(5, 50)
+
+internal fun buildMemoryEngineDiagnostics(
+    enabled: Boolean,
+    embeddingModel: String?,
+    rerankModel: String?,
+    extractionModel: String?,
+    candidateCount: Int,
+): List<String> {
+    val mode = if (enabled) "本地向量库：已启用" else "本地向量库：未启用"
+    val embedding = "Embedding：${embeddingModel?.takeIf { it.isNotBlank() } ?: "未配置"}"
+    val rerank = "Reranker：${rerankModel?.takeIf { it.isNotBlank() } ?: "未配置，将使用本地混合排序"}"
+    val extraction = "记忆抽取：${extractionModel?.takeIf { it.isNotBlank() } ?: "未单独配置，将使用当前聊天模型"}"
+    val candidates = "重排序候选：${candidateCount.coerceIn(5, 50)} 条"
+    val backend = "Backend / Vector Index：未接入，当前使用设备本地 Room 向量字段"
+    return listOf(mode, embedding, rerank, extraction, candidates, backend)
+}
 
 @Composable
 private fun DefaultTranslationModelSetting(
