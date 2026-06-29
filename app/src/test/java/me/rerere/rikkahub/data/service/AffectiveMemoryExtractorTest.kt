@@ -55,6 +55,11 @@ class AffectiveMemoryExtractorTest {
             embeddingText = "用户认可露露 露露开心 被需要 信任上升",
             sourceMessageNodeIds = listOf("user-node-1", "assistant-node-2"),
             evidenceMessageNodeIds = listOf("user-node-1"),
+            relatedMemoryIds = listOf("memory-2"),
+            people = listOf("露露", "用户"),
+            topics = listOf("记忆系统"),
+            supersededByMemoryId = "memory-3",
+            correctedAt = 5678L,
         )
 
         val entity = candidate.toEntity(
@@ -73,6 +78,11 @@ class AffectiveMemoryExtractorTest {
         assertTrue(entity.tagsJson!!.contains("认可"))
         assertTrue(entity.sourceMessageNodeIdsJson!!.contains("user-node-1"))
         assertTrue(entity.evidenceMessageNodeIdsJson!!.contains("user-node-1"))
+        assertTrue(entity.relatedMemoryIdsJson!!.contains("memory-2"))
+        assertTrue(entity.peopleJson!!.contains("露露"))
+        assertTrue(entity.topicsJson!!.contains("记忆系统"))
+        assertEquals("memory-3", entity.supersededByMemoryId)
+        assertEquals(5678L, entity.correctedAt)
     }
 
     @Test

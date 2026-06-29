@@ -56,11 +56,26 @@ data class MemoryBankEntity(
     @ColumnInfo("evidence_message_node_ids_json")
     val evidenceMessageNodeIdsJson: String? = null,
 
+    @ColumnInfo("related_memory_ids_json")
+    val relatedMemoryIdsJson: String? = null,
+
+    @ColumnInfo("people_json")
+    val peopleJson: String? = null,
+
+    @ColumnInfo("topics_json")
+    val topicsJson: String? = null,
+
     @ColumnInfo("deprecated", defaultValue = "0")
     val deprecated: Boolean = false,
 
     @ColumnInfo("deprecated_reason")
     val deprecatedReason: String? = null,
+
+    @ColumnInfo("superseded_by_memory_id")
+    val supersededByMemoryId: String? = null,
+
+    @ColumnInfo("corrected_at")
+    val correctedAt: Long? = null,
 
     @ColumnInfo("last_recalled_at")
     val lastRecalledAt: Long? = null,

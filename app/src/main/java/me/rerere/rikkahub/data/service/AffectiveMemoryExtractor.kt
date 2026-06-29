@@ -38,6 +38,11 @@ data class AffectiveMemoryCandidate(
     val embeddingText: String? = null,
     val sourceMessageNodeIds: List<String> = emptyList(),
     val evidenceMessageNodeIds: List<String> = emptyList(),
+    val relatedMemoryIds: List<String> = emptyList(),
+    val people: List<String> = emptyList(),
+    val topics: List<String> = emptyList(),
+    val supersededByMemoryId: String? = null,
+    val correctedAt: Long? = null,
 ) {
     fun normalized(): AffectiveMemoryCandidate = copy(
         type = type.trim().ifBlank { "event" },
@@ -54,6 +59,10 @@ data class AffectiveMemoryCandidate(
         embeddingText = embeddingText?.trim()?.takeIf { it.isNotBlank() },
         sourceMessageNodeIds = sourceMessageNodeIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
         evidenceMessageNodeIds = evidenceMessageNodeIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+        relatedMemoryIds = relatedMemoryIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+        people = people.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+        topics = topics.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+        supersededByMemoryId = supersededByMemoryId?.trim()?.takeIf { it.isNotBlank() },
     )
 
     fun toEntity(
@@ -78,6 +87,11 @@ data class AffectiveMemoryCandidate(
             embeddingText = normalized.embeddingText ?: normalized.content,
             sourceMessageNodeIdsJson = JsonInstant.encodeToString(normalized.sourceMessageNodeIds),
             evidenceMessageNodeIdsJson = JsonInstant.encodeToString(normalized.evidenceMessageNodeIds),
+            relatedMemoryIdsJson = JsonInstant.encodeToString(normalized.relatedMemoryIds),
+            peopleJson = JsonInstant.encodeToString(normalized.people),
+            topicsJson = JsonInstant.encodeToString(normalized.topics),
+            supersededByMemoryId = normalized.supersededByMemoryId,
+            correctedAt = normalized.correctedAt,
             assistantId = assistantId,
             conversationId = conversationId,
             createdAt = createdAt,
@@ -91,7 +105,7 @@ object AffectiveMemoryExtractor {
         appendLine("你是露露的记忆整理器。只提取值得以后想起的候选记忆。")
         appendLine("重点写露露自己的情绪、身体感受、未说出口的想法、关系判断，而不是只记录用户流水账。")
         appendLine("返回 JSON，格式为 {\"memories\":[...]}。不要输出解释。")
-        appendLine("每条字段：type, content, roleFeeling, bodySense, unspokenThought, userSignal, relationshipEffect, importance, confidence, tags, embeddingText, sourceMessageNodeIds, evidenceMessageNodeIds。")
+        appendLine("每条字段：type, content, roleFeeling, bodySense, unspokenThought, userSignal, relationshipEffect, importance, confidence, tags, embeddingText, sourceMessageNodeIds, evidenceMessageNodeIds, relatedMemoryIds, people, topics, supersededByMemoryId, correctedAt。")
         appendLine("type 只能优先使用 role_emotion, body_sense, promise, relationship, user_preference, event。")
         appendLine("<conversation_turns>")
         turns.forEach { turn ->

@@ -3,8 +3,10 @@ package me.rerere.rikkahub.data.service
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 import me.rerere.rikkahub.data.db.dao.MemoryBankDAO
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
+import me.rerere.rikkahub.utils.JsonInstant
 import okhttp3.OkHttpClient
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -152,6 +154,21 @@ class MemoryBankService(
                 val id = memoryBankDAO.insertMemory(entity).toInt()
                 entity.copy(id = id)
             }
+    }
+
+    suspend fun getProcessedSourceNodeIds(
+        assistantId: String,
+        conversationId: String,
+    ): Set<String> = withContext(Dispatchers.IO) {
+        memoryBankDAO.getMemoriesByAssistant(assistantId)
+            .asSequence()
+            .filter { it.conversationId == conversationId && !it.sourceMessageNodeIdsJson.isNullOrBlank() }
+            .flatMap { memory ->
+                runCatching {
+                    JsonInstant.decodeFromString<List<String>>(memory.sourceMessageNodeIdsJson.orEmpty())
+                }.getOrDefault(emptyList()).asSequence()
+            }
+            .toSet()
     }
 
     suspend fun recallMemories(query: String, count: Int): List<MemoryBankEntity> = withContext(Dispatchers.IO) {

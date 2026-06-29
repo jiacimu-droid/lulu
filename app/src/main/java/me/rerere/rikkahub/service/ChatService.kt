@@ -40,6 +40,7 @@ import kotlinx.serialization.json.jsonObject
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.core.ReasoningLevel
 import me.rerere.ai.core.Tool
+import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelAbility
 import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.TextGenerationParams
@@ -94,7 +95,9 @@ import me.rerere.rikkahub.data.model.replaceRegexes
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.repository.MemoryRepository
+import me.rerere.rikkahub.data.service.AffectiveMemoryExtractor
 import me.rerere.rikkahub.data.service.MemoryBankService
+import me.rerere.rikkahub.data.service.buildAffectiveMemoryExtractionPlan
 import me.rerere.rikkahub.web.BadRequestException
 import me.rerere.rikkahub.web.NotFoundException
 import me.rerere.rikkahub.utils.applyPlaceholders
@@ -727,6 +730,13 @@ class ChatService(
         }.onSuccess {
             val finalConversation = getConversationFlow(conversationId).value
             saveConversation(conversationId, finalConversation)
+            launchAffectiveMemoryExtraction(
+                conversationId = conversationId,
+                conversation = finalConversation,
+                assistant = assistant,
+                settings = settings,
+                model = model,
+            )
 
             // 触发 message_received 事件钩子
             try {
@@ -747,6 +757,69 @@ class ChatService(
 
             launchWithConversationReference(conversationId) {
                 generateSuggestion(conversationId, finalConversation)
+            }
+        }
+    }
+
+    private fun launchAffectiveMemoryExtraction(
+        conversationId: Uuid,
+        conversation: Conversation,
+        assistant: Assistant,
+        settings: Settings,
+        model: Model,
+    ) {
+        appScope.launch {
+            runCatching {
+                val processedSourceNodeIds = memoryBankService.getProcessedSourceNodeIds(
+                    assistantId = assistant.id.toString(),
+                    conversationId = conversationId.toString(),
+                )
+                val plan = buildAffectiveMemoryExtractionPlan(
+                    messageNodes = conversation.messageNodes,
+                    processedSourceNodeIds = processedSourceNodeIds,
+                ) ?: return@runCatching
+
+                val provider = model.findProvider(settings.providers) ?: return@runCatching
+                val providerImpl = providerManager.getProviderByType(provider)
+                val prompt = AffectiveMemoryExtractor.buildExtractionPrompt(plan.turns)
+                val chunk = providerImpl.generateText(
+                    providerSetting = provider,
+                    messages = listOf(UIMessage.user(prompt)),
+                    params = TextGenerationParams(
+                        model = model,
+                        temperature = 0.2f,
+                        topP = 0.8f,
+                        maxTokens = 1200,
+                        reasoningLevel = ReasoningLevel.OFF,
+                        customHeaders = buildList {
+                            addAll(assistant.customHeaders)
+                            addAll(model.customHeaders)
+                        },
+                        customBody = buildList {
+                            addAll(assistant.customBodies)
+                            addAll(model.customBodies)
+                        },
+                    ),
+                )
+                val rawText = chunk.choices.firstOrNull()?.message?.toText().orEmpty()
+                val candidates = AffectiveMemoryExtractor.parseExtractionResult(rawText)
+                    .memories
+                    .take(3)
+                if (candidates.isEmpty()) return@runCatching
+
+                memoryBankService.saveExtractedMemories(
+                    candidates = candidates,
+                    assistantId = assistant.id.toString(),
+                    conversationId = conversationId.toString(),
+                    createdAt = System.currentTimeMillis(),
+                )
+                Logging.log(
+                    TAG,
+                    "Saved ${candidates.size} affective memories for conversation=$conversationId reason=${plan.reason}",
+                )
+            }.onFailure { error ->
+                if (error is CancellationException) throw error
+                Log.w(TAG, "Affective memory extraction failed for conversation=$conversationId", error)
             }
         }
     }
