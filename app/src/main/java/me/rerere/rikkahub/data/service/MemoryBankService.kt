@@ -18,6 +18,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+private const val MEMORY_DUPLICATE_VECTOR_THRESHOLD = 0.85
+
 class MemoryBankService(
     private val memoryBankDAO: MemoryBankDAO,
     private val okHttpClient: OkHttpClient?,
@@ -300,6 +302,7 @@ internal fun buildMemoryRecallContext(
     val selected = memories
         .filter { it.content.isNotBlank() && !it.deprecated }
         .sortedByDescending { memory -> memory.recallScore(queryTerms, queryVector) }
+        .deduplicateNearVectors()
         .take(maxItems)
     if (selected.isEmpty()) return ""
 
@@ -359,6 +362,20 @@ private fun MemoryBankEntity.recallScore(queryTerms: List<String>, queryVector: 
     val vectorScore = cosineSimilarity(queryVector, decodeMemoryVector(embeddingVectorJson)) * 240.0
     return vectorScore + queryScore + promiseScore + pinnedScore + importanceScore + confidenceScore + freshnessScore
 }
+
+private fun List<MemoryBankEntity>.deduplicateNearVectors(): List<MemoryBankEntity> =
+    fold(emptyList()) { selected, candidate ->
+        val candidateVector = decodeMemoryVector(candidate.embeddingVectorJson)
+        if (candidateVector.isEmpty()) {
+            selected + candidate
+        } else {
+            val isDuplicate = selected.any { existing ->
+                cosineSimilarity(candidateVector, decodeMemoryVector(existing.embeddingVectorJson)) >
+                    MEMORY_DUPLICATE_VECTOR_THRESHOLD
+            }
+            if (isDuplicate) selected else selected + candidate
+        }
+    }
 
 private fun MemoryBankEntity.toRecallLine(maxContentLength: Int): String {
     val parts = buildList {

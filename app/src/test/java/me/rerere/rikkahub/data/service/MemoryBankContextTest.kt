@@ -171,4 +171,42 @@ class MemoryBankContextTest {
         assertTrue(context.contains("轻一点的陪伴"))
         assertTrue(!context.contains("雨天窝在床上"))
     }
+
+    @Test
+    fun `build memory context removes near duplicate vector memories`() {
+        val memories = listOf(
+            MemoryBankEntity(
+                content = "用户正在写论文大纲，希望露露帮她拆成更小的步骤。",
+                memoryKind = "user_preference",
+                embeddingVectorJson = encodeMemoryVector(listOf(1f, 0f, 0f)),
+                importance = 5,
+                createdAt = 300L,
+            ),
+            MemoryBankEntity(
+                content = "用户论文大纲卡住了，需要露露温柔地一步步梳理。",
+                memoryKind = "user_preference",
+                embeddingVectorJson = encodeMemoryVector(listOf(0.96f, 0.04f, 0f)),
+                importance = 3,
+                createdAt = 200L,
+            ),
+            MemoryBankEntity(
+                content = "露露答应下次继续检查参考文献格式。",
+                memoryKind = "promise",
+                embeddingVectorJson = encodeMemoryVector(listOf(0f, 1f, 0f)),
+                importance = 3,
+                createdAt = 100L,
+            ),
+        )
+
+        val context = buildMemoryRecallContext(
+            memories = memories,
+            query = "论文大纲",
+            queryVector = listOf(1f, 0f, 0f),
+            maxItems = 2,
+        )
+
+        assertTrue(context.contains("拆成更小的步骤"))
+        assertTrue(!context.contains("温柔地一步步梳理"))
+        assertTrue(context.contains("参考文献格式"))
+    }
 }
