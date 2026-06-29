@@ -656,8 +656,14 @@ class ChatService(
                 .deduplicateByToolName()
                 .withHumanLikeToolPrompts()
                 .withProactiveCooldown()
+            val latestUserText = conversation.currentMessages.lastOrNull { it.role == MessageRole.USER }
+                ?.toText()
+                .orEmpty()
             val proactiveContext = collectProactiveToolContext(conversation.currentMessages, availableTools)
-            val memoryContext = memoryBankService.buildRecallContext(assistant.id.toString())
+            val memoryContext = memoryBankService.buildRecallContext(
+                assistantId = assistant.id.toString(),
+                query = latestUserText,
+            )
 
             // start generating
             val session = getOrCreateSession(conversationId)

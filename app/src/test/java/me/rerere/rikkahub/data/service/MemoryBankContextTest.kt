@@ -101,4 +101,45 @@ class MemoryBankContextTest {
         assertTrue(!context.contains("memory-5"))
         assertTrue(context.contains("..."))
     }
+
+    @Test
+    fun `build memory context boosts memories related to current query`() {
+        val memories = listOf(
+            MemoryBankEntity(
+                content = "露露被夸以后觉得很开心。",
+                memoryKind = "role_emotion",
+                importance = 5,
+                createdAt = 500L,
+            ),
+            MemoryBankEntity(
+                content = "用户最近在准备论文大纲，卡住时希望露露轻一点陪她梳理。",
+                memoryKind = "user_preference",
+                importance = 2,
+                topicsJson = """["论文","大纲"]""",
+                createdAt = 100L,
+            ),
+            MemoryBankEntity(
+                content = "露露答应帮用户继续看论文大纲，不要突然忘掉这件事。",
+                memoryKind = "promise",
+                importance = 3,
+                createdAt = 50L,
+            ),
+            MemoryBankEntity(
+                content = "用户喜欢雨天窝在床上聊天。",
+                memoryKind = "user_preference",
+                importance = 4,
+                createdAt = 400L,
+            ),
+        )
+
+        val context = buildMemoryRecallContext(
+            memories = memories,
+            query = "论文大纲写不下去",
+            maxItems = 2,
+        )
+
+        assertTrue(context.contains("论文大纲"))
+        assertTrue(context.contains("答应帮用户继续看论文大纲"))
+        assertTrue(!context.contains("雨天窝在床上"))
+    }
 }

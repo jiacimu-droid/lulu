@@ -179,9 +179,10 @@ class MemoryBankService(
         }
     }
 
-    suspend fun buildRecallContext(assistantId: String?): String = withContext(Dispatchers.IO) {
+    suspend fun buildRecallContext(assistantId: String?, query: String = ""): String = withContext(Dispatchers.IO) {
         val memories = buildList {
             if (assistantId != null) {
+                addAll(memoryBankDAO.getMemoriesByAssistant(assistantId).take(80))
                 addAll(memoryBankDAO.getPinnedRecallMemoriesForAssistant(assistantId, 3))
                 addAll(memoryBankDAO.getImportantRecallMemoriesForAssistant(assistantId, minImportance = 4, limit = 5))
             } else {
@@ -197,28 +198,21 @@ class MemoryBankService(
             addAll(memoryBankDAO.getMemoriesByTypeLimit("manual", 3))
         }
             .distinctBy { it.id }
-            .sortedWith(
-                compareByDescending<MemoryBankEntity> { it.pinned }
-                    .thenByDescending { it.importance }
-                    .thenByDescending { it.createdAt }
-            )
 
-        buildMemoryRecallContext(memories)
+        buildMemoryRecallContext(memories, query = query)
     }
 }
 
 internal fun buildMemoryRecallContext(
     memories: List<MemoryBankEntity>,
+    query: String = "",
     maxItems: Int = 6,
     maxContentLength: Int = 120,
 ): String {
+    val queryTerms = query.recallQueryTerms()
     val selected = memories
         .filter { it.content.isNotBlank() && !it.deprecated }
-        .sortedWith(
-            compareByDescending<MemoryBankEntity> { it.pinned }
-                .thenByDescending { it.importance }
-                .thenByDescending { it.createdAt }
-        )
+        .sortedByDescending { memory -> memory.recallScore(queryTerms) }
         .take(maxItems)
     if (selected.isEmpty()) return ""
 
@@ -254,6 +248,30 @@ private fun MemoryBankEntity.recallSectionTitle(): String = when (memoryKind ?: 
     else -> "当前相关回忆"
 }
 
+private fun MemoryBankEntity.recallScore(queryTerms: List<String>): Double {
+    val text = listOfNotNull(
+        title,
+        content,
+        memoryKind,
+        roleFeeling,
+        bodySense,
+        unspokenThought,
+        userSignal,
+        relationshipEffect,
+        tagsJson,
+        embeddingText,
+        peopleJson,
+        topicsJson,
+    ).joinToString("\n").lowercase()
+    val queryScore = queryTerms.count { term -> term in text } * 120.0
+    val promiseScore = if ((memoryKind ?: type) == "promise") 160.0 else 0.0
+    val pinnedScore = if (pinned) 220.0 else 0.0
+    val importanceScore = importance.coerceIn(1, 5) * 24.0
+    val confidenceScore = confidence.coerceIn(0.0, 1.0) * 20.0
+    val freshnessScore = createdAt.coerceAtLeast(0L) / 1_000_000_000_000.0
+    return queryScore + promiseScore + pinnedScore + importanceScore + confidenceScore + freshnessScore
+}
+
 private fun MemoryBankEntity.toRecallLine(maxContentLength: Int): String {
     val parts = buildList {
         add(content.trim())
@@ -271,4 +289,20 @@ private fun String?.isNotBlankValue(): Boolean = this != null && isNotBlank()
 private fun String.ellipsize(maxLength: Int): String {
     if (length <= maxLength) return this
     return take(maxLength).trimEnd() + "..."
+}
+
+private fun String.recallQueryTerms(): List<String> {
+    val compact = trim().lowercase().filterNot(Char::isWhitespace)
+    if (compact.isBlank()) return emptyList()
+    val wordTerms = Regex("[\\p{L}\\p{N}_]{2,}")
+        .findAll(lowercase())
+        .map { it.value }
+    val cjkBigrams = compact.windowed(size = 2, step = 1, partialWindows = false)
+        .asSequence()
+        .filter { term -> term.any { it.code > 127 } }
+    return (wordTerms + cjkBigrams)
+        .filter { it.length >= 2 }
+        .distinct()
+        .take(24)
+        .toList()
 }
