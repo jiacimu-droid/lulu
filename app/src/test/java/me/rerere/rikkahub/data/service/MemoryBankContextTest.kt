@@ -142,4 +142,33 @@ class MemoryBankContextTest {
         assertTrue(context.contains("答应帮用户继续看论文大纲"))
         assertTrue(!context.contains("雨天窝在床上"))
     }
+
+    @Test
+    fun `build memory context can rank memories by vector similarity`() {
+        val memories = listOf(
+            MemoryBankEntity(
+                content = "露露记得用户要的是轻一点的陪伴，不是催促。",
+                memoryKind = "user_preference",
+                embeddingVectorJson = encodeMemoryVector(listOf(1f, 0f, 0f)),
+                importance = 1,
+                createdAt = 10L,
+            ),
+            MemoryBankEntity(
+                content = "用户喜欢雨天窝在床上聊天。",
+                memoryKind = "user_preference",
+                embeddingVectorJson = encodeMemoryVector(listOf(0f, 1f, 0f)),
+                importance = 5,
+                createdAt = 100L,
+            ),
+        )
+
+        val context = buildMemoryRecallContext(
+            memories = memories,
+            queryVector = listOf(1f, 0f, 0f),
+            maxItems = 1,
+        )
+
+        assertTrue(context.contains("轻一点的陪伴"))
+        assertTrue(!context.contains("雨天窝在床上"))
+    }
 }

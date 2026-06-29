@@ -76,7 +76,9 @@ val appModule = module {
         MemoryBankService(
             memoryBankDAO = get(),
             okHttpClient = get(),
-            context = get()
+            context = get(),
+            settingsStore = get(),
+            providerManager = get(),
         )
     }
 

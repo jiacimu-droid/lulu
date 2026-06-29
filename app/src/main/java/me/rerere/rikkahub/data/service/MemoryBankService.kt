@@ -4,8 +4,14 @@ import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
+import me.rerere.ai.provider.EmbeddingGenerationParams
+import me.rerere.ai.provider.ModelType
+import me.rerere.ai.provider.ProviderManager
 import me.rerere.rikkahub.data.db.dao.MemoryBankDAO
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
+import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.datastore.findModelById
+import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.utils.JsonInstant
 import okhttp3.OkHttpClient
 import java.text.SimpleDateFormat
@@ -15,7 +21,9 @@ import java.util.Locale
 class MemoryBankService(
     private val memoryBankDAO: MemoryBankDAO,
     private val okHttpClient: OkHttpClient?,
-    private val context: Context?
+    private val context: Context?,
+    private val settingsStore: SettingsStore? = null,
+    private val providerManager: ProviderManager? = null,
 ) {
     data class MemoryStats(
         val total: Int = 0,
@@ -124,7 +132,52 @@ class MemoryBankService(
     }
 
     suspend fun processPendingVectors() {
-        // No-op: vector processing is restored in a later phase after structured memory extraction lands.
+        val settingsStore = settingsStore ?: return
+        val providerManager = providerManager ?: return
+        withContext(Dispatchers.IO) {
+            val settings = settingsStore.settingsFlow.value
+            val config = settings.memoryEmbeddingConfig
+            if (!config.enabled) return@withContext
+            val modelId = config.modelId ?: return@withContext
+            val model = settings.findModelById(modelId)?.takeIf { it.type == ModelType.EMBEDDING } ?: return@withContext
+            val provider = model.findProvider(settings.providers) ?: return@withContext
+            val providerImpl = providerManager.getProviderByType(provider)
+            val pending = memoryBankDAO.getPendingVectorMemories(maxRetry = 3, limit = config.batchSize.coerceIn(1, 64))
+            if (pending.isEmpty()) return@withContext
+
+            val inputs = pending.map { memory -> memory.embeddingText?.takeIf { it.isNotBlank() } ?: memory.content }
+            runCatching {
+                providerImpl.generateEmbedding(
+                    providerSetting = provider,
+                    params = EmbeddingGenerationParams(
+                        model = model,
+                        input = inputs,
+                        dimensions = config.dimensions,
+                        customHeaders = model.customHeaders,
+                        customBody = model.customBodies,
+                    ),
+                )
+            }.onSuccess { result ->
+                pending.zip(result.embeddings).forEach { (memory, vector) ->
+                    memoryBankDAO.updateVectorResult(
+                        id = memory.id,
+                        status = "done",
+                        retryCount = memory.vectorRetryCount,
+                        vectorJson = encodeMemoryVector(vector),
+                        modelId = result.model,
+                        dimensions = vector.size,
+                    )
+                }
+            }.onFailure {
+                pending.forEach { memory ->
+                    memoryBankDAO.updateVectorStatus(
+                        id = memory.id,
+                        status = if (memory.vectorRetryCount + 1 >= 3) "failed" else "pending",
+                        retryCount = memory.vectorRetryCount + 1,
+                    )
+                }
+            }
+        }
     }
 
     suspend fun saveManualMemory(content: String): MemoryBankEntity = withContext(Dispatchers.IO) {
@@ -199,20 +252,54 @@ class MemoryBankService(
         }
             .distinctBy { it.id }
 
-        buildMemoryRecallContext(memories, query = query)
+        val queryVector = buildQueryEmbedding(query)
+        buildMemoryRecallContext(
+            memories = memories,
+            query = query,
+            queryVector = queryVector,
+        )
+    }
+
+    private suspend fun buildQueryEmbedding(query: String): List<Float> {
+        val settingsStore = settingsStore ?: return emptyList()
+        val providerManager = providerManager ?: return emptyList()
+        val trimmed = query.trim()
+        if (trimmed.isBlank()) return emptyList()
+
+        val settings = settingsStore.settingsFlow.value
+        val config = settings.memoryEmbeddingConfig
+        if (!config.enabled) return emptyList()
+        val modelId = config.modelId ?: return emptyList()
+        val model = settings.findModelById(modelId)?.takeIf { it.type == ModelType.EMBEDDING } ?: return emptyList()
+        val provider = model.findProvider(settings.providers) ?: return emptyList()
+        val providerImpl = providerManager.getProviderByType(provider)
+
+        return runCatching {
+            providerImpl.generateEmbedding(
+                providerSetting = provider,
+                params = EmbeddingGenerationParams(
+                    model = model,
+                    input = listOf(trimmed),
+                    dimensions = config.dimensions,
+                    customHeaders = model.customHeaders,
+                    customBody = model.customBodies,
+                ),
+            ).embeddings.firstOrNull().orEmpty()
+        }.getOrDefault(emptyList())
     }
 }
 
 internal fun buildMemoryRecallContext(
     memories: List<MemoryBankEntity>,
     query: String = "",
+    queryVector: List<Float> = emptyList(),
     maxItems: Int = 6,
     maxContentLength: Int = 120,
 ): String {
     val queryTerms = query.recallQueryTerms()
     val selected = memories
         .filter { it.content.isNotBlank() && !it.deprecated }
-        .sortedByDescending { memory -> memory.recallScore(queryTerms) }
+        .sortedByDescending { memory -> memory.recallScore(queryTerms, queryVector) }
         .take(maxItems)
     if (selected.isEmpty()) return ""
 
@@ -248,7 +335,7 @@ private fun MemoryBankEntity.recallSectionTitle(): String = when (memoryKind ?: 
     else -> "当前相关回忆"
 }
 
-private fun MemoryBankEntity.recallScore(queryTerms: List<String>): Double {
+private fun MemoryBankEntity.recallScore(queryTerms: List<String>, queryVector: List<Float>): Double {
     val text = listOfNotNull(
         title,
         content,
@@ -269,7 +356,8 @@ private fun MemoryBankEntity.recallScore(queryTerms: List<String>): Double {
     val importanceScore = importance.coerceIn(1, 5) * 24.0
     val confidenceScore = confidence.coerceIn(0.0, 1.0) * 20.0
     val freshnessScore = createdAt.coerceAtLeast(0L) / 1_000_000_000_000.0
-    return queryScore + promiseScore + pinnedScore + importanceScore + confidenceScore + freshnessScore
+    val vectorScore = cosineSimilarity(queryVector, decodeMemoryVector(embeddingVectorJson)) * 240.0
+    return vectorScore + queryScore + promiseScore + pinnedScore + importanceScore + confidenceScore + freshnessScore
 }
 
 private fun MemoryBankEntity.toRecallLine(maxContentLength: Int): String {

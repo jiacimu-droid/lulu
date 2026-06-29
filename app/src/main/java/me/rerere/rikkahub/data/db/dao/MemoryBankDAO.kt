@@ -113,4 +113,24 @@ interface MemoryBankDAO {
 
     @Query("UPDATE memory_bank SET vector_status = :status, vector_retry_count = :retryCount WHERE id = :id")
     suspend fun updateVectorStatus(id: Int, status: String, retryCount: Int)
+
+    @Query(
+        """
+        UPDATE memory_bank
+        SET vector_status = :status,
+            vector_retry_count = :retryCount,
+            embedding_vector_json = :vectorJson,
+            embedding_model_id = :modelId,
+            embedding_dimensions = :dimensions
+        WHERE id = :id
+        """
+    )
+    suspend fun updateVectorResult(
+        id: Int,
+        status: String,
+        retryCount: Int,
+        vectorJson: String?,
+        modelId: String?,
+        dimensions: Int?,
+    )
 }

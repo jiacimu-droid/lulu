@@ -50,6 +50,15 @@ data class MemoryBankEntity(
     @ColumnInfo("embedding_text")
     val embeddingText: String? = null,
 
+    @ColumnInfo("embedding_vector_json")
+    val embeddingVectorJson: String? = null,
+
+    @ColumnInfo("embedding_model_id")
+    val embeddingModelId: String? = null,
+
+    @ColumnInfo("embedding_dimensions")
+    val embeddingDimensions: Int? = null,
+
     @ColumnInfo("source_message_node_ids_json")
     val sourceMessageNodeIdsJson: String? = null,
 

@@ -125,6 +125,14 @@ private class RecordingMemoryBankDAO : MemoryBankDAO {
 
     override suspend fun getRecentDateGroups(limit: Int): List<String> = emptyList()
     override suspend fun updateVectorStatus(id: Int, status: String, retryCount: Int) = unsupported()
+    override suspend fun updateVectorResult(
+        id: Int,
+        status: String,
+        retryCount: Int,
+        vectorJson: String?,
+        modelId: String?,
+        dimensions: Int?,
+    ) = unsupported()
 
     private fun unsupported(): Nothing = error("Unexpected DAO call")
 }

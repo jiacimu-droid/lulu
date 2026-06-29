@@ -157,6 +157,8 @@ class SettingsStore(
         // 主动消息设置
         val PROACTIVE_MESSAGE_SETTING = stringPreferencesKey("proactive_message_setting")
 
+        val MEMORY_EMBEDDING_CONFIG = stringPreferencesKey("memory_embedding_config")
+
         val LULU_STATES = stringPreferencesKey("lulu_states")
 
     }
@@ -254,6 +256,9 @@ class SettingsStore(
                 proactiveMessageSetting = preferences[PROACTIVE_MESSAGE_SETTING]?.let {
                     JsonInstant.decodeFromString(it)
                 } ?: ProactiveMessageSetting(),
+                memoryEmbeddingConfig = preferences[MEMORY_EMBEDDING_CONFIG]?.let {
+                    JsonInstant.decodeFromString(it)
+                } ?: MemoryEmbeddingConfig(),
                 luluStates = preferences[LULU_STATES]?.let {
                     JsonInstant.decodeFromString(it)
                 } ?: emptyList(),
@@ -418,6 +423,7 @@ class SettingsStore(
             preferences[SPONSOR_ALERT_DISMISSED_AT] = settings.sponsorAlertDismissedAt
             preferences[SYSTEM_TOOLS_SETTING] = JsonInstant.encodeToString(settings.systemToolsSetting)
             preferences[PROACTIVE_MESSAGE_SETTING] = JsonInstant.encodeToString(settings.proactiveMessageSetting)
+            preferences[MEMORY_EMBEDDING_CONFIG] = JsonInstant.encodeToString(settings.memoryEmbeddingConfig)
             preferences[LULU_STATES] = JsonInstant.encodeToString(settings.luluStates)
         }
     }
@@ -548,6 +554,7 @@ data class Settings(
     val sponsorAlertDismissedAt: Int = 0,
     val systemToolsSetting: SystemToolsSetting = SystemToolsSetting(),
     val proactiveMessageSetting: ProactiveMessageSetting = ProactiveMessageSetting(),
+    val memoryEmbeddingConfig: MemoryEmbeddingConfig = MemoryEmbeddingConfig(),
     val luluStates: List<LuluState> = emptyList(),
 ) {
     companion object {
@@ -555,6 +562,14 @@ data class Settings(
         fun dummy() = Settings(init = true)
     }
 }
+
+@Serializable
+data class MemoryEmbeddingConfig(
+    val enabled: Boolean = false,
+    val modelId: Uuid? = null,
+    val dimensions: Int? = null,
+    val batchSize: Int = 16,
+)
 
 @Serializable
 enum class ChatFontFamily {

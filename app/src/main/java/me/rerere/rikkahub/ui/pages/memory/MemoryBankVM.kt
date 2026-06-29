@@ -5,13 +5,23 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
+import me.rerere.ai.provider.Model
+import me.rerere.ai.provider.ModelType
+import me.rerere.rikkahub.data.datastore.Settings
+import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
 import me.rerere.rikkahub.data.service.MemoryBankService
+import kotlin.uuid.Uuid
 
 class MemoryBankVM(
     private val memoryBankService: MemoryBankService,
+    private val settingsStore: SettingsStore,
 ) : ViewModel() {
+    val settings: StateFlow<Settings> = settingsStore.settingsFlow
+        .stateIn(viewModelScope, SharingStarted.Lazily, Settings.dummy())
 
     private val _memories = MutableStateFlow<List<MemoryBankEntity>>(emptyList())
     val memories: StateFlow<List<MemoryBankEntity>> = _memories.asStateFlow()
@@ -125,4 +135,33 @@ class MemoryBankVM(
             }
         }
     }
+
+    fun setMemoryEmbeddingEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsStore.update { settings ->
+                settings.copy(memoryEmbeddingConfig = settings.memoryEmbeddingConfig.copy(enabled = enabled))
+            }
+        }
+    }
+
+    fun setMemoryEmbeddingModel(modelId: Uuid?) {
+        viewModelScope.launch {
+            settingsStore.update { settings ->
+                settings.copy(memoryEmbeddingConfig = settings.memoryEmbeddingConfig.copy(modelId = modelId))
+            }
+        }
+    }
+
+    fun setMemoryEmbeddingDimensions(value: String) {
+        val dimensions = value.trim().toIntOrNull()?.takeIf { it > 0 }
+        viewModelScope.launch {
+            settingsStore.update { settings ->
+                settings.copy(memoryEmbeddingConfig = settings.memoryEmbeddingConfig.copy(dimensions = dimensions))
+            }
+        }
+    }
+
+    fun embeddingModels(settings: Settings): List<Model> =
+        settings.providers.flatMap { provider -> provider.models }
+            .filter { model -> model.type == ModelType.EMBEDDING }
 }

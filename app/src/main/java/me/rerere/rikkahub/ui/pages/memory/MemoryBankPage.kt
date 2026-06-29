@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -51,6 +52,7 @@ import me.rerere.hugeicons.stroke.Refresh01
 import me.rerere.hugeicons.stroke.Search01
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
 import me.rerere.rikkahub.data.service.MemoryBankService
+import me.rerere.rikkahub.ui.components.ui.Select
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -71,6 +73,8 @@ fun MemoryBankPage(
     val assistantIds by vm.assistantIds.collectAsStateWithLifecycle()
     val loading by vm.loading.collectAsStateWithLifecycle()
     val stats by vm.stats.collectAsStateWithLifecycle()
+    val settings by vm.settings.collectAsStateWithLifecycle()
+    val embeddingModels = remember(settings.providers) { vm.embeddingModels(settings) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showDeleteDialog by remember { mutableStateOf<MemoryBankEntity?>(null) }
@@ -119,6 +123,18 @@ fun MemoryBankPage(
             // 统计卡片 - 消息只显示条数
             item {
                 StatsRow(stats)
+            }
+
+            item {
+                MemoryEmbeddingConfigCard(
+                    enabled = settings.memoryEmbeddingConfig.enabled,
+                    selectedModelId = settings.memoryEmbeddingConfig.modelId,
+                    dimensions = settings.memoryEmbeddingConfig.dimensions,
+                    models = embeddingModels,
+                    onEnabledChange = vm::setMemoryEmbeddingEnabled,
+                    onModelSelected = vm::setMemoryEmbeddingModel,
+                    onDimensionsChange = vm::setMemoryEmbeddingDimensions,
+                )
             }
 
             item { Spacer(modifier = Modifier.height(4.dp)) }
@@ -257,6 +273,68 @@ fun MemoryBankPage(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun MemoryEmbeddingConfigCard(
+    enabled: Boolean,
+    selectedModelId: kotlin.uuid.Uuid?,
+    dimensions: Int?,
+    models: List<me.rerere.ai.provider.Model>,
+    onEnabledChange: (Boolean) -> Unit,
+    onModelSelected: (kotlin.uuid.Uuid?) -> Unit,
+    onDimensionsChange: (String) -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("记忆向量化", style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        text = "使用 Provider 里的 Embedding 模型处理待向量化记忆",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(checked = enabled, onCheckedChange = onEnabledChange)
+            }
+
+            if (models.isEmpty()) {
+                Text(
+                    text = "暂无 Embedding 模型。请先在 Provider 设置里新增模型并选择 Embedding 类型。",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            } else {
+                val options = listOf<me.rerere.ai.provider.Model?>(null) + models
+                val selectedModel = models.firstOrNull { it.id == selectedModelId }
+                Select(
+                    options = options,
+                    selectedOption = selectedModel,
+                    onOptionSelected = { model -> onModelSelected(model?.id) },
+                    optionToString = { model -> model?.displayName?.ifBlank { model.modelId } ?: "未选择模型" },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            OutlinedTextField(
+                value = dimensions?.toString().orEmpty(),
+                onValueChange = onDimensionsChange,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("向量维度（可选）") },
+                singleLine = true,
+            )
+        }
     }
 }
 
