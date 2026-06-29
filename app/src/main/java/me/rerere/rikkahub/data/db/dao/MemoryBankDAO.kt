@@ -81,6 +81,12 @@ interface MemoryBankDAO {
     @Query("SELECT COUNT(*) FROM memory_bank WHERE vector_status = :status")
     suspend fun getCountByVectorStatus(status: String): Int
 
+    @Query("SELECT COUNT(*) FROM memory_bank WHERE deprecated = 1")
+    suspend fun getDeprecatedCount(): Int
+
+    @Query("SELECT COUNT(*) FROM memory_bank WHERE assistant_id = :assistantId AND deprecated = 1")
+    suspend fun getDeprecatedCountByAssistant(assistantId: String): Int
+
     @Query("SELECT COUNT(*) FROM memory_bank WHERE assistant_id = :assistantId")
     suspend fun getCountByAssistant(assistantId: String): Int
 
@@ -90,11 +96,35 @@ interface MemoryBankDAO {
     @Query("SELECT * FROM memory_bank WHERE deprecated = 0 ORDER BY created_at DESC LIMIT :limit")
     suspend fun getRecentMemories(limit: Int): List<MemoryBankEntity>
 
+    @Query("SELECT * FROM memory_bank WHERE deprecated = 1 ORDER BY corrected_at DESC, created_at DESC LIMIT :limit")
+    suspend fun getDeprecatedMemories(limit: Int): List<MemoryBankEntity>
+
+    @Query("SELECT * FROM memory_bank WHERE deprecated = 1 AND assistant_id = :assistantId ORDER BY corrected_at DESC, created_at DESC LIMIT :limit")
+    suspend fun getDeprecatedMemoriesByAssistant(assistantId: String, limit: Int): List<MemoryBankEntity>
+
     @Query("SELECT * FROM memory_bank WHERE deprecated = 0 AND content LIKE '%' || :keyword || '%' ORDER BY created_at DESC LIMIT :limit")
     suspend fun searchMemoriesByKeyword(keyword: String, limit: Int = 20): List<MemoryBankEntity>
 
+    @Query("SELECT * FROM memory_bank WHERE deprecated = 1 AND content LIKE '%' || :keyword || '%' ORDER BY corrected_at DESC, created_at DESC LIMIT :limit")
+    suspend fun searchDeprecatedMemoriesByKeyword(keyword: String, limit: Int = 20): List<MemoryBankEntity>
+
+    @Query("SELECT * FROM memory_bank WHERE deprecated = 1 AND assistant_id = :assistantId AND content LIKE '%' || :keyword || '%' ORDER BY corrected_at DESC, created_at DESC LIMIT :limit")
+    suspend fun searchDeprecatedMemoriesByAssistantAndKeyword(
+        assistantId: String,
+        keyword: String,
+        limit: Int = 20,
+    ): List<MemoryBankEntity>
+
     @Query("SELECT * FROM memory_bank WHERE deprecated = 0 AND content LIKE '%' || :keyword || '%' AND type = :type ORDER BY created_at DESC LIMIT :limit")
     suspend fun searchMemoriesByKeywordAndType(keyword: String, type: String, limit: Int = 20): List<MemoryBankEntity>
+
+    @Query("SELECT * FROM memory_bank WHERE deprecated = 0 AND assistant_id = :assistantId AND content LIKE '%' || :keyword || '%' AND type = :type ORDER BY created_at DESC LIMIT :limit")
+    suspend fun searchMemoriesByAssistantKeywordAndType(
+        assistantId: String,
+        keyword: String,
+        type: String,
+        limit: Int = 20,
+    ): List<MemoryBankEntity>
 
     @Query("SELECT * FROM memory_bank WHERE deprecated = 0 AND pinned = 1 ORDER BY importance DESC, created_at DESC LIMIT :limit")
     suspend fun getPinnedRecallMemories(limit: Int): List<MemoryBankEntity>

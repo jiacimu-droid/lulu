@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -48,11 +50,14 @@ import me.rerere.hugeicons.stroke.ArrowLeft01
 import me.rerere.hugeicons.stroke.Database02
 import me.rerere.hugeicons.stroke.DatabaseSync
 import me.rerere.hugeicons.stroke.Delete02
+import me.rerere.hugeicons.stroke.PencilEdit01
 import me.rerere.hugeicons.stroke.Refresh01
 import me.rerere.hugeicons.stroke.Search01
+import me.rerere.hugeicons.stroke.Tools
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.ui.components.ui.Select
+import me.rerere.rikkahub.utils.JsonInstant
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -62,6 +67,7 @@ import java.util.Locale
 @Composable
 fun MemoryBankPage(
     onBack: () -> Unit,
+    onOpenSource: (conversationId: String, nodeId: String?) -> Unit,
 ) {
     val vm: MemoryBankVM = koinViewModel()
     val memories by vm.memories.collectAsStateWithLifecycle()
@@ -74,10 +80,13 @@ fun MemoryBankPage(
     val loading by vm.loading.collectAsStateWithLifecycle()
     val stats by vm.stats.collectAsStateWithLifecycle()
     val settings by vm.settings.collectAsStateWithLifecycle()
+    val maintenanceMessage by vm.maintenanceMessage.collectAsStateWithLifecycle()
     val embeddingModels = remember(settings.providers) { vm.embeddingModels(settings) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showDeleteDialog by remember { mutableStateOf<MemoryBankEntity?>(null) }
+    var editMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
+    var correctionMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -105,6 +114,9 @@ fun MemoryBankPage(
                     IconButton(onClick = { vm.processPendingVectors() }) {
                         Icon(HugeIcons.DatabaseSync, contentDescription = "处理向量化")
                     }
+                    IconButton(onClick = { vm.runLightMaintenance() }) {
+                        Icon(HugeIcons.Tools, contentDescription = "轻量维护")
+                    }
                     IconButton(onClick = { vm.loadMemories() }) {
                         Icon(HugeIcons.Refresh01, contentDescription = "刷新")
                     }
@@ -123,6 +135,16 @@ fun MemoryBankPage(
             // 统计卡片 - 消息只显示条数
             item {
                 StatsRow(stats)
+            }
+
+            maintenanceMessage?.let { message ->
+                item {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
 
             item {
@@ -192,7 +214,11 @@ fun MemoryBankPage(
                     items(todayPhaseSummaries, key = { it.id }) { memory ->
                         MemoryCard(
                             memory = memory,
-                            onDelete = { showDeleteDialog = memory }
+                            onDelete = { showDeleteDialog = memory },
+                            onOpenSource = onOpenSource,
+                            onEdit = { editMemory = memory },
+                            onTogglePinned = { vm.setPinned(memory, !memory.pinned) },
+                            onCorrect = { correctionMemory = memory },
                         )
                     }
                 }
@@ -211,7 +237,11 @@ fun MemoryBankPage(
                     items(dailySummaries, key = { it.id }) { memory ->
                         DiaryCard(
                             memory = memory,
-                            onDelete = { showDeleteDialog = memory }
+                            onDelete = { showDeleteDialog = memory },
+                            onOpenSource = onOpenSource,
+                            onEdit = { editMemory = memory },
+                            onTogglePinned = { vm.setPinned(memory, !memory.pinned) },
+                            onCorrect = { correctionMemory = memory },
                         )
                     }
                 }
@@ -233,7 +263,11 @@ fun MemoryBankPage(
                 items(memories, key = { it.id }) { memory ->
                     MemoryCard(
                         memory = memory,
-                        onDelete = { showDeleteDialog = memory }
+                        onDelete = { showDeleteDialog = memory },
+                        onOpenSource = onOpenSource,
+                        onEdit = { editMemory = memory },
+                        onTogglePinned = { vm.setPinned(memory, !memory.pinned) },
+                        onCorrect = { correctionMemory = memory },
                     )
                 }
 
@@ -274,6 +308,196 @@ fun MemoryBankPage(
             }
         )
     }
+
+    editMemory?.let { memory ->
+        EditMemoryDialog(
+            memory = memory,
+            onDismiss = { editMemory = null },
+            onConfirm = {
+                vm.updateMemory(it)
+                editMemory = null
+            },
+        )
+    }
+
+    correctionMemory?.let { memory ->
+        CorrectMemoryDialog(
+            memory = memory,
+            onDismiss = { correctionMemory = null },
+            onConfirm = { reason, supersededBy ->
+                vm.markDeprecated(memory, reason, supersededBy)
+                correctionMemory = null
+            },
+        )
+    }
+}
+
+@Composable
+private fun EditMemoryDialog(
+    memory: MemoryBankEntity,
+    onDismiss: () -> Unit,
+    onConfirm: (MemoryBankEntity) -> Unit,
+) {
+    var content by remember(memory.id) { mutableStateOf(memory.content) }
+    var title by remember(memory.id) { mutableStateOf(memory.title.orEmpty()) }
+    var memoryKind by remember(memory.id) { mutableStateOf(memory.memoryKind.orEmpty()) }
+    var importance by remember(memory.id) { mutableStateOf(memory.importance.toString()) }
+    var confidence by remember(memory.id) { mutableStateOf("%.2f".format(memory.confidence)) }
+    var tagsJson by remember(memory.id) { mutableStateOf(memory.tagsJson.orEmpty()) }
+    var embeddingText by remember(memory.id) { mutableStateOf(memory.embeddingText.orEmpty()) }
+    val contentChanged = content != memory.content || embeddingText != memory.embeddingText.orEmpty()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("编辑记忆") },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                OutlinedTextField(
+                    value = content,
+                    onValueChange = { content = it },
+                    label = { Text("内容") },
+                    minLines = 3,
+                    maxLines = 8,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("标题") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = memoryKind,
+                    onValueChange = { memoryKind = it },
+                    label = { Text("记忆类型") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = importance,
+                        onValueChange = { importance = it },
+                        label = { Text("重要度 1-5") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                    OutlinedTextField(
+                        value = confidence,
+                        onValueChange = { confidence = it },
+                        label = { Text("可信度 0-1") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                OutlinedTextField(
+                    value = tagsJson,
+                    onValueChange = { tagsJson = it },
+                    label = { Text("标签 JSON") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = embeddingText,
+                    onValueChange = { embeddingText = it },
+                    label = { Text("向量文本") },
+                    minLines = 2,
+                    maxLines = 4,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = content.isNotBlank(),
+                onClick = {
+                    val updated = memory.copy(
+                        content = content.trim(),
+                        title = title.trim().takeIf { it.isNotBlank() },
+                        memoryKind = memoryKind.trim().takeIf { it.isNotBlank() },
+                        importance = importance.toIntOrNull()?.coerceIn(1, 5) ?: memory.importance,
+                        confidence = confidence.toDoubleOrNull()?.coerceIn(0.0, 1.0) ?: memory.confidence,
+                        tagsJson = tagsJson.trim().takeIf { it.isNotBlank() },
+                        embeddingText = embeddingText.trim().takeIf { it.isNotBlank() },
+                        embeddingVectorJson = if (contentChanged) null else memory.embeddingVectorJson,
+                        embeddingModelId = if (contentChanged) null else memory.embeddingModelId,
+                        embeddingDimensions = if (contentChanged) null else memory.embeddingDimensions,
+                        vectorStatus = if (contentChanged) "pending" else memory.vectorStatus,
+                        vectorRetryCount = if (contentChanged) 0 else memory.vectorRetryCount,
+                    )
+                    onConfirm(updated)
+                },
+            ) {
+                Text("保存")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("取消")
+            }
+        },
+    )
+}
+
+@Composable
+private fun CorrectMemoryDialog(
+    memory: MemoryBankEntity,
+    onDismiss: () -> Unit,
+    onConfirm: (reason: String, supersededByMemoryId: String?) -> Unit,
+) {
+    var reason by remember(memory.id) { mutableStateOf(memory.deprecatedReason.orEmpty()) }
+    var supersededBy by remember(memory.id) { mutableStateOf(memory.supersededByMemoryId.orEmpty()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("修正记忆") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = memory.content,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                OutlinedTextField(
+                    value = reason,
+                    onValueChange = { reason = it },
+                    label = { Text("失效原因") },
+                    placeholder = { Text("例如：用户已澄清、重复记忆、旧设定失效") },
+                    minLines = 2,
+                    maxLines = 4,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = supersededBy,
+                    onValueChange = { supersededBy = it },
+                    label = { Text("修正为的记忆 ID（可选）") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm(
+                        reason.ifBlank { "manual_correction" },
+                        supersededBy.trim().takeIf { it.isNotBlank() },
+                    )
+                },
+            ) {
+                Text("标记失效")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("取消")
+            }
+        },
+    )
 }
 
 @Composable
@@ -359,6 +583,7 @@ private fun StatsRow(stats: MemoryBankService.MemoryStats) {
         StatCard("已向量化", stats.vectorizedCount, Modifier.weight(1f), MaterialTheme.colorScheme.primaryContainer)
         StatCard("待处理", stats.pendingCount, Modifier.weight(1f), MaterialTheme.colorScheme.tertiaryContainer)
         StatCard("失败", stats.failedCount, Modifier.weight(1f), MaterialTheme.colorScheme.errorContainer)
+        StatCard("失效", stats.deprecatedCount, Modifier.weight(1f), MaterialTheme.colorScheme.surfaceVariant)
     }
 }
 
@@ -410,7 +635,14 @@ private fun TypeFilterRow(
     selectedType: String,
     onTypeSelected: (String) -> Unit,
 ) {
-    val types = listOf("" to "总结视图", "phase_summary" to "阶段总结", "daily_summary" to "日记", "message" to "消息", "manual" to "手动")
+    val types = listOf(
+        "" to "总结视图",
+        "phase_summary" to "阶段总结",
+        "daily_summary" to "日记",
+        "message" to "消息",
+        "manual" to "手动",
+        "deprecated" to "失效",
+    )
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -428,7 +660,12 @@ private fun TypeFilterRow(
 private fun MemoryCard(
     memory: MemoryBankEntity,
     onDelete: () -> Unit,
+    onOpenSource: (conversationId: String, nodeId: String?) -> Unit,
+    onEdit: () -> Unit,
+    onTogglePinned: () -> Unit,
+    onCorrect: () -> Unit,
 ) {
+    val sourceNodeId = remember(memory.sourceMessageNodeIdsJson) { memory.firstSourceNodeId() }
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -483,6 +720,34 @@ private fun MemoryCard(
                         )
                     }
 
+                    if (memory.deprecated) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            shape = MaterialTheme.shapes.extraSmall,
+                        ) {
+                            Text(
+                                text = "已失效",
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                            )
+                        }
+                    }
+
+                    if (memory.pinned) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = MaterialTheme.shapes.extraSmall,
+                        ) {
+                            Text(
+                                text = "置顶",
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                        }
+                    }
+
                     val timeStr = remember(memory.createdAt) {
                         SimpleDateFormat("MM/dd HH:mm", Locale.getDefault())
                             .format(Date(memory.createdAt))
@@ -511,28 +776,105 @@ private fun MemoryCard(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                MemoryMetaInfo(memory)
             }
 
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.size(32.dp)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (memory.conversationId != null) {
+                    TextButton(onClick = { onOpenSource(memory.conversationId, sourceNodeId) }) {
+                        Text("原文")
+                    }
+                }
+                TextButton(onClick = onTogglePinned) {
+                    Text(if (memory.pinned) "取消置顶" else "置顶")
+                }
+                if (!memory.deprecated) {
+                    TextButton(onClick = onCorrect) {
+                        Text("修正")
+                    }
+                }
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        HugeIcons.PencilEdit01,
+                        contentDescription = "编辑",
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        HugeIcons.Delete02,
+                        contentDescription = "删除",
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MemoryMetaInfo(memory: MemoryBankEntity) {
+    val chips = buildList {
+        memory.memoryKind?.takeIf { it.isNotBlank() }?.let { add("类型：$it") }
+        add("重要度：${memory.importance}")
+        add("可信度：${"%.2f".format(memory.confidence)}")
+        if (memory.recallCount > 0) add("召回：${memory.recallCount}")
+        memory.lastRecalledAt?.let { add("上次召回：${formatShortTime(it)}") }
+        memory.relatedMemoryIdsJson?.takeIf { it.isNotBlank() && it != "[]" }?.let { add("关联：$it") }
+        memory.sourceMessageNodeIdsJson?.takeIf { it.isNotBlank() && it != "[]" }?.let { add("来源：$it") }
+        memory.evidenceMessageNodeIdsJson?.takeIf { it.isNotBlank() && it != "[]" }?.let { add("证据：$it") }
+        memory.supersededByMemoryId?.takeIf { it.isNotBlank() }?.let { add("修正为：#$it") }
+        memory.deprecatedReason?.takeIf { it.isNotBlank() }?.let { add("原因：$it") }
+        memory.correctedAt?.let { add("修正时间：${formatShortTime(it)}") }
+    }
+    if (chips.isEmpty()) return
+
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        chips.forEach { chip ->
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.extraSmall,
             ) {
-                Icon(
-                    HugeIcons.Delete02,
-                    contentDescription = "删除",
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.error,
+                Text(
+                    text = chip,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
     }
 }
 
+private fun formatShortTime(timestamp: Long): String =
+    SimpleDateFormat("MM/dd HH:mm", Locale.getDefault()).format(Date(timestamp))
+
 @Composable
 private fun DiaryCard(
     memory: MemoryBankEntity,
     onDelete: () -> Unit,
+    onOpenSource: (conversationId: String, nodeId: String?) -> Unit,
+    onEdit: () -> Unit,
+    onTogglePinned: () -> Unit,
+    onCorrect: () -> Unit,
 ) {
+    val sourceNodeId = remember(memory.sourceMessageNodeIdsJson) { memory.firstSourceNodeId() }
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -580,17 +922,47 @@ private fun DiaryCard(
                 )
             }
 
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    HugeIcons.Delete02,
-                    contentDescription = "删除",
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.error,
-                )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (memory.conversationId != null) {
+                    TextButton(onClick = { onOpenSource(memory.conversationId, sourceNodeId) }) {
+                        Text("原文")
+                    }
+                }
+                TextButton(onClick = onTogglePinned) {
+                    Text(if (memory.pinned) "取消置顶" else "置顶")
+                }
+                if (!memory.deprecated) {
+                    TextButton(onClick = onCorrect) {
+                        Text("修正")
+                    }
+                }
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        HugeIcons.PencilEdit01,
+                        contentDescription = "编辑",
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        HugeIcons.Delete02,
+                        contentDescription = "删除",
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
             }
         }
     }
 }
+
+private fun MemoryBankEntity.firstSourceNodeId(): String? =
+    runCatching {
+        JsonInstant.decodeFromString<List<String>>(sourceMessageNodeIdsJson.orEmpty()).firstOrNull()
+    }.getOrNull()

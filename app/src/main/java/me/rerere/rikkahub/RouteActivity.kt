@@ -613,7 +613,10 @@ class RouteActivity : ComponentActivity() {
 
                             entry<Screen.MemoryBank> {
                                 MemoryBankPage(
-                                    onBack = { backStack.removeLastOrNull() }
+                                    onBack = { backStack.removeLastOrNull() },
+                                    onOpenSource = { conversationId, nodeId ->
+                                        backStack.add(Screen.Chat(id = conversationId, nodeId = nodeId))
+                                    },
                                 )
                             }
 

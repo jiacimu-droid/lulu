@@ -37,6 +37,7 @@ class MemoryBankService(
         val vectorizedCount: Int = 0,
         val pendingCount: Int = 0,
         val failedCount: Int = 0,
+        val deprecatedCount: Int = 0,
     )
 
     data class MaintenanceResult(
@@ -81,6 +82,11 @@ class MemoryBankService(
         } else {
             memoryBankDAO.getCountByVectorStatus("failed")
         }
+        val deprecatedCount = if (assistantId != null) {
+            memoryBankDAO.getDeprecatedCountByAssistant(assistantId)
+        } else {
+            memoryBankDAO.getDeprecatedCount()
+        }
         MemoryStats(
             total = total,
             messageCount = messageCount,
@@ -88,7 +94,8 @@ class MemoryBankService(
             manualCount = manualCount,
             vectorizedCount = vectorizedCount,
             pendingCount = pendingCount,
-            failedCount = failedCount
+            failedCount = failedCount,
+            deprecatedCount = deprecatedCount,
         )
     }
 
@@ -118,7 +125,17 @@ class MemoryBankService(
         limit: Int = 100,
         assistantId: String? = null
     ): List<MemoryBankEntity> = withContext(Dispatchers.IO) {
-        if (keyword.isNotBlank() && type.isNotBlank()) {
+        if (type == "deprecated" && keyword.isNotBlank() && assistantId != null) {
+            memoryBankDAO.searchDeprecatedMemoriesByAssistantAndKeyword(assistantId, keyword, limit)
+        } else if (type == "deprecated" && keyword.isNotBlank()) {
+            memoryBankDAO.searchDeprecatedMemoriesByKeyword(keyword, limit)
+        } else if (type == "deprecated" && assistantId != null) {
+            memoryBankDAO.getDeprecatedMemoriesByAssistant(assistantId, limit)
+        } else if (type == "deprecated") {
+            memoryBankDAO.getDeprecatedMemories(limit)
+        } else if (keyword.isNotBlank() && type.isNotBlank() && assistantId != null) {
+            memoryBankDAO.searchMemoriesByAssistantKeywordAndType(assistantId, keyword, type, limit)
+        } else if (keyword.isNotBlank() && type.isNotBlank()) {
             memoryBankDAO.searchMemoriesByKeywordAndType(keyword, type, limit)
         } else if (keyword.isNotBlank()) {
             memoryBankDAO.searchMemoriesByKeyword(keyword, limit)
@@ -133,6 +150,27 @@ class MemoryBankService(
 
     suspend fun deleteMemory(id: Int) = withContext(Dispatchers.IO) {
         memoryBankDAO.deleteMemoryById(id)
+    }
+
+    suspend fun updateMemory(memory: MemoryBankEntity) = withContext(Dispatchers.IO) {
+        memoryBankDAO.updateMemory(memory)
+    }
+
+    suspend fun setPinned(memory: MemoryBankEntity, pinned: Boolean) = withContext(Dispatchers.IO) {
+        memoryBankDAO.updateMemory(memory.copy(pinned = pinned))
+    }
+
+    suspend fun markMemoryDeprecated(
+        memory: MemoryBankEntity,
+        reason: String,
+        supersededByMemoryId: String?,
+    ) = withContext(Dispatchers.IO) {
+        memoryBankDAO.markMemoryDeprecated(
+            id = memory.id,
+            deprecatedReason = reason.ifBlank { "manual_correction" },
+            supersededByMemoryId = supersededByMemoryId?.takeIf { it.isNotBlank() },
+            correctedAt = System.currentTimeMillis(),
+        )
     }
 
     suspend fun rebuildIndex() {

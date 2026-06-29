@@ -50,6 +50,9 @@ class MemoryBankVM(
     private val _stats = MutableStateFlow(MemoryBankService.MemoryStats())
     val stats: StateFlow<MemoryBankService.MemoryStats> = _stats.asStateFlow()
 
+    private val _maintenanceMessage = MutableStateFlow<String?>(null)
+    val maintenanceMessage: StateFlow<String?> = _maintenanceMessage.asStateFlow()
+
     init {
         loadMemories()
     }
@@ -112,6 +115,27 @@ class MemoryBankVM(
         }
     }
 
+    fun updateMemory(memory: MemoryBankEntity) {
+        viewModelScope.launch {
+            memoryBankService.updateMemory(memory)
+            loadMemories()
+        }
+    }
+
+    fun setPinned(memory: MemoryBankEntity, pinned: Boolean) {
+        viewModelScope.launch {
+            memoryBankService.setPinned(memory, pinned)
+            loadMemories()
+        }
+    }
+
+    fun markDeprecated(memory: MemoryBankEntity, reason: String, supersededByMemoryId: String?) {
+        viewModelScope.launch {
+            memoryBankService.markMemoryDeprecated(memory, reason, supersededByMemoryId)
+            loadMemories()
+        }
+    }
+
     fun rebuildIndex() {
         viewModelScope.launch {
             _loading.value = true
@@ -129,6 +153,19 @@ class MemoryBankVM(
             _loading.value = true
             try {
                 memoryBankService.processPendingVectors()
+                loadMemories()
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun runLightMaintenance() {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val result = memoryBankService.runLightMaintenance()
+                _maintenanceMessage.value = "轻量维护完成：合并 ${result.deprecatedDuplicateCount} 条重复记忆"
                 loadMemories()
             } finally {
                 _loading.value = false

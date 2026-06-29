@@ -136,6 +136,40 @@ class MemoryBankServiceExtractionTest {
         assertEquals(2, dao.deprecatedUpdates.single().id)
         assertEquals("1", dao.deprecatedUpdates.single().supersededByMemoryId)
     }
+
+    @Test
+    fun `search memories applies assistant filter when keyword and type are provided`() = runBlocking {
+        val dao = RecordingMemoryBankDAO(
+            recentMemories = listOf(
+                MemoryBankEntity(
+                    id = 1,
+                    assistantId = "assistant-1",
+                    type = "manual",
+                    content = "用户喜欢露露主动一点。",
+                ),
+                MemoryBankEntity(
+                    id = 2,
+                    assistantId = "assistant-2",
+                    type = "manual",
+                    content = "用户喜欢露露主动一点。",
+                ),
+            )
+        )
+        val service = MemoryBankService(
+            memoryBankDAO = dao,
+            okHttpClient = null,
+            context = null,
+        )
+
+        val result = service.searchMemories(
+            keyword = "主动",
+            type = "manual",
+            assistantId = "assistant-1",
+        )
+
+        assertEquals(listOf(1), result.map { it.id })
+        assertEquals("assistant-1", dao.lastAssistantKeywordTypeSearch?.assistantId)
+    }
 }
 
 private class RecordingMemoryBankDAO(
@@ -146,6 +180,7 @@ private class RecordingMemoryBankDAO(
     val recalledIds = mutableListOf<Int>()
     val relatedMemoryUpdates = mutableMapOf<Int, String?>()
     val deprecatedUpdates = mutableListOf<DeprecatedMemoryUpdate>()
+    var lastAssistantKeywordTypeSearch: AssistantKeywordTypeSearch? = null
     var recalledAt: Long = 0L
 
     override suspend fun insertMemory(memory: MemoryBankEntity): Long {
@@ -192,15 +227,56 @@ private class RecordingMemoryBankDAO(
     override suspend fun getCountByType(type: String): Int = 0
     override suspend fun getSummaryCount(): Int = 0
     override suspend fun getCountByVectorStatus(status: String): Int = 0
+    override suspend fun getDeprecatedCount(): Int = recentMemories.count { it.deprecated }
+    override suspend fun getDeprecatedCountByAssistant(assistantId: String): Int =
+        recentMemories.count { it.assistantId == assistantId && it.deprecated }
+
     override suspend fun getCountByAssistant(assistantId: String): Int = 0
     override suspend fun getCountByAssistantAndType(assistantId: String, type: String): Int = 0
     override suspend fun getRecentMemories(limit: Int): List<MemoryBankEntity> = recentMemories.take(limit)
+    override suspend fun getDeprecatedMemories(limit: Int): List<MemoryBankEntity> =
+        recentMemories.filter { it.deprecated }.take(limit)
+
+    override suspend fun getDeprecatedMemoriesByAssistant(
+        assistantId: String,
+        limit: Int,
+    ): List<MemoryBankEntity> = recentMemories.filter { it.assistantId == assistantId && it.deprecated }.take(limit)
+
     override suspend fun searchMemoriesByKeyword(keyword: String, limit: Int): List<MemoryBankEntity> = emptyList()
+    override suspend fun searchDeprecatedMemoriesByKeyword(
+        keyword: String,
+        limit: Int,
+    ): List<MemoryBankEntity> = recentMemories.filter { it.deprecated && keyword in it.content }.take(limit)
+
+    override suspend fun searchDeprecatedMemoriesByAssistantAndKeyword(
+        assistantId: String,
+        keyword: String,
+        limit: Int,
+    ): List<MemoryBankEntity> =
+        recentMemories.filter { it.assistantId == assistantId && it.deprecated && keyword in it.content }.take(limit)
+
     override suspend fun searchMemoriesByKeywordAndType(
         keyword: String,
         type: String,
         limit: Int,
     ): List<MemoryBankEntity> = emptyList()
+
+    override suspend fun searchMemoriesByAssistantKeywordAndType(
+        assistantId: String,
+        keyword: String,
+        type: String,
+        limit: Int,
+    ): List<MemoryBankEntity> {
+        lastAssistantKeywordTypeSearch = AssistantKeywordTypeSearch(assistantId, keyword, type)
+        return recentMemories
+            .filter {
+                it.assistantId == assistantId &&
+                    it.type == type &&
+                    !it.deprecated &&
+                    it.content.contains(keyword)
+            }
+            .take(limit)
+    }
 
     override suspend fun getPinnedRecallMemories(limit: Int): List<MemoryBankEntity> = emptyList()
     override suspend fun getImportantRecallMemories(minImportance: Int, limit: Int): List<MemoryBankEntity> =
@@ -259,4 +335,10 @@ private data class DeprecatedMemoryUpdate(
     val deprecatedReason: String?,
     val supersededByMemoryId: String?,
     val correctedAt: Long?,
+)
+
+private data class AssistantKeywordTypeSearch(
+    val assistantId: String,
+    val keyword: String,
+    val type: String,
 )
