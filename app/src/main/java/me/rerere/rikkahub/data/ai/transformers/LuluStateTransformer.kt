@@ -3,7 +3,11 @@ package me.rerere.rikkahub.data.ai.transformers
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
 import me.rerere.rikkahub.data.model.LuluState
+import me.rerere.rikkahub.data.model.LuluThought
+import me.rerere.rikkahub.data.model.buildLuluExpressionPlan
+import me.rerere.rikkahub.data.model.buildLuluPerception
 import me.rerere.rikkahub.data.model.currentLuluState
+import me.rerere.rikkahub.data.model.thoughtHistory
 import kotlin.uuid.Uuid
 
 object LuluStateTransformer : InputMessageTransformer {
@@ -14,6 +18,7 @@ object LuluStateTransformer : InputMessageTransformer {
         messages = messages,
         assistantId = ctx.assistant.id,
         states = ctx.settings.luluStates,
+        thoughts = ctx.settings.luluThoughts,
     )
 }
 
@@ -21,21 +26,35 @@ internal fun applyLuluStateContext(
     messages: List<UIMessage>,
     assistantId: Uuid,
     states: List<LuluState>,
+    thoughts: List<LuluThought> = emptyList(),
 ): List<UIMessage> {
     if (messages.isEmpty()) return messages
     if (states.none { it.assistantId == assistantId }) return messages
 
     val state = states.currentLuluState(assistantId)
-    val contextMessage = UIMessage.system(buildLuluStateContext(state))
     val lastUserIndex = messages.indexOfLast { it.role == MessageRole.USER }
+    val latestUserText = messages.getOrNull(lastUserIndex)?.toText().orEmpty()
+    val contextMessage = UIMessage.system(
+        buildLuluPresenceContext(
+            state = state,
+            userText = latestUserText,
+            thoughts = thoughts.thoughtHistory(assistantId),
+        )
+    )
     val insertIndex = if (lastUserIndex >= 0) lastUserIndex else messages.size
 
     return messages.take(insertIndex) + contextMessage + messages.drop(insertIndex)
 }
 
-private fun buildLuluStateContext(state: LuluState): String = buildString {
-    appendLine("<lulu_status>")
-    appendLine("这是露露此刻的状态栏，只作为角色内在状态参考，不要机械复述。")
+internal fun buildLuluPresenceContext(
+    state: LuluState,
+    userText: String,
+    thoughts: List<LuluThought> = emptyList(),
+): String = buildString {
+    val perception = buildLuluPerception(userText)
+    val expression = buildLuluExpressionPlan(state, reply = userText)
+    appendLine("<lulu_presence>")
+    appendLine("这是露露此刻的内在状态、感知和未说出口的想法，只作为角色参考。不要机械复述这些字段。")
     appendLine("当前状态：${state.statusText}")
     appendLine("心声：${state.innerVoice}")
     appendLine("心情：${state.mood.label}")
@@ -43,5 +62,13 @@ private fun buildLuluStateContext(state: LuluState): String = buildString {
     appendLine("亲密感：${state.relationship.label}")
     appendLine("行动状态：${state.mode.label}")
     appendLine("变化原因：${state.reason}")
-    append("</lulu_status>")
+    appendLine("当前感知：${perception.summary}")
+    if (thoughts.isNotEmpty()) {
+        appendLine("未说出口的想法：")
+        thoughts.forEach { thought ->
+            appendLine("- ${thought.content}")
+        }
+    }
+    appendLine("表达建议：${expression.guidance}")
+    append("</lulu_presence>")
 }

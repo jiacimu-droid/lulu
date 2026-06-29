@@ -35,7 +35,10 @@ import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.MessageNode
 import me.rerere.rikkahub.data.model.NodeFavoriteTarget
 import me.rerere.rikkahub.data.model.appendLuluState
+import me.rerere.rikkahub.data.model.appendLuluThoughts
 import me.rerere.rikkahub.data.model.buildLuluStateFromTurn
+import me.rerere.rikkahub.data.model.buildLuluThoughtFromTurn
+import me.rerere.rikkahub.data.model.currentLuluState
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.repository.FavoriteRepository
 import me.rerere.rikkahub.service.ChatError
@@ -147,13 +150,28 @@ class ChatVM(
         val assistantText = latestAssistantMessage.toText().trim()
         if (assistantText.isBlank()) return
 
-        val state = buildLuluStateFromTurn(
-            assistantId = currentConversation.assistantId,
-            userText = latestUserMessage.toText().trim(),
-            assistantText = assistantText,
-        )
         settingsStore.update { settings ->
-            settings.copy(luluStates = settings.luluStates.appendLuluState(state))
+            val assistantId = currentConversation.assistantId
+            val userText = latestUserMessage.toText().trim()
+            val state = buildLuluStateFromTurn(
+                assistantId = assistantId,
+                previous = settings.luluStates.currentLuluState(assistantId),
+                userText = userText,
+                assistantText = assistantText,
+            )
+            val newThought = buildLuluThoughtFromTurn(
+                assistantId = assistantId,
+                userText = userText,
+                state = state,
+            )
+            val validAssistantIds = settings.assistants.map { it.id }.toSet()
+            settings.copy(
+                luluStates = settings.luluStates.appendLuluState(state),
+                luluThoughts = settings.luluThoughts.appendLuluThoughts(
+                    thoughts = listOfNotNull(newThought),
+                    validAssistantIds = validAssistantIds,
+                ),
+            )
         }
     }
 

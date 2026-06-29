@@ -7,6 +7,7 @@ import me.rerere.rikkahub.data.model.LuluMode
 import me.rerere.rikkahub.data.model.LuluMood
 import me.rerere.rikkahub.data.model.LuluRelationship
 import me.rerere.rikkahub.data.model.LuluState
+import me.rerere.rikkahub.data.model.LuluThought
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -37,16 +38,28 @@ class LuluStateTransformerTest {
             messages = messages,
             assistantId = assistantId,
             states = listOf(state),
+            thoughts = listOf(
+                LuluThought(
+                    assistantId = assistantId,
+                    content = "我想等他先说完，再轻轻接住。",
+                    importance = 4,
+                    createdAt = 1_000L,
+                    expiresAt = 99_999L,
+                )
+            ),
         )
 
         assertEquals(messages.size + 1, result.size)
         assertEquals(MessageRole.SYSTEM, result[result.lastIndex - 1].role)
         assertEquals(MessageRole.USER, result.last().role)
         val injected = result[result.lastIndex - 1].toText()
-        assertTrue(injected.contains("<lulu_status>"))
+        assertTrue(injected.contains("<lulu_presence>"))
         assertTrue(injected.contains("有点困了"))
         assertTrue(injected.contains("夜里想安静陪着你。"))
         assertTrue(injected.contains("精力：有点困"))
+        assertTrue(injected.contains("当前感知"))
+        assertTrue(injected.contains("我想等他先说完"))
+        assertTrue(injected.contains("表达建议"))
     }
 
     @Test

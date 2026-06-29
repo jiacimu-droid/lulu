@@ -105,6 +105,7 @@ fun List<LuluState>.appendLuluState(state: LuluState): List<LuluState> =
 
 fun buildLuluStateFromTurn(
     assistantId: Uuid,
+    previous: LuluState? = null,
     userText: String,
     assistantText: String,
     nowMillis: Long = System.currentTimeMillis(),
@@ -119,23 +120,27 @@ fun buildLuluStateFromTurn(
     val isLateNight = hourOfDay in 0..5
     val isMorning = hourOfDay in 6..10
 
-    val mood = when {
+    val targetMood = when {
         hasSadSignal -> LuluMood.WORRIED
         hasHappySignal -> LuluMood.HAPPY
         isLateNight -> LuluMood.SOFT
         else -> LuluMood.CALM
     }
-    val energy = when {
+    val targetEnergy = when {
         isLateNight -> LuluEnergy.SLEEPY
         hasSadSignal -> LuluEnergy.LOW
         isMorning -> LuluEnergy.HIGH
         else -> LuluEnergy.NORMAL
     }
-    val mode = when {
+    val targetMode = when {
         isLateNight -> LuluMode.RESTING
         "学习" in userText || "study" in loweredUserText -> LuluMode.LEARNING
         else -> LuluMode.COMPANION
     }
+    val mood = previous?.mood?.moveToward(targetMood) ?: targetMood
+    val energy = previous?.energy?.moveToward(targetEnergy) ?: targetEnergy
+    val relationship = previous?.relationship ?: LuluRelationship.FAMILIAR
+    val mode = previous?.mode?.moveToward(targetMode) ?: targetMode
 
     return LuluState(
         assistantId = assistantId,
@@ -149,11 +154,39 @@ fun buildLuluStateFromTurn(
         innerVoice = buildInnerVoice(mood = mood, userText = userText, assistantText = loweredAssistantText),
         mood = mood,
         energy = energy,
-        relationship = LuluRelationship.FAMILIAR,
+        relationship = relationship,
         mode = mode,
         updatedAt = nowMillis,
-        reason = "最近对话：${userText.take(36).ifBlank { "没有文字内容" }}",
+        reason = buildString {
+            if (previous != null && (mood != targetMood || energy != targetEnergy || mode != targetMode)) {
+                append("状态惯性：")
+            }
+            append("最近对话：${userText.take(36).ifBlank { "没有文字内容" }}")
+        },
     )
+}
+
+private fun LuluMood.moveToward(target: LuluMood): LuluMood {
+    if (this == target) return this
+    if (this == LuluMood.CALM) return when (target) {
+        LuluMood.WORRIED, LuluMood.HAPPY -> LuluMood.SOFT
+        else -> target
+    }
+    return target
+}
+
+private fun LuluEnergy.moveToward(target: LuluEnergy): LuluEnergy {
+    if (this == target) return this
+    if (this == LuluEnergy.NORMAL && target == LuluEnergy.LOW) return LuluEnergy.NORMAL
+    if (this == LuluEnergy.NORMAL && target == LuluEnergy.SLEEPY) return LuluEnergy.SLEEPY
+    return target
+}
+
+private fun LuluMode.moveToward(target: LuluMode): LuluMode {
+    if (this == target) return this
+    if (this == LuluMode.COMPANION && target == LuluMode.RESTING) return LuluMode.RESTING
+    if (this == LuluMode.COMPANION && target == LuluMode.LEARNING) return LuluMode.LEARNING
+    return target
 }
 
 private fun buildInnerVoice(
