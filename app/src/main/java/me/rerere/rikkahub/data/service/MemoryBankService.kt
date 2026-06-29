@@ -255,11 +255,19 @@ class MemoryBankService(
             .distinctBy { it.id }
 
         val queryVector = buildQueryEmbedding(query)
-        buildMemoryRecallContext(
+        val selected = selectMemoryRecallItems(
             memories = memories,
             query = query,
             queryVector = queryVector,
         )
+        val recalledIds = selected.map { it.id }.filter { it > 0 }
+        if (recalledIds.isNotEmpty()) {
+            memoryBankDAO.markMemoriesRecalled(
+                ids = recalledIds,
+                recalledAt = System.currentTimeMillis(),
+            )
+        }
+        buildMemoryRecallContext(selected)
     }
 
     private suspend fun buildQueryEmbedding(query: String): List<Float> {
@@ -298,12 +306,12 @@ internal fun buildMemoryRecallContext(
     maxItems: Int = 6,
     maxContentLength: Int = 120,
 ): String {
-    val queryTerms = query.recallQueryTerms()
-    val selected = memories
-        .filter { it.content.isNotBlank() && !it.deprecated }
-        .sortedByDescending { memory -> memory.recallScore(queryTerms, queryVector) }
-        .deduplicateNearVectors()
-        .take(maxItems)
+    val selected = selectMemoryRecallItems(
+        memories = memories,
+        query = query,
+        queryVector = queryVector,
+        maxItems = maxItems,
+    )
     if (selected.isEmpty()) return ""
 
     val sections = listOf(
@@ -326,6 +334,20 @@ internal fun buildMemoryRecallContext(
         }
         append("</lulu_memory>")
     }
+}
+
+internal fun selectMemoryRecallItems(
+    memories: List<MemoryBankEntity>,
+    query: String = "",
+    queryVector: List<Float> = emptyList(),
+    maxItems: Int = 6,
+): List<MemoryBankEntity> {
+    val queryTerms = query.recallQueryTerms()
+    return memories
+        .filter { it.content.isNotBlank() && !it.deprecated }
+        .sortedByDescending { memory -> memory.recallScore(queryTerms, queryVector) }
+        .deduplicateNearVectors()
+        .take(maxItems)
 }
 
 private fun MemoryBankEntity.recallSectionTitle(): String = when (memoryKind ?: type) {

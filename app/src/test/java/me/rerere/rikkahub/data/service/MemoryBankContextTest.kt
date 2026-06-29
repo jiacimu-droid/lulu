@@ -209,4 +209,39 @@ class MemoryBankContextTest {
         assertTrue(!context.contains("温柔地一步步梳理"))
         assertTrue(context.contains("参考文献格式"))
     }
+
+    @Test
+    fun `select memory recall items returns the exact memories used in context`() {
+        val memories = listOf(
+            MemoryBankEntity(
+                id = 1,
+                content = "用户正在写论文大纲，希望露露帮她拆成更小的步骤。",
+                memoryKind = "user_preference",
+                importance = 5,
+                createdAt = 300L,
+            ),
+            MemoryBankEntity(
+                id = 2,
+                content = "用户喜欢雨天窝在床上聊天。",
+                memoryKind = "user_preference",
+                importance = 5,
+                createdAt = 200L,
+            ),
+            MemoryBankEntity(
+                id = 3,
+                content = "这条旧记忆已经被否认。",
+                memoryKind = "role_emotion",
+                deprecated = true,
+                createdAt = 400L,
+            ),
+        )
+
+        val selected = selectMemoryRecallItems(
+            memories = memories,
+            query = "论文大纲卡住了",
+            maxItems = 1,
+        )
+
+        assertEquals(listOf(1), selected.map { it.id })
+    }
 }

@@ -111,6 +111,16 @@ interface MemoryBankDAO {
     @Query("SELECT DISTINCT date_group FROM memory_bank WHERE date_group IS NOT NULL ORDER BY date_group DESC LIMIT :limit")
     suspend fun getRecentDateGroups(limit: Int): List<String>
 
+    @Query(
+        """
+        UPDATE memory_bank
+        SET last_recalled_at = :recalledAt,
+            recall_count = recall_count + 1
+        WHERE id IN (:ids)
+        """
+    )
+    suspend fun markMemoriesRecalled(ids: List<Int>, recalledAt: Long)
+
     @Query("UPDATE memory_bank SET vector_status = :status, vector_retry_count = :retryCount WHERE id = :id")
     suspend fun updateVectorStatus(id: Int, status: String, retryCount: Int)
 

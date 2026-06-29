@@ -50,10 +50,53 @@ class MemoryBankServiceExtractionTest {
         assertTrue(inserted.tagsJson!!.contains("praise"))
         assertTrue(inserted.sourceMessageNodeIdsJson!!.contains("user-node-1"))
     }
+
+    @Test
+    fun `build recall context marks injected memories as recalled`() = runBlocking {
+        val dao = RecordingMemoryBankDAO(
+            assistantMemories = listOf(
+                MemoryBankEntity(
+                    id = 7,
+                    content = "用户正在写论文大纲，希望露露帮她拆成更小的步骤。",
+                    memoryKind = "user_preference",
+                    assistantId = "assistant-1",
+                    importance = 5,
+                    createdAt = 300L,
+                ),
+                MemoryBankEntity(
+                    id = 8,
+                    content = "用户喜欢雨天窝在床上聊天。",
+                    memoryKind = "user_preference",
+                    assistantId = "assistant-1",
+                    importance = 3,
+                    createdAt = 200L,
+                ),
+            )
+        )
+        val service = MemoryBankService(
+            memoryBankDAO = dao,
+            okHttpClient = null,
+            context = null,
+        )
+
+        val context = service.buildRecallContext(
+            assistantId = "assistant-1",
+            query = "论文大纲卡住了",
+        )
+
+        assertTrue(context.contains("拆成更小的步骤"))
+        assertTrue(context.contains("雨天窝在床上聊天"))
+        assertEquals(listOf(7, 8), dao.recalledIds)
+        assertTrue(dao.recalledAt > 0L)
+    }
 }
 
-private class RecordingMemoryBankDAO : MemoryBankDAO {
+private class RecordingMemoryBankDAO(
+    private val assistantMemories: List<MemoryBankEntity> = emptyList(),
+) : MemoryBankDAO {
     val inserted = mutableListOf<MemoryBankEntity>()
+    val recalledIds = mutableListOf<Int>()
+    var recalledAt: Long = 0L
 
     override suspend fun insertMemory(memory: MemoryBankEntity): Long {
         inserted += memory
@@ -67,7 +110,8 @@ private class RecordingMemoryBankDAO : MemoryBankDAO {
     override suspend fun getAllMemories(): List<MemoryBankEntity> = unsupported()
     override suspend fun getMemoriesByType(type: String): List<MemoryBankEntity> = unsupported()
     override suspend fun getMemoriesByTypeLimit(type: String, limit: Int): List<MemoryBankEntity> = emptyList()
-    override suspend fun getMemoriesByAssistant(assistantId: String): List<MemoryBankEntity> = unsupported()
+    override suspend fun getMemoriesByAssistant(assistantId: String): List<MemoryBankEntity> =
+        assistantMemories.filter { it.assistantId == assistantId }
     override suspend fun getMemoriesByAssistantAndTypeLimit(
         assistantId: String,
         type: String,
@@ -124,6 +168,11 @@ private class RecordingMemoryBankDAO : MemoryBankDAO {
     ): List<MemoryBankEntity> = emptyList()
 
     override suspend fun getRecentDateGroups(limit: Int): List<String> = emptyList()
+    override suspend fun markMemoriesRecalled(ids: List<Int>, recalledAt: Long) {
+        recalledIds += ids
+        this.recalledAt = recalledAt
+    }
+
     override suspend fun updateVectorStatus(id: Int, status: String, retryCount: Int) = unsupported()
     override suspend fun updateVectorResult(
         id: Int,
