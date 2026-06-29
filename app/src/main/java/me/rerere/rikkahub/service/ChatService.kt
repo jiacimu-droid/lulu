@@ -98,6 +98,7 @@ import me.rerere.rikkahub.data.model.appendLuluThoughts
 import me.rerere.rikkahub.data.model.buildLuluStateFromTurn
 import me.rerere.rikkahub.data.model.buildLuluThoughtFromTurn
 import me.rerere.rikkahub.data.model.luluStateHistory
+import me.rerere.rikkahub.data.model.markResolvedLuluThoughts
 import me.rerere.rikkahub.data.model.replaceRegexes
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
@@ -211,9 +212,14 @@ internal fun Settings.recordLuluPresenceTurn(
     )
 
     val validAssistantIds = assistants.map { it.id }.toSet()
+    val resolvedThoughts = luluThoughts.markResolvedLuluThoughts(
+        assistantId = assistantId,
+        userText = cleanUserText,
+        nowMillis = nowMillis,
+    )
     return copy(
         luluStates = luluStates.appendLuluState(nextState),
-        luluThoughts = luluThoughts.appendLuluThoughts(
+        luluThoughts = resolvedThoughts.appendLuluThoughts(
             thoughts = listOfNotNull(nextThought),
             validAssistantIds = validAssistantIds,
             nowMillis = nowMillis,

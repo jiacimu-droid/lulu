@@ -151,6 +151,25 @@ fun List<LuluThought>.appendLuluThoughts(
 ): List<LuluThought> =
     (this + thoughts).normalizedLuluThoughts(validAssistantIds, nowMillis)
 
+fun List<LuluThought>.markResolvedLuluThoughts(
+    assistantId: Uuid,
+    userText: String,
+    nowMillis: Long = System.currentTimeMillis(),
+): List<LuluThought> {
+    if (!userText.hasPendingActionResolutionSignal()) return this
+    return map { thought ->
+        if (
+            thought.assistantId == assistantId &&
+            thought.category == LuluThoughtCategory.PENDING_ACTION &&
+            !thought.expressed
+        ) {
+            thought.copy(expressed = true, expiresAt = nowMillis)
+        } else {
+            thought
+        }
+    }
+}
+
 fun buildLuluPerception(
     userText: String,
     hourOfDay: Int = LocalDateTime.now().hour,
@@ -213,6 +232,24 @@ fun buildLuluExpressionPlan(
             LuluExpressionLength.NORMAL -> "自然表达即可；必要时按语义拆成 $bubbleCount 个气泡。"
         },
     )
+}
+
+private fun String.hasPendingActionResolutionSignal(): Boolean {
+    val lowered = lowercase()
+    return listOf(
+        "我回来了",
+        "回来了",
+        "我来了",
+        "下课了",
+        "学完了",
+        "写完了",
+        "做完了",
+        "忙完了",
+        "回来啦",
+        "back",
+        "finished",
+        "done",
+    ).any { signal -> signal in lowered }
 }
 
 fun buildLuluThoughtFromTurn(

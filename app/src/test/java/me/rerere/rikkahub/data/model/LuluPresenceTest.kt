@@ -103,6 +103,36 @@ class LuluPresenceTest {
     }
 
     @Test
+    fun `pending action is marked expressed when user returns`() {
+        val pending = LuluThought(
+            assistantId = assistantId,
+            content = "他说等下回来，我想记得等他回来。",
+            category = LuluThoughtCategory.PENDING_ACTION,
+            importance = 4,
+            createdAt = 1_000L,
+            expiresAt = 100_000L,
+        )
+        val concern = LuluThought(
+            assistantId = assistantId,
+            content = "他最近总是很累，我有点放不下。",
+            category = LuluThoughtCategory.CONCERN,
+            importance = 5,
+            createdAt = 1_000L,
+            expiresAt = 100_000L,
+        )
+
+        val updated = listOf(pending, concern).markResolvedLuluThoughts(
+            assistantId = assistantId,
+            userText = "我回来了，刚刚学完",
+            nowMillis = 2_000L,
+        )
+
+        assertTrue(updated.single { it.category == LuluThoughtCategory.PENDING_ACTION }.expressed)
+        assertFalse(updated.single { it.category == LuluThoughtCategory.CONCERN }.expressed)
+        assertTrue(updated.thoughtHistory(assistantId, nowMillis = 2_000L).none { it.id == pending.id })
+    }
+
+    @Test
     fun `perception tags late night and tired user text`() {
         val perception = buildLuluPerception(
             userText = "我好累，想睡觉",

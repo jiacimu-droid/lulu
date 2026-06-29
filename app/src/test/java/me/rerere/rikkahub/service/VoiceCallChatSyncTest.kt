@@ -7,6 +7,7 @@ import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.LuluMood
+import me.rerere.rikkahub.data.model.LuluThought
 import me.rerere.rikkahub.data.model.LuluThoughtCategory
 import me.rerere.rikkahub.data.model.currentLuluState
 import me.rerere.rikkahub.data.model.toMessageNode
@@ -136,5 +137,31 @@ class VoiceCallChatSyncTest {
 
         assertTrue(updated.luluStates.isEmpty())
         assertTrue(updated.luluThoughts.isEmpty())
+    }
+
+    @Test
+    fun `presence turn resolves pending action before adding new context`() {
+        val assistantId = Uuid.parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+        val pending = LuluThought(
+            assistantId = assistantId,
+            content = "他去学习了，我想等他回来时轻轻接一下。",
+            category = LuluThoughtCategory.PENDING_ACTION,
+            importance = 4,
+            createdAt = 1_000L,
+            expiresAt = 100_000L,
+        )
+        val settings = Settings(
+            assistants = listOf(Assistant(id = assistantId, name = "露露")),
+            luluThoughts = listOf(pending),
+        )
+
+        val updated = settings.recordLuluPresenceTurn(
+            assistantId = assistantId,
+            userText = "我回来了，学完了",
+            assistantText = "欢迎回来。",
+            nowMillis = 2_000L,
+        )
+
+        assertTrue(updated.luluThoughts.single { it.id == pending.id }.expressed)
     }
 }
