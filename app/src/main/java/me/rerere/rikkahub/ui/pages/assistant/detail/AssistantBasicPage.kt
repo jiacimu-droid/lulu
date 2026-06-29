@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,6 +40,7 @@ import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.ui.components.ai.ModelSelector
 import me.rerere.rikkahub.ui.components.ai.ReasoningButton
+import me.rerere.rikkahub.ui.components.ui.RikkaConfirmDialog
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.FormItem
 import me.rerere.rikkahub.ui.components.ui.TagsInput
@@ -99,6 +101,23 @@ internal fun AssistantBasicContent(
     onUpdate: (Assistant) -> Unit,
     vm: AssistantDetailVM
 ) {
+    var showClearHistoryDialog by remember { mutableStateOf(false) }
+
+    RikkaConfirmDialog(
+        show = showClearHistoryDialog,
+        title = "清除角色历史",
+        confirmText = "清除",
+        dismissText = stringResource(R.string.cancel),
+        onConfirm = {
+            showClearHistoryDialog = false
+            vm.clearAssistantHistory()
+        },
+        onDismiss = { showClearHistoryDialog = false },
+        text = {
+            Text("会清除这个角色的聊天记录、上下文、角色记忆、记忆库内容和电话记录，但不会修改人设、头像、提示词等基本信息。")
+        },
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -388,6 +407,28 @@ internal fun AssistantBasicContent(
             FormItem(
                 modifier = Modifier.padding(8.dp),
                 label = {
+                    Text("语音自动播放")
+                },
+                description = {
+                    Text("开启后，这个角色每次回复完成会自动生成并播放语音；关闭后只在你点消息下方的声音按钮时生成。")
+                },
+                tail = {
+                    Switch(
+                        checked = assistant.autoPlayVoice,
+                        onCheckedChange = {
+                            onUpdate(
+                                assistant.copy(
+                                    autoPlayVoice = it
+                                )
+                            )
+                        }
+                    )
+                }
+            )
+            HorizontalDivider()
+            FormItem(
+                modifier = Modifier.padding(8.dp),
+                label = {
                     Text(stringResource(R.string.assistant_page_thinking_budget))
                 },
             ) {
@@ -435,6 +476,28 @@ internal fun AssistantBasicContent(
                     }
                 )
             }
+        }
+
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            ),
+        ) {
+            FormItem(
+                modifier = Modifier.padding(8.dp),
+                label = {
+                    Text("清除聊天记录")
+                },
+                description = {
+                    Text("只清除这个角色过去产生的聊天、上下文、记忆和电话记录，保留角色人设与基本设置。")
+                },
+                tail = {
+                    TextButton(onClick = { showClearHistoryDialog = true }) {
+                        Text("清除")
+                    }
+                },
+            )
         }
 
         Card(

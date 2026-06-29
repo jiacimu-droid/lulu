@@ -91,8 +91,31 @@ class VoiceCallRepository(
         storageFile.parentFile?.mkdirs()
         storageFile.writeText(JsonInstant.encodeToString(sessions.sortedByDescending { it.startedAt }))
     }
+
+    fun deleteSessionsByAssistant(assistantId: String) {
+        val sessions = getSessions().filterNot { it.assistantId == assistantId }
+        storageFile.parentFile?.mkdirs()
+        storageFile.writeText(JsonInstant.encodeToString(sessions.sortedByDescending { it.startedAt }))
+    }
+
+    fun getSummary(): VoiceCallStatsSummary {
+        return summarizeVoiceCallSessions(getSessions())
+    }
 }
 
 fun VoiceCallSession.hasUserFacingContent(): Boolean {
     return sleepMode || transcript.any { it.role == VoiceCallRole.User && it.text.isNotBlank() }
 }
+
+data class VoiceCallStatsSummary(
+    val sessionCount: Int = 0,
+    val visibleLineCount: Int = 0,
+)
+
+fun summarizeVoiceCallSessions(sessions: List<VoiceCallSession>): VoiceCallStatsSummary =
+    VoiceCallStatsSummary(
+        sessionCount = sessions.size,
+        visibleLineCount = sessions.sumOf { session ->
+            session.transcript.count { line -> line.role != VoiceCallRole.System && line.text.isNotBlank() }
+        },
+    )

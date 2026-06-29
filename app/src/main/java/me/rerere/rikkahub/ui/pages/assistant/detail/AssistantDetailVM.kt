@@ -22,7 +22,10 @@ import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.AssistantMemory
 import me.rerere.rikkahub.data.model.Avatar
 import me.rerere.rikkahub.data.model.Tag
+import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.repository.MemoryRepository
+import me.rerere.rikkahub.data.service.MemoryBankService
+import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
 import kotlin.uuid.Uuid
 
 private const val TAG = "AssistantDetailVM"
@@ -31,6 +34,9 @@ class AssistantDetailVM(
     private val id: String,
     private val settingsStore: SettingsStore,
     private val memoryRepository: MemoryRepository,
+    private val conversationRepository: ConversationRepository,
+    private val memoryBankService: MemoryBankService,
+    private val voiceCallRepository: VoiceCallRepository,
     private val filesManager: FilesManager,
     private val skillManager: SkillManager,
 ) : ViewModel() {
@@ -190,6 +196,16 @@ class AssistantDetailVM(
     fun deleteMemory(memory: AssistantMemory) {
         viewModelScope.launch {
             memoryRepository.deleteMemory(id = memory.id)
+        }
+    }
+
+    fun clearAssistantHistory() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val assistantIdString = assistantId.toString()
+            conversationRepository.deleteConversationOfAssistant(assistantId)
+            memoryRepository.deleteMemoriesOfAssistant(assistantIdString)
+            memoryBankService.deleteMemoriesByAssistant(assistantIdString)
+            voiceCallRepository.deleteSessionsByAssistant(assistantIdString)
         }
     }
 

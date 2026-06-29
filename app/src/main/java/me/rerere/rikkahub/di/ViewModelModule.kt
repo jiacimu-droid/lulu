@@ -47,6 +47,9 @@ val viewModelModule = module {
             id = it.get(),
             settingsStore = get(),
             memoryRepository = get(),
+            conversationRepository = get(),
+            memoryBankService = get(),
+            voiceCallRepository = get(),
             filesManager = get(),
             skillManager = get(),
         )

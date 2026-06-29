@@ -140,6 +140,7 @@ internal fun appendVoiceCallVisibleTurn(
     conversation: Conversation,
     userText: String?,
     assistantText: String?,
+    assistantMessage: UIMessage? = null,
 ): Conversation {
     val visibleNodes = buildList {
         val cleanUserText = userText?.trim().orEmpty()
@@ -147,7 +148,12 @@ internal fun appendVoiceCallVisibleTurn(
         if (cleanUserText.isNotBlank()) {
             add(UIMessage.user(cleanUserText).toMessageNode())
         }
-        if (cleanAssistantText.isNotBlank()) {
+        val cleanAssistantMessage = assistantMessage?.takeIf {
+            it.role == MessageRole.ASSISTANT && it.toText().trim().isNotBlank()
+        }
+        if (cleanAssistantMessage != null) {
+            add(cleanAssistantMessage.toMessageNode())
+        } else if (cleanAssistantText.isNotBlank()) {
             add(UIMessage.assistant(cleanAssistantText).toMessageNode())
         }
     }
@@ -473,7 +479,7 @@ class ChatService(
         val beforeConversation = getConversationFlow(conversationId).value.withoutVoiceCallInstructionLeaks()
         saveConversation(conversationId, beforeConversation)
 
-        val reply = runCatching {
+        val replyMessage = runCatching {
             withTimeoutOrNull(120_000) {
                 generateHiddenVoiceCallReply(
                     conversationId = conversationId,
@@ -484,14 +490,22 @@ class ChatService(
         }.onFailure {
             addError(it, conversationId, title = context.getString(R.string.error_title_generation))
         }.getOrNull()
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
+            ?.takeIf { it.toText().isNotBlank() || it.extractTextToSpeechToolText().isNotBlank() }
             ?: return null
+        val reply = replyMessage.toText()
+            .ifBlank { replyMessage.extractTextToSpeechToolText() }
+            .trim()
+            .takeIf { it.isNotBlank() }
+            ?: return null
+        val visibleAssistantMessage = replyMessage.copy(
+            parts = listOf(UIMessagePart.Text(reply)),
+        )
 
         val cleanedConversation = appendVoiceCallVisibleTurn(
             conversation = beforeConversation,
             userText = visibleUserText,
             assistantText = reply,
+            assistantMessage = visibleAssistantMessage,
         )
         saveConversation(conversationId, cleanedConversation)
 
@@ -502,7 +516,7 @@ class ChatService(
         conversationId: Uuid,
         conversation: Conversation,
         text: String,
-    ): String? {
+    ): UIMessage? {
         val settings = settingsStore.settingsFlow.first()
         val assistant = settings.getAssistantById(conversation.assistantId)
             ?: settings.getCurrentAssistant()
@@ -553,7 +567,7 @@ class ChatService(
 
         return generatedMessages
             .lastOrNull { it.role == MessageRole.ASSISTANT }
-            ?.let { message -> message.toText().ifBlank { message.extractTextToSpeechToolText() } }
+            ?.takeIf { message -> message.toText().isNotBlank() || message.extractTextToSpeechToolText().isNotBlank() }
     }
 
     private fun UIMessage.extractTextToSpeechToolText(): String =

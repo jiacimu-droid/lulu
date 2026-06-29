@@ -185,8 +185,26 @@ private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
                 )
             }
 
+            if (stats.voiceCallStats.sessionCount > 0) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    CacheMetric(
+                        modifier = Modifier.weight(1f),
+                        label = "电话会话",
+                        value = stats.voiceCallStats.sessionCount.toString(),
+                    )
+                    CacheMetric(
+                        modifier = Modifier.weight(1f),
+                        label = "电话记录",
+                        value = stats.voiceCallStats.visibleLineCount.toString(),
+                    )
+                }
+            }
+
             Text(
-                text = "下面按每次 AI 回复记录缓存读取量和缓存率，最新记录排在最前。",
+                text = "下面按每次 AI 回复记录缓存读取量和缓存率，最新记录排在最前；电话会话也会在这里显示记录数量。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

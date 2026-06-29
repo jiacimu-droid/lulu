@@ -24,6 +24,9 @@ interface MemoryBankDAO {
     @Query("DELETE FROM memory_bank WHERE id = :id")
     suspend fun deleteMemoryById(id: Int)
 
+    @Query("DELETE FROM memory_bank WHERE assistant_id = :assistantId")
+    suspend fun deleteMemoriesByAssistant(assistantId: String)
+
     @Query("SELECT * FROM memory_bank WHERE id = :id")
     suspend fun getMemoryById(id: Int): MemoryBankEntity?
 

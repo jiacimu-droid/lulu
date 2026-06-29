@@ -55,6 +55,7 @@ import me.rerere.hugeicons.stroke.Refresh01
 import me.rerere.hugeicons.stroke.Search01
 import me.rerere.hugeicons.stroke.Tools
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
+import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.ui.components.ui.Select
 import me.rerere.rikkahub.utils.JsonInstant
@@ -82,6 +83,9 @@ fun MemoryBankPage(
     val settings by vm.settings.collectAsStateWithLifecycle()
     val maintenanceMessage by vm.maintenanceMessage.collectAsStateWithLifecycle()
     val embeddingModels = remember(settings.providers) { vm.embeddingModels(settings) }
+    val assistantLabels = remember(assistantIds, settings.assistants) {
+        buildMemoryAssistantLabels(assistantIds, settings.assistants)
+    }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showDeleteDialog by remember { mutableStateOf<MemoryBankEntity?>(null) }
@@ -167,6 +171,7 @@ fun MemoryBankPage(
                     AssistantFilterRow(
                         selectedAssistantId = selectedAssistantId,
                         assistantIds = assistantIds,
+                        assistantLabels = assistantLabels,
                         onAssistantSelected = { vm.setSelectedAssistantId(it) }
                     )
                 }
@@ -214,6 +219,7 @@ fun MemoryBankPage(
                     items(todayPhaseSummaries, key = { it.id }) { memory ->
                         MemoryCard(
                             memory = memory,
+                            assistantLabels = assistantLabels,
                             onDelete = { showDeleteDialog = memory },
                             onOpenSource = onOpenSource,
                             onEdit = { editMemory = memory },
@@ -237,6 +243,7 @@ fun MemoryBankPage(
                     items(dailySummaries, key = { it.id }) { memory ->
                         DiaryCard(
                             memory = memory,
+                            assistantLabels = assistantLabels,
                             onDelete = { showDeleteDialog = memory },
                             onOpenSource = onOpenSource,
                             onEdit = { editMemory = memory },
@@ -263,6 +270,7 @@ fun MemoryBankPage(
                 items(memories, key = { it.id }) { memory ->
                     MemoryCard(
                         memory = memory,
+                        assistantLabels = assistantLabels,
                         onDelete = { showDeleteDialog = memory },
                         onOpenSource = onOpenSource,
                         onEdit = { editMemory = memory },
@@ -609,6 +617,7 @@ private fun StatCard(label: String, count: Int, modifier: Modifier = Modifier, c
 private fun AssistantFilterRow(
     selectedAssistantId: String?,
     assistantIds: List<String>,
+    assistantLabels: Map<String, String>,
     onAssistantSelected: (String?) -> Unit,
 ) {
     FlowRow(
@@ -623,7 +632,7 @@ private fun AssistantFilterRow(
             FilterChip(
                 selected = selectedAssistantId == id,
                 onClick = { onAssistantSelected(id) },
-                label = { Text(id.take(16)) },
+                label = { Text(assistantLabels[id] ?: id.shortAssistantId()) },
             )
         }
     }
@@ -659,6 +668,7 @@ private fun TypeFilterRow(
 @Composable
 private fun MemoryCard(
     memory: MemoryBankEntity,
+    assistantLabels: Map<String, String>,
     onDelete: () -> Unit,
     onOpenSource: (conversationId: String, nodeId: String?) -> Unit,
     onEdit: () -> Unit,
@@ -761,7 +771,7 @@ private fun MemoryCard(
                     // Show assistant ID if available
                     if (memory.assistantId != null) {
                         Text(
-                            text = memory.assistantId.take(12),
+                            text = assistantLabels[memory.assistantId] ?: memory.assistantId.shortAssistantId(),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         )
@@ -868,6 +878,7 @@ private fun formatShortTime(timestamp: Long): String =
 @Composable
 private fun DiaryCard(
     memory: MemoryBankEntity,
+    assistantLabels: Map<String, String>,
     onDelete: () -> Unit,
     onOpenSource: (conversationId: String, nodeId: String?) -> Unit,
     onEdit: () -> Unit,
@@ -901,6 +912,14 @@ private fun DiaryCard(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
+
+                    if (memory.assistantId != null) {
+                        Text(
+                            text = assistantLabels[memory.assistantId] ?: memory.assistantId.shortAssistantId(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        )
+                    }
 
                     if (memory.vectorStatus == "done") {
                         Icon(
@@ -966,3 +985,17 @@ private fun MemoryBankEntity.firstSourceNodeId(): String? =
     runCatching {
         JsonInstant.decodeFromString<List<String>>(sourceMessageNodeIdsJson.orEmpty()).firstOrNull()
     }.getOrNull()
+
+internal fun buildMemoryAssistantLabels(
+    assistantIds: List<String>,
+    assistants: List<Assistant>,
+): Map<String, String> {
+    val assistantNames = assistants.associate { assistant ->
+        assistant.id.toString() to assistant.name.trim()
+    }
+    return assistantIds.associateWith { id ->
+        assistantNames[id]?.takeIf { it.isNotBlank() } ?: id.shortAssistantId()
+    }
+}
+
+private fun String.shortAssistantId(): String = take(8)

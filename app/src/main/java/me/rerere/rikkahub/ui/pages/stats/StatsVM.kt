@@ -15,6 +15,8 @@ import me.rerere.rikkahub.data.db.dao.getCacheRecords
 import me.rerere.rikkahub.data.db.dao.getMessageCountPerDay
 import me.rerere.rikkahub.data.db.dao.getTokenStats
 import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
+import me.rerere.rikkahub.data.voicecall.VoiceCallStatsSummary
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -27,6 +29,7 @@ data class AppStats(
     val totalCompletionTokens: Long = 0L,
     val totalCachedTokens: Long = 0L,
     val cacheRecords: List<MessageCacheRecord> = emptyList(),
+    val voiceCallStats: VoiceCallStatsSummary = VoiceCallStatsSummary(),
     val conversationsPerDay: Map<LocalDate, Int> = emptyMap(),
     val launchCount: Int = 0,
 )
@@ -35,6 +38,7 @@ class StatsVM(
     private val conversationDAO: ConversationDAO,
     private val messageNodeDAO: MessageNodeDAO,
     private val settingsStore: SettingsStore,
+    private val voiceCallRepository: VoiceCallRepository,
 ) : ViewModel() {
 
     private val _stats = MutableStateFlow(AppStats())
@@ -70,6 +74,9 @@ class StatsVM(
         // json_each() + json_extract() 在 SQLite 侧聚合，不再加载完整 JSON 到 Kotlin
         val tokenStats = messageNodeDAO.getTokenStats()
         val cacheRecords = messageNodeDAO.getCacheRecords()
+        val voiceCallStats = withContext(Dispatchers.IO) {
+            voiceCallRepository.getSummary()
+        }
 
         val launchCount = settingsStore.settingsFlow.value.launchCount
 
@@ -81,6 +88,7 @@ class StatsVM(
             totalCompletionTokens = tokenStats.completionTokens,
             totalCachedTokens = tokenStats.cachedTokens,
             cacheRecords = cacheRecords,
+            voiceCallStats = voiceCallStats,
             conversationsPerDay = conversationsPerDay,
             launchCount = launchCount,
         )

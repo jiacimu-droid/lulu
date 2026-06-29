@@ -1,6 +1,7 @@
 package me.rerere.rikkahub.service
 
 import me.rerere.ai.core.MessageRole
+import me.rerere.ai.core.TokenUsage
 import me.rerere.ai.ui.UIMessage
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.toMessageNode
@@ -48,6 +49,26 @@ class VoiceCallChatSyncTest {
         assertTrue(updated.currentMessages.all { it.role == MessageRole.ASSISTANT })
         assertEquals("喂，我在呢。", updated.currentMessages.single().toText())
     }
+
+    @Test
+    fun `voice call visible assistant message keeps token usage for stats`() {
+        val conversationId = Uuid.parse("77777777-7777-7777-7777-777777777777")
+        val assistantId = Uuid.parse("88888888-8888-8888-8888-888888888888")
+        val conversation = Conversation.ofId(conversationId, assistantId)
+        val assistantMessage = UIMessage
+            .assistant("电话回复")
+            .copy(usage = TokenUsage(promptTokens = 10, completionTokens = 5, cachedTokens = 3, totalTokens = 15))
+
+        val updated = appendVoiceCallVisibleTurn(
+            conversation = conversation,
+            userText = "喂",
+            assistantText = assistantMessage.toText(),
+            assistantMessage = assistantMessage,
+        )
+
+        assertEquals(assistantMessage.usage, updated.currentMessages.last().usage)
+    }
+
     @Test
     fun `voice call prompt leak cleanup removes internal instructions`() {
         val conversationId = Uuid.parse("55555555-5555-5555-5555-555555555555")
