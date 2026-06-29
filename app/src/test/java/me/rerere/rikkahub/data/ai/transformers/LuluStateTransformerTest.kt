@@ -37,6 +37,7 @@ class LuluStateTransformerTest {
             mode = LuluMode.RESTING,
             updatedAt = 1234L,
             sinceAt = 1000L,
+            perceptionSummary = "深夜 / 休息中 / 用户信号：睡眠偏少、电量低",
         )
 
         val result = applyLuluStateContext(
@@ -65,7 +66,7 @@ class LuluStateTransformerTest {
         assertTrue(injected.contains("精力：有点困"))
         assertTrue(injected.contains("强度 0.70"))
         assertTrue(injected.contains("状态持续"))
-        assertTrue(injected.contains("当前感知"))
+        assertTrue(injected.contains("当前感知：深夜 / 休息中 / 用户信号：睡眠偏少、电量低"))
         assertTrue(injected.contains("[未完成动作] 我想等他先说完"))
         assertTrue(injected.contains("表达建议"))
     }

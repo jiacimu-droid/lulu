@@ -10,6 +10,7 @@ import me.rerere.rikkahub.AppScope
 import me.rerere.rikkahub.data.ai.AILoggingManager
 import me.rerere.rikkahub.data.ai.tools.LocalTools
 import me.rerere.rikkahub.data.event.AppEventBus
+import me.rerere.rikkahub.data.service.LuluPerceptionCollector
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.utils.EmojiData
@@ -73,6 +74,10 @@ val appModule = module {
     }
 
     single {
+        LuluPerceptionCollector(get())
+    }
+
+    single {
         MemoryBankService(
             memoryBankDAO = get(),
             okHttpClient = get(),
@@ -98,7 +103,8 @@ val appModule = module {
             filesManager = get(),
             skillManager = get(),
             pluginToolProvider = get(),
-            pluginLoader = get()
+            pluginLoader = get(),
+            luluPerceptionCollector = get(),
         )
     }
 

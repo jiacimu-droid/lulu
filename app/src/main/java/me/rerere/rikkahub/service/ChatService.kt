@@ -97,6 +97,7 @@ import me.rerere.rikkahub.data.model.appendLuluState
 import me.rerere.rikkahub.data.model.appendLuluThoughts
 import me.rerere.rikkahub.data.model.buildLuluStateFromTurn
 import me.rerere.rikkahub.data.model.buildLuluThoughtFromTurn
+import me.rerere.rikkahub.data.model.LuluPerceptionInput
 import me.rerere.rikkahub.data.model.luluStateHistory
 import me.rerere.rikkahub.data.model.markResolvedLuluThoughts
 import me.rerere.rikkahub.data.model.replaceRegexes
@@ -104,6 +105,7 @@ import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.repository.MemoryRepository
 import me.rerere.rikkahub.data.service.AffectiveMemoryExtractor
+import me.rerere.rikkahub.data.service.LuluPerceptionCollector
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.buildAffectiveMemoryExtractionPlan
 import me.rerere.rikkahub.web.BadRequestException
@@ -187,6 +189,7 @@ internal fun Settings.recordLuluPresenceTurn(
     assistantId: Uuid,
     userText: String,
     assistantText: String,
+    perceptionInput: LuluPerceptionInput? = null,
     nowMillis: Long = System.currentTimeMillis(),
     hourOfDay: Int = java.time.LocalDateTime.now().hour,
 ): Settings {
@@ -196,13 +199,14 @@ internal fun Settings.recordLuluPresenceTurn(
     if (assistants.none { it.id == assistantId }) return this
 
     val previousState = luluStates.luluStateHistory(assistantId).firstOrNull()
+    val input = perceptionInput?.copy(userText = cleanUserText)
+        ?: LuluPerceptionInput(userText = cleanUserText, hourOfDay = hourOfDay)
     val nextState = buildLuluStateFromTurn(
         assistantId = assistantId,
         previous = previousState,
-        userText = cleanUserText,
+        perceptionInput = input,
         assistantText = cleanAssistantText,
         nowMillis = nowMillis,
-        hourOfDay = hourOfDay,
     )
     val nextThought = buildLuluThoughtFromTurn(
         assistantId = assistantId,
@@ -226,6 +230,13 @@ internal fun Settings.recordLuluPresenceTurn(
         ),
     )
 }
+
+private suspend fun LuluPerceptionCollector.collectSafely(
+    userText: String,
+    settings: Settings,
+): LuluPerceptionInput? = runCatching {
+    collect(userText = userText, settings = settings)
+}.getOrNull()
 
 private fun String.isVoiceCallInternalInstruction(): Boolean {
     val text = trim()
@@ -275,6 +286,7 @@ class ChatService(
     private val skillManager: SkillManager,
     private val pluginToolProvider: PluginToolProvider,
     private val pluginLoader: PluginLoader,
+    private val luluPerceptionCollector: LuluPerceptionCollector,
 ) {
     // 统一会话管理
     private val sessions = ConcurrentHashMap<Uuid, ConversationSession>()
@@ -561,11 +573,16 @@ class ChatService(
         val settings = settingsStore.settingsFlow.first()
         val assistant = settings.getAssistantById(cleanedConversation.assistantId)
             ?: settings.getCurrentAssistant()
+        val perceptionInput = luluPerceptionCollector.collectSafely(
+            userText = visibleUserText.orEmpty(),
+            settings = settings,
+        )
         settingsStore.update { currentSettings ->
             currentSettings.recordLuluPresenceTurn(
                 assistantId = assistant.id,
                 userText = visibleUserText.orEmpty(),
                 assistantText = reply,
+                perceptionInput = perceptionInput,
             )
         }
 
@@ -911,11 +928,16 @@ class ChatService(
             val lastAssistantText = finalConversation.currentMessages.lastOrNull { it.role == MessageRole.ASSISTANT }
                 ?.toText()
                 .orEmpty()
+            val perceptionInput = luluPerceptionCollector.collectSafely(
+                userText = lastUserText,
+                settings = settings,
+            )
             settingsStore.update { currentSettings ->
                 currentSettings.recordLuluPresenceTurn(
                     assistantId = assistant.id,
                     userText = lastUserText,
                     assistantText = lastAssistantText,
+                    perceptionInput = perceptionInput,
                 )
             }
             launchAffectiveMemoryExtraction(

@@ -54,6 +54,31 @@ data class LuluPerception(
     val summary: String,
 )
 
+data class LuluPerceptionInput(
+    val userText: String,
+    val hourOfDay: Int = LocalDateTime.now().hour,
+    val deviceState: LuluDeviceState? = null,
+    val healthState: LuluHealthState? = null,
+    val appUsageState: LuluAppUsageState? = null,
+)
+
+data class LuluDeviceState(
+    val batteryPercent: Int? = null,
+    val isCharging: Boolean? = null,
+    val networkType: String? = null,
+)
+
+data class LuluHealthState(
+    val sleepMinutes: Int? = null,
+    val heartRate: Int? = null,
+    val stepCount: Int? = null,
+)
+
+data class LuluAppUsageState(
+    val topApps: List<String> = emptyList(),
+    val screenMinutesToday: Int? = null,
+)
+
 @Serializable
 enum class LuluTimeLabel(val label: String) {
     @SerialName("late_night")
@@ -94,6 +119,18 @@ enum class LuluUserSignal(val label: String) {
 
     @SerialName("studying")
     STUDYING("学习"),
+
+    @SerialName("low_battery")
+    LOW_BATTERY("电量低"),
+
+    @SerialName("sleep_debt")
+    SLEEP_DEBT("睡眠偏少"),
+
+    @SerialName("elevated_heart_rate")
+    ELEVATED_HEART_RATE("心率偏高"),
+
+    @SerialName("heavy_phone_use")
+    HEAVY_PHONE_USE("屏幕时间偏长"),
 }
 
 @Serializable
@@ -173,13 +210,26 @@ fun List<LuluThought>.markResolvedLuluThoughts(
 fun buildLuluPerception(
     userText: String,
     hourOfDay: Int = LocalDateTime.now().hour,
-): LuluPerception {
+): LuluPerception = buildLuluPerception(
+    LuluPerceptionInput(
+        userText = userText,
+        hourOfDay = hourOfDay,
+    )
+)
+
+fun buildLuluPerception(input: LuluPerceptionInput): LuluPerception {
+    val userText = input.userText
+    val hourOfDay = input.hourOfDay
     val lowered = userText.lowercase()
     val signals = mutableSetOf<LuluUserSignal>()
     if (listOf("累", "困", "睡", "tired", "sleepy").any { it in lowered }) signals += LuluUserSignal.TIRED
     if (listOf("开心", "哈哈", "喜欢", "happy").any { it in lowered }) signals += LuluUserSignal.HAPPY
     if (listOf("难过", "烦", "崩溃", "哭", "sad").any { it in lowered }) signals += LuluUserSignal.SAD
     if (listOf("学习", "作业", "考试", "study").any { it in lowered }) signals += LuluUserSignal.STUDYING
+    if (input.deviceState?.isLowBattery() == true) signals += LuluUserSignal.LOW_BATTERY
+    if (input.healthState?.hasSleepDebt() == true) signals += LuluUserSignal.SLEEP_DEBT
+    if (input.healthState?.hasElevatedHeartRate() == true) signals += LuluUserSignal.ELEVATED_HEART_RATE
+    if (input.appUsageState?.hasHeavyPhoneUse() == true) signals += LuluUserSignal.HEAVY_PHONE_USE
     val timeLabel = when (hourOfDay) {
         in 0..5 -> LuluTimeLabel.LATE_NIGHT
         in 6..10 -> LuluTimeLabel.MORNING
@@ -203,9 +253,52 @@ fun buildLuluPerception(
                 append(" / 用户信号：")
                 append(signals.joinToString("、") { it.label })
             }
+            input.deviceState?.summaryText()?.let { append(" / $it") }
+            input.healthState?.summaryText()?.let { append(" / $it") }
+            input.appUsageState?.summaryText()?.let { append(" / $it") }
         },
     )
 }
+
+private fun LuluDeviceState.isLowBattery(): Boolean =
+    batteryPercent != null && batteryPercent <= 15 && isCharging != true
+
+private fun LuluDeviceState.summaryText(): String? = buildList {
+    batteryPercent?.let { battery ->
+        add(if (isLowBattery()) "电量低：$battery%" else "电量：$battery%")
+    }
+    networkType?.takeIf { it.isNotBlank() }?.let { network -> add("网络：$network") }
+}.joinToString("，").takeIf { it.isNotBlank() }
+
+private fun LuluHealthState.hasSleepDebt(): Boolean =
+    sleepMinutes != null && sleepMinutes < 6 * 60
+
+private fun LuluHealthState.hasElevatedHeartRate(): Boolean =
+    heartRate != null && heartRate >= 95
+
+private fun LuluHealthState.summaryText(): String? = buildList {
+    sleepMinutes?.let { minutes ->
+        val hours = minutes / 60
+        val restMinutes = minutes % 60
+        add(if (hasSleepDebt()) "睡眠偏少：${hours}小时${restMinutes}分" else "睡眠：${hours}小时${restMinutes}分")
+    }
+    heartRate?.let { rate ->
+        add(if (hasElevatedHeartRate()) "心率偏高：$rate" else "心率：$rate")
+    }
+    stepCount?.let { steps -> add("步数：$steps") }
+}.joinToString("，").takeIf { it.isNotBlank() }
+
+private fun LuluAppUsageState.hasHeavyPhoneUse(): Boolean =
+    screenMinutesToday != null && screenMinutesToday >= 6 * 60
+
+private fun LuluAppUsageState.summaryText(): String? = buildList {
+    screenMinutesToday?.let { minutes ->
+        val hours = minutes / 60
+        val restMinutes = minutes % 60
+        add(if (hasHeavyPhoneUse()) "屏幕时间偏长：${hours}小时${restMinutes}分" else "屏幕时间：${hours}小时${restMinutes}分")
+    }
+    topApps.take(3).takeIf { it.isNotEmpty() }?.let { apps -> add("常用：${apps.joinToString("、")}") }
+}.joinToString("，").takeIf { it.isNotBlank() }
 
 fun buildLuluExpressionPlan(
     state: LuluState,

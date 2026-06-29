@@ -21,6 +21,7 @@ data class LuluState(
     val mode: LuluMode = LuluMode.COMPANION,
     val updatedAt: Long = 0L,
     val sinceAt: Long = updatedAt,
+    val perceptionSummary: String = "",
     val reason: String = "默认状态",
 )
 
@@ -117,15 +118,36 @@ fun buildLuluStateFromTurn(
     assistantText: String,
     nowMillis: Long = System.currentTimeMillis(),
     hourOfDay: Int = LocalDateTime.now().hour,
+): LuluState = buildLuluStateFromTurn(
+    assistantId = assistantId,
+    previous = previous,
+    perceptionInput = LuluPerceptionInput(
+        userText = userText,
+        hourOfDay = hourOfDay,
+    ),
+    assistantText = assistantText,
+    nowMillis = nowMillis,
+)
+
+fun buildLuluStateFromTurn(
+    assistantId: Uuid,
+    previous: LuluState? = null,
+    perceptionInput: LuluPerceptionInput,
+    assistantText: String,
+    nowMillis: Long = System.currentTimeMillis(),
 ): LuluState {
+    val userText = perceptionInput.userText
+    val perception = buildLuluPerception(perceptionInput)
     val loweredUserText = userText.lowercase()
     val loweredAssistantText = assistantText.lowercase()
-    val hasSadSignal = listOf("sad", "tired", "难过", "伤心", "崩溃", "累", "烦", "哭")
-        .any { signal -> signal in loweredUserText }
-    val hasHappySignal = listOf("happy", "开心", "高兴", "喜欢", "哈哈", "嘿嘿")
-        .any { signal -> signal in loweredUserText }
-    val isLateNight = hourOfDay in 0..5
-    val isMorning = hourOfDay in 6..10
+    val hasSadSignal = LuluUserSignal.SAD in perception.userSignals ||
+        listOf("sad", "tired", "难过", "伤心", "崩溃", "累", "烦", "哭").any { signal -> signal in loweredUserText }
+    val hasHappySignal = LuluUserSignal.HAPPY in perception.userSignals ||
+        listOf("happy", "开心", "高兴", "喜欢", "哈哈", "嘿嘿").any { signal -> signal in loweredUserText }
+    val hasSleepDebt = LuluUserSignal.SLEEP_DEBT in perception.userSignals
+    val hasHeavyPhoneUse = LuluUserSignal.HEAVY_PHONE_USE in perception.userSignals
+    val isLateNight = perception.timeLabel == LuluTimeLabel.LATE_NIGHT
+    val isMorning = perception.timeLabel == LuluTimeLabel.MORNING
 
     val targetMood = when {
         hasSadSignal -> LuluMood.WORRIED
@@ -134,28 +156,34 @@ fun buildLuluStateFromTurn(
         else -> LuluMood.CALM
     }
     val targetEnergy = when {
-        isLateNight -> LuluEnergy.SLEEPY
+        isLateNight || hasSleepDebt -> LuluEnergy.SLEEPY
         hasSadSignal -> LuluEnergy.LOW
         isMorning -> LuluEnergy.HIGH
         else -> LuluEnergy.NORMAL
     }
     val targetMode = when {
-        isLateNight -> LuluMode.RESTING
-        "学习" in userText || "study" in loweredUserText -> LuluMode.LEARNING
+        isLateNight || hasSleepDebt -> LuluMode.RESTING
+        LuluUserSignal.STUDYING in perception.userSignals || "学习" in userText || "study" in loweredUserText -> {
+            LuluMode.LEARNING
+        }
         else -> LuluMode.COMPANION
     }
     val mood = previous?.mood?.moveToward(targetMood) ?: targetMood
     val energy = previous?.energy?.moveToward(targetEnergy) ?: targetEnergy
     val relationship = previous?.relationship ?: LuluRelationship.FAMILIAR
     val mode = previous?.mode?.moveToward(targetMode) ?: targetMode
-    val moodIntensity = previous?.moodIntensity.nextIntensity(
-        targetChanged = previous.mood != targetMood,
-        strongSignal = hasSadSignal || hasHappySignal || isLateNight,
-    ) ?: targetMood.defaultIntensity()
-    val energyIntensity = previous?.energyIntensity.nextIntensity(
-        targetChanged = previous.energy != targetEnergy,
-        strongSignal = hasSadSignal || isLateNight || isMorning,
-    ) ?: targetEnergy.defaultIntensity()
+    val moodIntensity = previous?.let { previousState ->
+        previousState.moodIntensity.nextIntensity(
+            targetChanged = previousState.mood != targetMood,
+            strongSignal = hasSadSignal || hasHappySignal || isLateNight,
+        )
+    } ?: targetMood.defaultIntensity()
+    val energyIntensity = previous?.let { previousState ->
+        previousState.energyIntensity.nextIntensity(
+            targetChanged = previousState.energy != targetEnergy,
+            strongSignal = hasSadSignal || isLateNight || isMorning,
+        )
+    } ?: targetEnergy.defaultIntensity()
     val relationshipIntensity = previous?.relationshipIntensity ?: relationship.defaultIntensity()
     val sinceAt = previous
         ?.takeIf { it.mood == mood && it.energy == energy && it.mode == mode }
@@ -181,11 +209,22 @@ fun buildLuluStateFromTurn(
         mode = mode,
         updatedAt = nowMillis,
         sinceAt = sinceAt,
+        perceptionSummary = perception.summary,
         reason = buildString {
             if (previous != null && (mood != targetMood || energy != targetEnergy || mode != targetMode)) {
                 append("状态惯性：")
             }
             append("最近对话：${userText.take(36).ifBlank { "没有文字内容" }}")
+            val perceptionDetails = perception.userSignals
+                .filter { it != LuluUserSignal.HAPPY && it != LuluUserSignal.STUDYING }
+                .joinToString("、") { it.label }
+            if (perceptionDetails.isNotBlank()) {
+                append("；感知：")
+                append(perceptionDetails)
+            }
+            if (hasHeavyPhoneUse) {
+                append("；建议降低打扰强度")
+            }
         },
     )
 }

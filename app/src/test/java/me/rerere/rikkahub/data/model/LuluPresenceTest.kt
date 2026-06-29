@@ -145,6 +145,61 @@ class LuluPresenceTest {
     }
 
     @Test
+    fun `perception merges health device and app usage context`() {
+        val perception = buildLuluPerception(
+            input = LuluPerceptionInput(
+                userText = "先不聊啦，我要去写作业",
+                hourOfDay = 23,
+                deviceState = LuluDeviceState(
+                    batteryPercent = 12,
+                    isCharging = false,
+                    networkType = "wifi",
+                ),
+                healthState = LuluHealthState(
+                    sleepMinutes = 240,
+                    heartRate = 96,
+                    stepCount = 500,
+                ),
+                appUsageState = LuluAppUsageState(
+                    topApps = listOf("哔哩哔哩", "微信"),
+                    screenMinutesToday = 420,
+                ),
+            ),
+        )
+
+        assertEquals(LuluTimeLabel.LATE_NIGHT, perception.timeLabel)
+        assertEquals(LuluSceneLabel.STUDYING, perception.sceneLabel)
+        assertTrue(perception.userSignals.contains(LuluUserSignal.STUDYING))
+        assertTrue(perception.userSignals.contains(LuluUserSignal.LOW_BATTERY))
+        assertTrue(perception.userSignals.contains(LuluUserSignal.SLEEP_DEBT))
+        assertTrue(perception.userSignals.contains(LuluUserSignal.HEAVY_PHONE_USE))
+        assertTrue(perception.summary.contains("电量低"))
+        assertTrue(perception.summary.contains("睡眠偏少"))
+        assertTrue(perception.summary.contains("屏幕时间偏长"))
+    }
+
+    @Test
+    fun `state update can use structured perception context`() {
+        val state = buildLuluStateFromTurn(
+            assistantId = assistantId,
+            perceptionInput = LuluPerceptionInput(
+                userText = "我还好",
+                hourOfDay = 23,
+                healthState = LuluHealthState(sleepMinutes = 260),
+                appUsageState = LuluAppUsageState(screenMinutesToday = 430),
+            ),
+            assistantText = "早点休息。",
+            nowMillis = 10_000L,
+        )
+
+        assertEquals(LuluEnergy.SLEEPY, state.energy)
+        assertEquals(LuluMode.RESTING, state.mode)
+        assertTrue(state.perceptionSummary.contains("睡眠偏少"))
+        assertTrue(state.reason.contains("睡眠偏少"))
+        assertTrue(state.reason.contains("屏幕时间偏长"))
+    }
+
+    @Test
     fun `expression plan becomes shorter and slower when sleepy`() {
         val plan = buildLuluExpressionPlan(
             state = LuluState(

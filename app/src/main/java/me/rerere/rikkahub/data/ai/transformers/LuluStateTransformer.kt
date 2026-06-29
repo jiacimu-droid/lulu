@@ -53,6 +53,7 @@ internal fun buildLuluPresenceContext(
     thoughts: List<LuluThought> = emptyList(),
 ): String = buildString {
     val perception = buildLuluPerception(userText)
+    val perceptionSummary = state.perceptionSummary.ifBlank { perception.summary }
     val expression = buildLuluExpressionPlan(state, reply = userText)
     appendLine("<lulu_presence>")
     appendLine("这是露露此刻的内在状态、感知和未说出口的想法，只作为角色参考。不要机械复述这些字段。")
@@ -64,7 +65,7 @@ internal fun buildLuluPresenceContext(
     appendLine("行动状态：${state.mode.label}")
     appendLine("状态持续：约 ${state.durationMillis().formatPresenceDuration()}")
     appendLine("变化原因：${state.reason}")
-    appendLine("当前感知：${perception.summary}")
+    appendLine("当前感知：$perceptionSummary")
     if (thoughts.isNotEmpty()) {
         appendLine("未说出口的想法：")
         thoughts.forEach { thought ->
