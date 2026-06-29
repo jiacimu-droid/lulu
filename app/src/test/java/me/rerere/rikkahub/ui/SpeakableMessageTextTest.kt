@@ -38,6 +38,20 @@ class SpeakableMessageTextTest {
     }
 
     @Test
+    fun `buildSpeakableMessageText does not fall back to generated speaking when visible text exists`() {
+        val message = UIMessage.assistant("(visible action)\nspeaking: wrong generated voice")
+
+        assertNull(buildSpeakableMessageText(message, onlyReadQuoted = false))
+    }
+
+    @Test
+    fun `buildSpeakableMessageText reads visible assistant text instead of generated speaking`() {
+        val message = UIMessage.assistant("visible reply\nspeaking: wrong generated voice")
+
+        assertEquals("visible reply", buildSpeakableMessageText(message, onlyReadQuoted = false))
+    }
+
+    @Test
     fun `buildSpeakableMessageText prefers visible assistant text over text to speech tool input`() {
         val message = UIMessage(
             role = MessageRole.ASSISTANT,

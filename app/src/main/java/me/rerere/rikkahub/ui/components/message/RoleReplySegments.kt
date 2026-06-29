@@ -63,16 +63,24 @@ fun String.extractSpeakableRoleText(): String =
         .joinToString("\n") { it.text }
         .trim()
 
+private fun String.removeHiddenZipTags(): String =
+    replace(Regex("\\[zip:[^\\]]+\\]", RegexOption.IGNORE_CASE), "")
+
 fun buildSpeakableMessageText(message: UIMessage, onlyReadQuoted: Boolean): String? {
-    val rawText = message.toText().ifBlank { message.extractTextToSpeechToolText() }
+    val rawText = message.toText().removeHiddenZipTags()
+    val sourceText = rawText.ifBlank { message.extractTextToSpeechToolText() }
     val selectedText = if (onlyReadQuoted) {
-        rawText.extractQuotedContentAsText() ?: rawText
+        sourceText.extractQuotedContentAsText() ?: sourceText
     } else {
-        rawText
+        sourceText
     }
     val withoutSpeakingLines = selectedText.removeGeneratedSpeakingLines()
-    val speakingFallback = selectedText.extractGeneratedSpeakingLines()
-    return (withoutSpeakingLines.extractSpeakableRoleText().ifBlank { speakingFallback.extractSpeakableRoleText() })
+    val visibleSpeakableText = withoutSpeakingLines.extractSpeakableRoleText()
+    if (withoutSpeakingLines.isNotBlank()) {
+        return visibleSpeakableText.takeIf { it.isNotBlank() }
+    }
+    return selectedText.extractGeneratedSpeakingLines()
+        .extractSpeakableRoleText()
         .takeIf { it.isNotBlank() }
 }
 
