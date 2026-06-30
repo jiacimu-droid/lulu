@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import androidx.core.app.NotificationCompat
@@ -42,9 +43,9 @@ import me.rerere.rikkahub.data.ai.transformers.DocumentAsPromptTransformer
 import me.rerere.rikkahub.data.ai.transformers.OcrTransformer
 import me.rerere.rikkahub.data.ai.transformers.ThinkTagTransformer
 import me.rerere.rikkahub.data.ai.transformers.Base64ImageToLocalFileTransformer
+import me.rerere.rikkahub.data.ai.transformers.LuluExpressionOutputTransformer
 import me.rerere.rikkahub.data.ai.transformers.RegexOutputTransformer
 import me.rerere.rikkahub.data.ai.transformers.transforms
-import me.rerere.rikkahub.data.ai.transformers.visualTransforms
 import me.rerere.rikkahub.data.ai.transformers.onGenerationFinish
 import me.rerere.rikkahub.data.ai.tools.LocalTools
 import me.rerere.rikkahub.data.ai.tools.SystemTools
@@ -519,6 +520,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             ThinkTagTransformer,
             Base64ImageToLocalFileTransformer,
             RegexOutputTransformer,
+            LuluExpressionOutputTransformer,
         )
     }
 
@@ -1050,6 +1052,29 @@ addAll(localTools.getTools(assistant.localTools))
      * 生成消息，支持工具调用
      * 返回最终消息列表和是否发生了工具调用
      */
+    private fun replaceAiMessageWithMessages(
+        conversationId: Uuid,
+        originalMessageId: Uuid,
+        aiMessages: List<UIMessage>,
+    ) {
+        if (aiMessages.isEmpty()) return
+        chatService.updateConversationState(conversationId) { conv ->
+            val existingNodeIndex = conv.messageNodes.indexOfFirst { node ->
+                node.messages.any { it.id == originalMessageId }
+            }
+            val newNodes = aiMessages.map { it.toMessageNode() }
+            if (existingNodeIndex >= 0) {
+                conv.copy(
+                    messageNodes = conv.messageNodes.take(existingNodeIndex) +
+                        newNodes +
+                        conv.messageNodes.drop(existingNodeIndex + 1)
+                )
+            } else {
+                conv.copy(messageNodes = conv.messageNodes + newNodes)
+            }
+        }
+    }
+
     private suspend fun generateWithTools(
         conversationId: Uuid,
         providerImpl: me.rerere.ai.provider.Provider<ProviderSetting>,
@@ -1119,7 +1144,17 @@ addAll(localTools.getTools(assistant.localTools))
                 )
                 messages[messages.lastIndex] = finalMessage
                 // 最终更新 session 状态（用 id 匹配就地更新）
-                updateOrAppendAiMessage(conversationId, finalMessage)
+                val finishedAt = now.toLocalDateTime(TimeZone.currentSystemDefault())
+                messages = messages.onGenerationFinish(
+                    transformers = outputTransformers,
+                    context = this@ProactiveMessageTriggerService,
+                    model = model,
+                    assistant = assistant,
+                    settings = settings,
+                )
+                    .markTrailingAssistantMessagesFinished(finishedAt)
+                    .toMutableList()
+                replaceAiMessageWithMessages(conversationId, finalMessage.id, messages.trailingAssistantMessages())
                 break
             }
 
@@ -1167,6 +1202,26 @@ addAll(localTools.getTools(assistant.localTools))
         }
 
         return Pair(messages, hasToolCalls)
+    }
+
+    private fun List<UIMessage>.markTrailingAssistantMessagesFinished(
+        finishedAt: LocalDateTime,
+    ): List<UIMessage> {
+        val firstTrailingAssistantIndex = indexOfLast { it.role != MessageRole.ASSISTANT } + 1
+        if (firstTrailingAssistantIndex !in indices) return this
+        return mapIndexed { index, message ->
+            if (index >= firstTrailingAssistantIndex && message.role == MessageRole.ASSISTANT) {
+                message.copy(finishedAt = finishedAt)
+            } else {
+                message
+            }
+        }
+    }
+
+    private fun List<UIMessage>.trailingAssistantMessages(): List<UIMessage> {
+        val firstTrailingAssistantIndex = indexOfLast { it.role != MessageRole.ASSISTANT } + 1
+        if (firstTrailingAssistantIndex !in indices) return emptyList()
+        return drop(firstTrailingAssistantIndex).filter { it.role == MessageRole.ASSISTANT }
     }
 
     override fun onBind(intent: Intent?): android.os.IBinder? = null

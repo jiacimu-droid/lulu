@@ -56,14 +56,20 @@ internal fun findAutoPlayTTSMessage(
     nodes: List<MessageNode>,
     lastSpokenMessageId: Uuid?,
 ): UIMessage? {
-    val message = nodes
-        .asReversed()
+    val messages = nodes
         .map { it.currentMessage }
-        .firstOrNull {
+        .filter {
             it.role == MessageRole.ASSISTANT &&
                 it.finishedAt != null &&
                 it.toText().isNotBlank()
         }
-        ?: return null
-    return message.takeIf { it.id != lastSpokenMessageId }
+    if (messages.isEmpty()) return null
+    if (lastSpokenMessageId == null) return messages.last()
+
+    val lastSpokenIndex = messages.indexOfFirst { it.id == lastSpokenMessageId }
+    return when {
+        lastSpokenIndex < 0 -> messages.last()
+        lastSpokenIndex < messages.lastIndex -> messages[lastSpokenIndex + 1]
+        else -> null
+    }
 }

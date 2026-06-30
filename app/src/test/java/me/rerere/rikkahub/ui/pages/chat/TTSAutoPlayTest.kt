@@ -5,17 +5,35 @@ import me.rerere.rikkahub.data.model.MessageNode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import kotlin.time.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class TTSAutoPlayTest {
     @Test
-    fun `selects newest assistant message once`() {
-        val first = UIMessage.assistant("第一句")
-        val second = UIMessage.assistant("第二句")
+    fun `selects newest assistant message when no spoken marker exists`() {
+        val first = assistantMessage("first")
+        val second = assistantMessage("second")
 
         assertEquals(
             second.id,
             findAutoPlayTTSMessage(
                 nodes = listOf(MessageNode.of(first), MessageNode.of(second)),
+                lastSpokenMessageId = null,
+            )?.id,
+        )
+    }
+
+    @Test
+    fun `selects next assistant message after last spoken one`() {
+        val first = assistantMessage("first")
+        val second = assistantMessage("second")
+        val third = assistantMessage("third")
+
+        assertEquals(
+            second.id,
+            findAutoPlayTTSMessage(
+                nodes = listOf(MessageNode.of(first), MessageNode.of(second), MessageNode.of(third)),
                 lastSpokenMessageId = first.id,
             )?.id,
         )
@@ -23,7 +41,7 @@ class TTSAutoPlayTest {
 
     @Test
     fun `does not replay the same assistant message`() {
-        val message = UIMessage.assistant("已经播过")
+        val message = assistantMessage("already spoken")
 
         assertNull(
             findAutoPlayTTSMessage(
@@ -32,4 +50,9 @@ class TTSAutoPlayTest {
             ),
         )
     }
+
+    private fun assistantMessage(text: String): UIMessage =
+        UIMessage.assistant(text).copy(
+            finishedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        )
 }

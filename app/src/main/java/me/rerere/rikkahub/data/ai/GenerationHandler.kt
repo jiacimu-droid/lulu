@@ -145,10 +145,9 @@ class GenerationHandler(
                     assistant = assistant,
                     settings = settings
                 )
-                messages = messages.slice(0 until messages.lastIndex) + messages.last().copy(
-                    finishedAt = Clock.System.now()
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                )
+                val finishedAt = Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                messages = messages.markTrailingAssistantMessagesFinished(finishedAt)
                 emit(GenerationChunk.Messages(messages))
 
                 val tools = messages.last().getTools().filter { !it.isExecuted }
@@ -305,6 +304,20 @@ class GenerationHandler(
         }
 
     }.flowOn(Dispatchers.IO)
+
+    private fun List<UIMessage>.markTrailingAssistantMessagesFinished(
+        finishedAt: kotlinx.datetime.LocalDateTime,
+    ): List<UIMessage> {
+        val firstTrailingAssistantIndex = indexOfLast { it.role != MessageRole.ASSISTANT } + 1
+        if (firstTrailingAssistantIndex !in indices) return this
+        return mapIndexed { index, message ->
+            if (index >= firstTrailingAssistantIndex && message.role == MessageRole.ASSISTANT) {
+                message.copy(finishedAt = finishedAt)
+            } else {
+                message
+            }
+        }
+    }
 
     private suspend fun generateInternal(
         assistant: Assistant,
