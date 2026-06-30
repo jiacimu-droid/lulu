@@ -784,6 +784,10 @@ class GoogleProvider(private val client: OkHttpClient, context: Context? = null)
             "Expected Google provider setting"
         }
 
+        if (!params.model.modelId.isImagenModelId()) {
+            return@withContext generateImageWithGemini(providerSetting, params)
+        }
+
         val requestBody = buildJsonObject {
             putJsonArray("instances") {
                 add(buildJsonObject {
@@ -847,4 +851,47 @@ class GoogleProvider(private val client: OkHttpClient, context: Context? = null)
 
         ImageGenerationResult(items = items)
     }
+
+    private suspend fun generateImageWithGemini(
+        providerSetting: ProviderSetting.Google,
+        params: ImageGenerationParams,
+    ): ImageGenerationResult {
+        val imageModel = params.model.copy(
+            type = ModelType.CHAT,
+            outputModalities = (params.model.outputModalities + Modality.IMAGE + Modality.TEXT).distinct(),
+        )
+        val chunk = generateText(
+            providerSetting = providerSetting,
+            messages = listOf(UIMessage.user(params.prompt)),
+            params = TextGenerationParams(
+                model = imageModel,
+                temperature = null,
+                topP = null,
+                maxTokens = null,
+                reasoningLevel = ReasoningLevel.OFF,
+                customHeaders = params.customHeaders,
+                customBody = params.customBody,
+            ),
+        )
+        val items = chunk.choices
+            .flatMap { choice -> choice.message?.parts.orEmpty() }
+            .filterIsInstance<UIMessagePart.Image>()
+            .take(params.numOfImages.coerceAtLeast(1))
+            .map { image ->
+                ImageGenerationItem(
+                    data = image.url,
+                    mimeType = "image/png",
+                )
+            }
+        if (items.isEmpty()) {
+            error(
+                "Google image generation returned no image. " +
+                    "Model=${params.model.modelId}; for Imagen use an imagen-* model, for Gemini make sure it supports image output."
+            )
+        }
+        return ImageGenerationResult(items = items)
+    }
+
+    private fun String.isImagenModelId(): Boolean =
+        contains("imagen", ignoreCase = true)
 }

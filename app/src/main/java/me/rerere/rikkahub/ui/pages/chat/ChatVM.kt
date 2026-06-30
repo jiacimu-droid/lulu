@@ -152,12 +152,15 @@ class ChatVM(
 
         settingsStore.update { settings ->
             val assistantId = currentConversation.assistantId
+            val assistant = settings.assistants.firstOrNull { it.id == assistantId }
             val userText = latestUserMessage.toText().trim()
             val state = buildLuluStateFromTurn(
                 assistantId = assistantId,
                 previous = settings.luluStates.currentLuluState(assistantId),
                 userText = userText,
                 assistantText = assistantText,
+                assistantName = assistant?.name.orEmpty(),
+                assistantPersona = assistant?.systemPrompt.orEmpty(),
             )
             val newThought = buildLuluThoughtFromTurn(
                 assistantId = assistantId,

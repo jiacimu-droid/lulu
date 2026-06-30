@@ -136,10 +136,22 @@ private fun CurrentStatus(state: LuluState) {
         HorizontalDivider()
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
-                text = state.reason,
+                text = "状态依据",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = state.reason.ifBlank { "根据最近一次对话自然更新。" },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            state.perceptionSummary.takeIf { it.isNotBlank() }?.let { summary ->
+                Text(
+                    text = "当前感知：$summary",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Text(
                 text = formatStateTime(state.updatedAt),
                 style = MaterialTheme.typography.labelSmall,

@@ -101,10 +101,19 @@ data class AffectiveMemoryCandidate(
 }
 
 object AffectiveMemoryExtractor {
-    fun buildExtractionPrompt(turns: List<MemoryExtractionTurn>): String = buildString {
-        appendLine("你是露露的记忆整理器。只提取值得以后想起的候选记忆。")
-        appendLine("重点写露露自己的情绪、身体感受、未说出口的想法、关系判断，而不是只记录用户流水账。")
-        appendLine("unspokenThought 要尽量具体：写露露当时的猜测、顾虑、想靠近但没有说出口的话、想做但暂时压住的动作、对用户真实状态的判断。不要只写“很担心”这类空泛短句。")
+    fun buildExtractionPrompt(
+        turns: List<MemoryExtractionTurn>,
+        assistantName: String = "露露",
+        assistantPersona: String = "",
+    ): String = buildString {
+        val name = assistantName.ifBlank { "当前角色" }
+        appendLine("你是$name 的记忆整理器。只提取值得以后想起的候选记忆。")
+        if (assistantPersona.isNotBlank()) {
+            appendLine("角色设定摘要：${assistantPersona.take(1200)}")
+        }
+        appendLine("重点写$name 自己的情绪、身体感受、未说出口的想法、关系判断，而不是只记录用户流水账。")
+        appendLine("unspokenThought 必须贴合$name 的人设、语言习惯和关系位置；不要写成旁白腔、客服腔或通用模板。")
+        appendLine("unspokenThought 要尽量具体：写$name 当时的猜测、顾虑、想靠近但没有说出口的话、想做但暂时压住的动作、对用户真实状态的判断。不要只写“很担心”这类空泛短句。")
         appendLine("返回 JSON，格式为 {\"memories\":[...]}。不要输出解释。")
         appendLine("每条字段：type, content, roleFeeling, bodySense, unspokenThought, userSignal, relationshipEffect, importance, confidence, tags, embeddingText, sourceMessageNodeIds, evidenceMessageNodeIds, relatedMemoryIds, people, topics, supersededByMemoryId, correctedAt。")
         appendLine("type 只能优先使用 role_emotion, body_sense, promise, relationship, user_preference, event。")

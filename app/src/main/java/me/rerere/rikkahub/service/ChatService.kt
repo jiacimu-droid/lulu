@@ -208,6 +208,7 @@ internal fun Settings.recordLuluPresenceTurn(
     val cleanAssistantText = assistantText.trim()
     if (cleanAssistantText.isBlank()) return this
     if (assistants.none { it.id == assistantId }) return this
+    val assistant = assistants.firstOrNull { it.id == assistantId }
 
     val previousState = luluStates.luluStateHistory(assistantId).firstOrNull()
     val input = perceptionInput?.copy(userText = cleanUserText)
@@ -217,6 +218,8 @@ internal fun Settings.recordLuluPresenceTurn(
         previous = previousState,
         perceptionInput = input,
         assistantText = cleanAssistantText,
+        assistantName = assistant?.name.orEmpty(),
+        assistantPersona = assistant?.systemPrompt.orEmpty(),
         nowMillis = nowMillis,
     )
     val nextThought = buildLuluThoughtFromTurn(
@@ -1161,7 +1164,11 @@ class ChatService(
                     ?: model
                 val provider = extractionModel.findProvider(settings.providers) ?: return@runCatching
                 val providerImpl = providerManager.getProviderByType(provider)
-                val prompt = AffectiveMemoryExtractor.buildExtractionPrompt(plan.turns)
+                val prompt = AffectiveMemoryExtractor.buildExtractionPrompt(
+                    turns = plan.turns,
+                    assistantName = assistant.name,
+                    assistantPersona = assistant.systemPrompt,
+                )
                 val chunk = providerImpl.generateText(
                     providerSetting = provider,
                     messages = listOf(UIMessage.user(prompt)),
@@ -1184,7 +1191,7 @@ class ChatService(
                 val rawText = chunk.choices.firstOrNull()?.message?.toText().orEmpty()
                 val candidates = AffectiveMemoryExtractor.parseExtractionResult(rawText)
                     .memories
-                    .take(3)
+                    .take(8)
                 if (candidates.isEmpty()) return@runCatching
 
                 memoryBankService.saveExtractedMemories(

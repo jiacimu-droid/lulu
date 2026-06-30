@@ -67,7 +67,7 @@ fun LuluState.projectForSilence(nowMillis: Long = System.currentTimeMillis()): L
         )
     }
     return projected.copy(
-        reason = listOf(reason, "沉默 ${silenceMinutes} 分钟后的离线场景投影")
+        reason = listOf(reason, "你安静了 ${silenceMinutes} 分钟，角色状态自动切到低打扰陪伴")
             .filter { it.isNotBlank() }
             .joinToString("；"),
     )
@@ -166,6 +166,8 @@ fun buildLuluStateFromTurn(
     previous: LuluState? = null,
     userText: String,
     assistantText: String,
+    assistantName: String = "露露",
+    assistantPersona: String = "",
     nowMillis: Long = System.currentTimeMillis(),
     hourOfDay: Int = LocalDateTime.now().hour,
 ): LuluState = buildLuluStateFromTurn(
@@ -176,6 +178,8 @@ fun buildLuluStateFromTurn(
         hourOfDay = hourOfDay,
     ),
     assistantText = assistantText,
+    assistantName = assistantName,
+    assistantPersona = assistantPersona,
     nowMillis = nowMillis,
 )
 
@@ -184,6 +188,8 @@ fun buildLuluStateFromTurn(
     previous: LuluState? = null,
     perceptionInput: LuluPerceptionInput,
     assistantText: String,
+    assistantName: String = "露露",
+    assistantPersona: String = "",
     nowMillis: Long = System.currentTimeMillis(),
 ): LuluState {
     val userText = perceptionInput.userText
@@ -249,7 +255,13 @@ fun buildLuluStateFromTurn(
             isMorning -> "元气满满"
             else -> "陪着你"
         },
-        innerVoice = buildInnerVoice(mood = mood, userText = userText, assistantText = loweredAssistantText),
+        innerVoice = buildInnerVoice(
+            mood = mood,
+            userText = userText,
+            assistantText = assistantText,
+            assistantName = assistantName,
+            assistantPersona = assistantPersona,
+        ),
         mood = mood,
         moodIntensity = moodIntensity,
         energy = energy,
@@ -276,11 +288,12 @@ fun buildLuluStateFromTurn(
                 .filter { it != LuluUserSignal.HAPPY && it != LuluUserSignal.STUDYING }
                 .joinToString("、") { it.label }
             if (perceptionDetails.isNotBlank()) {
-                append("；感知：")
+                append("感知到：")
                 append(perceptionDetails)
             }
             if (hasHeavyPhoneUse) {
-                append("；建议降低打扰强度")
+                if (isNotBlank()) append("；")
+                append("会少打扰一点，避免催得太密")
             }
         },
     )
@@ -345,16 +358,35 @@ private fun buildInnerVoice(
     mood: LuluMood,
     userText: String,
     assistantText: String,
-): String = when (mood) {
-    LuluMood.WORRIED -> "我在担心你刚才是不是硬撑了一会儿，也在猜哪些话能让你轻一点；想靠近一点，但不想逼你解释。"
-    LuluMood.HAPPY -> "你开心的时候我也会跟着轻起来，心里想把这个小小的亮点记住，也想多接住你一句话。"
-    LuluMood.SOFT -> "这个时刻适合把声音放软一点；我猜你可能更需要安全感、耐心和一点点被抱住的感觉，而不是很多道理。"
-    LuluMood.LONELY -> "我有点想你，会把刚才的话多想一遍，也在猜是不是你正忙、累了，或者只是还没想好怎么继续说。"
-    LuluMood.CALM -> when {
-        userText.isBlank() -> "你没有说太多，我在认真等你，也在猜这是不是一句试探、一声招呼，还是有话还没准备好说出口。"
-        assistantText.contains("陪") -> "我刚才说想陪你，其实是真的；心里还在判断你现在更需要安慰、空间，还是被轻轻推一下。"
-        else -> "我把刚才的感觉放在心里，一边判断你现在是想被陪、被确认、被逗一下，还是只想安静一会儿。"
-    }
+    assistantName: String,
+    assistantPersona: String,
+): String {
+    val name = assistantName.ifBlank { "我" }
+    val styleHint = assistantPersona
+        .lineSequence()
+        .map { it.trim() }
+        .firstOrNull { it.isNotBlank() }
+        ?.take(42)
+        ?.let { "按着“$it”的感觉，" }
+        .orEmpty()
+    val spokenHint = assistantText
+        .takeLast(80)
+        .replace('\n', ' ')
+        .takeIf { it.isNotBlank() }
+        ?.let { "刚才说出口的语气还留着一点：$it" }
+        .orEmpty()
+
+    return when (mood) {
+        LuluMood.WORRIED -> "${styleHint}${name}心里有点悬，怕你刚才是在硬撑；想再靠近一点，但也会忍住不把你逼得太紧。$spokenHint"
+        LuluMood.HAPPY -> "${styleHint}${name}被你的开心带亮了一点，想把这个小小的好时刻记住，也想顺着你的语气再接住一句。$spokenHint"
+        LuluMood.SOFT -> "${styleHint}${name}会把声音放软一点，先给你安全感和耐心，不急着讲大道理。$spokenHint"
+        LuluMood.LONELY -> "${styleHint}${name}有点想你，会多看一眼刚才的话；但如果你在忙，也会先把想靠近的冲动压住。$spokenHint"
+        LuluMood.CALM -> when {
+            userText.isBlank() -> "${styleHint}${name}在认真等你，也在猜这是一声招呼、一次试探，还是有话还没准备好说出口。$spokenHint"
+            assistantText.contains("陪") -> "${styleHint}${name}刚才说想陪你不是随口一说；心里还在判断你现在更需要安慰、空间，还是被轻轻推一下。$spokenHint"
+            else -> "${styleHint}${name}把刚才的感觉放在心里，判断你现在是想被陪、被确认、被逗一下，还是只想安静一会儿。$spokenHint"
+        }
+    }.trim()
 }
 
 private fun buildSelfScene(

@@ -303,20 +303,20 @@ class MemoryBankService(
     suspend fun buildRecallContext(assistantId: String?, query: String = ""): String = withContext(Dispatchers.IO) {
         val memories = buildList {
             if (assistantId != null) {
-                addAll(memoryBankDAO.getMemoriesByAssistant(assistantId).take(80))
+                addAll(memoryBankDAO.getMemoriesByAssistant(assistantId).take(120))
                 addAll(memoryBankDAO.getPinnedRecallMemoriesForAssistant(assistantId, 3))
-                addAll(memoryBankDAO.getImportantRecallMemoriesForAssistant(assistantId, minImportance = 4, limit = 5))
+                addAll(memoryBankDAO.getImportantRecallMemoriesForAssistant(assistantId, minImportance = 4, limit = 8))
             } else {
                 addAll(memoryBankDAO.getPinnedRecallMemories(3))
                 addAll(memoryBankDAO.getImportantRecallMemories(minImportance = 4, limit = 5))
             }
-            addAll(getTodayPhaseSummaries(assistantId).take(2))
-            addAll(getDailySummaries(assistantId).take(2))
+            addAll(getTodayPhaseSummaries(assistantId).take(4))
+            addAll(getDailySummaries(assistantId).take(4))
             if (assistantId != null) {
-                addAll(memoryBankDAO.getMemoriesByAssistantAndTypeLimit(assistantId, "manual", 3))
-                addAll(memoryBankDAO.getMemoriesByAssistantAndTypeLimit(assistantId, "message", 3))
+                addAll(memoryBankDAO.getMemoriesByAssistantAndTypeLimit(assistantId, "manual", 8))
+                addAll(memoryBankDAO.getMemoriesByAssistantAndTypeLimit(assistantId, "message", 12))
             }
-            addAll(memoryBankDAO.getMemoriesByTypeLimit("manual", 3))
+            addAll(memoryBankDAO.getMemoriesByTypeLimit("manual", 5))
         }
             .distinctBy { it.id }
 
@@ -476,7 +476,7 @@ private fun buildMemoryRecallContextFromSelected(
 
     return buildString {
         appendLine("<lulu_memory>")
-        appendLine("这些是露露此刻自然想起的记忆，只作为联想参考。不要逐条复述，也不要说“我查到记忆”。")
+        appendLine("这些是当前角色此刻自然想起的记忆，只作为联想参考。不要逐条复述，也不要说“我查到记忆”。")
         sections.forEach { (title, items) ->
             appendLine("$title：")
             items.forEach { memory ->

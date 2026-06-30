@@ -18,6 +18,7 @@ object LuluStateTransformer : InputMessageTransformer {
     ): List<UIMessage> = applyLuluStateContext(
         messages = messages,
         assistantId = ctx.assistant.id,
+        assistantName = ctx.assistant.name,
         states = ctx.settings.luluStates,
         thoughts = ctx.settings.luluThoughts,
     )
@@ -26,6 +27,7 @@ object LuluStateTransformer : InputMessageTransformer {
 internal fun applyLuluStateContext(
     messages: List<UIMessage>,
     assistantId: Uuid,
+    assistantName: String = "露露",
     states: List<LuluState>,
     thoughts: List<LuluThought> = emptyList(),
     nowMillis: Long = System.currentTimeMillis(),
@@ -40,6 +42,7 @@ internal fun applyLuluStateContext(
         buildLuluPresenceContext(
             state = state,
             userText = latestUserText,
+            assistantName = assistantName,
             thoughts = thoughts.thoughtHistory(assistantId),
         )
     )
@@ -51,17 +54,19 @@ internal fun applyLuluStateContext(
 internal fun buildLuluPresenceContext(
     state: LuluState,
     userText: String,
+    assistantName: String = "露露",
     thoughts: List<LuluThought> = emptyList(),
 ): String = buildString {
+    val name = assistantName.ifBlank { "当前角色" }
     val perception = buildLuluPerception(userText)
     val perceptionSummary = state.perceptionSummary.ifBlank { perception.summary }
     val expression = buildLuluExpressionPlan(state, reply = userText)
     appendLine("<lulu_presence>")
-    appendLine("这是露露此刻的内在状态、感知、推测和未说出口的想法，只作为角色参考。不要机械复述这些字段。")
-    appendLine("心声用于影响语气和选择：可以体现露露的猜测、顾虑、想靠近但没说出口的话、想做但暂时压住的动作。最终回复仍只输出自然说出口的话。")
+    appendLine("这是$name 此刻的内在状态、感知、推测和未说出口的想法，只作为角色参考。不要机械复述这些字段。")
+    appendLine("心声用于影响语气和选择：可以体现$name 的猜测、顾虑、想靠近但没说出口的话、想做但暂时压住的动作。最终回复仍只输出自然说出口的话。")
     appendLine("当前状态：${state.statusText}")
     appendLine("心声：${state.innerVoice}")
-    appendLine("露露自己的场景：${state.selfScene}")
+    appendLine("${name}自己的场景：${state.selfScene}")
     appendLine("心情：${state.mood.label}（强度 ${state.moodIntensity.formatPresenceIntensity()}）")
     appendLine("精力：${state.energy.label}（强度 ${state.energyIntensity.formatPresenceIntensity()}）")
     appendLine("亲密感：${state.relationship.label}（强度 ${state.relationshipIntensity.formatPresenceIntensity()}）")
