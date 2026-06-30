@@ -230,8 +230,6 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             state = state,
                             onSingle = { vm.draw(1) },
                             onTen = { vm.draw(10) },
-                            onRedeemMcDonalds = vm::redeemMcDonalds,
-                            onOpenStarWish = { navController.navigate(Screen.StarWish) },
                         )
                     }
                 }
@@ -1044,8 +1042,6 @@ private fun GachaCard(
     state: StudyState,
     onSingle: () -> Unit,
     onTen: () -> Unit,
-    onRedeemMcDonalds: () -> Unit,
-    onOpenStarWish: () -> Unit,
 ) {
     val singleCost = if (StudyRules.hasSingleDrawDiscount(state)) StudyRules.DISCOUNT_SINGLE_DRAW_COST else StudyRules.SINGLE_DRAW_COST
     StudyCard {
@@ -1076,31 +1072,6 @@ private fun GachaCard(
             }
             Button(onClick = onTen, modifier = Modifier.weight(1f)) {
                 Text("十连 800 / 券${state.wallet.tenDrawTickets}")
-            }
-        }
-        Surface(color = Color.White.copy(alpha = 0.78f), shape = RoundedCornerShape(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Surface(shape = CircleShape, color = StudyColors.goldText.copy(alpha = 0.18f), modifier = Modifier.size(42.dp)) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text("M", color = StudyColors.goldText, fontWeight = FontWeight.Black)
-                    }
-                }
-                Column(Modifier.weight(1f)) {
-                    Text("麦当劳奖励入口", fontWeight = FontWeight.SemiBold)
-                    Text(
-                        "麦当劳碎片 ${state.inventory.epicFragments}/2 · MCP 码在星愿馆填写",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                TextButton(onClick = onOpenStarWish) { Text("配置") }
-                Button(onClick = onRedeemMcDonalds, enabled = state.inventory.epicFragments >= 2) {
-                    Text("兑换")
-                }
             }
         }
     }

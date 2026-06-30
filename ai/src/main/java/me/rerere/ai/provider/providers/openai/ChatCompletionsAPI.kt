@@ -354,14 +354,11 @@ class ChatCompletionsAPI(
                 }
             }
 
-            // open router适配
-            if(host == "openrouter.ai") {
-                if(params.model.outputModalities.contains(Modality.IMAGE)) {
-                    put("modalities", buildJsonArray {
-                        add("image")
-                        add("text")
-                    })
-                }
+            if (params.model.outputModalities.contains(Modality.IMAGE)) {
+                put("modalities", buildJsonArray {
+                    add("image")
+                    add("text")
+                })
             }
 
             if (params.model.abilities.contains(ModelAbility.REASONING)) {
@@ -735,7 +732,15 @@ class ChatCompletionsAPI(
         )
 
         // 也许支持其他模态的输出content?
-        val content = jsonObject["content"]?.jsonPrimitiveOrNull?.contentOrNull ?: ""
+        val contentElement = jsonObject["content"]
+        val content = contentElement?.jsonPrimitiveOrNull?.contentOrNull
+            ?: contentElement?.jsonArrayOrNull?.mapNotNull { part ->
+                part.jsonObjectOrNull
+                    ?.takeIf { it["type"]?.jsonPrimitiveOrNull?.contentOrNull == "text" }
+                    ?.get("text")
+                    ?.jsonPrimitiveOrNull
+                    ?.contentOrNull
+            }?.joinToString("\n").orEmpty()
         val reasoning = jsonObject["reasoning_content"]?.jsonPrimitiveOrNull?.contentOrNull
             ?: jsonObject["reasoning"]?.jsonPrimitiveOrNull?.contentOrNull
             ?: jsonObject["content"]?.takeIf { it is JsonArray }?.let { arr ->
@@ -746,7 +751,15 @@ class ChatCompletionsAPI(
                 )?.jsonPrimitiveOrNull?.contentOrNull
             }
         val toolCalls = jsonObject["tool_calls"] as? JsonArray ?: JsonArray(emptyList())
-        val images = jsonObject["images"] as? JsonArray ?: JsonArray(emptyList())
+        val images = buildJsonArray {
+            (jsonObject["images"] as? JsonArray)?.forEach { add(it) }
+            contentElement?.jsonArrayOrNull?.forEach { part ->
+                val obj = part.jsonObjectOrNull ?: return@forEach
+                if (obj["type"]?.jsonPrimitiveOrNull?.contentOrNull == "image_url") {
+                    add(obj)
+                }
+            }
+        }
 
         return UIMessage(
             role = role,
@@ -784,7 +797,7 @@ class ChatCompletionsAPI(
                     if (type != "image_url") return@forEach
                     val url = imageObject["image_url"]?.jsonObjectOrNull?.get("url")?.jsonPrimitive?.contentOrNull ?: return@forEach
                     require(url.startsWith("data:image")) { "Only data uri is supported" }
-                    add(UIMessagePart.Image(url.substringAfter("data:image/png;base64,")))
+                    add(UIMessagePart.Image(url.substringAfter("base64,")))
                 }
             },
             annotations = parseAnnotations(

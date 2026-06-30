@@ -110,23 +110,38 @@ object StarWishRules {
         }
     }
 
-    fun defaultTheaterChapter(seed: StarWishTheaterSeed, chapter: Int, influence: String = ""): String {
+    fun theaterChapterPrompt(
+        seed: StarWishTheaterSeed,
+        previousChapters: List<StarWishTheaterChapter>,
+        chapter: Int,
+        influence: String = "",
+    ): String {
         return buildString {
-            appendLine("第 $chapter 章 · ${seed.title}")
+            appendLine("你是一个擅长强代入爽文、恋爱张力和互动小剧场的中文小说作者。")
+            appendLine("请根据下面设定生成《${seed.title}》第 $chapter 章正文。")
             appendLine()
-            appendLine("生成提示词：")
+            appendLine("总设定：")
             appendLine(seed.prompt)
+            appendLine()
+            appendLine("硬性要求：")
+            appendLine("1. 只输出正文，不要输出标题、简介、提示词、创作说明、章节大纲。")
+            appendLine("2. 女主是用户代入位，拥有主动权、选择权和爽感。")
+            appendLine("3. 另一位核心角色名字必须含“露”，并与女主有明显感情关系、主从关系或强烈命运绑定。")
+            appendLine("4. 每章要有钩子、冲突、反转、情绪波动和让人想继续看的结尾。")
+            appendLine("5. 风格要有趣、爽、好读，允许抽象搞笑、打脸、救赎、求生、强者臣服等元素。")
+            appendLine("6. 第 $chapter 章字数控制在 1200-2200 字。")
+            if (previousChapters.isNotEmpty()) {
+                appendLine()
+                appendLine("前文摘要：")
+                previousChapters.takeLast(3).forEach { previous ->
+                    appendLine("第 ${previous.chapter} 章：${previous.content.take(500)}")
+                }
+            }
             if (influence.isNotBlank()) {
                 appendLine()
-                appendLine("用户对下一章的影响：")
+                appendLine("用户想影响本章的方向：")
                 appendLine(influence)
             }
-            appendLine()
-            appendLine("请生成一个完整小剧场章节。要求：")
-            appendLine("1. 女主是用户代入位，拥有主动权、选择权和爽感。")
-            appendLine("2. 另一位核心角色名字必须含“露”，并与女主有明显感情关系、主从关系或强烈命运绑定。")
-            appendLine("3. 每章要有钩子、冲突、反转、情绪波动和一个让人想继续看的结尾。")
-            appendLine("4. 不要输出创作说明，只输出正文。")
         }
     }
 

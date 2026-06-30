@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -89,6 +90,7 @@ import org.koin.androidx.compose.koinViewModel
 private enum class StarWishSection(val label: String) {
     Scrolls("画卷"),
     Theaters("小剧场"),
+    McDonalds("麦当劳"),
 }
 
 private enum class ScrollSubsection(val label: String) {
@@ -201,13 +203,6 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                 }
                 StarWishSection.Theaters -> {
                     item {
-                        McDonaldsMcpCard(
-                            epicFragments = studyState.inventory.epicFragments,
-                            mcpCode = state.mcdonaldsMcpCode,
-                            onSave = vm::saveMcdonaldsMcpCode,
-                        )
-                    }
-                    item {
                         TheaterWalletCard(
                             rareFragments = studyState.inventory.universalRareFragments,
                             onAdd = { showAddTheater = true },
@@ -225,6 +220,17 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                             progress = (studyState.inventory.universalRareFragments.coerceAtMost(StarWishRules.RARE_FRAGMENTS_PER_CHAPTER)) / StarWishRules.RARE_FRAGMENTS_PER_CHAPTER.toFloat(),
                             icon = HugeIcons.BookOpen02,
                             onClick = { if (canCreate || hasChapter) navController.navigate(Screen.StarWishTheater(theater.title)) },
+                        )
+                    }
+                }
+                StarWishSection.McDonalds -> {
+                    item {
+                        McDonaldsMcpCard(
+                            epicFragments = studyState.inventory.epicFragments,
+                            redeemed = studyState.stats.mcdonaldsRedeemed,
+                            mcpCode = state.mcdonaldsMcpCode,
+                            onSave = vm::saveMcdonaldsMcpCode,
+                            onRedeem = vm::redeemMcDonalds,
                         )
                     }
                 }
@@ -274,6 +280,8 @@ fun StarWishTheaterPage(
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
     val studyState by vm.studyState.collectAsStateWithLifecycle()
+    val isGeneratingChapter by vm.isGeneratingChapter.collectAsStateWithLifecycle()
+    val chapterError by vm.chapterError.collectAsStateWithLifecycle()
     val theater = StarWishRules.allTheaters(state.customTheaters).firstOrNull { it.title == theaterTitle }
     Scaffold(
         topBar = {
@@ -298,6 +306,8 @@ fun StarWishTheaterPage(
                 credits = StarWishRules.chapterCredits(studyState),
                 rareFragments = studyState.inventory.universalRareFragments,
                 chapters = state.theaterChapters[theater.title].orEmpty(),
+                isGenerating = isGeneratingChapter,
+                error = chapterError,
                 modifier = Modifier.padding(padding).padding(horizontal = 16.dp, vertical = 14.dp),
                 onCreateChapter = { influence -> vm.createNextChapter(theater.title, influence) },
             )
@@ -587,8 +597,10 @@ private fun ScrollDetailDialog(
 @Composable
 private fun McDonaldsMcpCard(
     epicFragments: Int,
+    redeemed: Int,
     mcpCode: String,
     onSave: (String) -> Unit,
+    onRedeem: () -> Unit,
 ) {
     var code by remember(mcpCode) { mutableStateOf(mcpCode) }
     Card(
@@ -603,8 +615,8 @@ private fun McDonaldsMcpCard(
                     }
                 }
                 Column(Modifier.weight(1f)) {
-                    Text("麦当劳点单入口", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    Text("麦当劳碎片 $epicFragments/2 · 先填 MCP 码，兑换后由角色帮你进入点单流程。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("麦当劳点单渠道", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text("麦当劳碎片 $epicFragments/2 · 已兑换 $redeemed 次", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             OutlinedTextField(
@@ -618,11 +630,29 @@ private fun McDonaldsMcpCard(
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Text(
-                "当前先保存入口信息；等你把 MCP 码格式和调用方式发我，我再接真实下单动作。",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = onRedeem,
+                    enabled = epicFragments >= 2,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("兑换点单机会")
+                }
+                TextButton(
+                    onClick = { onSave(code.trim()) },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("保存渠道")
+                }
+            }
+            Surface(color = StarWishColors.mistBlue.copy(alpha = 0.72f), shape = RoundedCornerShape(14.dp)) {
+                Text(
+                    "点单流程放在这里统一管理。兑换会扣 2 个麦当劳碎片；真实下单仍需要你确认并自行支付。",
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = StarWishColors.inkBlue,
+                )
+            }
         }
     }
 }
@@ -633,82 +663,134 @@ private fun TheaterDetailContent(
     credits: Int,
     rareFragments: Int,
     chapters: List<me.rerere.rikkahub.data.starwish.StarWishTheaterChapter>,
+    isGenerating: Boolean,
+    error: String?,
     modifier: Modifier = Modifier,
     onCreateChapter: (String) -> Unit,
 ) {
     var influence by remember(theater.title, chapters.size) { mutableStateOf("") }
     var showGuide by remember { mutableStateOf(false) }
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            Card(colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.86f))) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(theater.title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                        Box {
-                            IconButton(onClick = { showGuide = true }) {
-                                Icon(HugeIcons.MoreVertical, contentDescription = "剧情指导")
-                            }
-                            DropdownMenu(expanded = showGuide, onDismissRequest = { showGuide = false }) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            StarWishRules.theaterGuide(theater),
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    },
-                                    onClick = { showGuide = false },
-                                )
-                            }
-                        }
-                    }
-                    Text("稀有碎片 $rareFragments · 可兑换 $credits 章 · 已生成 ${chapters.size} 章", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(theater.prompt, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 6, overflow = TextOverflow.Ellipsis)
-                    OutlinedTextField(
-                        value = influence,
-                        onValueChange = { influence = it },
-                        label = { Text(if (chapters.isEmpty()) "给第一章一点方向（可选）" else "我想影响下一章（可选）") },
-                        placeholder = { Text("例如：让露臣这章彻底低头，顺便狠狠打脸恶人") },
-                        minLines = 3,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
-        }
-        item {
-            Button(
-                onClick = {
-                    onCreateChapter(influence)
-                    influence = ""
-                },
-                enabled = rareFragments >= StarWishRules.RARE_FRAGMENTS_PER_CHAPTER,
-            ) {
-                Icon(HugeIcons.Play, null)
-                Spacer(Modifier.width(8.dp))
-                Text(if (chapters.isEmpty()) "生成第一章" else "续写下一章")
-            }
-        }
-        if (chapters.isEmpty()) {
+    var showCatalog by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 178.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
             item {
-                Card(colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.78f))) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "花 10 个稀有碎片生成第一章；之后每次再花 10 个稀有碎片续写下一章。",
-                        modifier = Modifier.padding(14.dp),
+                        "稀有碎片 $rareFragments · 可兑换 $credits 章 · 已生成 ${chapters.size} 章",
+                        modifier = Modifier.weight(1f),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    Box {
+                        IconButton(onClick = { showGuide = true }) {
+                            Icon(HugeIcons.MoreVertical, contentDescription = "剧情指导")
+                        }
+                        DropdownMenu(expanded = showGuide, onDismissRequest = { showGuide = false }) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        StarWishRules.theaterGuide(theater),
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                },
+                                onClick = { showGuide = false },
+                            )
+                        }
+                    }
+                }
+            }
+            if (chapters.isEmpty()) {
+                item {
+                    Card(colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.78f))) {
+                        Text(
+                            "还没有正文。花 10 个稀有碎片生成第一章；之后每次再花 10 个稀有碎片续写下一章。",
+                            modifier = Modifier.padding(14.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+            items(chapters) {
+                Surface(color = Color.White.copy(alpha = 0.86f), shape = RoundedCornerShape(16.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text(it.title, fontWeight = FontWeight.SemiBold)
+                        if (it.userInfluence.isNotBlank()) {
+                            Text("你的影响：${it.userInfluence}", style = MaterialTheme.typography.bodySmall, color = StarWishColors.inkBlue)
+                        }
+                        Text(it.content, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
         }
-        items(chapters) {
-            Surface(color = Color.White.copy(alpha = 0.86f), shape = RoundedCornerShape(16.dp)) {
-                Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(it.title, fontWeight = FontWeight.SemiBold)
-                    if (it.userInfluence.isNotBlank()) {
-                        Text("你的影响：${it.userInfluence}", style = MaterialTheme.typography.bodySmall, color = StarWishColors.inkBlue)
+        Box(modifier = Modifier.align(Alignment.BottomStart)) {
+            Surface(
+                color = Color.White.copy(alpha = 0.92f),
+                shape = RoundedCornerShape(16.dp),
+                shadowElevation = 2.dp,
+            ) {
+                TextButton(onClick = { showCatalog = true }) {
+                    Icon(HugeIcons.BookOpen02, null)
+                    Spacer(Modifier.width(6.dp))
+                    Text("目录")
+                }
+            }
+            DropdownMenu(expanded = showCatalog, onDismissRequest = { showCatalog = false }) {
+                if (chapters.isEmpty()) {
+                    DropdownMenuItem(text = { Text("暂无章节") }, onClick = { showCatalog = false })
+                } else {
+                    chapters.forEachIndexed { index, chapter ->
+                        DropdownMenuItem(
+                            text = { Text(chapter.title) },
+                            onClick = {
+                                showCatalog = false
+                                scope.launch { listState.animateScrollToItem(index + 1) }
+                            },
+                        )
                     }
-                    Text(it.content, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+        Surface(
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+            color = StarWishColors.paper.copy(alpha = 0.96f),
+            tonalElevation = 2.dp,
+        ) {
+            Column(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                error?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                }
+                OutlinedTextField(
+                    value = influence,
+                    onValueChange = { influence = it },
+                    label = { Text(if (chapters.isEmpty()) "给第一章一点方向（可选）" else "我想影响下一章（可选）") },
+                    placeholder = { Text("例如：让露臣这章彻底低头，顺便狠狠打脸恶人") },
+                    minLines = 2,
+                    maxLines = 4,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Button(
+                    onClick = {
+                        onCreateChapter(influence)
+                        influence = ""
+                    },
+                    enabled = !isGenerating && rareFragments >= StarWishRules.RARE_FRAGMENTS_PER_CHAPTER,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(HugeIcons.Play, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        when {
+                            isGenerating -> "生成中..."
+                            chapters.isEmpty() -> "生成第一章"
+                            else -> "续写下一章"
+                        }
+                    )
                 }
             }
         }

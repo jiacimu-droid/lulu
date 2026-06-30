@@ -16,13 +16,16 @@ import me.rerere.ai.provider.EmbeddingGenerationParams
 import me.rerere.ai.provider.EmbeddingGenerationResult
 import me.rerere.ai.provider.ImageEditParams
 import me.rerere.ai.provider.ImageGenerationParams
+import me.rerere.ai.provider.Modality
 import me.rerere.ai.provider.Model
+import me.rerere.ai.provider.ModelType
 import me.rerere.ai.provider.Provider
 import me.rerere.ai.provider.ProviderSetting
 import me.rerere.ai.provider.RerankItem
 import me.rerere.ai.provider.RerankParams
 import me.rerere.ai.provider.RerankResult
 import me.rerere.ai.provider.TextGenerationParams
+import me.rerere.ai.core.ReasoningLevel
 import me.rerere.ai.provider.providers.openai.ChatCompletionsAPI
 import me.rerere.ai.provider.providers.openai.ResponseAPI
 import me.rerere.ai.ui.ImageAspectRatio
@@ -281,25 +284,61 @@ class OpenAIProvider(
 
         val response = client.newCall(request).await()
         if (!response.isSuccessful) {
-            error("Failed to generate image: ${response.code} ${response.body?.string()}")
+            val rawError = response.body?.string().orEmpty()
+            return@withContext generateImageWithChatCompletionsFallback(providerSetting, params, rawError)
         }
 
         val bodyStr = response.body?.string() ?: ""
         val bodyJson = json.parseToJsonElement(bodyStr).jsonObject
-        val data = bodyJson["data"]?.jsonArray ?: error("No data in response")
+        val data = bodyJson["data"]?.jsonArray
+            ?: return@withContext generateImageWithChatCompletionsFallback(providerSetting, params, "No data in response: $bodyStr")
 
-        val items = data.map { imageJson ->
-            val imageObj = imageJson.jsonObject
-            val b64Json = imageObj["b64_json"]?.jsonPrimitive?.contentOrNull
-                ?: error("No b64_json in response")
-
-            ImageGenerationItem(
-                data = b64Json,
-                mimeType = "image/png"
-            )
+        val items = data.mapNotNull { imageJson ->
+            imageJson.jsonObject.toImageGenerationItemOrNull(client)
+        }
+        if (items.isEmpty()) {
+            return@withContext generateImageWithChatCompletionsFallback(providerSetting, params, "No supported image payload in response: $bodyStr")
         }
 
         ImageGenerationResult(items = items)
+    }
+
+    private suspend fun generateImageWithChatCompletionsFallback(
+        providerSetting: ProviderSetting.OpenAI,
+        params: ImageGenerationParams,
+        imageEndpointError: String,
+    ): ImageGenerationResult {
+        val imageModel = params.model.copy(
+            type = ModelType.CHAT,
+            outputModalities = (params.model.outputModalities + Modality.IMAGE + Modality.TEXT).distinct(),
+        )
+        val chunk = chatCompletionsAPI.generateText(
+            providerSetting = providerSetting,
+            messages = listOf(UIMessage.user(params.prompt)),
+            params = TextGenerationParams(
+                model = imageModel,
+                temperature = null,
+                topP = null,
+                maxTokens = null,
+                reasoningLevel = ReasoningLevel.OFF,
+                customHeaders = params.customHeaders,
+                customBody = params.customBody,
+            ),
+        )
+        val items = chunk.choices
+            .flatMap { it.message?.parts.orEmpty() }
+            .filterIsInstance<me.rerere.ai.ui.UIMessagePart.Image>()
+            .take(params.numOfImages.coerceAtLeast(1))
+            .map { part ->
+                ImageGenerationItem(
+                    data = part.url.toImageDataPayload(client),
+                    mimeType = part.url.imageMimeTypeFromPayload(),
+                )
+            }
+        if (items.isEmpty()) {
+            error("Failed to generate image via /images/generations and chat fallback. Image endpoint error: $imageEndpointError")
+        }
+        return ImageGenerationResult(items)
     }
 
     override suspend fun editImage(
@@ -367,16 +406,8 @@ class OpenAIProvider(
         val bodyJson = json.parseToJsonElement(bodyStr).jsonObject
         val data = bodyJson["data"]?.jsonArray ?: error("No data in response")
 
-        val items = data.map { imageJson ->
-            val imageObj = imageJson.jsonObject
-            val b64Json = imageObj["b64_json"]?.jsonPrimitive?.contentOrNull
-                ?: error("No b64_json in response")
-
-            ImageGenerationItem(
-                data = b64Json,
-                mimeType = "image/png"
-            )
-        }
+        val items = data.mapNotNull { imageJson -> imageJson.jsonObject.toImageGenerationItemOrNull(client) }
+        if (items.isEmpty()) error("No supported image payload in response")
 
         ImageGenerationResult(items = items)
     }
@@ -390,4 +421,38 @@ class OpenAIProvider(
     companion object {
         private val SUPPORTED_EDIT_IMAGE_EXTENSIONS = setOf("png", "jpg", "jpeg", "webp")
     }
+}
+
+private fun kotlinx.serialization.json.JsonObject.toImageGenerationItemOrNull(client: OkHttpClient): ImageGenerationItem? {
+    val b64Json = this["b64_json"]?.jsonPrimitive?.contentOrNull
+    if (!b64Json.isNullOrBlank()) {
+        return ImageGenerationItem(data = b64Json.toImageDataPayload(client), mimeType = b64Json.imageMimeTypeFromPayload())
+    }
+    val url = this["url"]?.jsonPrimitive?.contentOrNull
+    if (!url.isNullOrBlank()) {
+        return ImageGenerationItem(data = url.toImageDataPayload(client), mimeType = url.imageMimeTypeFromPayload())
+    }
+    return null
+}
+
+private fun String.toImageDataPayload(client: OkHttpClient): String {
+    val trimmed = trim()
+    return when {
+        trimmed.startsWith("data:image") -> trimmed.substringAfter("base64,")
+        trimmed.startsWith("http://") || trimmed.startsWith("https://") -> {
+            val request = Request.Builder().url(trimmed).get().build()
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) error("Failed to download generated image: ${response.code}")
+            android.util.Base64.encodeToString(response.body.bytes(), android.util.Base64.NO_WRAP)
+        }
+        else -> trimmed
+    }
+}
+
+private fun String.imageMimeTypeFromPayload(): String {
+    val trimmed = trim()
+    if (trimmed.startsWith("data:image")) {
+        return trimmed.substringAfter("data:").substringBefore(";").ifBlank { "image/png" }
+    }
+    return "image/png"
 }
