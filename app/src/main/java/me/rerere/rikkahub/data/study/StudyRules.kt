@@ -6,6 +6,7 @@ import kotlin.random.Random
 
 object StudyRules {
     const val SINGLE_DRAW_COST = 100
+    const val DISCOUNT_SINGLE_DRAW_COST = 90
     const val TEN_DRAW_COST = 800
 
     val outfitNames = listOf(
@@ -178,13 +179,14 @@ object StudyRules {
 
     fun draw(state: StudyState, count: Int, random: Random = Random.Default): StudyDrawActionResult {
         val drawCount = if (count >= 10) 10 else 1
+        val singleCost = if (hasSingleDrawDiscount(state)) DISCOUNT_SINGLE_DRAW_COST else SINGLE_DRAW_COST
         val nextWallet = when {
             drawCount == 1 && state.wallet.singleDrawTickets > 0 ->
                 state.wallet.copy(singleDrawTickets = state.wallet.singleDrawTickets - 1)
             drawCount == 10 && state.wallet.tenDrawTickets > 0 ->
                 state.wallet.copy(tenDrawTickets = state.wallet.tenDrawTickets - 1)
-            state.wallet.kudos >= if (drawCount == 10) TEN_DRAW_COST else SINGLE_DRAW_COST ->
-                state.wallet.copy(kudos = state.wallet.kudos - if (drawCount == 10) TEN_DRAW_COST else SINGLE_DRAW_COST)
+            state.wallet.kudos >= if (drawCount == 10) TEN_DRAW_COST else singleCost ->
+                state.wallet.copy(kudos = state.wallet.kudos - if (drawCount == 10) TEN_DRAW_COST else singleCost)
             else -> return StudyDrawActionResult(state, emptyList())
         }
         var inventory = state.inventory
@@ -220,6 +222,10 @@ object StudyRules {
 
     fun claimableLevels(state: StudyState): List<StudyLevel> {
         return levels.filter { state.wallet.totalKudosEarned >= it.threshold && it.level !in state.claimedLevelRewards }
+    }
+
+    fun hasSingleDrawDiscount(state: StudyState): Boolean {
+        return state.wallet.totalKudosEarned >= 80_000 || 15 in state.claimedLevelRewards
     }
 
     fun claimLevelReward(state: StudyState, level: Int): StudyActionResult {

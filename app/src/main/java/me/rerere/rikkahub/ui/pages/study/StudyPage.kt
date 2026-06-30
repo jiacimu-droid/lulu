@@ -116,6 +116,7 @@ private enum class StudySection(val label: String) {
     Collection("收藏"),
     Achievements("成就"),
     Shop("商店"),
+    Guide("说明"),
 }
 
 @Composable
@@ -199,6 +200,8 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             onClaimRare = { vm.claimSuperMoment(SuperMomentChoice.RareFragment) },
                         )
                     }
+                    item { InactivityStatusCard(state) }
+                    item { DailyIncomeCard() }
                     item { RecentEventsCard(events = state.recentEvents) }
                 }
                 StudySection.Gacha -> {
@@ -237,6 +240,9 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             onBuy = vm::buyShopItem,
                         )
                     }
+                }
+                StudySection.Guide -> {
+                    item { StudyGuideCard() }
                 }
             }
         }
@@ -580,6 +586,42 @@ private fun TodayProgressCard(
 }
 
 @Composable
+private fun DailyIncomeCard() {
+    StudyCard {
+        Text("全清收益参考", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text("按 4 个待办 + 5 个番茄钟估算：", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        IncomeLine("待办", "4 x 100 = 400")
+        IncomeLine("番茄钟", "5 x 50 = 250")
+        IncomeLine("连续签到第 5 天起", "75")
+        IncomeLine("盲盒期望", "约 106")
+        IncomeLine("超神固定奖励", "200 + 十连券 x1")
+        Text("日合计约 1031 夸夸值，再加 1 张十连券。", fontWeight = FontWeight.SemiBold, color = StudyColors.goldText)
+    }
+}
+
+@Composable
+private fun InactivityStatusCard(state: StudyState) {
+    val text = when {
+        state.inactiveStudyDays <= 0 -> "今天节奏安全。完成任意待办或番茄钟都会继续保持。"
+        state.inactiveStudyDays == 1 -> "已经 1 天没有记录学习行为，明天再断就会开始扣夸夸值。"
+        state.inactiveStudyDays == 2 -> "连续 2 天未学习，今日已进入 -50 规则。完成学习后计数会清零。"
+        else -> "连续 ${state.inactiveStudyDays} 天未学习，当前处于每日 -100 规则。"
+    }
+    StudyCard {
+        Text("学习连续性", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun IncomeLine(label: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
 private fun TaskCard(
     tasks: List<StudyTask>,
     newTask: String,
@@ -784,6 +826,7 @@ private fun DrawResultCelebration(
 
 @Composable
 private fun GachaCard(state: StudyState, onSingle: () -> Unit, onTen: () -> Unit) {
+    val singleCost = if (StudyRules.hasSingleDrawDiscount(state)) StudyRules.DISCOUNT_SINGLE_DRAW_COST else StudyRules.SINGLE_DRAW_COST
     StudyCard {
         Box(
             modifier = Modifier
@@ -808,7 +851,7 @@ private fun GachaCard(state: StudyState, onSingle: () -> Unit, onTen: () -> Unit
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             OutlinedButton(onClick = onSingle, modifier = Modifier.weight(1f)) {
-                Text("单抽 100 / 券${state.wallet.singleDrawTickets}")
+                Text("单抽 $singleCost / 券${state.wallet.singleDrawTickets}")
             }
             Button(onClick = onTen, modifier = Modifier.weight(1f)) {
                 Text("十连 800 / 券${state.wallet.tenDrawTickets}")
@@ -1037,6 +1080,87 @@ private fun ShopCard(state: StudyState, onRefresh: () -> Unit, onBuy: (StudyShop
                     enabled = item.id !in state.purchasedShopItemIds && state.wallet.kudos >= item.price,
                 ) { Text(if (item.id in state.purchasedShopItemIds) "已购" else "购买") }
             }
+        }
+    }
+}
+
+@Composable
+private fun StudyGuideCard() {
+    StudyCard {
+        Text("奖励系统说明", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        GuideBlock(
+            title = "每日获取",
+            lines = listOf(
+                "签到：25 夸夸值；连续第 3 天为 50，第 5 天起为 75。",
+                "完成 1 个番茄钟：50 夸夸值 + 1 个盲盒。",
+                "完成 1 项待办：100 夸夸值。",
+                "今日待办全清：触发超神时刻，固定给十连券 x1 + 200 夸夸值。",
+            ),
+        )
+        GuideBlock(
+            title = "盲盒概率",
+            lines = listOf(
+                "15 夸夸值：40% · 柔光蓝",
+                "25 夸夸值：30% · 流光蓝",
+                "50 夸夸值：15% · 幽雅紫",
+                "100 夸夸值：4% · 暖金",
+                "200 夸夸值：1% · 璨金",
+            ),
+        )
+        GuideBlock(
+            title = "抽卡与收藏",
+            lines = listOf(
+                "单抽 ${StudyRules.SINGLE_DRAW_COST} 夸夸值，Lv15 后单抽 ${StudyRules.DISCOUNT_SINGLE_DRAW_COST}。",
+                "十连 ${StudyRules.TEN_DRAW_COST} 夸夸值。",
+                "普通套装 85%，小剧场 12%，麦当劳碎片 3%。",
+                "每套普通套装有 6 个部件，每个部件 4 个同名碎片。",
+                "每部小剧场需要 5 个同名碎片。",
+            ),
+        )
+        GuideBlock(
+            title = "每周 5 天全清模拟",
+            lines = listOf(
+                "约 5155 夸夸值，可折算 51 次单抽。",
+                "超神 5 天给 5 张十连券；等级和成就还会追加抽卡券。",
+                "按 114 抽估算：普通碎片约 97，稀有约 14，史诗约 3。",
+                "如果超神都选普通碎片，还会额外获得 25 个通用普通碎片。",
+            ),
+        )
+        GuideBlock(
+            title = "惩罚机制",
+            lines = listOf(
+                "连续 2 天没有番茄钟或待办完成：扣 50 夸夸值。",
+                "连续 3 天及以上：每天扣 100 夸夸值。",
+                "恢复学习行为后连续未学习计数清零；夸夸值不会变成负数。",
+            ),
+        )
+        GuideBlock(
+            title = "陪伴机制",
+            lines = listOf(
+                "学习前可选择陪伴画面和语音鼓励。",
+                "番茄钟里可以和角色轻声聊天。",
+                "番茄钟完成后会自动发放夸夸值和盲盒奖励。",
+                "麦当劳兑换是角色奖励仪式：由角色帮你安排，最后仍由你确认和支付。",
+            ),
+        )
+        GuideBlock(
+            title = "当前已落地",
+            lines = listOf(
+                "签到、待办、番茄钟、盲盒、惩罚、抽卡、超神、等级、成就、商店都已接入本地状态。",
+                "收藏已按 10 套套装、每套 6 部件、每部件 4 碎片展示。",
+                "番茄钟已接入角色陪伴、语音鼓励和轻聊天。",
+                "更深的角色主动督学、AI 生图套装生成、真实麦当劳点餐接口可以作为后续增强。",
+            ),
+        )
+    }
+}
+
+@Composable
+private fun GuideBlock(title: String, lines: List<String>) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+        lines.forEach { line ->
+            Text("· $line", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
