@@ -23,6 +23,8 @@ class StudyVM(
     private val _effects = MutableSharedFlow<StudyEffect>(extraBufferCapacity = 8)
     val effects: SharedFlow<StudyEffect> = _effects
 
+    fun syncToday() = reduce { StudyRules.rolloverToDate(it, LocalDate.now()) }
+
     fun signIn() = reduce {
         val result = StudyRules.signIn(it, LocalDate.now())
         emitReward(result.reward.title)

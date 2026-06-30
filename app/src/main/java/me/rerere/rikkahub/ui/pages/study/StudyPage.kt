@@ -92,6 +92,7 @@ import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.study.StudyAchievement
 import me.rerere.rikkahub.data.study.StudyDrawResult
+import me.rerere.rikkahub.data.study.ExamStudyPlan
 import me.rerere.rikkahub.data.study.StudyEvent
 import me.rerere.rikkahub.data.study.StudyInventory
 import me.rerere.rikkahub.data.study.StudyRarity
@@ -99,6 +100,7 @@ import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyShopItem
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyTask
+import me.rerere.rikkahub.data.study.StudyTaskSource
 import me.rerere.rikkahub.data.study.SuperMomentChoice
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.ui.components.nav.BackButton
@@ -111,7 +113,6 @@ import me.rerere.rikkahub.utils.plus
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import kotlin.uuid.Uuid
 
 private enum class StudySection(val label: String) {
@@ -204,6 +205,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             onDelete = vm::deleteTask,
                         )
                     }
+                    item { PlanOverviewCard() }
                     item {
                         TodayProgressCard(
                             state = state,
@@ -257,6 +259,13 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                     item { StudyGuideCard() }
                 }
             }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            vm.syncToday()
+            delay(60_000)
         }
     }
 
@@ -501,7 +510,7 @@ private fun StudyHero(
     onPomodoro: () -> Unit,
     onOpenLevel: () -> Unit,
 ) {
-    val daysLeft = remember { ChronoUnit.DAYS.between(LocalDate.now(), nextExamDate()).coerceAtLeast(0) }
+    val daysLeft = remember { ExamStudyPlan.daysLeft() }
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(containerColor = StudyColors.hero),
         modifier = Modifier.fillMaxWidth(),
@@ -595,8 +604,17 @@ private fun TaskCard(
     onToggle: (String, Boolean) -> Unit,
     onDelete: (String) -> Unit,
 ) {
+    val planCount = tasks.count { it.source == StudyTaskSource.Plan }
+    val donePlanCount = tasks.count { it.source == StudyTaskSource.Plan && it.done }
     StudyCard {
-        Text("今日待办", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.weight(1f)) {
+                Text("今日待办", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                if (planCount > 0) {
+                    Text("计划任务 $donePlanCount/$planCount，手动任务 ${tasks.size - planCount} 个", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = newTask,
@@ -613,16 +631,52 @@ private fun TaskCard(
         tasks.forEach { task ->
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Checkbox(checked = task.done, onCheckedChange = { onToggle(task.id, it) })
-                Text(
-                    text = task.title,
-                    modifier = Modifier.weight(1f),
-                    textDecoration = if (task.done) TextDecoration.LineThrough else null,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Column(Modifier.weight(1f)) {
+                    if (task.source == StudyTaskSource.Plan) {
+                        Text("计划", style = MaterialTheme.typography.labelSmall, color = StudyColors.blue)
+                    }
+                    Text(
+                        text = task.title,
+                        textDecoration = if (task.done) TextDecoration.LineThrough else null,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
                 IconButton(onClick = { onDelete(task.id) }) {
                     Icon(HugeIcons.Delete01, "删除")
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlanOverviewCard() {
+    val today = LocalDate.now()
+    val todayPlan = ExamStudyPlan.todayPlan(today)
+    val month = ExamStudyPlan.monthlyPlans.firstOrNull { it.month == "2026-07" }
+    val week = ExamStudyPlan.julyWeeks.firstOrNull { week ->
+        val parts = week.dateRange.split(" 至 ")
+        parts.size == 2 && today >= LocalDate.parse(parts[0]) && today <= LocalDate.parse(parts[1])
+    } ?: ExamStudyPlan.julyWeeks.firstOrNull()
+    StudyCard {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Icon(HugeIcons.BookOpen02, null, tint = StudyColors.blue)
+            Column(Modifier.weight(1f)) {
+                Text(todayPlan?.title ?: "今日计划待生成", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("目标初试：2026-12-21，剩余 ${ExamStudyPlan.daysLeft(today)} 天", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        month?.let {
+            Text("7月方向：${it.focus}", fontWeight = FontWeight.SemiBold)
+            it.tasks.take(4).forEach { task ->
+                Text("· $task", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        week?.let {
+            Text(it.title, fontWeight = FontWeight.SemiBold)
+            it.tasks.take(6).forEach { task ->
+                Text("□ $task", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -1558,11 +1612,6 @@ private fun mysteryBoxText(kudos: Int): String = when (kudos) {
     50 -> "幽雅紫，花瓣光晕。获得 50 夸夸值。"
     100 -> "暖金亮起来了。获得 100 夸夸值。"
     else -> "璨金粒子炸开。获得 200 夸夸值。"
-}
-
-private fun nextExamDate(today: LocalDate = LocalDate.now()): LocalDate {
-    val current = LocalDate.of(today.year, 12, 21)
-    return if (today <= current) current else LocalDate.of(today.year + 1, 12, 21)
 }
 
 private fun secondsText(seconds: Int): String {

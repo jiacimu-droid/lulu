@@ -76,7 +76,7 @@ object StudyRules {
 
     fun rolloverToDate(state: StudyState, date: LocalDate = LocalDate.now()): StudyState {
         val dateText = date.toString()
-        if (state.today == dateText) return state
+        if (state.today == dateText) return syncPlanTasks(state, date)
         val previousDate = state.today.takeIf { it.isNotBlank() }
         val hadStudyOnPreviousDay = previousDate != null && state.lastStudyDate == previousDate
         val nextInactive = if (hadStudyOnPreviousDay) 0 else state.inactiveStudyDays + 1
@@ -87,8 +87,30 @@ object StudyRules {
             superMomentAvailable = false,
             purchasedShopItemIds = emptySet(),
             manualShopRefreshDate = null,
+            activePlanDate = null,
         )
-        return applyInactivityPenalty(rolled).state
+        return applyInactivityPenalty(syncPlanTasks(rolled, date)).state
+    }
+
+    fun syncPlanTasks(state: StudyState, date: LocalDate = LocalDate.now()): StudyState {
+        val dateText = date.toString()
+        if (state.activePlanDate == dateText) return state
+        val plan = ExamStudyPlan.todayPlan(date)
+        val manualTasks = state.tasks.filter { it.source != StudyTaskSource.Plan }
+        val planTasks = plan?.tasks?.mapIndexed { index, task ->
+            StudyTask(
+                id = "plan-$dateText-$index",
+                title = "${task.kind.label}｜${task.title}",
+                createdAt = date.toEpochDay(),
+                source = StudyTaskSource.Plan,
+            )
+        }.orEmpty()
+        return state.copy(
+            today = dateText,
+            tasks = planTasks + manualTasks,
+            activePlanDate = dateText,
+            superMomentAvailable = false,
+        )
     }
 
     fun signIn(state: StudyState, date: LocalDate = LocalDate.now()): StudyActionResult {

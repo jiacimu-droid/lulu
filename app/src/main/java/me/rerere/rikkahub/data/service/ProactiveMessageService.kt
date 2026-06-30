@@ -81,6 +81,8 @@ import me.rerere.rikkahub.data.model.currentProjectedLuluState
 import me.rerere.rikkahub.data.model.thoughtHistory
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
+import me.rerere.rikkahub.data.study.StudyStore
+import me.rerere.rikkahub.data.study.StudyTaskSource
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.service.LuluIntent
 import me.rerere.rikkahub.service.LuluIntentInput
@@ -100,6 +102,7 @@ import kotlin.random.Random
 class ProactiveMessageService : KoinComponent {
     private val settingsStore: SettingsStore by inject()
     private val conversationRepository: ConversationRepository by inject()
+    private val studyStore: StudyStore by inject()
 
     companion object {
         const val TAG = "ProactiveMessageService"
@@ -495,6 +498,33 @@ class ProactiveMessageService : KoinComponent {
         val currentTime = java.lang.System.currentTimeMillis()
         val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
         sb.appendLine("当前时间: ${sdf.format(java.util.Date(currentTime))}")
+
+        // Study plan context
+        try {
+            val studyState = studyStore.state.first()
+            val planTasks = studyState.tasks.filter { it.source == StudyTaskSource.Plan }
+            val manualTasks = studyState.tasks.filter { it.source == StudyTaskSource.Manual }
+            if (planTasks.isNotEmpty() || manualTasks.isNotEmpty() || studyState.stats.totalPomodoros > 0) {
+                val donePlan = planTasks.count { it.done }
+                val undonePlan = planTasks.filterNot { it.done }
+                sb.appendLine("今日考研计划:")
+                sb.appendLine("  - 日期: ${studyState.today}")
+                sb.appendLine("  - 计划待办完成: $donePlan/${planTasks.size}")
+                sb.appendLine("  - 手动待办: ${manualTasks.count { it.done }}/${manualTasks.size}")
+                sb.appendLine("  - 累计番茄钟: ${studyState.stats.totalPomodoros} 个，累计学习 ${studyState.stats.totalStudyMinutes} 分钟")
+                if (undonePlan.isNotEmpty()) {
+                    sb.appendLine("  - 未完成计划:")
+                    undonePlan.take(5).forEach { task ->
+                        sb.appendLine("    · ${task.title}")
+                    }
+                }
+                if (planTasks.isNotEmpty() && donePlan < planTasks.size) {
+                    sb.appendLine("  - 如果现在适合督促，语气要轻一点，帮用户先启动一个最小任务，不要一次压很多。")
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to get study plan context", e)
+        }
 
         // Battery context
         try {

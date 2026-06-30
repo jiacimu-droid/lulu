@@ -25,6 +25,7 @@ data class StudyState(
     val purchasedShopItemIds: Set<String> = emptySet(),
     val manualShopRefreshDate: String? = null,
     val recentEvents: List<StudyEvent> = emptyList(),
+    val activePlanDate: String? = null,
 )
 
 @Serializable
@@ -42,7 +43,14 @@ data class StudyTask(
     val done: Boolean = false,
     val createdAt: Long = 0L,
     val completedAt: Long? = null,
+    val source: StudyTaskSource = StudyTaskSource.Manual,
 )
+
+@Serializable
+enum class StudyTaskSource {
+    Manual,
+    Plan,
+}
 
 @Serializable
 data class StudyInventory(
