@@ -11,9 +11,11 @@ data class StudyState(
     val stats: StudyStats = StudyStats(),
     val signInStreak: Int = 0,
     val lastSignInDate: String? = null,
+    val lastStudyDate: String? = null,
     val inactiveStudyDays: Int = 0,
     val perfectStreak: Int = 0,
     val longestPerfectStreak: Int = 0,
+    val lastPerfectDate: String? = null,
     val superMomentAvailable: Boolean = false,
     val superMomentClaimedDate: String? = null,
     val claimedLevelRewards: Set<Int> = emptySet(),
@@ -85,6 +87,7 @@ enum class StudyEventType {
     Shop,
     Penalty,
     McDonalds,
+    Fragment,
 }
 
 @Serializable

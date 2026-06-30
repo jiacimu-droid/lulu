@@ -55,15 +55,5 @@ class StudyStore(
 }
 
 private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState {
-    val dateText = date.toString()
-    if (today == dateText) return this
-    val hadStudy = tasks.any { it.done } || stats.totalPomodoros > 0
-    val nextInactive = if (hadStudy) 0 else inactiveStudyDays + 1
-    return copy(
-        today = dateText,
-        tasks = emptyList(),
-        inactiveStudyDays = nextInactive,
-        superMomentAvailable = false,
-        purchasedShopItemIds = emptySet(),
-    )
+    return StudyRules.rolloverToDate(this, date)
 }

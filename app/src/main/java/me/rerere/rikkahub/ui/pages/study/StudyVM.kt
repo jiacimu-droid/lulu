@@ -53,7 +53,7 @@ class StudyVM(
         if (result.results.isNotEmpty()) {
             _effects.tryEmit(StudyEffect.DrawResults(result.results))
         } else {
-            _effects.tryEmit(StudyEffect.Message("夸夸值或抽卡券不够啦"))
+            _effects.tryEmit(StudyEffect.Message("夸夸值或抽卡券不够"))
         }
         result.state
     }
@@ -80,14 +80,56 @@ class StudyVM(
 
     fun buyShopItem(item: StudyShopItem) = reduce {
         val result = StudyRules.buyShopItem(it, item.id)
-        emitReward(result.reward.title.ifBlank { "购买失败，夸夸值不够或已售罄" })
+        emitReward(result.reward.title.ifBlank { "购买失败，夸夸值不够或商品已售罄" })
         result.state
     }
 
     fun redeemMcDonalds() = reduce {
         val result = StudyRules.redeemMcDonalds(it)
-        emitReward(result.reward.title.ifBlank { "还需要 2 个麦当劳碎片哦" })
+        emitReward(result.reward.title.ifBlank { "还需要 2 个麦当劳碎片" })
         result.state
+    }
+
+    fun applyUniversalNormal(key: String) = reduce {
+        val result = StudyRules.useUniversalNormalFragment(it, key)
+        emitReward(result.reward.title)
+        result.state
+    }
+
+    fun applyUniversalRare(key: String) = reduce {
+        val result = StudyRules.useUniversalRareFragment(it, key)
+        emitReward(result.reward.title)
+        result.state
+    }
+
+    fun applyUniversalEpic() = reduce {
+        val result = StudyRules.useUniversalEpicFragment(it)
+        emitReward(result.reward.title)
+        result.state
+    }
+
+    fun applyBestUniversalNormal() = reduce {
+        val key = StudyRules.bestNormalFragmentTarget(it)
+        val result = key?.let { target -> StudyRules.useUniversalNormalFragment(it, target) }
+        if (result == null) {
+            _effects.tryEmit(StudyEffect.Message("普通套装已经全部补满"))
+            it
+        } else {
+            emitReward(result.reward.title)
+            result.state
+        }
+    }
+
+    fun applyBestUniversalRare() = reduce {
+        val key = StudyRules.bestRareFragmentTarget(it)
+        val result = key?.let { target -> StudyRules.useUniversalRareFragment(it, target) }
+        if (result == null) {
+            _effects.tryEmit(StudyEffect.Message("小剧场已经全部补满"))
+            it
+        } else {
+            emitReward(result.reward.title)
+            result.state
+        }
     }
 
     fun applyPenalty() = reduce {

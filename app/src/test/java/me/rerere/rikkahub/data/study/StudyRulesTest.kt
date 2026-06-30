@@ -154,4 +154,58 @@ class StudyRulesTest {
         val zero = StudyRules.applyInactivityPenalty(penalized.state.copy(inactiveStudyDays = 3))
         assertEquals(0, zero.state.wallet.kudos)
     }
+
+    @Test
+    fun `daily rollover uses last study date instead of cumulative pomodoro totals`() {
+        val state = StudyState(
+            today = "2026-06-28",
+            wallet = StudyWallet(kudos = 200),
+            stats = StudyStats(totalPomodoros = 9),
+            lastStudyDate = "2026-06-20",
+            inactiveStudyDays = 1,
+        )
+
+        val next = StudyRules.rolloverToDate(state, LocalDate.of(2026, 6, 29))
+
+        assertEquals("2026-06-29", next.today)
+        assertEquals(2, next.inactiveStudyDays)
+        assertEquals(150, next.wallet.kudos)
+    }
+
+    @Test
+    fun `perfect streak only increments once per day`() {
+        val state = StudyState(
+            today = "2026-06-30",
+            tasks = listOf(
+                StudyTask(id = "a", title = "English"),
+                StudyTask(id = "b", title = "Politics"),
+            ),
+        )
+
+        val first = StudyRules.toggleTask(state, "a", true).state
+        val fullClear = StudyRules.toggleTask(first, "b", true).state
+        val unchecked = StudyRules.toggleTask(fullClear, "b", false).state
+        val clearedAgain = StudyRules.toggleTask(unchecked, "b", true).state
+
+        assertEquals(1, fullClear.perfectStreak)
+        assertEquals("2026-06-30", fullClear.lastPerfectDate)
+        assertEquals(1, clearedAgain.perfectStreak)
+        assertEquals(1, clearedAgain.longestPerfectStreak)
+    }
+
+    @Test
+    fun `universal fragments can fill the closest normal outfit part`() {
+        val key = "normal:${StudyRules.outfitNames.first()}:${StudyRules.outfitParts.first()}"
+        val state = StudyState(
+            inventory = StudyInventory(
+                normalFragments = mapOf(key to 3),
+                universalNormalFragments = 1,
+            )
+        )
+
+        val used = StudyRules.useUniversalNormalFragment(state, key)
+
+        assertEquals(4, used.state.inventory.normalFragments[key])
+        assertEquals(0, used.state.inventory.universalNormalFragments)
+    }
 }

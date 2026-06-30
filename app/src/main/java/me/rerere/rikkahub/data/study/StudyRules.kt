@@ -9,16 +9,33 @@ object StudyRules {
     const val TEN_DRAW_COST = 800
 
     val outfitNames = listOf(
-        "晨光书桌", "海盐自习", "樱花讲义", "星轨图书馆", "暖灯错题",
-        "雨后窗边", "云朵白衬", "深夜冲刺", "青柠计划", "金榜花火",
+        "晨光书桌",
+        "海盐自习",
+        "樱花讲义",
+        "星轨图书馆",
+        "暖灯错题",
+        "雨后窗边",
+        "云朵白衬",
+        "深夜冲刺",
+        "青柠计划",
+        "金榜花火",
     )
 
-    val outfitParts = listOf("服装", "饰品", "发型", "场景", "光影", "动态")
+    val outfitParts = listOf("服装", "饰品", "发型", "场景", "光影氛围", "动态姿势")
 
     val theaterNames = listOf(
-        "晚自习约定", "错题本秘密", "雨天图书馆", "清晨第一杯水",
-        "背单词小胜利", "月光下的计划", "倒计时拥抱", "考场前夜",
-        "便利店热牛奶", "天台吹风", "上岸后的信", "星穹彼岸",
+        "晚自习约定",
+        "错题本私语",
+        "雨天图书馆",
+        "清晨第一杯水",
+        "背单词小胜利",
+        "月光下的计划",
+        "倒计时拥抱",
+        "考场前夜",
+        "便利店热牛奶",
+        "天台吹风",
+        "上岸后的信",
+        "星穹彼岸",
     )
 
     val levels = listOf(
@@ -49,6 +66,22 @@ object StudyRules {
         StudyAchievement("mcdonalds_arrival", "麦门降临", "首次兑换麦当劳", StudyReward(kudos = 500, title = "夸夸值 500")),
     )
 
+    fun rolloverToDate(state: StudyState, date: LocalDate = LocalDate.now()): StudyState {
+        val dateText = date.toString()
+        if (state.today == dateText) return state
+        val previousDate = state.today.takeIf { it.isNotBlank() }
+        val hadStudyOnPreviousDay = previousDate != null && state.lastStudyDate == previousDate
+        val nextInactive = if (hadStudyOnPreviousDay) 0 else state.inactiveStudyDays + 1
+        val rolled = state.copy(
+            today = dateText,
+            tasks = emptyList(),
+            inactiveStudyDays = nextInactive,
+            superMomentAvailable = false,
+            purchasedShopItemIds = emptySet(),
+        )
+        return applyInactivityPenalty(rolled).state
+    }
+
     fun signIn(state: StudyState, date: LocalDate = LocalDate.now()): StudyActionResult {
         val dateText = date.toString()
         if (state.lastSignInDate == dateText) {
@@ -74,24 +107,37 @@ object StudyRules {
         )
     }
 
-    fun toggleTask(state: StudyState, taskId: String, done: Boolean, nowMillis: Long = System.currentTimeMillis()): StudyActionResult {
+    fun toggleTask(
+        state: StudyState,
+        taskId: String,
+        done: Boolean,
+        nowMillis: Long = System.currentTimeMillis(),
+    ): StudyActionResult {
         val index = state.tasks.indexOfFirst { it.id == taskId }
         if (index < 0 || state.tasks[index].done == done) return StudyActionResult(state)
         val nextTasks = state.tasks.toMutableList()
         nextTasks[index] = nextTasks[index].copy(done = done, completedAt = if (done) nowMillis else null)
         val reward = if (done) StudyReward(kudos = 100, title = "完成待办 +100") else StudyReward()
         val completedAll = nextTasks.isNotEmpty() && nextTasks.all { it.done }
-        val nextPerfectStreak = if (completedAll && !state.superMomentAvailable) state.perfectStreak + 1 else state.perfectStreak
+        val canRecordPerfect = completedAll && state.lastPerfectDate != state.today
+        val nextPerfectStreak = if (canRecordPerfect) state.perfectStreak + 1 else state.perfectStreak
         return StudyActionResult(
             state = state.copy(
                 tasks = nextTasks,
                 wallet = state.wallet.add(reward),
                 stats = if (done) state.stats.copy(totalTasksCompleted = state.stats.totalTasksCompleted + 1) else state.stats,
                 inactiveStudyDays = if (done) 0 else state.inactiveStudyDays,
-                superMomentAvailable = state.superMomentAvailable || completedAll,
+                lastStudyDate = if (done) state.today else state.lastStudyDate,
+                superMomentAvailable = state.superMomentAvailable ||
+                    (completedAll && state.superMomentClaimedDate != state.today),
                 perfectStreak = nextPerfectStreak,
                 longestPerfectStreak = max(state.longestPerfectStreak, nextPerfectStreak),
-                recentEvents = state.recentEvents.addEvent(StudyEventType.Task, if (done) "待办完成" else "待办取消", nextTasks[index].title),
+                lastPerfectDate = if (canRecordPerfect) state.today else state.lastPerfectDate,
+                recentEvents = state.recentEvents.addEvent(
+                    StudyEventType.Task,
+                    if (done) "待办完成" else "待办取消",
+                    nextTasks[index].title,
+                ),
             ),
             reward = reward,
         )
@@ -109,6 +155,7 @@ object StudyRules {
             state = state.copy(
                 wallet = state.wallet.add(totalReward),
                 inactiveStudyDays = 0,
+                lastStudyDate = state.today,
                 stats = state.stats.copy(
                     totalPomodoros = state.stats.totalPomodoros + 1,
                     totalStudyMinutes = state.stats.totalStudyMinutes + minutes,
@@ -124,8 +171,10 @@ object StudyRules {
     fun draw(state: StudyState, count: Int, random: Random = Random.Default): StudyDrawActionResult {
         val drawCount = if (count >= 10) 10 else 1
         val nextWallet = when {
-            drawCount == 1 && state.wallet.singleDrawTickets > 0 -> state.wallet.copy(singleDrawTickets = state.wallet.singleDrawTickets - 1)
-            drawCount == 10 && state.wallet.tenDrawTickets > 0 -> state.wallet.copy(tenDrawTickets = state.wallet.tenDrawTickets - 1)
+            drawCount == 1 && state.wallet.singleDrawTickets > 0 ->
+                state.wallet.copy(singleDrawTickets = state.wallet.singleDrawTickets - 1)
+            drawCount == 10 && state.wallet.tenDrawTickets > 0 ->
+                state.wallet.copy(tenDrawTickets = state.wallet.tenDrawTickets - 1)
             state.wallet.kudos >= if (drawCount == 10) TEN_DRAW_COST else SINGLE_DRAW_COST ->
                 state.wallet.copy(kudos = state.wallet.kudos - if (drawCount == 10) TEN_DRAW_COST else SINGLE_DRAW_COST)
             else -> return StudyDrawActionResult(state, emptyList())
@@ -147,7 +196,11 @@ object StudyRules {
                     unlockedOutfitSets = refreshed.second.first,
                     unlockedTheaters = refreshed.second.second,
                 ),
-                recentEvents = state.recentEvents.addEvent(StudyEventType.Draw, if (drawCount == 10) "十连抽" else "单抽", "获得 ${results.size} 个碎片"),
+                recentEvents = state.recentEvents.addEvent(
+                    StudyEventType.Draw,
+                    if (drawCount == 10) "十连抽" else "单抽",
+                    "获得 ${results.size} 个碎片",
+                ),
             ),
             results = results,
         )
@@ -176,7 +229,7 @@ object StudyRules {
     }
 
     fun claimSuperMoment(state: StudyState, choice: SuperMomentChoice): StudyActionResult {
-        if (!state.superMomentAvailable) return StudyActionResult(state)
+        if (!state.superMomentAvailable || state.superMomentClaimedDate == state.today) return StudyActionResult(state)
         val selected = when (choice) {
             SuperMomentChoice.NormalFragments -> StudyReward(universalNormalFragments = 5, title = "通用普通碎片 x5")
             SuperMomentChoice.RareFragment -> StudyReward(universalRareFragments = 1, title = "通用稀有碎片 x1")
@@ -217,7 +270,11 @@ object StudyRules {
                 wallet = state.wallet.add(achievement.reward),
                 inventory = state.inventory.addReward(achievement.reward),
                 claimedAchievementIds = state.claimedAchievementIds + id,
-                recentEvents = state.recentEvents.addEvent(StudyEventType.Achievement, achievement.title, achievement.reward.title),
+                recentEvents = state.recentEvents.addEvent(
+                    StudyEventType.Achievement,
+                    achievement.title,
+                    achievement.reward.title,
+                ),
             ),
             reward = achievement.reward,
         )
@@ -276,10 +333,80 @@ object StudyRules {
             state = state.copy(
                 inventory = state.inventory.copy(epicFragments = state.inventory.epicFragments - 2),
                 stats = state.stats.copy(mcdonaldsRedeemed = state.stats.mcdonaldsRedeemed + 1),
-                recentEvents = state.recentEvents.addEvent(StudyEventType.McDonalds, "麦当劳奖励", "角色帮你安排一顿小奖励"),
+                recentEvents = state.recentEvents.addEvent(
+                    StudyEventType.McDonalds,
+                    "麦当劳奖励",
+                    "角色帮你安排一顿小奖励",
+                ),
             ),
             reward = StudyReward(title = "麦当劳点餐机会 x1"),
         )
+    }
+
+    fun useUniversalNormalFragment(state: StudyState, key: String): StudyActionResult {
+        if (state.inventory.universalNormalFragments <= 0 || !key.startsWith("normal:")) return StudyActionResult(state)
+        val inventory = state.inventory.copy(
+            universalNormalFragments = state.inventory.universalNormalFragments - 1,
+            normalFragments = state.inventory.normalFragments.plusCount(key, 1),
+        ).refreshUnlockStats().first
+        return StudyActionResult(
+            state = state.copy(
+                inventory = inventory,
+                stats = state.stats.copy(
+                    unlockedOutfitSets = inventory.unlockedOutfits.size,
+                    unlockedTheaters = inventory.unlockedTheaters.size,
+                ),
+                recentEvents = state.recentEvents.addEvent(StudyEventType.Fragment, "使用通用普通碎片", normalTitle(key)),
+            ),
+            reward = StudyReward(title = "已补到 ${normalTitle(key)}"),
+        )
+    }
+
+    fun useUniversalRareFragment(state: StudyState, key: String): StudyActionResult {
+        if (state.inventory.universalRareFragments <= 0 || !key.startsWith("rare:")) return StudyActionResult(state)
+        val inventory = state.inventory.copy(
+            universalRareFragments = state.inventory.universalRareFragments - 1,
+            rareFragments = state.inventory.rareFragments.plusCount(key, 1),
+        ).refreshUnlockStats().first
+        return StudyActionResult(
+            state = state.copy(
+                inventory = inventory,
+                stats = state.stats.copy(
+                    unlockedOutfitSets = inventory.unlockedOutfits.size,
+                    unlockedTheaters = inventory.unlockedTheaters.size,
+                ),
+                recentEvents = state.recentEvents.addEvent(StudyEventType.Fragment, "使用通用稀有碎片", rareTitle(key)),
+            ),
+            reward = StudyReward(title = "已补到 ${rareTitle(key)}"),
+        )
+    }
+
+    fun useUniversalEpicFragment(state: StudyState): StudyActionResult {
+        if (state.inventory.universalEpicFragments <= 0) return StudyActionResult(state)
+        return StudyActionResult(
+            state = state.copy(
+                inventory = state.inventory.copy(
+                    universalEpicFragments = state.inventory.universalEpicFragments - 1,
+                    epicFragments = state.inventory.epicFragments + 1,
+                ),
+                recentEvents = state.recentEvents.addEvent(StudyEventType.Fragment, "使用通用史诗碎片", "麦当劳碎片 +1"),
+            ),
+            reward = StudyReward(title = "麦当劳碎片 +1"),
+        )
+    }
+
+    fun bestNormalFragmentTarget(state: StudyState): String? {
+        return outfitNames.flatMap { outfit ->
+            outfitParts.map { part -> "normal:$outfit:$part" }
+        }.filter { key ->
+            (state.inventory.normalFragments[key] ?: 0) < 4
+        }.maxByOrNull { key -> state.inventory.normalFragments[key] ?: 0 }
+    }
+
+    fun bestRareFragmentTarget(state: StudyState): String? {
+        return theaterNames.map { "rare:$it" }
+            .filter { key -> (state.inventory.rareFragments[key] ?: 0) < 5 }
+            .maxByOrNull { key -> state.inventory.rareFragments[key] ?: 0 }
     }
 
     fun addTask(state: StudyState, title: String, nowMillis: Long = System.currentTimeMillis()): StudyState {
@@ -291,6 +418,15 @@ object StudyRules {
 
     fun deleteTask(state: StudyState, id: String): StudyState {
         return state.copy(tasks = state.tasks.filterNot { it.id == id })
+    }
+
+    fun normalTitle(key: String): String {
+        val parts = key.split(":")
+        return if (parts.size >= 3) "${parts[1]}-${parts[2]}" else key
+    }
+
+    fun rareTitle(key: String): String {
+        return key.removePrefix("rare:")
     }
 
     private fun mysteryBox(random: Random): Int {
