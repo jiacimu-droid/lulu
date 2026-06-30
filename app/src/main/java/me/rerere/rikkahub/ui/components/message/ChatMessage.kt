@@ -77,6 +77,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.rerere.ai.core.MessageRole
@@ -115,6 +116,7 @@ import me.rerere.rikkahub.utils.JsonInstant
 import me.rerere.rikkahub.utils.base64Encode
 import me.rerere.rikkahub.utils.openUrl
 import me.rerere.rikkahub.utils.urlDecode
+import java.io.File
 import java.util.Locale
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
@@ -217,6 +219,13 @@ fun ChatMessage(
             }
         }
 
+        if (lastMessage && message.role == MessageRole.ASSISTANT) {
+            LuluExpressionInlineState(
+                messageKey = message.id.toString(),
+                loading = loading,
+            )
+        }
+
         val showActions = if (lastMessage) {
             !loading
         } else {
@@ -295,6 +304,61 @@ fun ChatMessage(
 private fun isFreshMessage(createdAt: LocalDateTime): Boolean {
     val age = Clock.System.now() - createdAt.toInstant(TimeZone.currentSystemDefault())
     return age.inWholeMilliseconds in 0..8_000
+}
+
+@Composable
+private fun LuluExpressionInlineState(
+    messageKey: String,
+    loading: Boolean,
+) {
+    val context = LocalContext.current
+    var state by remember(messageKey) { mutableStateOf<LuluExpressionSnapshot?>(null) }
+
+    LaunchedEffect(messageKey, loading) {
+        if (loading) {
+            state = null
+            return@LaunchedEffect
+        }
+        delay(120)
+        state = readLatestLuluExpressionSnapshot(File(context.filesDir, "lulu/lulu_expression_state.jsonl"))
+    }
+
+    val text = state?.toDisplayText().orEmpty()
+    if (text.isNotBlank()) {
+        Text(
+            text = text,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 2.dp, start = 6.dp, end = 6.dp),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.66f),
+        )
+    }
+}
+
+private data class LuluExpressionSnapshot(
+    val emoji: String,
+    val sticker: String,
+    val gesture: String,
+) {
+    fun toDisplayText(): String = listOfNotNull(
+        emoji.takeIf { it.isNotBlank() }?.let { "表情：$it" },
+        sticker.takeIf { it.isNotBlank() }?.let { "动作：$it" },
+        gesture.takeIf { it.isNotBlank() }?.let { "姿势：$it" },
+    ).joinToString(" · ")
+}
+
+private fun readLatestLuluExpressionSnapshot(file: File): LuluExpressionSnapshot? {
+    if (!file.exists()) return null
+    val line = file.useLines { lines -> lines.lastOrNull { it.isNotBlank() } } ?: return null
+    return runCatching {
+        val obj = JsonInstant.parseToJsonElement(line).jsonObject
+        LuluExpressionSnapshot(
+            emoji = obj["emoji"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+            sticker = obj["sticker"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+            gesture = obj["gesture"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+        )
+    }.getOrNull()
 }
 
 @OptIn(FlowPreview::class)

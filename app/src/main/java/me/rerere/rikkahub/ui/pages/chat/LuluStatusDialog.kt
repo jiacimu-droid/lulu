@@ -1,6 +1,5 @@
 package me.rerere.rikkahub.ui.pages.chat
 
-import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -18,25 +17,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.LuluState
-import me.rerere.rikkahub.utils.JsonInstant
-import org.koin.compose.koinInject
-import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -52,7 +42,6 @@ fun LuluStatusDialog(
 ) {
     var showHistory by rememberSaveable { mutableStateOf(false) }
     var selectedHistory by rememberSaveable { mutableStateOf(emptySet<Long>()) }
-    val expressionState = rememberLatestLuluExpressionState()
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -81,7 +70,7 @@ fun LuluStatusDialog(
                         onSelectedChange = { selectedHistory = it },
                     )
                 } else {
-                    CurrentStatus(state = currentState, expressionState = expressionState)
+                    CurrentStatus(state = currentState)
                 }
             }
         },
@@ -121,7 +110,7 @@ fun LuluStatusDialog(
 }
 
 @Composable
-private fun CurrentStatus(state: LuluState, expressionState: LuluExpressionState?) {
+private fun CurrentStatus(state: LuluState) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(
@@ -143,31 +132,6 @@ private fun CurrentStatus(state: LuluState, expressionState: LuluExpressionState
             StatusChip(label = "精力", value = state.energy.label)
             StatusChip(label = "亲密", value = state.relationship.label)
             StatusChip(label = "状态", value = state.mode.label)
-        }
-        expressionState?.let { expression ->
-            HorizontalDivider()
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = "表达状态",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    if (expression.emoji.isNotBlank()) StatusChip("表情", expression.emoji)
-                    if (expression.sticker.isNotBlank()) StatusChip("动作", expression.sticker)
-                    if (expression.gesture.isNotBlank()) StatusChip("姿态", expression.gesture)
-                    if (expression.avatarMood.isNotBlank()) StatusChip("头像氛围", expression.avatarMood)
-                    StatusChip("强度", "%.1f".format(expression.intensity))
-                }
-                Text(
-                    text = formatStateTime(expression.timestampMs),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
-                )
-            }
         }
         HorizontalDivider()
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -260,39 +224,4 @@ private fun formatStateTime(timeMillis: Long): String {
     return Instant.ofEpochMilli(timeMillis)
         .atZone(ZoneId.systemDefault())
         .format(formatter)
-}
-
-private data class LuluExpressionState(
-    val emoji: String,
-    val sticker: String,
-    val gesture: String,
-    val avatarMood: String,
-    val intensity: Double,
-    val timestampMs: Long,
-)
-
-@Composable
-private fun rememberLatestLuluExpressionState(): LuluExpressionState? {
-    val app = koinInject<Application>()
-    var state by remember { mutableStateOf<LuluExpressionState?>(null) }
-    LaunchedEffect(app.filesDir) {
-        state = readLatestLuluExpressionState(File(app.filesDir, "lulu/lulu_expression_state.jsonl"))
-    }
-    return state
-}
-
-private fun readLatestLuluExpressionState(file: File): LuluExpressionState? {
-    if (!file.exists()) return null
-    val line = file.readLines().lastOrNull { it.isNotBlank() } ?: return null
-    return runCatching {
-        val obj = JsonInstant.parseToJsonElement(line).jsonObject
-        LuluExpressionState(
-            emoji = obj["emoji"]?.jsonPrimitive?.contentOrNull.orEmpty(),
-            sticker = obj["sticker"]?.jsonPrimitive?.contentOrNull.orEmpty(),
-            gesture = obj["gesture"]?.jsonPrimitive?.contentOrNull.orEmpty(),
-            avatarMood = obj["avatar_mood"]?.jsonPrimitive?.contentOrNull.orEmpty(),
-            intensity = obj["intensity"]?.jsonPrimitive?.doubleOrNull ?: 0.5,
-            timestampMs = obj["timestamp_ms"]?.jsonPrimitive?.contentOrNull?.toLongOrNull() ?: 0L,
-        )
-    }.getOrNull()
 }

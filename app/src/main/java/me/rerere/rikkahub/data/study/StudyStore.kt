@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import me.rerere.rikkahub.AppScope
 import me.rerere.rikkahub.utils.JsonInstant
 import java.time.LocalDate
 import kotlin.random.Random
@@ -23,7 +23,7 @@ private val Context.studyDataStore: DataStore<Preferences> by preferencesDataSto
 
 class StudyStore(
     private val context: Context,
-    scope: CoroutineScope,
+    scope: AppScope,
     private val json: Json = JsonInstant,
 ) {
     private val stateKey = stringPreferencesKey("state")
