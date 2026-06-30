@@ -17,18 +17,46 @@ internal fun splitLuluAssistantExpressionMessages(messages: List<UIMessage>): Li
     if (last.role != MessageRole.ASSISTANT) return messages
 
     val textPart = last.parts.singleOrNull() as? UIMessagePart.Text ?: return messages
-    val segments = splitLuluExpressionBubbles(textPart.text)
+    val visibleText = sanitizeLuluVisibleExpression(textPart.text)
+    val visibleLast = if (visibleText != textPart.text) {
+        last.copy(parts = listOf(textPart.copy(text = visibleText)))
+    } else {
+        last
+    }
+    val visibleTextPart = visibleLast.parts.single() as UIMessagePart.Text
+    val segments = splitLuluExpressionBubbles(visibleText)
     if (segments.size <= 1) return messages
+        .dropLast(1) + visibleLast
 
     val splitMessages = segments.mapIndexed { index, segment ->
-        last.copy(
-            id = if (index == 0) last.id else Uuid.random(),
-            parts = listOf(textPart.copy(text = segment)),
-            usage = if (index == 0) last.usage else null,
+        visibleLast.copy(
+            id = if (index == 0) visibleLast.id else Uuid.random(),
+            parts = listOf(visibleTextPart.copy(text = segment)),
+            usage = if (index == 0) visibleLast.usage else null,
             translation = null,
         )
     }
     return messages.dropLast(1) + splitMessages
+}
+
+internal fun sanitizeLuluVisibleExpression(text: String): String {
+    val withoutPresenceBlocks = text
+        .replace(Regex("(?is)<lulu_presence>.*?</lulu_presence>"), "")
+        .trim()
+    val internalPrefixes = listOf(
+        "表达建议：",
+        "表情建议：",
+        "贴纸/动作建议：",
+        "身体表现：",
+        "头像氛围：",
+        "使用方式：",
+    )
+    return withoutPresenceBlocks
+        .lineSequence()
+        .map { it.trim() }
+        .filter { line -> line.isNotBlank() && internalPrefixes.none { prefix -> line.startsWith(prefix) } }
+        .joinToString("\n")
+        .trim()
 }
 
 private fun splitLuluExpressionBubbles(text: String): List<String> {

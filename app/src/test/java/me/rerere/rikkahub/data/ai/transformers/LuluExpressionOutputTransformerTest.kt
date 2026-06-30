@@ -75,6 +75,24 @@ class LuluExpressionOutputTransformerTest {
         assertEquals("I can hear you now.", result[3].toText())
     }
 
+    @Test
+    fun `strips leaked lulu presence fields before showing assistant message`() {
+        val assistant = assistantMessage(
+            """
+            <lulu_presence>
+            表情建议：✨
+            贴纸/动作建议：开心贴近
+            </lulu_presence>
+            我来啦。
+            """.trimIndent()
+        )
+
+        val result = splitLuluAssistantExpressionMessages(listOf(assistant))
+
+        assertEquals(1, result.size)
+        assertEquals("我来啦。", result.single().toText())
+    }
+
     private fun assistantMessage(text: String) = UIMessage(
         role = MessageRole.ASSISTANT,
         parts = listOf(UIMessagePart.Text(text)),

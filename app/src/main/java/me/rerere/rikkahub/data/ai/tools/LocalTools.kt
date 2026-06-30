@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
@@ -57,6 +58,10 @@ sealed class LocalToolOption {
     @Serializable
     @SerialName("lulu_journal")
     data object LuluJournal : LocalToolOption()
+
+    @Serializable
+    @SerialName("lulu_expression")
+    data object LuluExpression : LocalToolOption()
 
     @Serializable
     @SerialName("allow_skip_reply")
@@ -379,6 +384,69 @@ class LocalTools(private val context: Context) {
         )
     }
 
+    val luluExpressionTool by lazy {
+        Tool(
+            name = "set_lulu_expression_state",
+            description = """
+                Record the character's current visible expression intent for this turn.
+                Use when a reply should carry embodied presence: emoji, sticker/action feeling,
+                body gesture, or temporary avatar mood. This records intent only; do not claim
+                that the real avatar file has changed unless another explicit avatar tool exists.
+            """.trimIndent().replace("\n", " "),
+            parameters = {
+                InputSchema.Obj(
+                    properties = buildJsonObject {
+                        put("emoji", buildJsonObject {
+                            put("type", "string")
+                            put("description", "A single short emoji that matches the current mood")
+                        })
+                        put("sticker", buildJsonObject {
+                            put("type", "string")
+                            put("description", "Short sticker/action feeling, such as soft hug or quiet peek")
+                        })
+                        put("gesture", buildJsonObject {
+                            put("type", "string")
+                            put("description", "Natural body-language hint for the reply")
+                        })
+                        put("avatar_mood", buildJsonObject {
+                            put("type", "string")
+                            put("description", "Temporary avatar atmosphere, not a persistent avatar change")
+                        })
+                        put("intensity", buildJsonObject {
+                            put("type", "number")
+                            put("description", "0.0 to 1.0 expression intensity")
+                        })
+                    }
+                )
+            },
+            execute = {
+                val params = it.jsonObject
+                val now = ZonedDateTime.now()
+                val expression = buildJsonObject {
+                    put("created_at", now.toString())
+                    put("timestamp_ms", now.toInstant().toEpochMilli())
+                    put("emoji", params["emoji"]?.jsonPrimitive?.contentOrNull.orEmpty())
+                    put("sticker", params["sticker"]?.jsonPrimitive?.contentOrNull.orEmpty())
+                    put("gesture", params["gesture"]?.jsonPrimitive?.contentOrNull.orEmpty())
+                    put("avatar_mood", params["avatar_mood"]?.jsonPrimitive?.contentOrNull.orEmpty())
+                    put("intensity", params["intensity"]?.jsonPrimitive?.doubleOrNull ?: 0.5)
+                }
+                val luluDir = File(context.filesDir, "lulu").apply { mkdirs() }
+                val expressionFile = File(luluDir, "lulu_expression_state.jsonl")
+                expressionFile.appendText(expression.toString() + "\n")
+                listOf(
+                    UIMessagePart.Text(
+                        buildJsonObject {
+                            put("success", true)
+                            put("path", expressionFile.absolutePath)
+                            put("message", "Expression state recorded")
+                        }.toString()
+                    )
+                )
+            },
+        )
+    }
+
     fun getTools(options: List<LocalToolOption>): List<Tool> {
         val tools = mutableListOf<Tool>()
         if (options.contains(LocalToolOption.JavascriptEngine)) {
@@ -404,6 +472,9 @@ class LocalTools(private val context: Context) {
         }
         if (options.contains(LocalToolOption.LuluJournal)) {
             tools.add(luluJournalTool)
+        }
+        if (options.contains(LocalToolOption.LuluExpression) || options.contains(LocalToolOption.TimeInfo)) {
+            tools.add(luluExpressionTool)
         }
         return tools
     }

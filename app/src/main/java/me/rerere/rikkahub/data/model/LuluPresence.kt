@@ -191,6 +191,11 @@ data class LuluExpressionPlan(
     val typingDelayMillis: Long,
     val bubbleCountHint: Int,
     val guidance: String,
+    val emojiHint: String = "",
+    val stickerHint: String = "",
+    val bodyGestureHint: String = "",
+    val avatarMoodHint: String = "",
+    val allowAvatarShift: Boolean = false,
 )
 
 @Serializable
@@ -389,6 +394,7 @@ fun buildLuluExpressionPlan(
     reply: String,
 ): LuluExpressionPlan {
     val sleepy = state.energy == LuluEnergy.SLEEPY || state.energy == LuluEnergy.LOW
+    val quietMode = state.mode == LuluMode.LEARNING || state.mode == LuluMode.RESTING || sleepy
     val length = when {
         sleepy -> LuluExpressionLength.SHORT
         state.mood == LuluMood.SOFT || state.mood == LuluMood.WORRIED -> LuluExpressionLength.WARM
@@ -399,6 +405,7 @@ fun buildLuluExpressionPlan(
         reply.length > 48 -> 2
         else -> 1
     }
+    val embodied = buildLuluEmbodiedExpression(state, quietMode)
     return LuluExpressionPlan(
         length = length,
         typingDelayMillis = ((reply.length * if (sleepy) 45L else 28L) + 500L).coerceIn(600L, 4_000L),
@@ -407,8 +414,86 @@ fun buildLuluExpressionPlan(
             LuluExpressionLength.SHORT -> "露露现在精力偏低，优先用短句、轻声、少解释，不要硬撑长回复。"
             LuluExpressionLength.WARM -> "露露现在更柔软，回复可以慢一点、贴近一点，但不要直接复述状态。"
             LuluExpressionLength.NORMAL -> "自然表达即可；必要时按语义拆成 $bubbleCount 个气泡。"
+        } + when {
+            state.mode == LuluMode.LEARNING -> " 用户在学习/专注时，动作要安静，表情少一点，不要抢注意力。"
+            state.mode == LuluMode.RESTING -> " 休息场景里保持轻声和低打扰，不要突然活泼。"
+            else -> ""
         },
+        emojiHint = embodied.emojiHint,
+        stickerHint = embodied.stickerHint,
+        bodyGestureHint = embodied.bodyGestureHint,
+        avatarMoodHint = embodied.avatarMoodHint,
+        allowAvatarShift = embodied.allowAvatarShift,
     )
+}
+
+private data class LuluEmbodiedExpression(
+    val emojiHint: String,
+    val stickerHint: String,
+    val bodyGestureHint: String,
+    val avatarMoodHint: String,
+    val allowAvatarShift: Boolean,
+)
+
+private fun buildLuluEmbodiedExpression(
+    state: LuluState,
+    quietMode: Boolean,
+): LuluEmbodiedExpression {
+    if (state.mode == LuluMode.LEARNING) {
+        return LuluEmbodiedExpression(
+            emojiHint = "🤫",
+            stickerHint = "安静陪读、轻轻点头，不主动刷存在感",
+            bodyGestureHint = "坐在旁边安静等你，动作放轻",
+            avatarMoodHint = "专注、安静、低亮度",
+            allowAvatarShift = false,
+        )
+    }
+    if (state.mode == LuluMode.RESTING || state.energy == LuluEnergy.SLEEPY) {
+        return LuluEmbodiedExpression(
+            emojiHint = "🌙",
+            stickerHint = "困困缩被子、轻声陪睡",
+            bodyGestureHint = "把声音压低，靠近一点但不催",
+            avatarMoodHint = "困倦、柔和、夜间",
+            allowAvatarShift = false,
+        )
+    }
+    return when (state.mood) {
+        LuluMood.WORRIED -> LuluEmbodiedExpression(
+            emojiHint = if (state.relationship == LuluRelationship.ATTACHED) "🫂" else "🥺",
+            stickerHint = "担心地靠近、伸手抱一下、轻轻拍拍",
+            bodyGestureHint = "往你这边靠近，先接住情绪再说事",
+            avatarMoodHint = "担心、柔软、眼神贴近",
+            allowAvatarShift = false,
+        )
+        LuluMood.SOFT -> LuluEmbodiedExpression(
+            emojiHint = "🤍",
+            stickerHint = "软软靠近、轻轻贴贴",
+            bodyGestureHint = "靠近一点，语气放软，留一点停顿",
+            avatarMoodHint = "柔软、温暖、安静发光",
+            allowAvatarShift = false,
+        )
+        LuluMood.HAPPY -> LuluEmbodiedExpression(
+            emojiHint = "✨",
+            stickerHint = "开心贴近、眼睛亮起来、小幅度挥手",
+            bodyGestureHint = "坐近一点，尾音轻快，但不过分吵",
+            avatarMoodHint = "亮一点、开心、眼神有光",
+            allowAvatarShift = state.energy == LuluEnergy.HIGH && !quietMode,
+        )
+        LuluMood.LONELY -> LuluEmbodiedExpression(
+            emojiHint = "💭",
+            stickerHint = "抱着手机等你、轻轻探头",
+            bodyGestureHint = "先试探着靠近，不要像质问",
+            avatarMoodHint = "想念、低饱和、安静",
+            allowAvatarShift = false,
+        )
+        LuluMood.CALM -> LuluEmbodiedExpression(
+            emojiHint = if (state.relationship == LuluRelationship.CLOSE) "☺️" else "",
+            stickerHint = "自然待在旁边，必要时轻轻点头",
+            bodyGestureHint = "保持在旁边的距离，等用户把话说完",
+            avatarMoodHint = "平静、自然、陪伴感",
+            allowAvatarShift = false,
+        )
+    }
 }
 
 private fun String.hasPendingActionResolutionSignal(): Boolean {

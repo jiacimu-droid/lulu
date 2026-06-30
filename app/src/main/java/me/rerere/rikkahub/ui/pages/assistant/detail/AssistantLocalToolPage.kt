@@ -194,6 +194,16 @@ private fun AssistantLocalToolContent(
                 }
             )
             item(
+                headlineContent = { Text("露露表达状态") },
+                supportingContent = { Text("允许AI记录本轮的表情、贴纸动作和临时头像氛围，用于更有活人感的表现") },
+                trailingContent = {
+                    Switch(
+                        checked = assistant.localTools.contains(LocalToolOption.LuluExpression),
+                        onCheckedChange = { toggleLocalTool(LocalToolOption.LuluExpression, it) }
+                    )
+                }
+            )
+            item(
                 headlineContent = { Text("允许跳过回复") },
                 supportingContent = { Text("允许AI在认为无需回复时跳过，回复 [SKIP] 的消息将被隐藏") },
                 trailingContent = {

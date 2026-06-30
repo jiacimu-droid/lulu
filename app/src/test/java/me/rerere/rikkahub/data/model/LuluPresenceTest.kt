@@ -216,6 +216,61 @@ class LuluPresenceTest {
     }
 
     @Test
+    fun `expression plan carries embodied cues when worried`() {
+        val plan = buildLuluExpressionPlan(
+            state = LuluState(
+                assistantId = assistantId,
+                mood = LuluMood.WORRIED,
+                energy = LuluEnergy.LOW,
+                mode = LuluMode.COMPANION,
+                perceptionSummary = "深夜 / 休息中 / 用户信号：疲惫",
+            ),
+            reply = "我在，先别一个人硬撑。",
+        )
+
+        assertEquals(LuluExpressionLength.SHORT, plan.length)
+        assertTrue(plan.emojiHint in listOf("🥺", "🫂", "🤍"))
+        assertTrue(plan.bodyGestureHint.contains("靠近") || plan.bodyGestureHint.contains("抱"))
+        assertTrue(plan.avatarMoodHint.contains("担心") || plan.avatarMoodHint.contains("柔软"))
+        assertFalse(plan.allowAvatarShift)
+    }
+
+    @Test
+    fun `expression plan can suggest playful avatar shift when happy and energetic`() {
+        val plan = buildLuluExpressionPlan(
+            state = LuluState(
+                assistantId = assistantId,
+                mood = LuluMood.HAPPY,
+                energy = LuluEnergy.HIGH,
+                mode = LuluMode.COMPANION,
+            ),
+            reply = "好耶，我也有点开心起来了！",
+        )
+
+        assertEquals("✨", plan.emojiHint)
+        assertTrue(plan.allowAvatarShift)
+        assertTrue(plan.avatarMoodHint.contains("亮"))
+        assertTrue(plan.stickerHint.contains("贴近") || plan.stickerHint.contains("开心"))
+    }
+
+    @Test
+    fun `expression plan stays quiet during learning mode`() {
+        val plan = buildLuluExpressionPlan(
+            state = LuluState(
+                assistantId = assistantId,
+                mood = LuluMood.CALM,
+                energy = LuluEnergy.NORMAL,
+                mode = LuluMode.LEARNING,
+            ),
+            reply = "我在旁边，你先写。",
+        )
+
+        assertEquals("🤫", plan.emojiHint)
+        assertFalse(plan.allowAvatarShift)
+        assertTrue(plan.guidance.contains("学习") || plan.bodyGestureHint.contains("安静"))
+    }
+
+    @Test
     fun `state tracks intensity and duration`() {
         val previous = LuluState(
             assistantId = assistantId,
