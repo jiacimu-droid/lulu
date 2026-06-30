@@ -54,7 +54,7 @@ import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.datastore.getCurrentChatModel
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.model.Conversation
-import me.rerere.rikkahub.data.model.currentLuluState
+import me.rerere.rikkahub.data.model.currentProjectedLuluState
 import me.rerere.rikkahub.data.model.luluStateHistory
 import me.rerere.rikkahub.service.ChatError
 import me.rerere.rikkahub.ui.components.ai.ChatInput
@@ -403,7 +403,7 @@ private fun TopBar(
     }
     var showLuluStatus by rememberSaveable { mutableStateOf(false) }
     val assistant = settings.getAssistantById(conversation.assistantId) ?: settings.getCurrentAssistant()
-    val currentLuluState = settings.luluStates.currentLuluState(assistant.id)
+    val currentLuluState = settings.luluStates.currentProjectedLuluState(assistant.id)
     val luluStateHistory = settings.luluStates.luluStateHistory(assistant.id)
     val assistantDefaultName = stringResource(R.string.assistant_page_default_assistant)
 

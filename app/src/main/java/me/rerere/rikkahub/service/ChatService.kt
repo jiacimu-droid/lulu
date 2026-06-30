@@ -102,6 +102,7 @@ import me.rerere.rikkahub.data.model.appendLuluThoughts
 import me.rerere.rikkahub.data.model.buildLuluStateFromTurn
 import me.rerere.rikkahub.data.model.buildLuluThoughtFromTurn
 import me.rerere.rikkahub.data.model.currentLuluState
+import me.rerere.rikkahub.data.model.currentProjectedLuluState
 import me.rerere.rikkahub.data.model.LuluPerceptionInput
 import me.rerere.rikkahub.data.model.thoughtHistory
 import me.rerere.rikkahub.data.model.luluStateHistory
@@ -1044,7 +1045,7 @@ class ChatService(
         finalConversation: Conversation,
     ): LuluIntentPlan {
         val availableToolNames = buildAvailableTools(settings, assistant).map { it.name }.toSet()
-        val currentState = settings.luluStates.currentLuluState(assistant.id)
+        val currentState = settings.luluStates.currentProjectedLuluState(assistant.id)
         val pendingThoughts = settings.luluThoughts
             .thoughtHistory(assistant.id)
             .map { it.content }
@@ -1357,7 +1358,7 @@ class ChatService(
         availableToolNames: Set<String>,
         recentlyUsedToolNames: Set<String>,
     ): ChatTurnPlanResult {
-        val currentState = settings.luluStates.currentLuluState(assistant.id)
+        val currentState = settings.luluStates.currentProjectedLuluState(assistant.id)
         val pendingThoughts = settings.luluThoughts
             .thoughtHistory(assistant.id)
             .map { it.content }

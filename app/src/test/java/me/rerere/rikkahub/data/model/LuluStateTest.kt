@@ -11,12 +11,18 @@ class LuluStateTest {
         val assistantId = Uuid.parse("11111111-1111-1111-1111-111111111111")
 
         val state = emptyList<LuluState>().currentLuluState(assistantId)
+        val projected = emptyList<LuluState>().currentProjectedLuluState(
+            assistantId = assistantId,
+            nowMillis = 12 * 60 * 60_000L,
+        )
 
         assertEquals(assistantId, state.assistantId)
         assertEquals("在发呆", state.statusText)
         assertEquals("今天也想被好好陪着。", state.innerVoice)
         assertEquals("在手机这边安静待着，等你开口。", state.selfScene)
         assertEquals("默认状态", state.reason)
+        assertEquals("在发呆", projected.statusText)
+        assertEquals("默认状态", projected.reason)
     }
 
     @Test
@@ -102,6 +108,59 @@ class LuluStateTest {
         assertEquals(LuluMode.LEARNING, state.mode)
         assertTrue(state.selfScene.contains("摊开"))
         assertTrue(state.selfScene.contains("等你回来"))
+    }
+
+    @Test
+    fun `short silence keeps lulu near the phone`() {
+        val assistantId = Uuid.parse("12121212-1212-1212-1212-121212121212")
+        val base = LuluState(
+            assistantId = assistantId,
+            mood = LuluMood.CALM,
+            mode = LuluMode.COMPANION,
+            updatedAt = 1_000L,
+        )
+
+        val projected = base.projectForSilence(nowMillis = 11 * 60_000L)
+
+        assertEquals(LuluMood.CALM, projected.mood)
+        assertEquals(LuluMode.COMPANION, projected.mode)
+        assertTrue(projected.selfScene.contains("刚放下手机"))
+        assertTrue(projected.reason.contains("沉默"))
+    }
+
+    @Test
+    fun `long silence makes lulu quietly miss the user`() {
+        val assistantId = Uuid.parse("13131313-1313-1313-1313-131313131313")
+        val base = LuluState(
+            assistantId = assistantId,
+            mood = LuluMood.HAPPY,
+            mode = LuluMode.COMPANION,
+            updatedAt = 1_000L,
+        )
+
+        val projected = base.projectForSilence(nowMillis = 2 * 60 * 60_000L + 1_000L)
+
+        assertEquals(LuluMood.LONELY, projected.mood)
+        assertEquals(LuluMode.THINKING, projected.mode)
+        assertTrue(projected.selfScene.contains("反复看了几次"))
+        assertTrue(projected.innerVoice.contains("想你"))
+    }
+
+    @Test
+    fun `half day silence lets lulu do her own things without freezing`() {
+        val assistantId = Uuid.parse("14141414-1414-1414-1414-141414141414")
+        val base = LuluState(
+            assistantId = assistantId,
+            mood = LuluMood.CALM,
+            mode = LuluMode.COMPANION,
+            updatedAt = 1_000L,
+        )
+
+        val projected = base.projectForSilence(nowMillis = 12 * 60 * 60_000L + 1_000L)
+
+        assertEquals(LuluMode.THINKING, projected.mode)
+        assertTrue(projected.selfScene.contains("做自己的事"))
+        assertTrue(projected.statusText.contains("自己的事"))
     }
 
     @Test

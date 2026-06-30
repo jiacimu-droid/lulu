@@ -70,7 +70,7 @@ import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.RouteActivity
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.LuluThoughtCategory
-import me.rerere.rikkahub.data.model.currentLuluState
+import me.rerere.rikkahub.data.model.currentProjectedLuluState
 import me.rerere.rikkahub.data.model.thoughtHistory
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
@@ -961,7 +961,7 @@ addAll(localTools.getTools(assistant.localTools))
     ): LuluIntentPlan {
         val input = LuluIntentInput(
             assistantName = assistant.name,
-            state = settings.luluStates.currentLuluState(assistant.id),
+            state = settings.luluStates.currentProjectedLuluState(assistant.id),
             userText = historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
             assistantText = historyMessages.lastOrNull { it.role == MessageRole.ASSISTANT }?.toText().orEmpty(),
             minutesSinceLastChat = historyMessages.lastOrNull()

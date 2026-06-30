@@ -6,7 +6,7 @@ import me.rerere.rikkahub.data.model.LuluState
 import me.rerere.rikkahub.data.model.LuluThought
 import me.rerere.rikkahub.data.model.buildLuluExpressionPlan
 import me.rerere.rikkahub.data.model.buildLuluPerception
-import me.rerere.rikkahub.data.model.currentLuluState
+import me.rerere.rikkahub.data.model.currentProjectedLuluState
 import me.rerere.rikkahub.data.model.durationMillis
 import me.rerere.rikkahub.data.model.thoughtHistory
 import kotlin.uuid.Uuid
@@ -28,11 +28,12 @@ internal fun applyLuluStateContext(
     assistantId: Uuid,
     states: List<LuluState>,
     thoughts: List<LuluThought> = emptyList(),
+    nowMillis: Long = System.currentTimeMillis(),
 ): List<UIMessage> {
     if (messages.isEmpty()) return messages
     if (states.none { it.assistantId == assistantId }) return messages
 
-    val state = states.currentLuluState(assistantId)
+    val state = states.currentProjectedLuluState(assistantId, nowMillis)
     val lastUserIndex = messages.indexOfLast { it.role == MessageRole.USER }
     val latestUserText = messages.getOrNull(lastUserIndex)?.toText().orEmpty()
     val contextMessage = UIMessage.system(

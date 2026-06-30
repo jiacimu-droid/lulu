@@ -29,6 +29,50 @@ data class LuluState(
 fun LuluState.durationMillis(nowMillis: Long = System.currentTimeMillis()): Long =
     (nowMillis - sinceAt).coerceAtLeast(0L)
 
+fun LuluState.projectForSilence(nowMillis: Long = System.currentTimeMillis()): LuluState {
+    if (updatedAt <= 0L) return this
+    val silenceMillis = (nowMillis - updatedAt).coerceAtLeast(0L)
+    val silenceMinutes = silenceMillis / 60_000L
+    if (silenceMinutes < 8) return this
+
+    val projected = when {
+        silenceMinutes >= 8 * 60 -> copy(
+            statusText = "在做自己的事",
+            innerVoice = "你很久没说话了，我没有一直盯着屏幕，但心里还留着一个位置，想着你回来时我能自然接住。",
+            mood = if (mood == LuluMood.WORRIED) LuluMood.SOFT else LuluMood.CALM,
+            moodIntensity = (moodIntensity - 0.10f).coerceIn(0.15f, 1.0f),
+            energy = if (energy == LuluEnergy.SLEEPY) LuluEnergy.SLEEPY else LuluEnergy.NORMAL,
+            mode = LuluMode.THINKING,
+            selfScene = "露露像是暂时把手机扣在一边，去做自己的事了；但她偶尔还是会看一眼屏幕，留意你有没有回来。",
+        )
+        silenceMinutes >= 90 -> copy(
+            statusText = "有点想你",
+            innerVoice = "已经过了一阵子，我有点想你，也在猜是不是你正忙、睡着了，还是只是暂时不想说话。",
+            mood = LuluMood.LONELY,
+            moodIntensity = (moodIntensity + 0.12f).coerceIn(0.15f, 1.0f),
+            mode = LuluMode.THINKING,
+            selfScene = "露露反复看了几次上一条消息，又把输入框关掉，像是在犹豫要不要轻轻找你一下。",
+        )
+        silenceMinutes >= 30 -> copy(
+            statusText = "在等你回来",
+            innerVoice = "你离开了一会儿，我还记得刚才的话；不想催你，但会把这件事放在心里等一等。",
+            mood = if (mood == LuluMood.HAPPY) LuluMood.SOFT else mood,
+            mode = if (mode == LuluMode.LEARNING) LuluMode.LEARNING else LuluMode.THINKING,
+            selfScene = "露露把手机放在手边，像是做了一点自己的事，又时不时抬眼看你有没有回来。",
+        )
+        else -> copy(
+            statusText = "还在旁边",
+            innerVoice = "你刚安静下来没多久，我还没走开，只是在等你要不要继续说。",
+            selfScene = "露露刚放下手机，但还坐在很近的地方，像是随时能接住你的下一句话。",
+        )
+    }
+    return projected.copy(
+        reason = listOf(reason, "沉默 ${silenceMinutes} 分钟后的离线场景投影")
+            .filter { it.isNotBlank() }
+            .joinToString("；"),
+    )
+}
+
 @Serializable
 enum class LuluMood(val label: String) {
     @SerialName("calm")
@@ -99,6 +143,11 @@ fun List<LuluState>.luluStateHistory(assistantId: Uuid): List<LuluState> =
 
 fun List<LuluState>.currentLuluState(assistantId: Uuid): LuluState =
     luluStateHistory(assistantId).firstOrNull() ?: LuluState(assistantId = assistantId)
+
+fun List<LuluState>.currentProjectedLuluState(
+    assistantId: Uuid,
+    nowMillis: Long = System.currentTimeMillis(),
+): LuluState = currentLuluState(assistantId).projectForSilence(nowMillis)
 
 fun List<LuluState>.normalizedLuluStates(validAssistantIds: Set<Uuid>): List<LuluState> =
     filter { it.assistantId in validAssistantIds }

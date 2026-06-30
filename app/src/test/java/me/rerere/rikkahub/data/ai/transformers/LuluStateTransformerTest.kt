@@ -55,6 +55,7 @@ class LuluStateTransformerTest {
                     expiresAt = 99_999L,
                 )
             ),
+            nowMillis = 1_500L,
         )
 
         assertEquals(messages.size + 1, result.size)
@@ -85,5 +86,30 @@ class LuluStateTransformerTest {
         )
 
         assertEquals(messages, result)
+    }
+
+    @Test
+    fun `injects projected silence scene instead of stale stored scene`() {
+        val assistantId = Uuid.parse("99999999-9999-9999-9999-999999999999")
+        val messages = listOf(UIMessage.user("你在吗"))
+        val state = LuluState(
+            assistantId = assistantId,
+            statusText = "陪着你",
+            mood = LuluMood.HAPPY,
+            mode = LuluMode.COMPANION,
+            updatedAt = 1_000L,
+            selfScene = "旧场景",
+        )
+
+        val result = applyLuluStateContext(
+            messages = messages,
+            assistantId = assistantId,
+            states = listOf(state),
+            nowMillis = 2 * 60 * 60_000L + 1_000L,
+        )
+
+        val injected = result.first { it.role == MessageRole.SYSTEM }.toText()
+        assertTrue(injected.contains("有点想你"))
+        assertTrue(injected.contains("反复看了几次上一条消息"))
     }
 }
