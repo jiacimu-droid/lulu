@@ -195,6 +195,9 @@ private fun ChatPageContent(
                     onUpdateTitle = {
                         vm.updateTitle(it)
                     },
+                    onUpdateSettings = {
+                        vm.updateSettings(it)
+                    },
                 )
             },
             bottomBar = {
@@ -396,6 +399,7 @@ private fun TopBar(
     previewMode: Boolean,
     onClickMenu: () -> Unit,
     onUpdateTitle: (String) -> Unit,
+    onUpdateSettings: (Settings) -> Unit,
 ) {
     val toaster = LocalToaster.current
     val titleState = useEditState<String> {
@@ -473,6 +477,24 @@ private fun TopBar(
             assistant = assistant,
             currentState = currentLuluState,
             history = luluStateHistory,
+            onDeleteHistory = { selected ->
+                onUpdateSettings(
+                    settings.copy(
+                        luluStates = settings.luluStates.filterNot {
+                            it.assistantId == assistant.id && it.updatedAt in selected
+                        }
+                    )
+                )
+            },
+            onClearHistory = {
+                onUpdateSettings(
+                    settings.copy(
+                        luluStates = settings.luluStates.filterNot {
+                            it.assistantId == assistant.id
+                        }
+                    )
+                )
+            },
             onDismissRequest = { showLuluStatus = false },
         )
     }

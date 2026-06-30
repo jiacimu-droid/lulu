@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
 import me.rerere.rikkahub.data.datastore.Settings
@@ -28,20 +29,31 @@ fun TTSAutoPlay(vm: ChatVM, setting: Settings, conversation: Conversation) {
     var lastSpokenMessageId by remember(conversation.id) {
         mutableStateOf(conversation.messageNodes.latestAssistantMessageId())
     }
-    val target = remember(conversation.messageNodes, lastSpokenMessageId) {
-        findAutoPlayTTSMessage(
-            nodes = conversation.messageNodes,
-            lastSpokenMessageId = lastSpokenMessageId,
-        )
+    var lastFinishedCount by remember(conversation.id) {
+        mutableStateOf(conversation.finishedAssistantMessageCount())
+    }
+    val target = remember(conversation.messageNodes, lastSpokenMessageId, lastFinishedCount) {
+        val finishedCount = conversation.finishedAssistantMessageCount()
+        if (finishedCount <= lastFinishedCount) {
+            null
+        } else {
+            findAutoPlayTTSMessage(
+                nodes = conversation.messageNodes,
+                lastSpokenMessageId = lastSpokenMessageId,
+            )
+        }
     }
 
     LaunchedEffect(target?.id, isAvailable, setting.displaySetting.ttsOnlyReadQuoted) {
         if (!isAvailable || target == null) return@LaunchedEffect
+        delay(450)
         val text = buildSpeakableMessageText(
             message = target,
             onlyReadQuoted = setting.displaySetting.ttsOnlyReadQuoted,
-        ) ?: return@LaunchedEffect
+        )
         lastSpokenMessageId = target.id
+        lastFinishedCount = conversation.finishedAssistantMessageCount()
+        if (text == null) return@LaunchedEffect
         tts.speak(text)
     }
 }
@@ -51,6 +63,15 @@ private fun List<MessageNode>.latestAssistantMessageId(): Uuid? =
         .map { it.currentMessage }
         .firstOrNull { it.role == MessageRole.ASSISTANT && it.finishedAt != null }
         ?.id
+
+private fun Conversation.finishedAssistantMessageCount(): Int =
+    messageNodes
+        .map { it.currentMessage }
+        .count {
+            it.role == MessageRole.ASSISTANT &&
+                it.finishedAt != null &&
+                it.toText().isNotBlank()
+        }
 
 internal fun findAutoPlayTTSMessage(
     nodes: List<MessageNode>,
