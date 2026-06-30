@@ -1,10 +1,34 @@
 {
   "version": 1,
   "skills": {
+    "android-material3-design-system": {
+      "source": "krutikjain/android-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/android-material3-design-system/SKILL.md",
+      "computedHash": "16cfbcb633b02a4fa19b3f3524c3549fe9166842bb9061c6b91ab33a364e9631"
+    },
+    "design-taste-frontend": {
+      "source": "Leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/taste-skill/SKILL.md",
+      "computedHash": "899b84384f74f540ea5284d9b2e9234e050998b42eacc805410b518d4226c0b3"
+    },
+    "imagegen-frontend-mobile": {
+      "source": "Leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/imagegen-frontend-mobile/SKILL.md",
+      "computedHash": "7c1d1dc59cd0df4063b8621af543bf5dea1d576b261507e17b0323c69680b048"
+    },
     "material-3-expressive": {
       "source": "albermonte/android-skills",
       "sourceType": "github",
       "computedHash": "125ef6d71eedeb58ab4481bd75be1c038433e3d7ea2a3a25b2f67644d135d2fc"
+    },
+    "mobile-app-ui-design": {
+      "source": "ceorkm/mobile-app-ui-design",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "b55732a1e5fbd0d00eb205d52af2bc72cfb9dbd13f8a7fd38d25acdc96f7ac5e"
     }
   }
 }
