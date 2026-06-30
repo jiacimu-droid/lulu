@@ -175,7 +175,7 @@ private fun ChatPageContent(
     var previewMode by rememberSaveable { mutableStateOf(false) }
     val hazeState = rememberHazeState()
 
-    TTSAutoPlay(vm = vm, setting = setting, conversation = conversation)
+    TTSAutoPlay(setting = setting, conversation = conversation, loading = loadingJob != null)
 
     Surface(
         color = MaterialTheme.colorScheme.background,

@@ -3,7 +3,7 @@ package me.rerere.rikkahub.ui.pages.chat
 import me.rerere.ai.ui.UIMessage
 import me.rerere.rikkahub.data.model.MessageNode
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
@@ -11,31 +11,46 @@ import kotlinx.datetime.toLocalDateTime
 
 class TTSAutoPlayTest {
     @Test
-    fun `selects newest assistant message when no spoken marker exists`() {
+    fun `returns null when every assistant message is already marked spoken`() {
         val first = assistantMessage("first")
         val second = assistantMessage("second")
 
-        assertEquals(
-            second.id,
-            findAutoPlayTTSMessage(
+        assertTrue(
+            findAutoPlayTTSMessages(
                 nodes = listOf(MessageNode.of(first), MessageNode.of(second)),
-                lastSpokenMessageId = null,
-            )?.id,
+                spokenMessageIds = setOf(first.id, second.id),
+            ).isEmpty(),
         )
     }
 
     @Test
-    fun `selects next assistant message after last spoken one`() {
+    fun `loaded history becomes spoken baseline before autoplay starts`() {
+        val history = listOf(
+            MessageNode.of(assistantMessage("loaded first")),
+            MessageNode.of(assistantMessage("loaded second")),
+        )
+        val spoken = history.finishedAssistantMessageIdsForAutoPlay()
+
+        assertTrue(
+            findAutoPlayTTSMessages(
+                nodes = history,
+                spokenMessageIds = spoken,
+            ).isEmpty(),
+        )
+    }
+
+    @Test
+    fun `selects newly finished assistant messages as one autoplay batch`() {
         val first = assistantMessage("first")
         val second = assistantMessage("second")
         val third = assistantMessage("third")
 
         assertEquals(
-            second.id,
-            findAutoPlayTTSMessage(
+            listOf(second.id, third.id),
+            findAutoPlayTTSMessages(
                 nodes = listOf(MessageNode.of(first), MessageNode.of(second), MessageNode.of(third)),
-                lastSpokenMessageId = first.id,
-            )?.id,
+                spokenMessageIds = setOf(first.id),
+            ).map { it.id },
         )
     }
 
@@ -43,11 +58,11 @@ class TTSAutoPlayTest {
     fun `does not replay the same assistant message`() {
         val message = assistantMessage("already spoken")
 
-        assertNull(
-            findAutoPlayTTSMessage(
+        assertTrue(
+            findAutoPlayTTSMessages(
                 nodes = listOf(MessageNode.of(message)),
-                lastSpokenMessageId = message.id,
-            ),
+                spokenMessageIds = setOf(message.id),
+            ).isEmpty(),
         )
     }
 

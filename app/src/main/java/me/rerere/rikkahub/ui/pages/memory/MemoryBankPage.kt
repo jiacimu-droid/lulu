@@ -113,10 +113,10 @@ fun MemoryBankPage(
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                     IconButton(onClick = { vm.rebuildIndex() }) {
-                        Icon(HugeIcons.Database02, contentDescription = "重建索引")
+                        Icon(HugeIcons.Database02, contentDescription = "重建向量索引")
                     }
                     IconButton(onClick = { vm.processPendingVectors() }) {
-                        Icon(HugeIcons.DatabaseSync, contentDescription = "处理向量化")
+                        Icon(HugeIcons.DatabaseSync, contentDescription = "处理待向量化记忆")
                     }
                     IconButton(onClick = { vm.runLightMaintenance() }) {
                         Icon(HugeIcons.Tools, contentDescription = "轻量维护")
@@ -175,6 +175,10 @@ fun MemoryBankPage(
                         onAssistantSelected = { vm.setSelectedAssistantId(it) }
                     )
                 }
+            }
+
+            item {
+                MemoryBankLegend()
             }
 
             item { Spacer(modifier = Modifier.height(4.dp)) }
@@ -596,6 +600,23 @@ private fun StatsRow(stats: MemoryBankService.MemoryStats) {
 }
 
 @Composable
+private fun MemoryBankLegend() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        shape = MaterialTheme.shapes.medium,
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text("按钮：重建向量索引 / 处理待向量化 / 轻量维护合并重复 / 刷新列表", style = MaterialTheme.typography.bodySmall)
+            Text("分类：阶段总结和日记来自自动总结；消息来自对话抽取；手动是你或插件主动保存的记忆；失效是被替换或废弃的旧记忆。", style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
 private fun StatCard(label: String, count: Int, modifier: Modifier = Modifier, containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceVariant) {
     Surface(
         modifier = modifier,
@@ -626,7 +647,7 @@ private fun AssistantFilterRow(
         FilterChip(
             selected = selectedAssistantId == null,
             onClick = { onAssistantSelected(null) },
-            label = { Text("全部助手") },
+            label = { Text("全部角色") },
         )
         assistantIds.forEach { id ->
             FilterChip(

@@ -68,7 +68,7 @@ class AffectiveMemoryExtractorTest {
             createdAt = 1234L,
         )
 
-        assertEquals("manual", entity.type)
+        assertEquals("message", entity.type)
         assertEquals("role_emotion", entity.memoryKind)
         assertEquals("assistant-1", entity.assistantId)
         assertEquals("conversation-1", entity.conversationId)

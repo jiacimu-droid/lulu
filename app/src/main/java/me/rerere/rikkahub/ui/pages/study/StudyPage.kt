@@ -491,6 +491,7 @@ fun StudyPomodoroFocusPage(
                                 chatService.sendVoiceCallTurn(
                                     conversationId = conversationId,
                                     text = buildStudyChatPrompt(text, task),
+                                    visibleUserText = text,
                                 ) ?: buildEncourageLine(task, assistant)
                             }
                             coachReply = line

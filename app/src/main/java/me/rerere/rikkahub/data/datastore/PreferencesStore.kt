@@ -587,8 +587,8 @@ data class MemoryEmbeddingConfig(
     val rerankModelId: Uuid? = null,
     val extractionModelId: Uuid? = null,
     val dimensions: Int? = null,
-    val batchSize: Int = 16,
-    val rerankCandidateCount: Int = 20,
+    val batchSize: Int = 60,
+    val rerankCandidateCount: Int = 60,
 )
 
 @Serializable

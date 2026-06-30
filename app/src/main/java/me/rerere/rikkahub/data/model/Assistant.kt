@@ -21,7 +21,7 @@ data class Assistant(
     val systemPrompt: String = "",
     val temperature: Float? = null,
     val topP: Float? = null,
-    val contextMessageSize: Int = 20,
+    val contextMessageSize: Int = 60,
     val streamOutput: Boolean = true,
     val autoPlayVoice: Boolean = false,
     val enableMemory: Boolean = false,

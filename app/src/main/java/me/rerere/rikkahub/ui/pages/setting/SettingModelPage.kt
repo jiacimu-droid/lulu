@@ -519,7 +519,7 @@ internal fun parseMemoryEmbeddingBatchSizeInput(value: String): Int =
     (value.trim().toIntOrNull() ?: 1).coerceIn(1, 64)
 
 internal fun parseMemoryRerankCandidateCountInput(value: String): Int =
-    (value.trim().toIntOrNull() ?: 5).coerceIn(5, 50)
+    (value.trim().toIntOrNull() ?: 5).coerceIn(5, 60)
 
 internal fun buildMemoryEngineDiagnostics(
     enabled: Boolean,
@@ -532,7 +532,7 @@ internal fun buildMemoryEngineDiagnostics(
     val embedding = "Embedding：${embeddingModel?.takeIf { it.isNotBlank() } ?: "未配置"}"
     val rerank = "Reranker：${rerankModel?.takeIf { it.isNotBlank() } ?: "未配置，将使用本地混合排序"}"
     val extraction = "记忆抽取：${extractionModel?.takeIf { it.isNotBlank() } ?: "未单独配置，将使用当前聊天模型"}"
-    val candidates = "重排序候选：${candidateCount.coerceIn(5, 50)} 条"
+    val candidates = "重排序候选：${candidateCount.coerceIn(5, 60)} 条"
     val backend = "Backend / Vector Index：未接入，当前使用设备本地 Room 向量字段"
     return listOf(mode, embedding, rerank, extraction, candidates, backend)
 }

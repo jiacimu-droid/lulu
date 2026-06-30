@@ -73,7 +73,7 @@ data class AffectiveMemoryCandidate(
         val normalized = normalized()
         return MemoryBankEntity(
             content = normalized.content,
-            type = "manual",
+            type = "message",
             title = normalized.title,
             memoryKind = normalized.type,
             roleFeeling = normalized.roleFeeling,

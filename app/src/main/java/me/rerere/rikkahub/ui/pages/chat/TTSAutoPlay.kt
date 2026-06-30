@@ -18,7 +18,7 @@ import me.rerere.rikkahub.ui.context.LocalTTSState
 import kotlin.uuid.Uuid
 
 @Composable
-fun TTSAutoPlay(vm: ChatVM, setting: Settings, conversation: Conversation) {
+fun TTSAutoPlay(setting: Settings, conversation: Conversation, loading: Boolean) {
     val assistant = remember(setting.assistants, conversation.assistantId) {
         setting.assistants.firstOrNull { it.id == conversation.assistantId }
     }
@@ -26,71 +26,65 @@ fun TTSAutoPlay(vm: ChatVM, setting: Settings, conversation: Conversation) {
 
     val tts = LocalTTSState.current
     val isAvailable by tts.isAvailable.collectAsState()
-    var lastSpokenMessageId by remember(conversation.id) {
-        mutableStateOf(conversation.messageNodes.latestAssistantMessageId())
+    var spokenMessageIds by remember(conversation.id) {
+        mutableStateOf(emptySet<Uuid>())
     }
-    var lastFinishedCount by remember(conversation.id) {
-        mutableStateOf(conversation.finishedAssistantMessageCount())
+    var readyForNewReplies by remember(conversation.id) {
+        mutableStateOf(false)
     }
-    val target = remember(conversation.messageNodes, lastSpokenMessageId, lastFinishedCount) {
-        val finishedCount = conversation.finishedAssistantMessageCount()
-        if (finishedCount <= lastFinishedCount) {
-            null
-        } else {
-            findAutoPlayTTSMessage(
-                nodes = conversation.messageNodes,
-                lastSpokenMessageId = lastSpokenMessageId,
-            )
+
+    LaunchedEffect(conversation.id, conversation.messageNodes.isNotEmpty()) {
+        if (!readyForNewReplies && conversation.messageNodes.isNotEmpty()) {
+            spokenMessageIds = conversation.messageNodes.finishedAssistantMessageIdsForAutoPlay()
+            readyForNewReplies = true
         }
     }
 
-    LaunchedEffect(target?.id, isAvailable, setting.displaySetting.ttsOnlyReadQuoted) {
-        if (!isAvailable || target == null) return@LaunchedEffect
+    val target = remember(conversation.messageNodes, spokenMessageIds, readyForNewReplies, loading) {
+        if (readyForNewReplies && !loading) {
+            findAutoPlayTTSMessages(
+                nodes = conversation.messageNodes,
+                spokenMessageIds = spokenMessageIds,
+            )
+        } else {
+            emptyList()
+        }
+    }
+
+    LaunchedEffect(target.map { it.id }, isAvailable, setting.displaySetting.ttsOnlyReadQuoted) {
+        if (!isAvailable || target.isEmpty()) return@LaunchedEffect
         delay(450)
-        val text = buildSpeakableMessageText(
-            message = target,
-            onlyReadQuoted = setting.displaySetting.ttsOnlyReadQuoted,
-        )
-        lastSpokenMessageId = target.id
-        lastFinishedCount = conversation.finishedAssistantMessageCount()
+        val text = target
+            .mapNotNull { message ->
+                buildSpeakableMessageText(
+                    message = message,
+                    onlyReadQuoted = setting.displaySetting.ttsOnlyReadQuoted,
+                )
+            }
+            .joinToString("\n")
+            .takeIf { it.isNotBlank() }
+        spokenMessageIds = spokenMessageIds + target.map { it.id }
         if (text == null) return@LaunchedEffect
         tts.speak(text)
     }
 }
 
-private fun List<MessageNode>.latestAssistantMessageId(): Uuid? =
-    asReversed()
-        .map { it.currentMessage }
-        .firstOrNull { it.role == MessageRole.ASSISTANT && it.finishedAt != null }
-        ?.id
+internal fun List<MessageNode>.finishedAssistantMessageIdsForAutoPlay(): Set<Uuid> =
+    map { it.currentMessage }
+        .filter { it.isFinishedSpeakableAssistantMessage() }
+        .map { it.id }
+        .toSet()
 
-private fun Conversation.finishedAssistantMessageCount(): Int =
-    messageNodes
-        .map { it.currentMessage }
-        .count {
-            it.role == MessageRole.ASSISTANT &&
-                it.finishedAt != null &&
-                it.toText().isNotBlank()
-        }
-
-internal fun findAutoPlayTTSMessage(
+internal fun findAutoPlayTTSMessages(
     nodes: List<MessageNode>,
-    lastSpokenMessageId: Uuid?,
-): UIMessage? {
-    val messages = nodes
+    spokenMessageIds: Set<Uuid>,
+): List<UIMessage> {
+    return nodes
         .map { it.currentMessage }
-        .filter {
-            it.role == MessageRole.ASSISTANT &&
-                it.finishedAt != null &&
-                it.toText().isNotBlank()
-        }
-    if (messages.isEmpty()) return null
-    if (lastSpokenMessageId == null) return messages.last()
-
-    val lastSpokenIndex = messages.indexOfFirst { it.id == lastSpokenMessageId }
-    return when {
-        lastSpokenIndex < 0 -> messages.last()
-        lastSpokenIndex < messages.lastIndex -> messages[lastSpokenIndex + 1]
-        else -> null
-    }
+        .filter { it.isFinishedSpeakableAssistantMessage() && it.id !in spokenMessageIds }
 }
+
+private fun UIMessage.isFinishedSpeakableAssistantMessage(): Boolean =
+    role == MessageRole.ASSISTANT &&
+        finishedAt != null &&
+        toText().isNotBlank()

@@ -154,7 +154,10 @@ internal fun AssistantBasicContent(
         ) {
             FormItem(
                 label = {
-                    Text(stringResource(R.string.assistant_page_name))
+                    Text("角色姓名 / 昵称")
+                },
+                description = {
+                    Text("这里改名后，桌面、聊天页、头像和角色选择器会同步显示。")
                 },
                 modifier = Modifier.padding(8.dp),
 
@@ -169,6 +172,32 @@ internal fun AssistantBasicContent(
                         )
                     },
                     modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            HorizontalDivider()
+
+            FormItem(
+                label = {
+                    Text("角色资料 / 设定备注")
+                },
+                description = {
+                    Text("和提示词页的系统人设同步，用来写角色身份、关系、语气和互动边界。")
+                },
+                modifier = Modifier.padding(8.dp),
+            ) {
+                OutlinedTextField(
+                    value = assistant.systemPrompt,
+                    onValueChange = {
+                        onUpdate(
+                            assistant.copy(
+                                systemPrompt = it
+                            )
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 4,
+                    maxLines = 8,
                 )
             }
 

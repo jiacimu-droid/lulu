@@ -378,8 +378,8 @@ class MemoryBankService(
         settingsStore?.settingsFlow?.value
             ?.memoryEmbeddingConfig
             ?.rerankCandidateCount
-            ?.coerceIn(5, 50)
-            ?: 20
+            ?.coerceIn(5, 60)
+            ?: 60
 
     private suspend fun rerankRecallCandidates(
         query: String,
@@ -492,12 +492,12 @@ internal fun selectMemoryRecallItems(
     query: String = "",
     queryVector: List<Float> = emptyList(),
     maxItems: Int? = null,
-    rerankCandidateCount: Int = 20,
+    rerankCandidateCount: Int = 60,
     reranker: (List<MemoryBankEntity>) -> List<MemoryRerankResult> = { emptyList() },
 ): List<MemoryBankEntity> {
     val sorted = rankMemoryRecallCandidates(memories, query, queryVector)
     val limit = maxItems ?: sorted.dynamicRecallLimit(queryVector)
-    val candidateLimit = if (maxItems == null) sorted.size.coerceAtMost(rerankCandidateCount.coerceIn(5, 50)) else limit
+    val candidateLimit = if (maxItems == null) sorted.size.coerceAtMost(rerankCandidateCount.coerceIn(5, 60)) else limit
     val candidates = sorted.take(candidateLimit)
     val direct = applyMemoryRerankResults(
         memories = candidates,
