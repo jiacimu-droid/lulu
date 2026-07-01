@@ -1015,12 +1015,6 @@ private fun DrawResultCelebration(
                     fontWeight = FontWeight.Black,
                     color = Color.White,
                 )
-                Text(
-                    drawResultSubtitle(best),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.82f),
-                    textAlign = TextAlign.Center,
-                )
                 Spacer(Modifier.weight(0.4f))
                 val current = results.getOrNull(currentIndex)
                 if (current == null) {
@@ -1937,14 +1931,6 @@ private fun drawResultTitle(best: StudyRarity, count: Int): String {
         StudyRarity.Epic -> "金光炸开了"
         StudyRarity.Rare -> if (count >= 10) "十连有好东西" else "稀有碎片出现"
         StudyRarity.Normal -> if (count >= 10) "十连结果" else "抽卡结果"
-    }
-}
-
-private fun drawResultSubtitle(best: StudyRarity): String {
-    return when (best) {
-        StudyRarity.Epic -> "麦当劳碎片到手，离兑换更近一步。"
-        StudyRarity.Rare -> "稀有碎片到手，可以去星愿馆换小剧场章节。"
-        StudyRarity.Normal -> "画卷碎片收进背包，离完整造型更近一点。"
     }
 }
 

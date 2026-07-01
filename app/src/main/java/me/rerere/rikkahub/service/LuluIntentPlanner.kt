@@ -83,8 +83,12 @@ object LuluIntentPlanner {
             when (intent) {
                 LuluIntent.CARE_REMINDER -> {
                     if (text.hasAny("睡", "困", "晚安")) add("get_gadgetbridge_data")
+                    if (text.hasAny("天气", "温度", "几度", "下雨", "雨", "冷不冷", "热不热", "带伞", "伞")) {
+                        add("get_weather")
+                    }
                     if (text.hasAny("吃饭", "没吃", "外卖")) {
                         add("get_location")
+                        add("get_weather")
                         add("explore_nearby")
                     }
                     add("get_app_usage")

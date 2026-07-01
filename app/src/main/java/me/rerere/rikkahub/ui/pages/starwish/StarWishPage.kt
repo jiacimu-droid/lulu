@@ -731,7 +731,8 @@ private fun McDonaldsMcpCard(
                     code = it
                     onSave(it)
                 },
-                label = { Text("麦当劳 MCP 码") },
+                label = { Text("麦当劳 MCP Token") },
+                supportingText = { Text("可直接粘贴 token；保存时会自动写成 Authorization: Bearer <token>") },
                 placeholder = { Text("把你的 MCP 码粘到这里") },
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth(),

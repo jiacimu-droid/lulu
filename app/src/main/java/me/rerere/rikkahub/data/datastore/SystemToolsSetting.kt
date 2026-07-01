@@ -71,6 +71,7 @@ data class SystemToolsSetting(
         if (batteryEnabled) options.add(me.rerere.rikkahub.data.ai.tools.SystemToolOption.Battery)
         if (musicEnabled) options.add(me.rerere.rikkahub.data.ai.tools.SystemToolOption.Music)
         if (smsEnabled) options.add(me.rerere.rikkahub.data.ai.tools.SystemToolOption.Sms)
+        if (locationAccess) options.add(me.rerere.rikkahub.data.ai.tools.SystemToolOption.Weather)
         return options
     }
 }

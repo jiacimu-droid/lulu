@@ -39,6 +39,15 @@ import me.rerere.rikkahub.data.ai.mcp.McpServerConfig
 private const val MCDONALDS_MCP_NAME = "麦当劳 MCP"
 private const val MCDONALDS_MCP_URL = "https://mcp.mcd.cn"
 
+private fun normalizeMcdonaldsMcpAuthValue(token: String): String {
+    val value = token.trim()
+    return if (value.startsWith("Bearer ", ignoreCase = true)) {
+        value
+    } else {
+        "Bearer $value"
+    }
+}
+
 class StarWishVM(
     private val store: StarWishStore,
     private val studyStore: StudyStore,
@@ -122,7 +131,7 @@ class StarWishVM(
                     server.commonOptions.name == MCDONALDS_MCP_NAME ||
                         (server is McpServerConfig.StreamableHTTPServer && server.url == MCDONALDS_MCP_URL)
                 }
-                val headers = listOf("Authorization" to "Bearer $token")
+                val headers = listOf("Authorization" to normalizeMcdonaldsMcpAuthValue(token))
                 val commonOptions = (existing?.commonOptions ?: McpCommonOptions())
                     .copy(
                         enable = true,

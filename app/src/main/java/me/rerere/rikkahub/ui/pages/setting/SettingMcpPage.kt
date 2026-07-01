@@ -334,6 +334,12 @@ private fun McpServerItem(
                 }
 
                 IconButton(
+                    onClick = onDelete
+                ) {
+                    Icon(HugeIcons.Delete01, contentDescription = "删除 MCP")
+                }
+
+                IconButton(
                     onClick = {
                         onEdit(item)
                     }

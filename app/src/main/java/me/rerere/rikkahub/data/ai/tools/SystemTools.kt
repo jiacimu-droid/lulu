@@ -31,6 +31,7 @@ sealed class SystemToolOption {
     @Serializable @SerialName("battery") data object Battery : SystemToolOption()
     @Serializable @SerialName("music") data object Music : SystemToolOption()
     @Serializable @SerialName("sms") data object Sms : SystemToolOption()
+    @Serializable @SerialName("weather") data object Weather : SystemToolOption()
 }
 
 class SystemTools(private val context: Context, private val settings: Settings) {
@@ -181,6 +182,7 @@ class SystemTools(private val context: Context, private val settings: Settings) 
     private val batteryTool by lazy { createBatteryTool(context) }
     private val musicTool by lazy { createMusicTool(context) }
     private val smsTool by lazy { createSmsTool(context) }
+    private val weatherTool by lazy { createWeatherTool(context, settings) }
 
     // ==================== 获取工具列表 ====================
 
@@ -196,6 +198,7 @@ class SystemTools(private val context: Context, private val settings: Settings) 
         if (SystemToolOption.Battery in enabledTools) tools.add(batteryTool)
         if (SystemToolOption.Music in enabledTools) tools.add(musicTool)
         if (SystemToolOption.Sms in enabledTools) tools.add(smsTool)
+        if (SystemToolOption.Weather in enabledTools) tools.add(weatherTool)
         return tools
     }
 }
