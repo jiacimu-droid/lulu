@@ -273,6 +273,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                             mcpCode = state.mcdonaldsMcpCode,
                             mcpDiagnostic = mcpDiagnostic,
                             onSave = vm::saveMcdonaldsMcpCode,
+                            onInstallMcp = vm::installMcdonaldsMcp,
                             onRedeem = vm::redeemMcDonalds,
                         )
                     }
@@ -704,6 +705,7 @@ private fun McDonaldsMcpCard(
     mcpCode: String,
     mcpDiagnostic: String,
     onSave: (String) -> Unit,
+    onInstallMcp: (String) -> Unit,
     onRedeem: () -> Unit,
 ) {
     var code by remember(mcpCode) { mutableStateOf(mcpCode) }
@@ -743,15 +745,15 @@ private fun McDonaldsMcpCard(
                     Text("兑换点单机会")
                 }
                 TextButton(
-                    onClick = { onSave(code.trim()) },
+                    onClick = { onInstallMcp(code.trim()) },
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("保存渠道")
+                    Text("保存并接通")
                 }
             }
             Surface(color = StarWishColors.mistBlue.copy(alpha = 0.72f), shape = RoundedCornerShape(14.dp)) {
                 Text(
-                    "这里先保存 MCP 码并兑换点单机会。$mcpDiagnostic",
+                    "服务地址和鉴权头会自动配置好，你只需要填 MCP 码。$mcpDiagnostic",
                     modifier = Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = StarWishColors.inkBlue,
