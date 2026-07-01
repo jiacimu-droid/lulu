@@ -82,12 +82,16 @@ object StarWishRules {
 
     fun scrollForOutfit(outfit: String): StarWishScroll {
         val index = StudyRules.outfitNames.indexOf(outfit).takeIf { it >= 0 } ?: 0
-        return scrolls[index.coerceIn(scrolls.indices)]
+        return scrolls[index % scrolls.size]
     }
 
     fun isScrollUnlocked(studyState: StudyState, scroll: StarWishScroll): Boolean {
         val index = scrolls.indexOf(scroll)
         val outfit = StudyRules.outfitNames.getOrNull(index) ?: return false
+        return outfit in studyState.inventory.unlockedOutfits
+    }
+
+    fun scrollUnlockedForOutfit(studyState: StudyState, outfit: String): Boolean {
         return outfit in studyState.inventory.unlockedOutfits
     }
 

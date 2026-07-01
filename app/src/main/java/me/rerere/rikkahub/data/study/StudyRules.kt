@@ -8,6 +8,7 @@ object StudyRules {
     const val SINGLE_DRAW_COST = 100
     const val DISCOUNT_SINGLE_DRAW_COST = 100
     const val TEN_DRAW_COST = 800
+    const val NORMAL_FRAGMENTS_PER_OUTFIT = 10
     private const val OVERFLOW_NORMAL_FRAGMENT_KUDOS = 100
     private const val INTERNAL_TEST_GRANT_VERSION = 1
 
@@ -22,9 +23,19 @@ object StudyRules {
         "月光浴场",
         "废墟花园",
         "倒悬都市",
+        "雨后天台",
+        "星砂邮局",
+        "薄荷钟楼",
+        "雾港旧船",
+        "玻璃温室",
+        "极光书房",
+        "柠檬海岸",
+        "雪夜便利店",
+        "琥珀剧院",
+        "云雀庭院",
     )
 
-    val outfitParts = listOf("服装", "饰品", "发型", "场景", "光影氛围", "动态姿势")
+    val outfitParts = listOf("专属碎片")
 
     val theaterNames = listOf(
         "少卿今天不早朝",
@@ -252,7 +263,7 @@ object StudyRules {
         val results = buildList {
             repeat(drawCount) {
                 val result = drawOne(random)
-                if (result.rarity == StudyRarity.Normal && (inventory.normalFragments[result.fragmentKey] ?: 0) >= 4) {
+                if (result.rarity == StudyRarity.Normal && inventory.isNormalFragmentFull(result.fragmentKey)) {
                     overflowKudos += OVERFLOW_NORMAL_FRAGMENT_KUDOS
                 } else {
                     inventory = inventory.addDrawResult(result)
@@ -450,8 +461,7 @@ object StudyRules {
 
     fun useUniversalNormalFragment(state: StudyState, key: String): StudyActionResult {
         if (state.inventory.universalNormalFragments <= 0 || !key.startsWith("normal:")) return StudyActionResult(state)
-        val currentCount = state.inventory.normalFragments[key] ?: 0
-        if (currentCount >= 4) {
+        if (state.inventory.isNormalFragmentFull(key)) {
             return StudyActionResult(
                 state = state.copy(
                     wallet = state.wallet.copy(kudos = state.wallet.kudos + OVERFLOW_NORMAL_FRAGMENT_KUDOS),
@@ -502,7 +512,7 @@ object StudyRules {
         return outfitNames.flatMap { outfit ->
             outfitParts.map { part -> "normal:$outfit:$part" }
         }.filter { key ->
-            (state.inventory.normalFragments[key] ?: 0) < 4
+            !state.inventory.isNormalFragmentFull(key)
         }.maxByOrNull { key -> state.inventory.normalFragments[key] ?: 0 }
     }
 
@@ -528,7 +538,7 @@ object StudyRules {
 
     private fun mysteryBox(random: Random): StudyMysteryBoxReward {
         val kudos = weighted(listOf(15 to 40, 25 to 30, 50 to 15, 100 to 4, 200 to 1), random)
-        val normalFragments = weighted(listOf(0 to 50, 1 to 38, 2 to 12), random)
+        val normalFragments = weighted(listOf(0 to 20, 1 to 55, 2 to 20, 3 to 5), random)
         return StudyMysteryBoxReward(kudos = kudos, universalNormalFragments = normalFragments)
     }
 
@@ -592,11 +602,16 @@ private fun StudyInventory.addReward(reward: StudyReward): StudyInventory {
 
 private fun StudyInventory.unlockFirstIncompleteOutfit(): StudyInventory {
     val target = StudyRules.outfitNames.firstOrNull { outfit ->
-        StudyRules.outfitParts.any { part -> (normalFragments["normal:$outfit:$part"] ?: 0) < 4 }
+        normalFragments.normalOutfitTotal(outfit) < StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT
     } ?: return this
     val completedFragments = StudyRules.outfitParts.fold(normalFragments) { current, part ->
         val key = "normal:$target:$part"
-        if ((current[key] ?: 0) >= 4) current else current + (key to 4)
+        val missing = StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT - current.normalOutfitTotal(target)
+        if (missing <= 0) {
+            current
+        } else {
+            current.plusCount(key, missing)
+        }
     }
     return copy(normalFragments = completedFragments)
 }
@@ -611,7 +626,7 @@ private fun StudyInventory.addDrawResult(result: StudyDrawResult): StudyInventor
 
 private fun StudyInventory.refreshUnlockStats(): Pair<StudyInventory, Pair<Int, Int>> {
     val unlockedOutfits = StudyRules.outfitNames.filter { outfit ->
-        StudyRules.outfitParts.all { part -> (normalFragments["normal:$outfit:$part"] ?: 0) >= 4 }
+        normalFragments.normalOutfitTotal(outfit) >= StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT
     }.toSet()
     return copy(unlockedOutfits = unlockedOutfits, unlockedTheaters = emptySet()) to
         (unlockedOutfits.size to 0)
@@ -619,6 +634,16 @@ private fun StudyInventory.refreshUnlockStats(): Pair<StudyInventory, Pair<Int, 
 
 private fun Map<String, Int>.plusCount(key: String, count: Int): Map<String, Int> {
     return this + (key to ((this[key] ?: 0) + count))
+}
+
+private fun StudyInventory.isNormalFragmentFull(key: String): Boolean {
+    val outfit = key.split(":").getOrNull(1) ?: return false
+    return normalFragments.normalOutfitTotal(outfit) >= StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT
+}
+
+private fun Map<String, Int>.normalOutfitTotal(outfit: String): Int {
+    val prefix = "normal:$outfit:"
+    return entries.sumOf { (key, count) -> if (key.startsWith(prefix)) count else 0 }
 }
 
 private fun List<StudyEvent>.addEvent(type: StudyEventType, title: String, detail: String): List<StudyEvent> {
@@ -634,7 +659,7 @@ private fun List<StudyEvent>.addEvent(type: StudyEventType, title: String, detai
 
 private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
     return when (this) {
-        StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x1", 90)
+        StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x3", 120)
         StudyShopItemType.UniversalRareFragment -> StudyShopItem(id, this, "稀有碎片 x1", 280)
         StudyShopItemType.UniversalEpicFragment -> StudyShopItem(id, this, "通用史诗碎片 x1", 750)
         StudyShopItemType.SingleDrawTicket -> StudyShopItem(id, this, "单抽券 x1", 90)
@@ -643,7 +668,7 @@ private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
 
 private fun StudyShopItem.toReward(): StudyReward {
     return when (type) {
-        StudyShopItemType.UniversalNormalFragment -> StudyReward(universalNormalFragments = 1, title = title)
+        StudyShopItemType.UniversalNormalFragment -> StudyReward(universalNormalFragments = 3, title = title)
         StudyShopItemType.UniversalRareFragment -> StudyReward(universalRareFragments = 1, title = title)
         StudyShopItemType.UniversalEpicFragment -> StudyReward(universalEpicFragments = 1, title = title)
         StudyShopItemType.SingleDrawTicket -> StudyReward(singleDrawTickets = 1, title = title)

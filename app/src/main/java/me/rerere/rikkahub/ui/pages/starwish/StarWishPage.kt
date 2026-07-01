@@ -111,7 +111,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     val clipboard = LocalClipboardManager.current
     var section by remember { mutableStateOf(StarWishSection.Scrolls) }
     var scrollSubsection by remember { mutableStateOf(ScrollSubsection.Prompts) }
-    var selectedScroll by remember { mutableStateOf<StarWishScroll?>(null) }
+    var selectedScroll by remember { mutableStateOf<Pair<String, StarWishScroll>?>(null) }
     var showAddTheater by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -186,18 +186,17 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                             }
                         }
                         ScrollSubsection.Prompts -> {
-                            items(StarWishRules.scrolls) { scroll ->
-                                val index = StarWishRules.scrolls.indexOf(scroll)
-                                val outfit = StudyRules.outfitNames.getOrNull(index) ?: scroll.title
-                                val unlocked = StarWishRules.isScrollUnlocked(studyState, scroll)
+                            items(StudyRules.outfitNames) { outfit ->
+                                val scroll = StarWishRules.scrollForOutfit(outfit)
+                                val unlocked = StarWishRules.scrollUnlockedForOutfit(studyState, outfit)
                                 val launches = state.imageLaunches.count { it.outfit == outfit }
                                 StarWishListRow(
-                                    title = scroll.title,
+                                    title = outfit,
                                     subtitle = if (unlocked) "已点亮 · 已生成 $launches 次" else "未解锁 · 去考研 App 收集完整套装",
                                     unlocked = unlocked,
                                     progress = outfitProgress(outfit, studyState.inventory.normalFragments),
                                     icon = HugeIcons.AiImage,
-                                    onClick = { if (unlocked) selectedScroll = scroll },
+                                    onClick = { if (unlocked) selectedScroll = outfit to scroll },
                                 )
                             }
                         }
@@ -243,9 +242,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
         }
     }
 
-    selectedScroll?.let { scroll ->
-        val index = StarWishRules.scrolls.indexOf(scroll)
-        val outfit = StudyRules.outfitNames.getOrNull(index) ?: scroll.title
+    selectedScroll?.let { (outfit, scroll) ->
         val saved = state.customOutfitPrompts[outfit]
         val prompts = saved ?: StarWishOutfitPrompts(scroll.soloPrompt, scroll.interactionPrompt)
         ScrollDetailDialog(
@@ -861,8 +858,11 @@ private fun AddTheaterDialog(
 }
 
 private fun outfitProgress(outfit: String, fragments: Map<String, Int>): Float {
-    val count = StudyRules.outfitParts.sumOf { part -> (fragments["normal:$outfit:$part"] ?: 0).coerceAtMost(4) }
-    return count / 24f
+    val prefix = "normal:$outfit:"
+    val count = fragments.entries.sumOf { (key, value) ->
+        if (key.startsWith(prefix)) value else 0
+    }.coerceAtMost(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT)
+    return count / StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT.toFloat()
 }
 
 private object StarWishColors {

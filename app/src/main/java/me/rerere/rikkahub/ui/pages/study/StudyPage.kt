@@ -899,6 +899,7 @@ private fun DrawResultCelebration(
 ) {
     val best = results.maxByOrNull { it.rarity.weight }?.rarity ?: StudyRarity.Normal
     var currentIndex by remember(results) { mutableIntStateOf(-1) }
+    var skipReveal by remember(results) { mutableStateOf(false) }
     val transition = rememberInfiniteTransition(label = "draw-result")
     val pulse by transition.animateFloat(
         initialValue = 0.96f,
@@ -912,7 +913,11 @@ private fun DrawResultCelebration(
         animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
         label = "draw-glow",
     )
-    LaunchedEffect(results) {
+    LaunchedEffect(results, skipReveal) {
+        if (skipReveal) {
+            currentIndex = results.lastIndex
+            return@LaunchedEffect
+        }
         currentIndex = -1
         delay(520)
         results.forEachIndexed { index, _ ->
@@ -982,6 +987,14 @@ private fun DrawResultCelebration(
                 ) {
                     items(results.take((currentIndex + 1).coerceAtLeast(0))) { result ->
                         DrawRevealedRow(result = result)
+                    }
+                }
+                if (currentIndex < results.lastIndex) {
+                    OutlinedButton(
+                        onClick = { skipReveal = true },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("跳过动画")
                     }
                 }
                 Button(
@@ -1239,7 +1252,7 @@ private fun CollectionCard(
             FilterChip(
                 selected = collectionSection == CollectionSection.Scrolls,
                 onClick = { collectionSection = CollectionSection.Scrolls },
-                label = { Text("已解锁画卷 ${inventory.unlockedOutfits.size}/10", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                label = { Text("已解锁画卷 ${inventory.unlockedOutfits.size}/${StudyRules.outfitNames.size}", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 modifier = Modifier.weight(1f),
             )
             FilterChip(
@@ -1264,8 +1277,8 @@ private fun CollectionCard(
             title = { Text("使用通用普通碎片？") },
             text = {
                 Text(
-                    if ((inventory.normalFragments[key] ?: 0) >= 4) {
-                        "$label 已经满 4 片，继续使用会转换成100夸夸值。"
+                    if ((inventory.normalFragments[key] ?: 0) >= StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT) {
+                        "$label 已经满 ${StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT} 片，继续使用会转换成100夸夸值。"
                     } else {
                         "要给 $label 增加 1 个碎片吗？"
                     }
@@ -1312,9 +1325,8 @@ private fun CollectionProgressList(
             StudyRules.outfitNames.chunked(2).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     row.forEach { outfit ->
-                        val fragmentCount = StudyRules.outfitParts.sumOf { part ->
-                            (inventory.normalFragments["normal:$outfit:$part"] ?: 0).coerceAtMost(4)
-                        }
+                        val fragmentCount = inventory.normalOutfitTotal(outfit)
+                            .coerceAtMost(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT)
                         OutfitSummaryTile(
                             outfit = outfit,
                             fragmentCount = fragmentCount,
@@ -1328,12 +1340,9 @@ private fun CollectionProgressList(
                 }
             }
             selectedOutfit?.let { outfit ->
-                val fragmentCount = StudyRules.outfitParts.sumOf { part ->
-                    (inventory.normalFragments["normal:$outfit:$part"] ?: 0).coerceAtMost(4)
-                }
-                val completedParts = StudyRules.outfitParts.count { part ->
-                    (inventory.normalFragments["normal:$outfit:$part"] ?: 0) >= 4
-                }
+                val fragmentCount = inventory.normalOutfitTotal(outfit)
+                    .coerceAtMost(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT)
+                val completedParts = if (fragmentCount >= StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT) 1 else 0
                 OutfitProgressCard(
                     outfit = outfit,
                     fragmentCount = fragmentCount,
@@ -1365,6 +1374,11 @@ private fun CollectionProgressList(
     }
 }
 
+private fun StudyInventory.normalOutfitTotal(outfit: String): Int {
+    val prefix = "normal:$outfit:"
+    return normalFragments.entries.sumOf { (key, count) -> if (key.startsWith(prefix)) count else 0 }
+}
+
 @Composable
 private fun OutfitSummaryTile(
     outfit: String,
@@ -1374,7 +1388,7 @@ private fun OutfitSummaryTile(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val progress = (fragmentCount / 24f).coerceIn(0f, 1f)
+    val progress = (fragmentCount / StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT.toFloat()).coerceIn(0f, 1f)
     Surface(
         modifier = modifier.clickable(onClick = onClick),
         color = when {
@@ -1401,7 +1415,11 @@ private fun OutfitSummaryTile(
             }
             Column(Modifier.weight(1f)) {
                 Text(outfit, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(if (unlocked) "已解锁" else "$fragmentCount/24", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    if (unlocked) "已解锁" else "$fragmentCount/${StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
@@ -1426,14 +1444,28 @@ private fun OutfitProgressCard(
                 Column(Modifier.weight(1f)) {
                     Text(outfit, fontWeight = FontWeight.SemiBold)
                     Text(
-                        if (unlocked) "完整画卷已解锁" else "$completedParts/6 部件 · $fragmentCount/24 碎片",
+                        if (unlocked) {
+                            "完整画卷已解锁"
+                        } else {
+                            "$completedParts/1 专属碎片 · $fragmentCount/${StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT} 片"
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                Text(if (unlocked) "已解锁" else "${(fragmentCount * 100 / 24).coerceIn(0, 100)}%", color = StudyColors.goldText)
+                Text(
+                    if (unlocked) {
+                        "已解锁"
+                    } else {
+                        "${(fragmentCount * 100 / StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT).coerceIn(0, 100)}%"
+                    },
+                    color = StudyColors.goldText,
+                )
             }
-            LinearProgressIndicator(progress = { fragmentCount / 24f }, modifier = Modifier.fillMaxWidth())
+            LinearProgressIndicator(
+                progress = { fragmentCount / StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT.toFloat() },
+                modifier = Modifier.fillMaxWidth(),
+            )
             if (unlocked) {
                 FilledTonalButton(onClick = { onOpenImageGen(outfit) }, modifier = Modifier.fillMaxWidth()) {
                     Icon(HugeIcons.AiMagic, null)
@@ -1443,12 +1475,13 @@ private fun OutfitProgressCard(
             }
             StudyRules.outfitParts.forEach { part ->
                 val key = "normal:$outfit:$part"
-                val count = (inventory.normalFragments[key] ?: 0).coerceAtMost(4)
+                val count = inventory.normalOutfitTotal(outfit)
+                    .coerceAtMost(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT)
                 CollectionProgressRow(
                     title = part,
-                    detail = "$count/4",
-                    progress = count / 4f,
-                    unlocked = count >= 4,
+                    detail = "$count/${StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT}",
+                    progress = count / StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT.toFloat(),
+                    unlocked = count >= StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT,
                     enabled = inventory.universalNormalFragments > 0,
                     onClick = if (inventory.universalNormalFragments > 0) {
                         { onUseUniversalNormalTarget(key, "$outfit · $part") }
@@ -1598,7 +1631,7 @@ private fun StudyGuideCard() {
                 "单抽 ${StudyRules.SINGLE_DRAW_COST} 夸夸值。",
                 "十连 ${StudyRules.TEN_DRAW_COST} 夸夸值。",
                 "画卷碎片 85%，小剧场 12%，麦当劳碎片 3%。",
-                "每套画卷有 6 个部件，每个部件 4 个同名碎片。",
+                "每套画卷需要 10 个专属碎片；通用普通碎片可以补任意未满画卷。",
                 "稀有碎片不区分剧情，10 个稀有碎片可在星愿馆兑换或续写 1 章小剧场。",
             ),
         )
@@ -1631,7 +1664,7 @@ private fun StudyGuideCard() {
             title = "当前已落地",
             lines = listOf(
                 "签到、待办、番茄钟、盲盒、惩罚、抽卡、超神、等级、成就、商店都已接入本地状态。",
-                "收藏已按 10 套画卷、每套 6 部件、每部件 4 碎片展示。",
+                "收藏已按 20 套画卷、每套 10 个专属碎片展示。",
                 "通用普通碎片可以自动补最佳目标，也可以在收藏里指定补某个部件；稀有碎片用于星愿馆章节兑换。",
                 "Lv14 会自动补齐一套未完成画卷；已解锁画卷可以直接跳到生图页。",
                 "番茄钟已接入角色陪伴、语音鼓励和轻聊天。",
