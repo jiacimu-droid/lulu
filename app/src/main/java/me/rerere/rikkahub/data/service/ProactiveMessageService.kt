@@ -513,24 +513,27 @@ class ProactiveMessageService : KoinComponent {
         // Study plan context
         try {
             val studyState = studyStore.state.first()
-            val planTasks = studyState.tasks.filter { it.source == StudyTaskSource.Plan }
-            val manualTasks = studyState.tasks.filter { it.source == StudyTaskSource.Manual }
-            if (planTasks.isNotEmpty() || manualTasks.isNotEmpty() || studyState.stats.totalPomodoros > 0) {
+            val selectedStudyAssistant = studyState.selectedAssistantId
+            if (selectedStudyAssistant == settings.assistantId.toString()) {
+                val planTasks = studyState.tasks.filter { it.source == StudyTaskSource.Plan }
+                val manualTasks = studyState.tasks.filter { it.source == StudyTaskSource.Manual }
+                val undoneTasks = studyState.tasks.filterNot { it.done }
+                if (planTasks.isNotEmpty() || manualTasks.isNotEmpty() || studyState.stats.totalPomodoros > 0) {
                 val donePlan = planTasks.count { it.done }
-                val undonePlan = planTasks.filterNot { it.done }
                 sb.appendLine("今日考研计划:")
                 sb.appendLine("  - 日期: ${studyState.today}")
                 sb.appendLine("  - 计划待办完成: $donePlan/${planTasks.size}")
                 sb.appendLine("  - 手动待办: ${manualTasks.count { it.done }}/${manualTasks.size}")
                 sb.appendLine("  - 累计番茄钟: ${studyState.stats.totalPomodoros} 个，累计学习 ${studyState.stats.totalStudyMinutes} 分钟")
-                if (undonePlan.isNotEmpty()) {
-                    sb.appendLine("  - 未完成计划:")
-                    undonePlan.take(5).forEach { task ->
+                if (undoneTasks.isNotEmpty()) {
+                    sb.appendLine("  - 未完成待办:")
+                    undoneTasks.take(6).forEach { task ->
                         sb.appendLine("    · ${task.title}")
                     }
                 }
-                if (planTasks.isNotEmpty() && donePlan < planTasks.size) {
-                    sb.appendLine("  - 如果现在适合督促，语气要轻一点，帮用户先启动一个最小任务，不要一次压很多。")
+                if (undoneTasks.isNotEmpty()) {
+                    sb.appendLine("  - 你就是今天陪用户学习的角色。主动回来时可以自然提醒未完成待办，语气要像偏爱和陪伴，不要像系统催办；优先帮用户启动一个最小任务。")
+                }
                 }
             }
         } catch (e: Exception) {

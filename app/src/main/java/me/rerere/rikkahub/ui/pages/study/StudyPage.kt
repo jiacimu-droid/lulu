@@ -144,8 +144,12 @@ private enum class PlanView(val label: String) {
 fun StudyPage(vm: StudyVM = koinViewModel()) {
     val navController = LocalNavController.current
     val settings = LocalSettings.current
-    val assistant = settings.getCurrentAssistant()
     val state by vm.state.collectAsStateWithLifecycle()
+    val companionAssistant = remember(settings.assistants, settings.assistantId, state.selectedAssistantId) {
+        val selected = state.selectedAssistantId
+        settings.assistants.firstOrNull { it.id.toString() == selected }
+            ?: settings.getCurrentAssistant()
+    }
     val snackbarHostState = remember { SnackbarHostState() }
     var section by remember { mutableStateOf(StudySection.Today) }
     var newTask by remember { mutableStateOf("") }
@@ -197,10 +201,12 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                     item {
                         StudyHero(
                             state = state,
-                            assistant = assistant,
+                            assistant = companionAssistant,
+                            assistants = settings.assistants,
                             onSignIn = vm::signIn,
                             onPomodoro = { navController.navigate(Screen.StudyPomodoro) },
                             onOpenLevel = { showLevelDialog = true },
+                            onSelectCompanion = { vm.selectCompanion(it.id.toString()) },
                         )
                     }
                     item {
@@ -242,9 +248,14 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             onUseUniversalNormalTarget = vm::applyUniversalNormal,
                             onOpenImageGen = { outfit ->
                                 val scroll = StarWishRules.scrollForOutfit(outfit)
+                                val prompt = StarWishRules.imagePromptForCompanion(
+                                    basePrompt = scroll.soloPrompt,
+                                    assistant = companionAssistant,
+                                    interaction = false,
+                                )
                                 navController.navigate(
                                     Screen.ImageGen(
-                                        initialPrompt = scroll.soloPrompt,
+                                        initialPrompt = prompt,
                                         count = 1,
                                         autoGenerate = false,
                                     ),
@@ -300,7 +311,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
 
     if (showSuperDialog) {
         SuperMomentCelebration(
-            assistant = assistant,
+            assistant = companionAssistant,
             onDismissRequest = { showSuperDialog = false },
             onClaimNormal = {
                 showSuperDialog = false
@@ -554,11 +565,14 @@ fun StudyPomodoroFocusPage(
 private fun StudyHero(
     state: StudyState,
     assistant: Assistant,
+    assistants: List<Assistant>,
     onSignIn: () -> Unit,
     onPomodoro: () -> Unit,
     onOpenLevel: () -> Unit,
+    onSelectCompanion: (Assistant) -> Unit,
 ) {
     val daysLeft = remember { ExamStudyPlan.daysLeft() }
+    var showCompanionPicker by remember { mutableStateOf(false) }
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(containerColor = StudyColors.hero),
         modifier = Modifier.fillMaxWidth(),
@@ -571,10 +585,16 @@ private fun StudyHero(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    UIAvatar(assistant.name, assistant.avatar, Modifier.size(58.dp))
+                    UIAvatar(
+                        assistant.name,
+                        assistant.avatar,
+                        Modifier
+                            .size(58.dp)
+                            .clickable { showCompanionPicker = true },
+                    )
                     Column(modifier = Modifier.weight(1f)) {
                         Text("${assistant.name}陪你备考", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                        Text("今天也不是一个人硬撑。把清单交给我，我们一点点赢。", style = MaterialTheme.typography.bodyMedium)
+                        Text("点头像可以换陪你学习的角色。今天的待办和番茄钟会同步给 TA。", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
@@ -596,6 +616,48 @@ private fun StudyHero(
                 }
             }
         }
+    }
+    if (showCompanionPicker) {
+        AlertDialog(
+            onDismissRequest = { showCompanionPicker = false },
+            title = { Text("选择今天陪你学习的角色") },
+            text = {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.height(360.dp),
+                ) {
+                    items(assistants) { item ->
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onSelectCompanion(item)
+                                    showCompanionPicker = false
+                                },
+                            color = if (item.id == assistant.id) Color.White.copy(alpha = 0.92f) else Color.White.copy(alpha = 0.62f),
+                            shape = RoundedCornerShape(14.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                UIAvatar(item.name, item.avatar, Modifier.size(42.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(item.name.ifBlank { "未命名角色" }, fontWeight = FontWeight.SemiBold)
+                                    Text(
+                                        if (item.id == assistant.id) "正在陪你学习" else "切换为今日陪伴",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showCompanionPicker = false }) { Text("收起") } },
+        )
     }
 }
 

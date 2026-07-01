@@ -443,6 +443,13 @@ object StudyRules {
         )
     }
 
+    fun selectCompanion(state: StudyState, assistantId: String): StudyState {
+        return state.copy(
+            selectedAssistantId = assistantId,
+            recentEvents = state.recentEvents.addEvent(StudyEventType.Fragment, "学习陪伴角色", "已切换今天陪你学习的角色"),
+        )
+    }
+
     fun redeemMcDonalds(state: StudyState): StudyActionResult {
         if (state.inventory.epicFragments < 2) return StudyActionResult(state)
         return StudyActionResult(
@@ -456,6 +463,23 @@ object StudyRules {
                 ),
             ),
             reward = StudyReward(title = "麦当劳点餐机会 x1"),
+        )
+    }
+
+    fun redeemSpecialStory(state: StudyState): StudyActionResult {
+        if (state.inventory.specialStoryFragments < 2) return StudyActionResult(state)
+        return StudyActionResult(
+            state = state.copy(
+                inventory = state.inventory.copy(
+                    specialStoryFragments = state.inventory.specialStoryFragments - 2,
+                ),
+                recentEvents = state.recentEvents.addEvent(
+                    StudyEventType.Fragment,
+                    "特殊剧情兑换",
+                    "消耗 2 枚特殊剧情碎片，点亮一个专属章节",
+                ),
+            ),
+            reward = StudyReward(title = "特殊剧情章节 x1"),
         )
     }
 
@@ -545,6 +569,10 @@ object StudyRules {
     private fun drawOne(random: Random): StudyDrawResult {
         val roll = random.nextDouble()
         return when {
+            roll < 0.12 -> {
+                val amount = if (random.nextInt(100) < 18) 2 else 1
+                StudyDrawResult(StudyRarity.Normal, "normal:universal:$amount", "通用普通碎片 x$amount")
+            }
             roll < 0.85 -> {
                 val outfit = outfitNames[random.nextInt(outfitNames.size)]
                 val part = outfitParts[random.nextInt(outfitParts.size)]
@@ -553,7 +581,8 @@ object StudyRules {
             roll < 0.97 -> {
                 StudyDrawResult(StudyRarity.Rare, "rare:any", "稀有碎片")
             }
-            else -> StudyDrawResult(StudyRarity.Epic, "epic:mcdonalds", "麦当劳碎片")
+            roll < 0.985 -> StudyDrawResult(StudyRarity.Epic, "epic:mcdonalds", "麦当劳碎片")
+            else -> StudyDrawResult(StudyRarity.Epic, "epic:special_story", "特殊剧情碎片")
         }
     }
 
@@ -578,6 +607,7 @@ private operator fun StudyReward.plus(other: StudyReward): StudyReward {
         universalNormalFragments = universalNormalFragments + other.universalNormalFragments,
         universalRareFragments = universalRareFragments + other.universalRareFragments,
         universalEpicFragments = universalEpicFragments + other.universalEpicFragments,
+        specialStoryFragments = specialStoryFragments + other.specialStoryFragments,
         title = title,
     )
 }
@@ -597,6 +627,7 @@ private fun StudyInventory.addReward(reward: StudyReward): StudyInventory {
         universalNormalFragments = universalNormalFragments + reward.universalNormalFragments,
         universalRareFragments = universalRareFragments + reward.universalRareFragments,
         universalEpicFragments = universalEpicFragments + reward.universalEpicFragments,
+        specialStoryFragments = specialStoryFragments + reward.specialStoryFragments,
     )
 }
 
@@ -618,9 +649,22 @@ private fun StudyInventory.unlockFirstIncompleteOutfit(): StudyInventory {
 
 private fun StudyInventory.addDrawResult(result: StudyDrawResult): StudyInventory {
     return when (result.rarity) {
-        StudyRarity.Normal -> copy(normalFragments = normalFragments.plusCount(result.fragmentKey, 1))
+        StudyRarity.Normal -> {
+            if (result.fragmentKey.startsWith("normal:universal:")) {
+                val amount = result.fragmentKey.substringAfterLast(":").toIntOrNull() ?: 1
+                copy(universalNormalFragments = universalNormalFragments + amount)
+            } else {
+                copy(normalFragments = normalFragments.plusCount(result.fragmentKey, 1))
+            }
+        }
         StudyRarity.Rare -> copy(universalRareFragments = universalRareFragments + 1)
-        StudyRarity.Epic -> copy(epicFragments = epicFragments + 1)
+        StudyRarity.Epic -> {
+            if (result.fragmentKey == "epic:special_story") {
+                copy(specialStoryFragments = specialStoryFragments + 1)
+            } else {
+                copy(epicFragments = epicFragments + 1)
+            }
+        }
     }
 }
 
@@ -659,7 +703,7 @@ private fun List<StudyEvent>.addEvent(type: StudyEventType, title: String, detai
 
 private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
     return when (this) {
-        StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x3", 120)
+        StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x1", 90)
         StudyShopItemType.UniversalRareFragment -> StudyShopItem(id, this, "稀有碎片 x1", 280)
         StudyShopItemType.UniversalEpicFragment -> StudyShopItem(id, this, "通用史诗碎片 x1", 750)
         StudyShopItemType.SingleDrawTicket -> StudyShopItem(id, this, "单抽券 x1", 90)
@@ -668,7 +712,7 @@ private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
 
 private fun StudyShopItem.toReward(): StudyReward {
     return when (type) {
-        StudyShopItemType.UniversalNormalFragment -> StudyReward(universalNormalFragments = 3, title = title)
+        StudyShopItemType.UniversalNormalFragment -> StudyReward(universalNormalFragments = 1, title = title)
         StudyShopItemType.UniversalRareFragment -> StudyReward(universalRareFragments = 1, title = title)
         StudyShopItemType.UniversalEpicFragment -> StudyReward(universalEpicFragments = 1, title = title)
         StudyShopItemType.SingleDrawTicket -> StudyReward(singleDrawTickets = 1, title = title)

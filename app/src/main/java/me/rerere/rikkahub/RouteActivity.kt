@@ -356,6 +356,10 @@ class RouteActivity : ComponentActivity() {
                                 StarWishTheaterPage(theaterTitle = key.title)
                             }
 
+                            entry<Screen.StarWishSpecialStory> { key ->
+                                StarWishTheaterPage(theaterTitle = key.title, special = true)
+                            }
+
                             entry<Screen.StudyPomodoro> {
                                 StudyPomodoroPage()
                             }
@@ -692,6 +696,9 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data class StarWishTheater(val title: String) : Screen
+
+    @Serializable
+    data class StarWishSpecialStory(val title: String) : Screen
 
     @Serializable
     data object StudyPomodoro : Screen

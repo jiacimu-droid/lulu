@@ -1,10 +1,12 @@
 package me.rerere.rikkahub.data.starwish
 
+import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyState
 
 object StarWishRules {
     const val RARE_FRAGMENTS_PER_CHAPTER = 10
+    const val SPECIAL_FRAGMENTS_PER_CHAPTER = 2
 
     val scrolls: List<StarWishScroll> = listOf(
         StarWishScroll(
@@ -80,9 +82,52 @@ object StarWishRules {
 
     fun allTheaters(custom: List<StarWishTheaterSeed>): List<StarWishTheaterSeed> = theaters + custom
 
+    val specialStories: List<StarWishTheaterSeed> = listOf(
+        theater("只为你醒来的深夜奖励", "考研深夜、专属陪伴、克制暧昧、强互动感。角色知道用户今天已经很努力，特殊剧情要像完成学习后的私密奖励：温柔、贴近、被偏爱，带一点心照不宣的暧昧，但不油腻。"),
+        theater("满分偏爱的秘密房间", "奖励剧情、理想型定制、独占感、情绪价值拉满。角色为用户准备一个只属于两个人的小房间，里面有她喜欢的光、气味、食物和故事。剧情重点是被理解、被照顾、被认真选择。"),
+        theater("抽到金光后的告白事件", "抽卡金光、心跳事件、乙女游戏式奖励。角色以为自己只是陪用户学习，直到金光落下，他终于承认自己一直在期待被用户选中。要有强烈的命运感和甜蜜反差。"),
+    )
+
+    fun allSpecialStories(custom: List<StarWishTheaterSeed>): List<StarWishTheaterSeed> = specialStories + custom
+
     fun scrollForOutfit(outfit: String): StarWishScroll {
         val index = StudyRules.outfitNames.indexOf(outfit).takeIf { it >= 0 } ?: 0
         return scrolls[index % scrolls.size]
+    }
+
+    fun imagePromptForCompanion(
+        basePrompt: String,
+        assistant: Assistant,
+        interaction: Boolean,
+    ): String {
+        if (basePrompt.contains("请根据下面设定生成一张高质量二次元精致 CG")) {
+            return basePrompt
+        }
+        val appearance = assistant.appearancePrompt.trim().ifBlank {
+            "使用角色「${assistant.name}」的人设作为外貌参考：保持同一个角色的发色、瞳色、年龄感、气质和标志性特征，不要随机换人。"
+        }
+        val relationship = if (interaction) {
+            "互动版：画面必须有第一人称互动感，镜头代表我正在靠近或触碰他；让人感觉被偏爱、被认真看见，氛围温馨、暧昧、有故事张力。"
+        } else {
+            "独美版：画面只突出角色本身的精致、美感和故事性，像一张可以收藏的高级角色立绘/CG。"
+        }
+        return buildString {
+            appendLine("请根据下面设定生成一张高质量二次元精致 CG。提示词用中文理解即可，最终画面要稳定使用当前陪伴角色。")
+            appendLine()
+            appendLine("主体：${assistant.name.ifBlank { "当前陪伴角色" }}。$appearance")
+            appendLine("服装：必须贴合画卷主题，衣料纹理清晰，有层次，有能体现角色气质的小细节。")
+            appendLine("背景：必须与画卷主题强相关，不要空背景；背景要有空间深度和故事感。")
+            appendLine("光影：脸部始终明亮清楚，眼睛有高光；可使用柔和主光、侧光、逆光或粒子光，但不要黑脸。")
+            appendLine("饰品：加入 1-3 个与主题相关的饰品或小道具，精致但不喧宾夺主。")
+            appendLine("动作：姿势自然，手部结构准确，手指清楚；动作要服务情绪和故事。")
+            appendLine("表情：表情细腻，有被捕捉到一瞬间的真实情绪。")
+            appendLine("画风：masterpiece, best quality, delicate anime illustration, exquisite CG texture, soft painterly brushstrokes, pseudo-BJD doll texture, cinematic composition。")
+            appendLine("画质：8K ultra HD, sharp focus on face and hands, detailed fingers, visible fabric texture, luminous eyes, shallow depth of field, soft bokeh, ethereal dreamy atmosphere。")
+            appendLine(relationship)
+            appendLine()
+            appendLine("画卷主题细节：")
+            appendLine(basePrompt)
+        }
     }
 
     fun isScrollUnlocked(studyState: StudyState, scroll: StarWishScroll): Boolean {

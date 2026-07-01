@@ -69,6 +69,7 @@ import me.rerere.hugeicons.stroke.AiMagic
 import me.rerere.hugeicons.stroke.BookOpen02
 import me.rerere.hugeicons.stroke.CircleLock01
 import me.rerere.hugeicons.stroke.Delete01
+import me.rerere.hugeicons.stroke.Favourite
 import me.rerere.hugeicons.stroke.Image03
 import me.rerere.hugeicons.stroke.MoreVertical
 import me.rerere.hugeicons.stroke.PencilEdit01
@@ -81,9 +82,11 @@ import me.rerere.rikkahub.data.starwish.StarWishRules
 import me.rerere.rikkahub.data.starwish.StarWishScroll
 import me.rerere.rikkahub.data.starwish.StarWishTheaterSeed
 import me.rerere.rikkahub.data.study.StudyRules
+import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.ImagePreviewDialog
 import me.rerere.rikkahub.ui.context.LocalNavController
+import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.utils.plus
 import org.koin.androidx.compose.koinViewModel
@@ -91,6 +94,7 @@ import org.koin.androidx.compose.koinViewModel
 private enum class StarWishSection(val label: String) {
     Scrolls("画卷"),
     Theaters("小剧场"),
+    SpecialStories("特殊剧情"),
     McDonalds("麦当劳"),
 }
 
@@ -102,6 +106,7 @@ private enum class ScrollSubsection(val label: String) {
 @Composable
 fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     val navController = LocalNavController.current
+    val settings = LocalSettings.current
     val state by vm.state.collectAsStateWithLifecycle()
     val generatedImages by vm.generatedImages.collectAsStateWithLifecycle()
     val studyState by vm.studyState.collectAsStateWithLifecycle()
@@ -113,6 +118,12 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     var scrollSubsection by remember { mutableStateOf(ScrollSubsection.Prompts) }
     var selectedScroll by remember { mutableStateOf<Pair<String, StarWishScroll>?>(null) }
     var showAddTheater by remember { mutableStateOf(false) }
+    var showAddSpecialStory by remember { mutableStateOf(false) }
+    val companionAssistant = remember(settings.assistants, settings.assistantId, studyState.selectedAssistantId) {
+        val selected = studyState.selectedAssistantId
+        settings.assistants.firstOrNull { it.id.toString() == selected }
+            ?: settings.getCurrentAssistant()
+    }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -226,6 +237,34 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                         )
                     }
                 }
+                StarWishSection.SpecialStories -> {
+                    item {
+                        SpecialStoryWalletCard(
+                            fragments = studyState.inventory.specialStoryFragments,
+                            onAdd = { showAddSpecialStory = true },
+                        )
+                    }
+                    items(StarWishRules.allSpecialStories(state.customSpecialStories)) { story ->
+                        val chapters = state.specialStoryChapters[story.title].orEmpty()
+                            .filterNot { it.isPromptPlaceholder(story) }
+                            .size
+                        val canCreate = studyState.inventory.specialStoryFragments >= StarWishRules.SPECIAL_FRAGMENTS_PER_CHAPTER
+                        val hasChapter = chapters > 0
+                        StarWishListRow(
+                            title = story.title,
+                            subtitle = if (hasChapter) {
+                                "已生成 $chapters 章 · 再花 2 特殊剧情碎片续写"
+                            } else {
+                                "候选特殊剧情 · 花 2 特殊剧情碎片生成第一章"
+                            },
+                            unlocked = canCreate || hasChapter,
+                            progress = studyState.inventory.specialStoryFragments.coerceAtMost(StarWishRules.SPECIAL_FRAGMENTS_PER_CHAPTER) /
+                                StarWishRules.SPECIAL_FRAGMENTS_PER_CHAPTER.toFloat(),
+                            icon = HugeIcons.Favourite,
+                            onClick = { if (canCreate || hasChapter) navController.navigate(Screen.StarWishSpecialStory(story.title)) },
+                        )
+                    }
+                }
                 StarWishSection.McDonalds -> {
                     item {
                         McDonaldsMcpCard(
@@ -244,7 +283,10 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
 
     selectedScroll?.let { (outfit, scroll) ->
         val saved = state.customOutfitPrompts[outfit]
-        val prompts = saved ?: StarWishOutfitPrompts(scroll.soloPrompt, scroll.interactionPrompt)
+        val prompts = saved ?: StarWishOutfitPrompts(
+            solo = StarWishRules.imagePromptForCompanion(scroll.soloPrompt, companionAssistant, interaction = false),
+            interaction = StarWishRules.imagePromptForCompanion(scroll.interactionPrompt, companionAssistant, interaction = true),
+        )
         ScrollDetailDialog(
             scroll = scroll,
             outfit = outfit,
@@ -257,9 +299,14 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                 scope.launch { snackbarHostState.showSnackbar("提示词已复制") }
             },
             onGenerate = { prompt ->
-                vm.recordImageLaunch(outfit, prompt)
+                val finalPrompt = StarWishRules.imagePromptForCompanion(
+                    basePrompt = prompt,
+                    assistant = companionAssistant,
+                    interaction = prompt == interaction,
+                )
+                vm.recordImageLaunch(outfit, finalPrompt)
                 selectedScroll = null
-                navController.navigate(Screen.ImageGen(initialPrompt = prompt, count = 1, autoGenerate = false))
+                navController.navigate(Screen.ImageGen(initialPrompt = finalPrompt, count = 1, autoGenerate = false))
             },
         )
     }
@@ -273,18 +320,33 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
             },
         )
     }
+
+    if (showAddSpecialStory) {
+        AddTheaterDialog(
+            onDismiss = { showAddSpecialStory = false },
+            onAdd = { title, prompt ->
+                vm.addCustomSpecialStory(title, prompt)
+                showAddSpecialStory = false
+            },
+        )
+    }
 }
 
 @Composable
 fun StarWishTheaterPage(
     theaterTitle: String,
+    special: Boolean = false,
     vm: StarWishVM = koinViewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
     val studyState by vm.studyState.collectAsStateWithLifecycle()
     val isGeneratingChapter by vm.isGeneratingChapter.collectAsStateWithLifecycle()
     val chapterError by vm.chapterError.collectAsStateWithLifecycle()
-    val theater = StarWishRules.allTheaters(state.customTheaters).firstOrNull { it.title == theaterTitle }
+    val theater = if (special) {
+        StarWishRules.allSpecialStories(state.customSpecialStories).firstOrNull { it.title == theaterTitle }
+    } else {
+        StarWishRules.allTheaters(state.customTheaters).firstOrNull { it.title == theaterTitle }
+    }
     Scaffold(
         topBar = {
             LargeFlexibleTopAppBar(
@@ -305,14 +367,24 @@ fun StarWishTheaterPage(
         } else {
             TheaterDetailContent(
                 theater = theater,
-                credits = StarWishRules.chapterCredits(studyState),
-                rareFragments = studyState.inventory.universalRareFragments,
-                chapters = state.theaterChapters[theater.title].orEmpty(),
+                credits = if (special) {
+                    studyState.inventory.specialStoryFragments / StarWishRules.SPECIAL_FRAGMENTS_PER_CHAPTER
+                } else {
+                    StarWishRules.chapterCredits(studyState)
+                },
+                rareFragments = if (special) studyState.inventory.specialStoryFragments else studyState.inventory.universalRareFragments,
+                chapters = if (special) state.specialStoryChapters[theater.title].orEmpty() else state.theaterChapters[theater.title].orEmpty(),
                 isGenerating = isGeneratingChapter,
                 error = chapterError,
                 modifier = Modifier.padding(padding).padding(horizontal = 16.dp, vertical = 14.dp),
-                onCreateChapter = { influence -> vm.createNextChapter(theater.title, influence) },
-                onDeleteChapter = { chapterId -> vm.deleteChapter(theater.title, chapterId) },
+                costPerChapter = if (special) StarWishRules.SPECIAL_FRAGMENTS_PER_CHAPTER else StarWishRules.RARE_FRAGMENTS_PER_CHAPTER,
+                fragmentLabel = if (special) "特殊剧情碎片" else "稀有碎片",
+                onCreateChapter = { influence ->
+                    if (special) vm.createNextSpecialStoryChapter(theater.title, influence) else vm.createNextChapter(theater.title, influence)
+                },
+                onDeleteChapter = { chapterId ->
+                    if (special) vm.deleteSpecialStoryChapter(theater.title, chapterId) else vm.deleteChapter(theater.title, chapterId)
+                },
             )
         }
     }
@@ -408,6 +480,34 @@ private fun TheaterWalletCard(
             Column(Modifier.weight(1f)) {
                 Text("稀有碎片 $rareFragments", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text("10 个稀有碎片可生成或续写 1 章。自定义剧场会先锁定，兑换后点亮。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            TextButton(onClick = onAdd) { Text("添加") }
+        }
+    }
+}
+
+@Composable
+private fun SpecialStoryWalletCard(
+    fragments: Int,
+    onAdd: () -> Unit,
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.82f)),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Surface(shape = CircleShape, color = Color(0xFFF5DDEC), modifier = Modifier.size(44.dp)) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(HugeIcons.Favourite, null, tint = Color(0xFF8A3E67))
+                }
+            }
+            Column(Modifier.weight(1f)) {
+                Text("特殊剧情碎片 $fragments", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("2 个特殊剧情碎片兑换 1 章。这里放更贴 XP、更有奖励感的专属剧情。", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             TextButton(onClick = onAdd) { Text("添加") }
         }
@@ -670,6 +770,8 @@ private fun TheaterDetailContent(
     isGenerating: Boolean,
     error: String?,
     modifier: Modifier = Modifier,
+    costPerChapter: Int = StarWishRules.RARE_FRAGMENTS_PER_CHAPTER,
+    fragmentLabel: String = "稀有碎片",
     onCreateChapter: (String) -> Unit,
     onDeleteChapter: (String) -> Unit,
 ) {
@@ -689,7 +791,7 @@ private fun TheaterDetailContent(
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "稀有碎片 $rareFragments · 可兑换 $credits 章 · 已生成 ${visibleChapters.size} 章",
+                        "$fragmentLabel $rareFragments · 可兑换 $credits 章 · 已生成 ${visibleChapters.size} 章",
                         modifier = Modifier.weight(1f),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -715,7 +817,7 @@ private fun TheaterDetailContent(
                 item {
                     Card(colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.78f))) {
                         Text(
-                            "还没有正文。花 10 个稀有碎片生成第一章；之后每次再花 10 个稀有碎片续写下一章。",
+                            "还没有正文。花 $costPerChapter 个$fragmentLabel 生成第一章；之后每次再花 $costPerChapter 个$fragmentLabel 续写下一章。",
                             modifier = Modifier.padding(14.dp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -790,7 +892,7 @@ private fun TheaterDetailContent(
                         onCreateChapter(influence)
                         influence = ""
                     },
-                    enabled = !isGenerating && rareFragments >= StarWishRules.RARE_FRAGMENTS_PER_CHAPTER,
+                    enabled = !isGenerating && rareFragments >= costPerChapter,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(HugeIcons.Play, null)

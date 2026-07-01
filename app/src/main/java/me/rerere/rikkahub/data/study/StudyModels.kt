@@ -26,6 +26,7 @@ data class StudyState(
     val manualShopRefreshDate: String? = null,
     val recentEvents: List<StudyEvent> = emptyList(),
     val activePlanDate: String? = null,
+    val selectedAssistantId: String? = null,
     val internalTestGrantVersion: Int = 0,
 )
 
@@ -58,6 +59,7 @@ data class StudyInventory(
     val normalFragments: Map<String, Int> = emptyMap(),
     val rareFragments: Map<String, Int> = emptyMap(),
     val epicFragments: Int = 0,
+    val specialStoryFragments: Int = 0,
     val universalNormalFragments: Int = 0,
     val universalRareFragments: Int = 0,
     val universalEpicFragments: Int = 0,
@@ -109,6 +111,7 @@ data class StudyReward(
     val universalNormalFragments: Int = 0,
     val universalRareFragments: Int = 0,
     val universalEpicFragments: Int = 0,
+    val specialStoryFragments: Int = 0,
     val title: String = "",
 )
 

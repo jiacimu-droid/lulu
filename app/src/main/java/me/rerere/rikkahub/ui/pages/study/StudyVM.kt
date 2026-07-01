@@ -26,6 +26,8 @@ class StudyVM(
 
     fun syncToday() = reduce { StudyRules.rolloverToDate(it, LocalDate.now()) }
 
+    fun selectCompanion(assistantId: String) = reduce { StudyRules.selectCompanion(it, assistantId) }
+
     fun signIn() = reduce {
         val result = StudyRules.signIn(it, LocalDate.now())
         emitReward(result.reward.title)

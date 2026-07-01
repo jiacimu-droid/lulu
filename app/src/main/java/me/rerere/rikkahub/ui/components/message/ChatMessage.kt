@@ -346,7 +346,9 @@ private data class LuluExpressionSnapshot(
     fun toDisplayText(): String {
         description.trim().takeIf { it.isNotBlank() }?.let { return it }
         val parts = listOf(emoji, sticker, gesture).map { it.trim() }.filter { it.isNotBlank() }
-        return parts.takeIf { it.isNotEmpty() }?.joinToString("，", prefix = "（", postfix = "）").orEmpty()
+        return parts.takeIf { it.isNotEmpty() }
+            ?.joinToString("，", prefix = "此刻状态：", postfix = "。")
+            .orEmpty()
     }
 }
 

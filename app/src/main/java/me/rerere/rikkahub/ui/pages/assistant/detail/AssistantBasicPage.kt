@@ -214,6 +214,32 @@ internal fun AssistantBasicContent(
 
             FormItem(
                 label = {
+                    Text("角色外貌 / 生图参考")
+                },
+                description = {
+                    Text("写这个角色稳定的外貌、发色、瞳色、体型、气质和标志物。考研奖励生图会优先使用这里。")
+                },
+                modifier = Modifier.padding(8.dp),
+            ) {
+                OutlinedTextField(
+                    value = assistant.appearancePrompt,
+                    onValueChange = {
+                        onUpdate(
+                            assistant.copy(
+                                appearancePrompt = it
+                            )
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    maxLines = 6,
+                )
+            }
+
+            HorizontalDivider()
+
+            FormItem(
+                label = {
                     Text(stringResource(R.string.assistant_page_tags))
                 },
                 modifier = Modifier.padding(8.dp),

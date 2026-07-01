@@ -390,8 +390,9 @@ class LocalTools(private val context: Context) {
             description = """
                 Record the character's current visible expression intent for this turn.
                 Use when a reply should carry embodied presence. Prefer one complete natural
-                parenthesized sentence that merges expression, action, and posture, such as:
-                （他带着困倦的表情，虽然困着都眯眯眼了，可还是抱住佳辞轻轻地拍着）.
+                Chinese paragraph describing current state, behavior, action, posture, and tags.
+                Keep it for the status strip below chat; do not put parenthesized action in the
+                main spoken reply.
                 This records intent only; do not claim that the real avatar file has changed.
             """.trimIndent().replace("\n", " "),
             parameters = {
@@ -399,7 +400,7 @@ class LocalTools(private val context: Context) {
                     properties = buildJsonObject {
                         put("description", buildJsonObject {
                             put("type", "string")
-                            put("description", "One complete natural Chinese sentence in parentheses merging expression, action, and posture")
+                            put("description", "One natural Chinese paragraph for the status strip, not parenthesized, merging state, behavior, action, posture, and tags")
                         })
                         put("emoji", buildJsonObject {
                             put("type", "string")

@@ -7,7 +7,9 @@ data class StarWishState(
     val customOutfitPrompts: Map<String, StarWishOutfitPrompts> = emptyMap(),
     val imageLaunches: List<StarWishImageLaunch> = emptyList(),
     val theaterChapters: Map<String, List<StarWishTheaterChapter>> = emptyMap(),
+    val specialStoryChapters: Map<String, List<StarWishTheaterChapter>> = emptyMap(),
     val customTheaters: List<StarWishTheaterSeed> = emptyList(),
+    val customSpecialStories: List<StarWishTheaterSeed> = emptyList(),
     val mcdonaldsMcpCode: String = "",
 )
 

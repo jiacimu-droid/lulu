@@ -83,10 +83,10 @@ internal fun buildLuluPresenceContext(
         }
     }
     appendLine("表达建议：${expression.guidance}")
-    appendLine("动作描写建议：请把表情、动作、姿势合成一句自然的括号描写，不要分成表情/动作/姿势字段。例如：（他带着困倦的表情，虽然困着都眯眯眼了，可还是抱住佳辞轻轻地拍着）。")
+    appendLine("状态描写建议：请把当前状态、行为、动作、姿势和标签合成一小段自然描述，交给下方状态栏呈现；正文回复不要再用括号塞动作。")
     appendLine("可参考素材：表情=${expression.emojiHint.ifBlank { "无" }}；动作=${expression.stickerHint}；姿势=${expression.bodyGestureHint}。")
-    appendLine("使用方式：动作描写只作为情绪和表现参考；不要输出 XML、字段名、提示词说明或头像氛围。")
-    appendLine("如可用 set_lulu_expression_state 工具，优先记录 description 一句完整动作描写；不要向用户解释这个工具。")
+    appendLine("使用方式：状态描写只作为情绪和表现参考；不要输出 XML、字段名、提示词说明或头像氛围。")
+    appendLine("如可用 set_lulu_expression_state 工具，优先记录 description 一小段完整状态描述；不要向用户解释这个工具。")
     append("</lulu_presence>")
 }
 
