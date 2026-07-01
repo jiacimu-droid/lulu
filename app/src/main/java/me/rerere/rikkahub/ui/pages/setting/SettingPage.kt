@@ -227,6 +227,12 @@ fun SettingPage(vm: SettingVM = koinViewModel()) {
                         headlineContent = { Text(stringResource(R.string.setting_page_providers)) },
                     )
                     item(
+                        onClick = { navController.navigate(Screen.Developer) },
+                        leadingContent = { Icon(HugeIcons.Developer, null) },
+                        supportingContent = { Text("查看最近 API 调用、输入输出 token 和调用状态") },
+                        headlineContent = { Text("API 控制台") },
+                    )
+                    item(
                         onClick = { navController.navigate(Screen.SettingSearch) },
                         leadingContent = { Icon(HugeIcons.GlobalSearch, null) },
                         supportingContent = { Text(stringResource(R.string.setting_page_search_service_desc)) },

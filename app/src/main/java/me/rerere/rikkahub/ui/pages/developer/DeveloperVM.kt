@@ -7,4 +7,8 @@ class DeveloperVM(
     private val aiLoggingManager: AILoggingManager
 ) : ViewModel() {
     val logs = aiLoggingManager.getLogs()
+
+    fun clearLogs() {
+        aiLoggingManager.clearLogs()
+    }
 }

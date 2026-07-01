@@ -1,69 +1,120 @@
 package me.rerere.rikkahub.ui.pages.developer
 
-import me.rerere.hugeicons.HugeIcons
-import me.rerere.hugeicons.stroke.FileScript
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
+import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.Clock02
+import me.rerere.hugeicons.stroke.Delete01
+import me.rerere.hugeicons.stroke.FileScript
 import me.rerere.rikkahub.data.ai.AILogging
+import me.rerere.rikkahub.ui.components.nav.BackButton
+import me.rerere.rikkahub.utils.formatNumber
+import me.rerere.rikkahub.utils.plus
 import org.koin.androidx.compose.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun DeveloperPage(vm: DeveloperVM = koinViewModel()) {
-    val pager = rememberPagerState { 1 }
-    val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Developer Page",
+                        text = "API 控制台",
                         maxLines = 1,
                     )
-                }
+                },
+                navigationIcon = {
+                    BackButton()
+                },
+                actions = {
+                    IconButton(onClick = vm::clearLogs) {
+                        Icon(HugeIcons.Delete01, contentDescription = "清空日志")
+                    }
+                },
             )
         },
-        bottomBar = {
-            BottomAppBar {
-                NavigationBarItem(
-                    selected = pager.currentPage == 0,
-                    onClick = { scope.launch { pager.animateScrollToPage(0) } },
-                    label = {
-                        Text(text = "Developer")
-                    },
-                    icon = {
-                        Icon(HugeIcons.FileScript, null)
-                    }
+    ) { innerPadding ->
+        LoggingPaging(
+            vm = vm,
+            contentPadding = innerPadding,
+        )
+    }
+}
+
+@Composable
+fun LoggingPaging(
+    vm: DeveloperVM,
+    contentPadding: PaddingValues,
+) {
+    val logs by vm.logs.collectAsStateWithLifecycle()
+    if (logs.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(24.dp),
+            ) {
+                Icon(
+                    imageVector = HugeIcons.FileScript,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = "还没有 API 调用",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = "发一条消息后，这里会显示模型、输入/输出 token 和调用状态。",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
-    ) { innerPadding ->
-        HorizontalPager(
-            state = pager,
-            contentPadding = innerPadding
-        ) { page ->
-            when (page) {
-                0 -> {
-                    LoggingPaging(vm = vm)
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = contentPadding + PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(logs.asReversed(), key = { log ->
+                when (log) {
+                    is AILogging.Generation -> log.id.toString()
+                }
+            }) { log ->
+                when (log) {
+                    is AILogging.Generation -> {
+                        GenerationLogCard(log)
+                    }
                 }
             }
         }
@@ -71,26 +122,129 @@ fun DeveloperPage(vm: DeveloperVM = koinViewModel()) {
 }
 
 @Composable
-fun LoggingPaging(vm: DeveloperVM) {
-    val logs by vm.logs.collectAsStateWithLifecycle()
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+private fun GenerationLogCard(log: AILogging.Generation) {
+    val usage = log.usage
+    val duration = log.finishedAtMillis?.let { it - log.createdAtMillis }
+    val status = when {
+        log.error != null -> "失败"
+        log.finishedAtMillis != null -> "完成"
+        else -> "进行中"
+    }
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = if (log.error == null) {
+                MaterialTheme.colorScheme.surfaceContainer
+            } else {
+                MaterialTheme.colorScheme.errorContainer
+            }
+        )
     ) {
-        items(logs) { log ->
-            when (log) {
-                is AILogging.Generation -> {
-                    Card {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top,
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        text = log.params.model.displayName.ifBlank { log.params.model.modelId },
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = "${log.providerSetting.name} · ${if (log.stream) "流式" else "非流式"} · ${formatTime(log.createdAtMillis)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Text(
+                    text = status,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (log.error == null) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    },
+                )
+            }
 
-                        }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                TokenStat("输入", usage?.promptTokens, Modifier.weight(1f))
+                TokenStat("输出", usage?.completionTokens, Modifier.weight(1f))
+                TokenStat("缓存", usage?.cachedTokens, Modifier.weight(1f))
+                TokenStat("总计", usage?.totalTokens, Modifier.weight(1f))
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                DetailLine("消息", "${log.messages.size} 条")
+                DetailLine("工具", "${log.params.tools.size} 个")
+                DetailLine("温度", log.params.temperature?.toString() ?: "默认")
+                DetailLine("Top P", log.params.topP?.toString() ?: "默认")
+                DetailLine("最大输出", log.params.maxTokens?.toString() ?: "默认")
+                if (duration != null) {
+                    DetailLine("耗时", "${duration}ms")
+                } else {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(
+                            imageVector = HugeIcons.Clock02,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = "等待模型返回 token 用量",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
+                }
+                log.error?.let {
+                    DetailLine("错误", it)
                 }
             }
         }
     }
+}
+
+@Composable
+private fun TokenStat(label: String, value: Int?, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = value?.formatNumber() ?: "-",
+            style = MaterialTheme.typography.titleSmall,
+        )
+    }
+}
+
+@Composable
+private fun DetailLine(label: String, value: String) {
+    Text(
+        text = "$label：$value",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+private fun formatTime(timestamp: Long): String {
+    return SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(timestamp))
 }

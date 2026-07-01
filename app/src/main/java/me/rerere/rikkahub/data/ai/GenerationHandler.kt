@@ -405,58 +405,70 @@ class GenerationHandler(
             }
         )
         if (stream) {
-            aiLoggingManager.addLog(
-                AILogging.Generation(
-                    params = params,
-                    messages = messages,
-                    providerSetting = provider,
-                    stream = true
-                )
-            )
-            providerImpl.streamText(
+            val apiLog = AILogging.Generation(
+                params = params,
+                messages = messages,
                 providerSetting = provider,
-                messages = internalMessages,
-                params = params
-            ).collect {
-                messages = messages.handleMessageChunk(chunk = it, model = model)
-                it.usage?.let { usage ->
+                stream = true
+            )
+            aiLoggingManager.addLog(apiLog)
+            try {
+                providerImpl.streamText(
+                    providerSetting = provider,
+                    messages = internalMessages,
+                    params = params
+                ).collect {
+                    messages = messages.handleMessageChunk(chunk = it, model = model)
+                    it.usage?.let { usage ->
+                        aiLoggingManager.updateGenerationUsage(apiLog.id, usage)
+                        messages = messages.mapIndexed { index, message ->
+                            if (index == messages.lastIndex) {
+                                message.copy(usage = message.usage.merge(usage))
+                            } else {
+                                message
+                            }
+                        }
+                    }
+                    onUpdateMessages(messages)
+                }
+                aiLoggingManager.finishGeneration(apiLog.id)
+            } catch (e: Throwable) {
+                aiLoggingManager.finishGeneration(apiLog.id, e.message ?: e::class.simpleName)
+                throw e
+            }
+        } else {
+            val apiLog = AILogging.Generation(
+                params = params,
+                messages = messages,
+                providerSetting = provider,
+                stream = false
+            )
+            aiLoggingManager.addLog(apiLog)
+            try {
+                val chunk = providerImpl.generateText(
+                    providerSetting = provider,
+                    messages = internalMessages,
+                    params = params,
+                )
+                messages = messages.handleMessageChunk(chunk = chunk, model = model)
+                chunk.usage?.let { usage ->
+                    aiLoggingManager.updateGenerationUsage(apiLog.id, usage)
                     messages = messages.mapIndexed { index, message ->
                         if (index == messages.lastIndex) {
-                            message.copy(usage = message.usage.merge(usage))
+                            message.copy(
+                                usage = message.usage.merge(usage)
+                            )
                         } else {
                             message
                         }
                     }
                 }
                 onUpdateMessages(messages)
+                aiLoggingManager.finishGeneration(apiLog.id)
+            } catch (e: Throwable) {
+                aiLoggingManager.finishGeneration(apiLog.id, e.message ?: e::class.simpleName)
+                throw e
             }
-        } else {
-            aiLoggingManager.addLog(
-                AILogging.Generation(
-                    params = params,
-                    messages = messages,
-                    providerSetting = provider,
-                    stream = false
-                )
-            )
-            val chunk = providerImpl.generateText(
-                providerSetting = provider,
-                messages = internalMessages,
-                params = params,
-            )
-            messages = messages.handleMessageChunk(chunk = chunk, model = model)
-            chunk.usage?.let { usage ->
-                messages = messages.mapIndexed { index, message ->
-                    if (index == messages.lastIndex) {
-                        message.copy(
-                            usage = message.usage.merge(usage)
-                        )
-                    } else {
-                        message
-                    }
-                }
-            }
-            onUpdateMessages(messages)
         }
     }
 
@@ -482,52 +494,86 @@ class GenerationHandler(
 
             var messages = listOf(UIMessage.user(prompt))
             var translatedText = ""
-
-            providerHandler.streamText(
-                providerSetting = provider,
+            val params = TextGenerationParams(
+                model = model,
+                reasoningLevel = ReasoningLevel.fromBudgetTokens(settings.translateThinkingBudget),
+            )
+            val apiLog = AILogging.Generation(
+                params = params,
                 messages = messages,
-                params = TextGenerationParams(
-                    model = model,
-                    reasoningLevel = ReasoningLevel.fromBudgetTokens(settings.translateThinkingBudget),
-                ),
-            ).collect { chunk ->
-                messages = messages.handleMessageChunk(chunk)
-                translatedText = messages.lastOrNull()?.toText() ?: ""
+                providerSetting = provider,
+                stream = true,
+            )
+            aiLoggingManager.addLog(apiLog)
+
+            try {
+                providerHandler.streamText(
+                    providerSetting = provider,
+                    messages = messages,
+                    params = params,
+                ).collect { chunk ->
+                    messages = messages.handleMessageChunk(chunk)
+                    chunk.usage?.let { usage ->
+                        aiLoggingManager.updateGenerationUsage(apiLog.id, usage)
+                    }
+                    translatedText = messages.lastOrNull()?.toText() ?: ""
+
+                    if (translatedText.isNotBlank()) {
+                        onStreamUpdate?.invoke(translatedText)
+                        emit(translatedText)
+                    }
+                }
+                aiLoggingManager.finishGeneration(apiLog.id)
+            } catch (e: Throwable) {
+                aiLoggingManager.finishGeneration(apiLog.id, e.message ?: e::class.simpleName)
+                throw e
+            }
+        } else {
+            // Use Qwen MT model with special translation options
+            val messages = listOf(UIMessage.user(sourceText))
+            val params = TextGenerationParams(
+                model = model,
+                temperature = 0.3f,
+                topP = 0.95f,
+                customBody = listOf(
+                    CustomBody(
+                        key = "translation_options",
+                        value = buildJsonObject {
+                            put("source_lang", JsonPrimitive("auto"))
+                            put(
+                                "target_lang",
+                                JsonPrimitive(targetLanguage.getDisplayLanguage(Locale.ENGLISH))
+                            )
+                        }
+                    )
+                )
+            )
+            val apiLog = AILogging.Generation(
+                params = params,
+                messages = messages,
+                providerSetting = provider,
+                stream = false,
+            )
+            aiLoggingManager.addLog(apiLog)
+            try {
+                val chunk = providerHandler.generateText(
+                    providerSetting = provider,
+                    messages = messages,
+                    params = params,
+                )
+                chunk.usage?.let { usage ->
+                    aiLoggingManager.updateGenerationUsage(apiLog.id, usage)
+                }
+                val translatedText = chunk.choices.firstOrNull()?.message?.toText() ?: ""
 
                 if (translatedText.isNotBlank()) {
                     onStreamUpdate?.invoke(translatedText)
                     emit(translatedText)
                 }
-            }
-        } else {
-            // Use Qwen MT model with special translation options
-            val messages = listOf(UIMessage.user(sourceText))
-            val chunk = providerHandler.generateText(
-                providerSetting = provider,
-                messages = messages,
-                params = TextGenerationParams(
-                    model = model,
-                    temperature = 0.3f,
-                    topP = 0.95f,
-                    customBody = listOf(
-                        CustomBody(
-                            key = "translation_options",
-                            value = buildJsonObject {
-                                put("source_lang", JsonPrimitive("auto"))
-                                put(
-                                    "target_lang",
-                                    JsonPrimitive(targetLanguage.getDisplayLanguage(Locale.ENGLISH))
-                                )
-                            }
-                        )
-                    )
-                ),
-            )
-            val translatedText = chunk.choices.firstOrNull()?.message?.toText() ?: ""
-
-            if (translatedText.isNotBlank()) {
-                onStreamUpdate?.invoke(translatedText)
-                emit(translatedText)
+                aiLoggingManager.finishGeneration(apiLog.id)
+            } catch (e: Throwable) {
+                aiLoggingManager.finishGeneration(apiLog.id, e.message ?: e::class.simpleName)
+                throw e
             }
         }
     }.flowOn(Dispatchers.IO)
