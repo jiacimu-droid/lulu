@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -142,6 +141,12 @@ private enum class CollectionSection(val label: String) {
 private enum class PlanView(val label: String) {
     Weekly("周计划"),
     Monthly("月计划"),
+}
+
+private enum class DailyDashboardView(val label: String) {
+    Tasks("待办"),
+    Plan("今日计划"),
+    Tips("Tips"),
 }
 
 @Composable
@@ -793,39 +798,36 @@ private fun DailyStudyDashboard(
     val schedule = ExamStudyPlan.todaySchedule(today)
     val tips = ExamStudyPlan.todayTips(today)
 
-    BoxWithConstraints {
-        if (maxWidth < 900.dp) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                TaskCard(
-                    tasks = tasks,
-                    newTask = newTask,
-                    onNewTask = onNewTask,
-                    onAdd = onAdd,
-                    onToggle = onToggle,
-                    onDelete = onDelete,
+    var dashboardView by remember { mutableStateOf(DailyDashboardView.Tasks) }
+
+    StudyCard {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            DailyDashboardView.entries.forEach { view ->
+                FilterChip(
+                    selected = dashboardView == view,
+                    onClick = { dashboardView = view },
+                    label = {
+                        Text(
+                            text = view.label,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    modifier = Modifier.weight(1f),
                 )
-                TodayPlanCard(todayPlan = todayPlan, schedule = schedule)
-                StudyTipsCard(tips = tips)
             }
-        } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                Box(Modifier.weight(1.05f)) {
-                    TaskCard(
-                        tasks = tasks,
-                        newTask = newTask,
-                        onNewTask = onNewTask,
-                        onAdd = onAdd,
-                        onToggle = onToggle,
-                        onDelete = onDelete,
-                    )
-                }
-                Box(Modifier.weight(1.15f)) {
-                    TodayPlanCard(todayPlan = todayPlan, schedule = schedule)
-                }
-                Box(Modifier.weight(1f)) {
-                    StudyTipsCard(tips = tips)
-                }
-            }
+        }
+        when (dashboardView) {
+            DailyDashboardView.Tasks -> TaskContent(
+                tasks = tasks,
+                newTask = newTask,
+                onNewTask = onNewTask,
+                onAdd = onAdd,
+                onToggle = onToggle,
+                onDelete = onDelete,
+            )
+            DailyDashboardView.Plan -> TodayPlanContent(todayPlan = todayPlan, schedule = schedule)
+            DailyDashboardView.Tips -> StudyTipsContent(tips = tips)
         }
     }
 }
@@ -839,9 +841,30 @@ private fun TaskCard(
     onToggle: (String, Boolean) -> Unit,
     onDelete: (String) -> Unit,
 ) {
+    StudyCard {
+        TaskContent(
+            tasks = tasks,
+            newTask = newTask,
+            onNewTask = onNewTask,
+            onAdd = onAdd,
+            onToggle = onToggle,
+            onDelete = onDelete,
+        )
+    }
+}
+
+@Composable
+private fun TaskContent(
+    tasks: List<StudyTask>,
+    newTask: String,
+    onNewTask: (String) -> Unit,
+    onAdd: () -> Unit,
+    onToggle: (String, Boolean) -> Unit,
+    onDelete: (String) -> Unit,
+) {
     val planCount = tasks.count { it.source == StudyTaskSource.Plan }
     val donePlanCount = tasks.count { it.source == StudyTaskSource.Plan && it.done }
-    StudyCard {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.weight(1f)) {
                 Text("待办", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
@@ -884,13 +907,22 @@ private fun TaskCard(
         }
     }
 }
-
 @Composable
 private fun TodayPlanCard(
     todayPlan: DailyStudyPlan?,
     schedule: List<StudyScheduleBlock>,
 ) {
     StudyCard {
+        TodayPlanContent(todayPlan = todayPlan, schedule = schedule)
+    }
+}
+
+@Composable
+private fun TodayPlanContent(
+    todayPlan: DailyStudyPlan?,
+    schedule: List<StudyScheduleBlock>,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Icon(HugeIcons.Clock02, null, tint = StudyColors.blue)
             Column(Modifier.weight(1f)) {
@@ -918,6 +950,13 @@ private fun TodayPlanCard(
 @Composable
 private fun StudyTipsCard(tips: List<StudyTip>) {
     StudyCard {
+        StudyTipsContent(tips = tips)
+    }
+}
+
+@Composable
+private fun StudyTipsContent(tips: List<StudyTip>) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Icon(HugeIcons.AiMagic, null, tint = StudyColors.goldText)
             Column(Modifier.weight(1f)) {

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -30,9 +31,7 @@ class StudyStore(
 
     val state: StateFlow<StudyState> = context.studyDataStore.data
         .map { prefs ->
-            prefs[stateKey]?.let { raw ->
-                runCatching { json.decodeFromString<StudyState>(raw) }.getOrNull()
-            } ?: StudyState(today = LocalDate.now().toString())
+            prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
         }
         .catch { emit(StudyState(today = LocalDate.now().toString())) }
         .map { StudyRules.grantInternalTestResources(StudyRules.refreshShopIfNeeded(it.ensureToday(), LocalDate.now(), Random.Default)) }
@@ -40,9 +39,7 @@ class StudyStore(
 
     suspend fun update(transform: (StudyState) -> StudyState) {
         context.studyDataStore.edit { prefs ->
-            val current = prefs[stateKey]?.let { raw ->
-                runCatching { json.decodeFromString<StudyState>(raw) }.getOrNull()
-            } ?: StudyState(today = LocalDate.now().toString())
+            val current = prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
             prefs[stateKey] = json.encodeToString(StudyRules.grantInternalTestResources(transform(current.ensureToday())))
         }
     }
@@ -52,6 +49,20 @@ class StudyStore(
             prefs[stateKey] = json.encodeToString(state)
         }
     }
+
+    private fun decodeState(raw: String): StudyState {
+        return runCatching { studyJson.decodeFromString<StudyState>(raw) }
+            .recoverCatching { error ->
+                if (error !is SerializationException && error !is IllegalArgumentException) throw error
+                json.decodeFromString(raw)
+            }
+            .getOrThrow()
+    }
+}
+
+private val studyJson = Json(JsonInstant) {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
 }
 
 private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState {
