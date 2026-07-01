@@ -49,14 +49,22 @@ class StudyVM(
 
     fun completePomodoro(minutes: Int) = reduce {
         val result = StudyRules.completePomodoro(it, minutes, Random.Default)
-        _effects.tryEmit(
-            StudyEffect.MysteryBox(
-                StudyMysteryBoxReward(
-                    kudos = result.reward.mysteryBoxKudos,
-                    universalNormalFragments = result.reward.universalNormalFragments,
+        _effects.tryEmit(StudyEffect.MysteryBoxReady)
+        result.state
+    }
+
+    fun openMysteryBox(index: Int = 0) = reduce {
+        val result = StudyRules.openMysteryBox(it, index)
+        if (result.reward.title.isNotBlank()) {
+            _effects.tryEmit(
+                StudyEffect.MysteryBox(
+                    StudyMysteryBoxReward(
+                        kudos = result.reward.kudos,
+                        universalNormalFragments = result.reward.universalNormalFragments,
+                    ),
                 ),
-            ),
-        )
+            )
+        }
         result.state
     }
 
@@ -151,6 +159,7 @@ class StudyVM(
 
 sealed interface StudyEffect {
     data class Message(val text: String) : StudyEffect
+    data object MysteryBoxReady : StudyEffect
     data class MysteryBox(val reward: StudyMysteryBoxReward) : StudyEffect
     data class DrawResults(val results: List<StudyDrawResult>) : StudyEffect
     data object VideoRedeemed : StudyEffect

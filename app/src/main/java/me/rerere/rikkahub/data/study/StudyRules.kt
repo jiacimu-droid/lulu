@@ -208,25 +208,18 @@ object StudyRules {
         random: Random = Random.Default,
     ): StudyActionResult {
         val box = mysteryBox(random)
-        val titleParts = buildList {
-            add("番茄钟 +50")
-            add("盲盒 +${box.kudos}")
-            if (box.universalNormalFragments > 0) add("通用普通碎片 x${box.universalNormalFragments}")
-        }
         val reward = StudyReward(
             kudos = 50,
             mysteryBoxKudos = box.kudos,
             universalNormalFragments = box.universalNormalFragments,
-            title = titleParts.joinToString("，"),
-        )
-        val totalReward = StudyReward(
-            kudos = reward.kudos + reward.mysteryBoxKudos,
-            universalNormalFragments = reward.universalNormalFragments,
+            title = "番茄钟 +50 + 盲盒待开启",
         )
         return StudyActionResult(
             state = state.copy(
-                wallet = state.wallet.add(totalReward),
-                inventory = state.inventory.addReward(totalReward),
+                wallet = state.wallet.add(StudyReward(kudos = 50)),
+                inventory = state.inventory.copy(
+                    unopenedMysteryBoxes = state.inventory.unopenedMysteryBoxes + box,
+                ),
                 inactiveStudyDays = 0,
                 lastStudyDate = state.today,
                 stats = state.stats.copy(
@@ -237,10 +230,38 @@ object StudyRules {
                     .addEvent(StudyEventType.Pomodoro, "番茄钟完成", "获得 50 夸夸值")
                     .addEvent(
                         StudyEventType.MysteryBox,
-                        "盲盒开启",
-                        "获得 ${box.kudos} 夸夸值" +
-                            if (box.universalNormalFragments > 0) "，通用普通碎片 x${box.universalNormalFragments}" else "",
+                        "盲盒待开启",
+                        "已放进收藏背包，可以现在开，也可以之后再开",
                     ),
+            ),
+            reward = reward,
+        )
+    }
+
+    fun openMysteryBox(state: StudyState, index: Int = 0): StudyActionResult {
+        val box = state.inventory.unopenedMysteryBoxes.getOrNull(index) ?: return StudyActionResult(state)
+        val reward = StudyReward(
+            kudos = box.kudos,
+            universalNormalFragments = box.universalNormalFragments,
+            title = buildString {
+                append("盲盒 +${box.kudos} 夸夸值")
+                if (box.universalNormalFragments > 0) {
+                    append(" + 通用普通碎片 x${box.universalNormalFragments}")
+                }
+            },
+        )
+        val remainingBoxes = state.inventory.unopenedMysteryBoxes.toMutableList().also { it.removeAt(index) }
+        return StudyActionResult(
+            state = state.copy(
+                wallet = state.wallet.add(reward),
+                inventory = state.inventory
+                    .addReward(reward)
+                    .copy(unopenedMysteryBoxes = remainingBoxes),
+                recentEvents = state.recentEvents.addEvent(
+                    StudyEventType.MysteryBox,
+                    "盲盒开启",
+                    reward.title,
+                ),
             ),
             reward = reward,
         )

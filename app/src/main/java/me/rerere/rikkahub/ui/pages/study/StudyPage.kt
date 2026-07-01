@@ -155,6 +155,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
     var section by remember { mutableStateOf(StudySection.Today) }
     var newTask by remember { mutableStateOf("") }
     var drawDialog by remember { mutableStateOf<List<StudyDrawResult>?>(null) }
+    var pendingBoxDialog by remember { mutableStateOf(false) }
     var boxDialog by remember { mutableStateOf<StudyMysteryBoxReward?>(null) }
     var showVideoDialog by remember { mutableStateOf(false) }
     var showSuperDialog by remember { mutableStateOf(false) }
@@ -166,6 +167,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
         vm.effects.collect { effect ->
             when (effect) {
                 is StudyEffect.Message -> snackbarHostState.showSnackbar(effect.text)
+                StudyEffect.MysteryBoxReady -> pendingBoxDialog = true
                 is StudyEffect.MysteryBox -> boxDialog = effect.reward
                 is StudyEffect.DrawResults -> drawDialog = effect.results
                 StudyEffect.VideoRedeemed -> showVideoDialog = true
@@ -247,6 +249,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                         CollectionCard(
                             inventory = state.inventory,
                             onUseUniversalNormalTarget = vm::applyUniversalNormal,
+                            onOpenMysteryBox = { vm.openMysteryBox(it) },
                             onOpenImageGen = { outfit ->
                                 val scroll = StarWishRules.scrollForOutfit(outfit)
                                 val prompt = StarWishRules.imagePromptForCompanion(
@@ -300,6 +303,16 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
         MysteryBoxCelebration(
             reward = reward,
             onDismissRequest = { boxDialog = null },
+        )
+    }
+
+    if (pendingBoxDialog) {
+        MysteryBoxPendingDialog(
+            onOpen = {
+                pendingBoxDialog = false
+                vm.openMysteryBox()
+            },
+            onKeep = { pendingBoxDialog = false },
         )
     }
 
@@ -737,8 +750,22 @@ private fun TodayProgressCard(
     val total = state.tasks.size
     val done = state.tasks.count { it.done }
     val progress = if (total == 0) 0f else done.toFloat() / total
+    val progressPercent = (progress * 100).toInt().coerceIn(0, 100)
     StudyCard {
-        Text("今日进度", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.weight(1f)) {
+                Text("今日进度", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("计划下面单独看进度：$done/$total", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Surface(color = StudyColors.hero.copy(alpha = 0.78f), shape = CircleShape) {
+                Text(
+                    "$progressPercent%",
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    color = StudyColors.goldText,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
         if (state.superMomentAvailable) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = onClaimNormal, modifier = Modifier.weight(1f)) { Text("普通 x5") }
@@ -814,9 +841,6 @@ private fun PlanOverviewCard(state: StudyState) {
         val parts = week.dateRange.split(" 至 ")
         parts.size == 2 && today >= LocalDate.parse(parts[0]) && today <= LocalDate.parse(parts[1])
     } ?: ExamStudyPlan.julyWeeks.firstOrNull()
-    val total = state.tasks.size
-    val done = state.tasks.count { it.done }
-    val progressPercent = if (total == 0) 0 else ((done * 100f) / total).toInt().coerceIn(0, 100)
 
     StudyCard {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
@@ -836,14 +860,6 @@ private fun PlanOverviewCard(state: StudyState) {
                     Column(Modifier.weight(1f)) {
                         Text(todayPlan?.title ?: "今日计划待生成", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                         Text("目标初试：2026-12-21，剩余 ${ExamStudyPlan.daysLeft(today)} 天", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Surface(color = StudyColors.hero.copy(alpha = 0.78f), shape = CircleShape) {
-                        Text(
-                            "$progressPercent%",
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                            color = StudyColors.goldText,
-                            fontWeight = FontWeight.SemiBold,
-                        )
                     }
                 }
                 todayPlan?.tasks?.forEach { task ->
@@ -1248,6 +1264,30 @@ private fun MysteryBoxCelebration(reward: StudyMysteryBoxReward, onDismissReques
 }
 
 @Composable
+private fun MysteryBoxPendingDialog(
+    onOpen: () -> Unit,
+    onKeep: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onKeep,
+        title = { Text("盲盒待开启") },
+        text = {
+            Text("番茄钟奖励已经放进收藏背包。现在开启就能看到奖励；不想开的话，之后也可以在收藏背包里打开。")
+        },
+        confirmButton = {
+            Button(onClick = onOpen) {
+                Text("开启盲盒")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onKeep) {
+                Text("先放背包")
+            }
+        },
+    )
+}
+
+@Composable
 private fun VideoRewardCelebration(onDismissRequest: () -> Unit) {
     val transition = rememberInfiniteTransition(label = "video_reward")
     val pulse by transition.animateFloat(
@@ -1330,6 +1370,7 @@ private fun GachaCard(
 private fun CollectionCard(
     inventory: StudyInventory,
     onUseUniversalNormalTarget: (String) -> Unit,
+    onOpenMysteryBox: (Int) -> Unit,
     onOpenImageGen: (String) -> Unit,
 ) {
     var collectionSection by remember { mutableStateOf(CollectionSection.Scrolls) }
@@ -1337,6 +1378,27 @@ private fun CollectionCard(
     var pendingNormalTarget by remember { mutableStateOf<Pair<String, String>?>(null) }
     StudyCard {
         Text("收藏背包", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        if (inventory.unopenedMysteryBoxes.isNotEmpty()) {
+            Surface(color = StudyColors.hero.copy(alpha = 0.72f), shape = MaterialTheme.shapes.medium) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Icon(HugeIcons.Package, null, tint = StudyColors.goldText)
+                    Column(Modifier.weight(1f)) {
+                        Text("未开启盲盒", fontWeight = FontWeight.SemiBold)
+                        Text(
+                            "还有 ${inventory.unopenedMysteryBoxes.size} 个番茄钟盲盒可以打开",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    Button(onClick = { onOpenMysteryBox(0) }) {
+                        Text("开启")
+                    }
+                }
+            }
+        }
         Surface(color = StudyColors.softBlue.copy(alpha = 0.92f), shape = MaterialTheme.shapes.medium) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(14.dp),

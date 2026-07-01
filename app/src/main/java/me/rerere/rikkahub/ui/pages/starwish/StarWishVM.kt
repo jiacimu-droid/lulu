@@ -244,8 +244,6 @@ class StarWishVM(
                 topP = 0.95f,
                 maxTokens = 3200,
                 reasoningLevel = ReasoningLevel.OFF,
-                customHeaders = model.customHeaders,
-                customBody = model.customBodies,
             ),
         )
         return chunk.choices.firstOrNull()?.message?.toText()?.trim()

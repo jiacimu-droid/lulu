@@ -272,7 +272,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                             redeemed = studyState.stats.videoRewardsRedeemed,
                             videoModelStatus = videoModelStatus,
                             onRedeem = vm::redeemVideo,
-                            onOpenImageGen = { navController.navigate(Screen.ImageGen()) },
+                            onOpenVideoSetting = { navController.navigate(Screen.SettingModels) },
                         )
                     }
                 }
@@ -702,7 +702,7 @@ private fun VideoRewardCard(
     redeemed: Int,
     videoModelStatus: String,
     onRedeem: () -> Unit,
-    onOpenImageGen: () -> Unit,
+    onOpenVideoSetting: () -> Unit,
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.84f)),
@@ -722,7 +722,7 @@ private fun VideoRewardCard(
             }
             Surface(color = StarWishColors.mistBlue.copy(alpha = 0.72f), shape = RoundedCornerShape(14.dp)) {
                 Text(
-                    "$videoModelStatus\n1 个视频碎片可兑换 1 次视频生成机会。这里先留视频生成入口，具体生成参数可以继续接你的视频模型 API。",
+                    "$videoModelStatus\n1 个视频碎片可兑换 1 次视频生成机会。当前仓库还没有独立的视频生成页面，先在这里记录兑换，视频模型在默认模型里单独配置。",
                     modifier = Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = StarWishColors.inkBlue,
@@ -737,10 +737,10 @@ private fun VideoRewardCard(
                     Text("兑换视频机会")
                 }
                 TextButton(
-                    onClick = onOpenImageGen,
+                    onClick = onOpenVideoSetting,
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("打开生成入口")
+                    Text("视频模型设置")
                 }
             }
         }

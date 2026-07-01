@@ -49,7 +49,7 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `pomodoro completion gives fixed kudos and a mystery box reward`() {
+    fun `pomodoro completion gives fixed kudos and stores an unopened mystery box`() {
         val result = StudyRules.completePomodoro(
             state = StudyState(today = "2026-06-30"),
             minutes = 18,
@@ -58,9 +58,25 @@ class StudyRulesTest {
 
         assertEquals(50, result.reward.kudos)
         assertTrue(result.reward.mysteryBoxKudos in listOf(15, 25, 50, 100, 200))
-        assertEquals(50 + result.reward.mysteryBoxKudos, result.state.wallet.kudos)
+        assertEquals(50, result.state.wallet.kudos)
+        assertEquals(1, result.state.inventory.unopenedMysteryBoxes.size)
         assertEquals(1, result.state.stats.totalPomodoros)
         assertEquals(18, result.state.stats.totalStudyMinutes)
+    }
+
+    @Test
+    fun `opening a stored mystery box applies its reward`() {
+        val completed = StudyRules.completePomodoro(
+            state = StudyState(today = "2026-06-30"),
+            minutes = 25,
+            random = Random(1),
+        )
+
+        val opened = StudyRules.openMysteryBox(completed.state)
+
+        assertEquals(0, opened.state.inventory.unopenedMysteryBoxes.size)
+        assertEquals(50 + opened.reward.kudos, opened.state.wallet.kudos)
+        assertEquals(opened.reward.universalNormalFragments, opened.state.inventory.universalNormalFragments)
     }
 
     @Test

@@ -66,6 +66,7 @@ data class StudyInventory(
     val universalEpicFragments: Int = 0,
     val unlockedOutfits: Set<String> = emptySet(),
     val unlockedTheaters: Set<String> = emptySet(),
+    val unopenedMysteryBoxes: List<StudyMysteryBoxReward> = emptyList(),
 )
 
 @Serializable
