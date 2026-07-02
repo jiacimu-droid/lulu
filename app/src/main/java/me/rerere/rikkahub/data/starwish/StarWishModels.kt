@@ -15,6 +15,9 @@ data class StarWishState(
     val hiddenSpecialStoryTitles: Set<String> = emptySet(),
     val hiddenImageLaunchIds: Set<String> = emptySet(),
     val hiddenGeneratedImageIds: Set<Int> = emptySet(),
+    val customVideos: List<StarWishVideoItem> = emptyList(),
+    val unlockedVideoIds: Set<String> = emptySet(),
+    val hiddenVideoIds: Set<String> = emptySet(),
     val lastSection: String = "Scrolls",
 )
 
@@ -51,10 +54,26 @@ data class StarWishTheaterSeed(
     val createdAt: Long = 0L,
 )
 
+@Serializable
+data class StarWishVideoItem(
+    val id: String,
+    val title: String,
+    val uri: String,
+    val builtIn: Boolean = false,
+    val createdAt: Long = 0L,
+)
+
 data class StarWishGeneratedImage(
     val id: Int,
     val outfit: String,
     val filePath: String,
     val prompt: String,
     val createdAt: Long,
+)
+
+data class StarWishVideoUnlockResult(
+    val starWishState: StarWishState,
+    val studyState: me.rerere.rikkahub.data.study.StudyState,
+    val video: StarWishVideoItem?,
+    val consumedFragment: Boolean,
 )

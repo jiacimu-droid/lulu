@@ -1,5 +1,7 @@
 package me.rerere.rikkahub.ui.pages.study
 
+import android.widget.MediaController
+import android.widget.VideoView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,6 +55,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -65,13 +69,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -111,6 +118,7 @@ import me.rerere.rikkahub.data.study.StudyTask
 import me.rerere.rikkahub.data.study.StudyTaskSource
 import me.rerere.rikkahub.data.study.SuperMomentChoice
 import me.rerere.rikkahub.data.starwish.StarWishRules
+import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
@@ -163,6 +171,8 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
     var section by remember { mutableStateOf(StudySection.Today) }
     var newTask by remember { mutableStateOf("") }
     var drawDialog by remember { mutableStateOf<List<StudyDrawResult>?>(null) }
+    var pendingVideos by remember { mutableStateOf<List<StarWishVideoItem>>(emptyList()) }
+    var currentVideo by remember { mutableStateOf<StarWishVideoItem?>(null) }
     var pendingBoxDialog by remember { mutableStateOf(false) }
     var boxDialog by remember { mutableStateOf<StudyMysteryBoxReward?>(null) }
     var showVideoDialog by remember { mutableStateOf(false) }
@@ -178,9 +188,16 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                 StudyEffect.MysteryBoxReady -> pendingBoxDialog = true
                 is StudyEffect.MysteryBox -> boxDialog = effect.reward
                 is StudyEffect.DrawResults -> drawDialog = effect.results
+                is StudyEffect.StarWishVideosUnlocked -> pendingVideos = pendingVideos + effect.videos
                 StudyEffect.VideoRedeemed -> showVideoDialog = true
                 StudyEffect.SuperMomentReady -> showSuperDialog = true
             }
+        }
+    }
+    LaunchedEffect(drawDialog, currentVideo, pendingVideos) {
+        if (drawDialog == null && currentVideo == null && pendingVideos.isNotEmpty()) {
+            currentVideo = pendingVideos.first()
+            pendingVideos = pendingVideos.drop(1)
         }
     }
 
@@ -348,6 +365,13 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
 
     if (showVideoDialog) {
         VideoRewardCelebration(onDismissRequest = { showVideoDialog = false })
+    }
+
+    currentVideo?.let { video ->
+        StudyVideoPlayerDialog(
+            video = video,
+            onDismiss = { currentVideo = null },
+        )
     }
 
     if (showLevelDialog) {
@@ -1443,13 +1467,54 @@ private fun VideoRewardCelebration(onDismissRequest: () -> Unit) {
                         Icon(HugeIcons.Play, null, tint = StudyColors.goldText, modifier = Modifier.size(44.dp))
                     }
                 }
-                Text("角色为你点亮了一次视频生成机会。", color = Color.White, fontWeight = FontWeight.SemiBold)
+                Text("角色为你点亮了一次视频收藏解锁。", color = Color.White, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "已消耗 1 个视频碎片。去星愿馆的视频板块，把想要的镜头感、剧情感和角色互动写进去。",
+                    "已消耗 1 个视频碎片。去星愿馆的视频板块上传视频，已解锁的视频可以反复观看。",
                     color = Color.White.copy(alpha = 0.9f),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+        },
+    )
+}
+
+@Composable
+private fun StudyVideoPlayerDialog(
+    video: StarWishVideoItem,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    var videoView by remember(video.id) { mutableStateOf<VideoView?>(null) }
+    DisposableEffect(video.id) {
+        onDispose {
+            videoView?.stopPlayback()
+            videoView = null
+        }
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = { Button(onClick = onDismiss) { Text("收起") } },
+        title = { Text(video.title) },
+        text = {
+            AndroidView(
+                modifier = Modifier.fillMaxWidth().aspectRatio(9f / 16f).clip(RoundedCornerShape(16.dp)),
+                factory = { viewContext ->
+                    VideoView(viewContext).apply {
+                        videoView = this
+                        val controller = MediaController(context)
+                        controller.setAnchorView(this)
+                        setMediaController(controller)
+                        setVideoURI(video.uri.toUri())
+                        setOnPreparedListener { player ->
+                            player.isLooping = true
+                            start()
+                        }
+                    }
+                },
+                update = { view ->
+                    if (videoView !== view) videoView = view
+                },
+            )
         },
     )
 }
@@ -1962,7 +2027,7 @@ private fun StudyGuideCard() {
                 "通用普通碎片可以自动补最佳目标，也可以在收藏里指定补某个部件；小剧场碎片用于星愿馆章节兑换。",
                 "Lv14 会自动补齐一套未完成画卷；已解锁画卷可以直接跳到生图页。",
                 "番茄钟已接入角色陪伴、语音鼓励和轻聊天。",
-                "更深的角色主动督学、画卷提示词自动带入、视频生成接口可以作为后续增强。",
+                "更深的角色主动督学、画卷提示词自动带入、星愿馆视频收藏柜可以作为后续增强。",
             ),
         )
     }

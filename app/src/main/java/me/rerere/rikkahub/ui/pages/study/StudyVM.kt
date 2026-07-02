@@ -13,11 +13,15 @@ import me.rerere.rikkahub.data.study.StudyShopItem
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.data.study.SuperMomentChoice
+import me.rerere.rikkahub.data.starwish.StarWishRules
+import me.rerere.rikkahub.data.starwish.StarWishStore
+import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import java.time.LocalDate
 import kotlin.random.Random
 
 class StudyVM(
     private val store: StudyStore,
+    private val starWishStore: StarWishStore,
 ) : ViewModel() {
     val state: StateFlow<StudyState> = store.state
 
@@ -68,14 +72,33 @@ class StudyVM(
         result.state
     }
 
-    fun draw(count: Int) = reduce {
-        val result = StudyRules.draw(it, count, Random.Default)
-        if (result.results.isNotEmpty()) {
+    fun draw(count: Int) {
+        viewModelScope.launch {
+            val result = StudyRules.draw(state.value, count, Random.Default)
+            if (result.results.isEmpty()) {
+                _effects.tryEmit(StudyEffect.Message("夸夸值或抽卡券不够"))
+                store.set(result.state)
+                return@launch
+            }
+            var nextStudyState = result.state
+            var nextStarWishState = starWishStore.state.value
+            val videosToPlay = mutableListOf<StarWishVideoItem>()
+            val videoFragments = result.results.count { it.rarity == me.rerere.rikkahub.data.study.StudyRarity.Rainbow }
+            repeat(videoFragments) {
+                val unlock = StarWishRules.unlockNextVideo(nextStarWishState, nextStudyState, Random.Default)
+                nextStudyState = unlock.studyState
+                nextStarWishState = unlock.starWishState
+                unlock.video?.let(videosToPlay::add)
+            }
+            store.set(nextStudyState)
+            if (nextStarWishState != starWishStore.state.value) {
+                starWishStore.update { nextStarWishState }
+            }
             _effects.tryEmit(StudyEffect.DrawResults(result.results))
-        } else {
-            _effects.tryEmit(StudyEffect.Message("夸夸值或抽卡券不够"))
+            if (videosToPlay.isNotEmpty()) {
+                _effects.tryEmit(StudyEffect.StarWishVideosUnlocked(videosToPlay))
+            }
         }
-        result.state
     }
 
     fun claimSuperMoment(choice: SuperMomentChoice) = reduce {
@@ -162,6 +185,7 @@ sealed interface StudyEffect {
     data object MysteryBoxReady : StudyEffect
     data class MysteryBox(val reward: StudyMysteryBoxReward) : StudyEffect
     data class DrawResults(val results: List<StudyDrawResult>) : StudyEffect
+    data class StarWishVideosUnlocked(val videos: List<StarWishVideoItem>) : StudyEffect
     data object VideoRedeemed : StudyEffect
     data object SuperMomentReady : StudyEffect
 }

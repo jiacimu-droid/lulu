@@ -3,10 +3,12 @@ package me.rerere.rikkahub.data.starwish
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyState
+import kotlin.random.Random
 
 object StarWishRules {
     const val RARE_FRAGMENTS_PER_CHAPTER = 1
     const val SPECIAL_FRAGMENTS_PER_CHAPTER = 1
+    const val VIDEO_FRAGMENTS_PER_UNLOCK = 1
 
     val scrolls: List<StarWishScroll> = listOf(
         starWishScroll(
@@ -224,6 +226,51 @@ object StarWishRules {
     )
 
     fun allSpecialStories(custom: List<StarWishTheaterSeed>): List<StarWishTheaterSeed> = specialStories + custom
+
+    val builtInVideos: List<StarWishVideoItem> = listOf(
+    )
+
+    fun allVideos(custom: List<StarWishVideoItem>): List<StarWishVideoItem> = builtInVideos + custom
+
+    fun unlockNextVideo(
+        starWishState: StarWishState,
+        studyState: StudyState,
+        random: Random = Random.Default,
+    ): StarWishVideoUnlockResult {
+        val visibleVideos = allVideos(starWishState.customVideos)
+            .filterNot { it.id in starWishState.hiddenVideoIds }
+        if (visibleVideos.isEmpty()) {
+            return StarWishVideoUnlockResult(starWishState, studyState, null, consumedFragment = false)
+        }
+        val lockedVideo = visibleVideos.firstOrNull { it.id !in starWishState.unlockedVideoIds }
+        if (lockedVideo != null) {
+            if (studyState.inventory.epicFragments < VIDEO_FRAGMENTS_PER_UNLOCK) {
+                return StarWishVideoUnlockResult(starWishState, studyState, null, consumedFragment = false)
+            }
+            return StarWishVideoUnlockResult(
+                starWishState = starWishState.copy(
+                    unlockedVideoIds = starWishState.unlockedVideoIds + lockedVideo.id,
+                ),
+                studyState = studyState.copy(
+                    inventory = studyState.inventory.copy(
+                        epicFragments = (studyState.inventory.epicFragments - VIDEO_FRAGMENTS_PER_UNLOCK).coerceAtLeast(0),
+                    ),
+                    stats = studyState.stats.copy(
+                        videoRewardsRedeemed = studyState.stats.videoRewardsRedeemed + 1,
+                    ),
+                ),
+                video = lockedVideo,
+                consumedFragment = true,
+            )
+        }
+        val playable = visibleVideos.filter { it.id in starWishState.unlockedVideoIds }.ifEmpty { visibleVideos }
+        return StarWishVideoUnlockResult(
+            starWishState = starWishState,
+            studyState = studyState,
+            video = playable[random.nextInt(playable.size)],
+            consumedFragment = false,
+        )
+    }
 
     fun scrollForOutfit(outfit: String): StarWishScroll {
         val index = StudyRules.outfitNames.indexOf(outfit).takeIf { it >= 0 } ?: 0

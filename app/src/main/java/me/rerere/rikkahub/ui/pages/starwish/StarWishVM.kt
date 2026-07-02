@@ -1,17 +1,18 @@
 package me.rerere.rikkahub.ui.pages.starwish
 
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import java.io.File
+import kotlin.random.Random
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import me.rerere.ai.core.ReasoningLevel
 import me.rerere.ai.provider.Model
@@ -32,6 +33,7 @@ import me.rerere.rikkahub.data.starwish.StarWishState
 import me.rerere.rikkahub.data.starwish.StarWishStore
 import me.rerere.rikkahub.data.starwish.StarWishTheaterChapter
 import me.rerere.rikkahub.data.starwish.StarWishTheaterSeed
+import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyStore
 
@@ -45,14 +47,10 @@ class StarWishVM(
 ) : ViewModel() {
     val state: StateFlow<StarWishState> = store.state
     val studyState = studyStore.state
-    val videoModelStatus = settingsStore.settingsFlow
-        .map { settings ->
-            settings.findModelById(settings.videoGenerationModelId)
-                ?.takeIf { it.type == ModelType.VIDEO }
-                ?.let { "已选择视频模型：${it.displayName.ifBlank { it.modelId }}" }
-                ?: "还没有选择视频模型；去设置-默认模型里选择一个视频模型。"
-        }
-        .stateIn(viewModelScope, SharingStarted.Lazily, "正在读取视频模型...")
+    private val _videoPlayback = MutableSharedFlow<StarWishVideoItem>(extraBufferCapacity = 8)
+    val videoPlayback = _videoPlayback
+    private val _videoMessage = MutableSharedFlow<String>(extraBufferCapacity = 8)
+    val videoMessage = _videoMessage
     private val _generatedImages = MutableStateFlow<List<StarWishGeneratedImage>>(emptyList())
     val generatedImages = _generatedImages.asStateFlow()
     private val _isGeneratingChapter = MutableStateFlow(false)
@@ -110,16 +108,74 @@ class StarWishVM(
         }
     }
 
-    fun redeemVideo() {
+    fun importVideo(uri: Uri) {
         viewModelScope.launch {
-            studyStore.update { current -> StudyRules.redeemVideo(current).state }
+            val localUri = filesManager.createChatFilesByContents(listOf(uri)).firstOrNull()
+            if (localUri == null) {
+                _videoMessage.tryEmit("视频导入失败")
+                return@launch
+            }
+            val sourceName = filesManager.getFileNameFromUri(uri) ?: "星愿视频"
+            val item = StarWishVideoItem(
+                id = "custom-video-${System.currentTimeMillis()}-${sourceName.hashCode()}",
+                title = sourceName.substringBeforeLast('.').ifBlank { "星愿视频" },
+                uri = localUri.toString(),
+                builtIn = false,
+                createdAt = System.currentTimeMillis(),
+            )
+            store.update { current ->
+                current.copy(customVideos = current.customVideos + item)
+            }
+            _videoMessage.tryEmit("已加入视频柜，抽到视频碎片后可解锁")
         }
     }
 
-    fun clearVideoRecords() {
+    fun unlockNextVideoOrPlayRandom() {
         viewModelScope.launch {
-            studyStore.update { current ->
-                current.copy(stats = current.stats.copy(videoRewardsRedeemed = 0))
+            val currentStarWish = state.value
+            val currentStudy = studyState.value
+            val visibleVideos = StarWishRules.allVideos(currentStarWish.customVideos)
+                .filterNot { it.id in currentStarWish.hiddenVideoIds }
+            val hasLockedVideo = visibleVideos.any { it.id !in currentStarWish.unlockedVideoIds }
+            val result = StarWishRules.unlockNextVideo(currentStarWish, currentStudy, Random.Default)
+            val video = result.video
+            if (video == null) {
+                _videoMessage.tryEmit(if (visibleVideos.isEmpty()) "先上传或内置视频后再解锁" else "还需要 1 个视频碎片")
+                return@launch
+            }
+            if (result.consumedFragment) {
+                studyStore.set(result.studyState)
+                store.update { result.starWishState }
+                _videoMessage.tryEmit("已解锁：${video.title}")
+            } else if (hasLockedVideo) {
+                _videoMessage.tryEmit("还需要 1 个视频碎片")
+                return@launch
+            }
+            _videoPlayback.emit(video)
+        }
+    }
+
+    fun playVideo(video: StarWishVideoItem) {
+        viewModelScope.launch {
+            if (video.id in state.value.unlockedVideoIds) {
+                _videoPlayback.emit(video)
+            } else {
+                _videoMessage.tryEmit("这个视频还没有解锁")
+            }
+        }
+    }
+
+    fun deleteVideo(video: StarWishVideoItem) {
+        viewModelScope.launch {
+            if (!video.builtIn) {
+                runCatching { filesManager.deleteChatFiles(listOf(video.uri.toUri())) }
+            }
+            store.update { current ->
+                current.copy(
+                    customVideos = current.customVideos.filterNot { it.id == video.id },
+                    hiddenVideoIds = current.hiddenVideoIds + video.id,
+                    unlockedVideoIds = current.unlockedVideoIds - video.id,
+                )
             }
         }
     }

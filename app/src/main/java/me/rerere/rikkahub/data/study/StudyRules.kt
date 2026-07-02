@@ -88,7 +88,7 @@ object StudyRules {
         StudyAchievement("theater_open", "剧场开幕", "攒够一次小剧场章节兑换", StudyReward(singleDrawTickets = 3, title = "单抽券 x3")),
         StudyAchievement("lucky_drawer", "好运初现", "累计获得20个抽卡碎片", StudyReward(kudos = 120, title = "夸夸值 120")),
         StudyAchievement("epic_touch", "镜头亮起", "获得第一枚视频碎片", StudyReward(singleDrawTickets = 2, kudos = 120, title = "单抽券 x2 + 夸夸值 120")),
-        StudyAchievement("mcdonalds_arrival", "第一支视频", "首次兑换视频奖励", StudyReward(kudos = 500, title = "夸夸值 500")),
+        StudyAchievement("mcdonalds_arrival", "第一支视频", "首次解锁视频奖励", StudyReward(kudos = 500, title = "夸夸值 500")),
     )
 
     fun rolloverToDate(state: StudyState, date: LocalDate = LocalDate.now()): StudyState {
@@ -480,10 +480,10 @@ object StudyRules {
                 recentEvents = state.recentEvents.addEvent(
                     StudyEventType.Video,
                     "视频奖励",
-                    "消耗 1 枚视频碎片，点亮一次视频生成机会",
+                    "消耗 1 枚视频碎片，解锁一次视频收藏",
                 ),
             ),
-            reward = StudyReward(title = "视频生成机会 x1"),
+            reward = StudyReward(title = "视频收藏解锁 x1"),
         )
     }
 

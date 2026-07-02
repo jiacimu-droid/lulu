@@ -1,5 +1,9 @@
 package me.rerere.rikkahub.ui.pages.starwish
 
+import android.widget.MediaController
+import android.widget.VideoView
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,12 +61,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import androidx.core.net.toUri
 import java.io.File
 import kotlinx.coroutines.launch
 import me.rerere.hugeicons.HugeIcons
@@ -82,6 +90,7 @@ import me.rerere.rikkahub.data.starwish.StarWishOutfitPrompts
 import me.rerere.rikkahub.data.starwish.StarWishRules
 import me.rerere.rikkahub.data.starwish.StarWishScroll
 import me.rerere.rikkahub.data.starwish.StarWishTheaterSeed
+import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.ui.components.nav.BackButton
@@ -111,10 +120,10 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     val generatedImages by vm.generatedImages.collectAsStateWithLifecycle()
     val studyState by vm.studyState.collectAsStateWithLifecycle()
-    val videoModelStatus by vm.videoModelStatus.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
+    var selectedVideo by remember { mutableStateOf<StarWishVideoItem?>(null) }
     var section by remember { mutableStateOf(StarWishSection.Scrolls) }
     var scrollSubsection by remember { mutableStateOf(ScrollSubsection.Prompts) }
     var selectedScroll by remember { mutableStateOf<Pair<String, StarWishScroll>?>(null) }
@@ -128,6 +137,15 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     LaunchedEffect(state.lastSection) {
         section = StarWishSection.entries.firstOrNull { it.name == state.lastSection } ?: StarWishSection.Scrolls
+    }
+    LaunchedEffect(Unit) {
+        vm.videoPlayback.collect { selectedVideo = it }
+    }
+    LaunchedEffect(Unit) {
+        vm.videoMessage.collect { snackbarHostState.showSnackbar(it) }
+    }
+    val videoPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let(vm::importVideo)
     }
 
     Scaffold(
@@ -290,15 +308,36 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                     }
                 }
                 StarWishSection.Video -> {
+                    val videos = StarWishRules.allVideos(state.customVideos)
+                        .filterNot { it.id in state.hiddenVideoIds }
+                    val unlockedCount = videos.count { it.id in state.unlockedVideoIds }
                     item {
                         VideoRewardCard(
                             epicFragments = studyState.inventory.epicFragments,
-                            redeemed = studyState.stats.videoRewardsRedeemed,
-                            videoModelStatus = videoModelStatus,
-                            onRedeem = vm::redeemVideo,
-                            onOpenVideoSetting = { navController.navigate(Screen.SettingModels) },
-                            onClearVideoRecords = vm::clearVideoRecords,
+                            unlocked = unlockedCount,
+                            total = videos.size,
+                            onUnlock = vm::unlockNextVideoOrPlayRandom,
+                            onUpload = { videoPickerLauncher.launch("video/*") },
                         )
+                    }
+                    if (videos.isEmpty()) {
+                        item {
+                            StarWishEmptyCard(
+                                title = "还没有视频",
+                                subtitle = "先上传豆包生成的视频；它会以灰色锁定状态进入视频柜，抽到视频碎片后解锁。",
+                                icon = HugeIcons.Play,
+                                onClick = { videoPickerLauncher.launch("video/*") },
+                            )
+                        }
+                    } else {
+                        items(videos) { video ->
+                            StarWishVideoRow(
+                                video = video,
+                                unlocked = video.id in state.unlockedVideoIds,
+                                onPlay = { vm.playVideo(video) },
+                                onDelete = { vm.deleteVideo(video) },
+                            )
+                        }
                     }
                 }
             }
@@ -333,6 +372,13 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                 selectedScroll = null
                 navController.navigate(Screen.ImageGen(initialPrompt = finalPrompt, count = 1, autoGenerate = false))
             },
+        )
+    }
+
+    selectedVideo?.let { video ->
+        StarWishVideoPlayerDialog(
+            video = video,
+            onDismiss = { selectedVideo = null },
         )
     }
 
@@ -745,11 +791,10 @@ private fun ScrollDetailDialog(
 @Composable
 private fun VideoRewardCard(
     epicFragments: Int,
-    redeemed: Int,
-    videoModelStatus: String,
-    onRedeem: () -> Unit,
-    onOpenVideoSetting: () -> Unit,
-    onClearVideoRecords: () -> Unit,
+    unlocked: Int,
+    total: Int,
+    onUnlock: () -> Unit,
+    onUpload: () -> Unit,
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.84f)),
@@ -763,13 +808,13 @@ private fun VideoRewardCard(
                     }
                 }
                 Column(Modifier.weight(1f)) {
-                    Text("视频奖励", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    Text("视频碎片 $epicFragments 枚 · 已兑换 $redeemed 次", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("视频收藏柜", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text("视频碎片 $epicFragments 枚 · 已解锁 $unlocked/$total", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Surface(color = StarWishColors.mistBlue.copy(alpha = 0.72f), shape = RoundedCornerShape(14.dp)) {
                 Text(
-                    "$videoModelStatus\n1 个视频碎片可兑换 1 次视频生成机会。当前仓库还没有独立的视频生成页面，先在这里记录兑换，视频模型在默认模型里单独配置。",
+                    "上传豆包生成的视频后，它会先以灰色锁定状态进入收藏柜。每消耗 1 个视频碎片，按列表顺序解锁下一个视频并自动播放；全部解锁后会随机播放已解锁视频。",
                     modifier = Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = StarWishColors.inkBlue,
@@ -777,32 +822,112 @@ private fun VideoRewardCard(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                 Button(
-                    onClick = onRedeem,
-                    enabled = epicFragments >= 1,
+                    onClick = onUnlock,
+                    enabled = total > 0 && (epicFragments >= StarWishRules.VIDEO_FRAGMENTS_PER_UNLOCK || unlocked >= total),
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("兑换视频机会")
+                    Text(if (unlocked >= total && total > 0) "随机播放" else "解锁下一个")
                 }
                 TextButton(
-                    onClick = onOpenVideoSetting,
+                    onClick = onUpload,
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("视频模型设置")
+                    Text("上传视频")
                 }
-            }
-            TextButton(
-                onClick = onClearVideoRecords,
-                enabled = redeemed > 0,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(HugeIcons.Delete01, null)
-                Spacer(Modifier.width(6.dp))
-                Text("清空视频兑换记录")
             }
         }
     }
 }
 
+@Composable
+private fun StarWishVideoRow(
+    video: StarWishVideoItem,
+    unlocked: Boolean,
+    onPlay: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = if (unlocked) 0.88f else 0.58f)),
+        modifier = Modifier.fillMaxWidth().clickable(enabled = unlocked, onClick = onPlay),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = if (unlocked) StarWishColors.mistBlue else StarWishColors.locked,
+                modifier = Modifier.size(54.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        if (unlocked) HugeIcons.Play else HugeIcons.CircleLock01,
+                        contentDescription = null,
+                        tint = if (unlocked) StarWishColors.inkBlue else MaterialTheme.colorScheme.outline,
+                    )
+                }
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(video.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    if (unlocked) "已解锁 · 可反复播放" else "未解锁 · 抽到视频碎片后点亮",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (unlocked) {
+                IconButton(onClick = onPlay) {
+                    Icon(HugeIcons.Play, contentDescription = "播放")
+                }
+            }
+            IconButton(onClick = onDelete) {
+                Icon(HugeIcons.Delete01, contentDescription = "删除")
+            }
+        }
+    }
+}
+
+@Composable
+private fun StarWishVideoPlayerDialog(
+    video: StarWishVideoItem,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    var videoView by remember(video.id) { mutableStateOf<VideoView?>(null) }
+    DisposableEffect(video.id) {
+        onDispose {
+            videoView?.stopPlayback()
+            videoView = null
+        }
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = { Button(onClick = onDismiss) { Text("收起") } },
+        title = { Text(video.title) },
+        text = {
+            AndroidView(
+                modifier = Modifier.fillMaxWidth().aspectRatio(9f / 16f).clip(RoundedCornerShape(16.dp)),
+                factory = { viewContext ->
+                    VideoView(viewContext).apply {
+                        videoView = this
+                        val controller = MediaController(context)
+                        controller.setAnchorView(this)
+                        setMediaController(controller)
+                        setVideoURI(video.uri.toUri())
+                        setOnPreparedListener { player ->
+                            player.isLooping = true
+                            start()
+                        }
+                    }
+                },
+                update = { view ->
+                    if (videoView !== view) videoView = view
+                },
+            )
+        },
+    )
+}
 @Composable
 private fun TheaterDetailContent(
     theater: StarWishTheaterSeed,
