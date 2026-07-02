@@ -20,10 +20,10 @@ class StudyRulesTest {
         )
         val duplicate = StudyRules.signIn(afterDay5.state, day1.plusDays(4))
 
-        assertEquals(25, afterDay1.reward.kudos)
-        assertEquals(25, afterDay2.reward.kudos)
+        assertEquals(50, afterDay1.reward.kudos)
+        assertEquals(50, afterDay2.reward.kudos)
         assertEquals(50, afterDay3.reward.kudos)
-        assertEquals(75, afterDay5.reward.kudos)
+        assertEquals(50, afterDay5.reward.kudos)
         assertEquals(0, duplicate.reward.kudos)
         assertEquals(5, afterDay5.state.signInStreak)
     }
@@ -82,16 +82,16 @@ class StudyRulesTest {
     @Test
     fun `draws consume coupons before kudos and add fragments`() {
         val state = StudyState(
-            wallet = StudyWallet(kudos = 800, singleDrawTickets = 1, tenDrawTickets = 1)
+            wallet = StudyWallet(kudos = 400, singleDrawTickets = 1, tenDrawTickets = 1)
         )
 
         val single = StudyRules.draw(state, count = 1, random = Random(3))
         val ten = StudyRules.draw(single.state, count = 10, random = Random(4))
         val paidTen = StudyRules.draw(ten.state, count = 10, random = Random(5))
 
-        assertEquals(800, single.state.wallet.kudos)
+        assertEquals(400, single.state.wallet.kudos)
         assertEquals(0, single.state.wallet.singleDrawTickets)
-        assertEquals(800, ten.state.wallet.kudos)
+        assertEquals(400, ten.state.wallet.kudos)
         assertEquals(0, ten.state.wallet.tenDrawTickets)
         assertEquals(0, paidTen.state.wallet.kudos)
         assertEquals(21, paidTen.results.size + ten.results.size + single.results.size)
@@ -115,11 +115,58 @@ class StudyRulesTest {
         val claimed = StudyRules.claimSuperMoment(state, SuperMomentChoice.NormalFragments)
         val duplicate = StudyRules.claimSuperMoment(claimed.state, SuperMomentChoice.RareFragment)
 
-        assertEquals(300, claimed.state.wallet.kudos)
+        assertEquals(100, claimed.state.wallet.kudos)
         assertEquals(1, claimed.state.wallet.tenDrawTickets)
-        assertEquals(5, claimed.state.inventory.universalNormalFragments)
+        assertEquals(0, claimed.state.inventory.universalNormalFragments)
         assertEquals(0, duplicate.reward.kudos)
         assertFalse(claimed.state.superMomentAvailable)
+    }
+
+    @Test
+    fun `economy reset clears test currency fragments tickets and shop state once`() {
+        val state = StudyState(
+            wallet = StudyWallet(kudos = 999, totalKudosEarned = 1_500, singleDrawTickets = 3, tenDrawTickets = 2),
+            inventory = StudyInventory(
+                normalFragments = mapOf("normal:星穹图书馆:专属碎片" to 4),
+                rareFragments = mapOf("rare:any" to 2),
+                epicFragments = 3,
+                specialStoryFragments = 2,
+                universalNormalFragments = 5,
+                universalRareFragments = 4,
+                universalEpicFragments = 1,
+                unlockedOutfits = setOf("星穹图书馆"),
+                unopenedMysteryBoxes = listOf(StudyMysteryBoxReward(50, 2)),
+            ),
+            claimedLevelRewards = setOf(1, 2),
+            claimedAchievementIds = setOf("warm_start"),
+            shopDate = "2026-07-02",
+            shopItems = listOf(StudyShopItem("a", StudyShopItemType.SingleDrawTicket, "单抽券 x1", 40)),
+            purchasedShopItemIds = setOf("a"),
+            internalTestGrantVersion = 1,
+        )
+
+        val reset = StudyRules.resetEconomyForOfficialStart(state)
+        val duplicate = StudyRules.resetEconomyForOfficialStart(reset)
+
+        assertEquals(0, reset.wallet.kudos)
+        assertEquals(0, reset.wallet.totalKudosEarned)
+        assertEquals(0, reset.wallet.singleDrawTickets)
+        assertEquals(0, reset.wallet.tenDrawTickets)
+        assertTrue(reset.inventory.normalFragments.isEmpty())
+        assertTrue(reset.inventory.rareFragments.isEmpty())
+        assertEquals(0, reset.inventory.epicFragments)
+        assertEquals(0, reset.inventory.specialStoryFragments)
+        assertEquals(0, reset.inventory.universalNormalFragments)
+        assertEquals(0, reset.inventory.universalRareFragments)
+        assertEquals(0, reset.inventory.universalEpicFragments)
+        assertTrue(reset.inventory.unlockedOutfits.isEmpty())
+        assertTrue(reset.inventory.unopenedMysteryBoxes.isEmpty())
+        assertTrue(reset.claimedLevelRewards.isEmpty())
+        assertTrue(reset.claimedAchievementIds.isEmpty())
+        assertEquals(null, reset.shopDate)
+        assertTrue(reset.shopItems.isEmpty())
+        assertEquals(StudyRules.OFFICIAL_ECONOMY_RESET_VERSION, reset.internalTestGrantVersion)
+        assertEquals(reset, duplicate)
     }
 
     @Test
@@ -228,29 +275,29 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `overflowing a completed normal outfit part converts universal fragment into single ticket`() {
+    fun `overflowing a completed normal outfit part converts universal fragment into kudos`() {
         val key = "normal:${StudyRules.outfitNames.first()}:${StudyRules.outfitParts.first()}"
         val state = StudyState(
-            wallet = StudyWallet(singleDrawTickets = 1),
+            wallet = StudyWallet(kudos = 20),
             inventory = StudyInventory(
-                normalFragments = mapOf(key to 4),
+                normalFragments = mapOf(key to StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT),
                 universalNormalFragments = 1,
             )
         )
 
         val used = StudyRules.useUniversalNormalFragment(state, key)
 
-        assertEquals(4, used.state.inventory.normalFragments[key])
+        assertEquals(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT, used.state.inventory.normalFragments[key])
         assertEquals(0, used.state.inventory.universalNormalFragments)
-        assertEquals(2, used.state.wallet.singleDrawTickets)
+        assertEquals(120, used.state.wallet.kudos)
     }
 
     @Test
-    fun `drawing a completed normal outfit part converts overflow into single ticket`() {
+    fun `drawing a completed normal outfit part converts overflow into kudos`() {
         val key = "normal:${StudyRules.outfitNames.first()}:${StudyRules.outfitParts.first()}"
         val state = StudyState(
-            wallet = StudyWallet(singleDrawTickets = 1),
-            inventory = StudyInventory(normalFragments = mapOf(key to 4)),
+            wallet = StudyWallet(kudos = StudyRules.SINGLE_DRAW_COST),
+            inventory = StudyInventory(normalFragments = mapOf(key to StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT)),
         )
         val result = StudyDrawResult(StudyRarity.Normal, key, StudyRules.normalTitle(key))
 
@@ -259,10 +306,10 @@ class StudyRulesTest {
             override fun nextInt(until: Int): Int = 0
         })
 
-        assertEquals(4, drawn.state.inventory.normalFragments[key])
+        assertEquals(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT, drawn.state.inventory.normalFragments[key])
         assertEquals(1, drawn.results.size)
         assertEquals(result.fragmentKey, drawn.results.first().fragmentKey)
-        assertEquals(1, drawn.state.wallet.singleDrawTickets)
+        assertEquals(100, drawn.state.wallet.kudos)
     }
 
     @Test

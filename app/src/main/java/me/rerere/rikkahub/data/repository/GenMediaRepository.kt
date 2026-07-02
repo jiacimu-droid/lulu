@@ -12,4 +12,10 @@ class GenMediaRepository(private val dao: GenMediaDAO) {
     suspend fun insertMedia(media: GenMediaEntity) = dao.insert(media)
 
     suspend fun deleteMedia(id: Int) = dao.delete(id)
+
+    suspend fun deleteMediaByIds(ids: List<Int>) {
+        if (ids.isNotEmpty()) {
+            dao.deleteByIds(ids)
+        }
+    }
 }

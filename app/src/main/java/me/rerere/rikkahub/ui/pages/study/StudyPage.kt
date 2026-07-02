@@ -806,8 +806,7 @@ private fun TodayProgressCard(
         }
         if (state.superMomentAvailable) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onClaimNormal, modifier = Modifier.weight(1f)) { Text("普通 x5") }
-                OutlinedButton(onClick = onClaimRare, modifier = Modifier.weight(1f)) { Text("小剧场 x1") }
+                Button(onClick = onClaimNormal, modifier = Modifier.fillMaxWidth()) { Text("领取十连券 x1") }
             }
         }
         LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
@@ -1219,7 +1218,7 @@ private fun SuperMomentCelebration(
                 Text("超神时刻", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold, color = Color.White)
                 Text("今日全清", style = MaterialTheme.typography.headlineMedium, color = Color.White.copy(alpha = 0.92f))
                 Text(
-                    "${assistant.name}看见你把今天全部拿下了。十连券、200 夸夸值，还有自选碎片都亮起来了。",
+                    "${assistant.name}看见你把今天全部拿下了。奖励固定发放十连券 x1。",
                     color = Color.White.copy(alpha = 0.92f),
                     style = MaterialTheme.typography.bodyLarge,
                 )
@@ -1235,10 +1234,7 @@ private fun SuperMomentCelebration(
             }
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                 Button(onClick = onClaimNormal, modifier = Modifier.fillMaxWidth()) {
-                    Text("选择普通碎片 x5")
-                }
-                OutlinedButton(onClick = onClaimRare, modifier = Modifier.fillMaxWidth()) {
-                    Text("选择小剧场碎片 x1")
+                    Text("领取十连券 x1")
                 }
                 TextButton(onClick = onDismissRequest, modifier = Modifier.fillMaxWidth()) {
                     Text("先等等", color = Color.White)
@@ -1759,10 +1755,10 @@ private fun drawFullscreenBrush(rarity: StudyRarity): Brush = when (rarity) {
 
 @Composable
 private fun MysteryBoxCelebration(reward: StudyMysteryBoxReward, onDismissRequest: () -> Unit) {
-    val rarity = when {
-        reward.kudos >= 100 || reward.universalNormalFragments >= 2 -> StudyRarity.Epic
-        reward.kudos >= 50 || reward.universalNormalFragments >= 1 -> StudyRarity.Rare
-        else -> StudyRarity.Normal
+    val rarity = when (reward.kudos) {
+        15, 25 -> StudyRarity.Normal
+        50 -> StudyRarity.Rare
+        else -> StudyRarity.Epic
     }
     val transition = rememberInfiniteTransition(label = "mystery-box")
     val pulse by transition.animateFloat(
@@ -1912,7 +1908,7 @@ private fun GachaCard(
                 Text("单抽 $singleCost / 券${state.wallet.singleDrawTickets}")
             }
             Button(onClick = onTen, modifier = Modifier.weight(1f)) {
-                Text("十连 800 / 券${state.wallet.tenDrawTickets}")
+                Text("十连 ${StudyRules.TEN_DRAW_COST} / 券${state.wallet.tenDrawTickets}")
             }
         }
     }
@@ -2326,10 +2322,10 @@ private fun StudyGuideCard() {
         GuideBlock(
             title = "每日获取",
             lines = listOf(
-                "签到：25 夸夸值；连续第 3 天为 50，第 5 天起为 75。",
+                "签到：每天固定 50 夸夸值。",
                 "完成 1 个番茄钟：50 夸夸值 + 1 个盲盒。",
                 "完成 1 项待办：100 夸夸值。",
-                "今日待办全清：触发超神时刻，固定给十连券 x1 + 200 夸夸值。",
+                "今日待办全清：触发超神时刻，固定给十连券 x1。",
             ),
         )
         GuideBlock(
@@ -2355,10 +2351,10 @@ private fun StudyGuideCard() {
         GuideBlock(
             title = "每周 5 天全清模拟",
             lines = listOf(
-                "约 5155 夸夸值，可折算 51 次单抽。",
-                "超神 5 天给 5 张十连券；等级和成就还会追加抽卡券。",
-                "按 114 抽估算：普通碎片约 97，稀有约 14，史诗约 3。",
-                "如果超神都选普通碎片，还会额外获得 25 个通用普通碎片。",
+                "约 4155 夸夸值，可折算 83 次单抽。",
+                "超神 5 天给 5 张十连券；等级、成就和商店会追加抽卡券。",
+                "按 133 抽估算：普通碎片约 122，小剧场约 7，特殊剧情约 3，视频约 1。",
+                "超神不再发碎片，画卷进度主要来自抽卡、盲盒、等级、成就和神秘商店。",
             ),
         )
         GuideBlock(

@@ -95,8 +95,21 @@ class StarWishVM(
             val launches = current.imageLaunches.filterNot { it.id in current.hiddenImageLaunchIds }
             val imagesDir = filesManager.getImagesDir()
             val media = genMediaRepository.listAllMedia()
+            val hiddenMedia = media.filter { it.id in current.hiddenGeneratedImageIds }
+            if (hiddenMedia.isNotEmpty()) {
+                hiddenMedia.forEach { entity ->
+                    runCatching {
+                        File(imagesDir, entity.path.removePrefix("images/")).delete()
+                    }
+                }
+                genMediaRepository.deleteMediaByIds(hiddenMedia.map { it.id })
+                store.update { state ->
+                    state.copy(hiddenGeneratedImageIds = state.hiddenGeneratedImageIds - hiddenMedia.map { it.id }.toSet())
+                }
+            }
+            val hiddenIds = hiddenMedia.map { it.id }.toSet()
             _generatedImages.value = media.mapNotNull { entity ->
-                if (entity.id in current.hiddenGeneratedImageIds) return@mapNotNull null
+                if (entity.id in current.hiddenGeneratedImageIds || entity.id in hiddenIds) return@mapNotNull null
                 val launch = launches.firstOrNull { it.prompt == entity.prompt }
                 StarWishGeneratedImage(
                     id = entity.id,

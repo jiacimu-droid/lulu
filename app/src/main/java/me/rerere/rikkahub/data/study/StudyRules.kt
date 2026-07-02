@@ -5,9 +5,10 @@ import kotlin.math.max
 import kotlin.random.Random
 
 object StudyRules {
-    const val SINGLE_DRAW_COST = 100
-    const val DISCOUNT_SINGLE_DRAW_COST = 100
-    const val TEN_DRAW_COST = 800
+    const val SINGLE_DRAW_COST = 50
+    const val DISCOUNT_SINGLE_DRAW_COST = 50
+    const val TEN_DRAW_COST = 400
+    const val OFFICIAL_ECONOMY_RESET_VERSION = 2
     const val NORMAL_FRAGMENTS_PER_OUTFIT = 10
     private const val OVERFLOW_NORMAL_FRAGMENT_KUDOS = 100
     private const val INTERNAL_TEST_GRANT_VERSION = 1
@@ -76,19 +77,19 @@ object StudyRules {
 
     val achievements = listOf(
         StudyAchievement("first_companion", "初识陪伴", "累计完成10个番茄钟", StudyReward(singleDrawTickets = 1, title = "单抽券 x1")),
-        StudyAchievement("warm_start", "热身完成", "累计完成3个番茄钟", StudyReward(kudos = 80, title = "夸夸值 80")),
-        StudyAchievement("todo_slayer", "清单杀手", "累计完成30项待办", StudyReward(kudos = 150, title = "夸夸值 150")),
+        StudyAchievement("warm_start", "热身完成", "累计完成3个番茄钟", StudyReward(kudos = 50, title = "夸夸值 50")),
+        StudyAchievement("todo_slayer", "清单杀手", "累计完成30项待办", StudyReward(kudos = 100, title = "夸夸值 100")),
         StudyAchievement("task_spark", "清单起势", "累计完成10项待办", StudyReward(singleDrawTickets = 1, title = "单抽券 x1")),
         StudyAchievement("perfect_3", "连续全清3天", "连续3天待办全清", StudyReward(universalNormalFragments = 2, title = "通用普通碎片 x2")),
         StudyAchievement("perfect_7", "连续全清7天", "连续7天待办全清", StudyReward(tenDrawTickets = 1, title = "十连抽券 x1")),
-        StudyAchievement("deep_work_10h", "坐稳书桌", "累计学习时长10小时", StudyReward(kudos = 180, title = "夸夸值 180")),
-        StudyAchievement("time_traveler", "时光旅人", "累计学习时长50小时", StudyReward(kudos = 300, title = "夸夸值 300")),
+        StudyAchievement("deep_work_10h", "坐稳书桌", "累计学习时长10小时", StudyReward(kudos = 100, title = "夸夸值 100")),
+        StudyAchievement("time_traveler", "时光旅人", "累计学习时长50小时", StudyReward(kudos = 200, title = "夸夸值 200")),
         StudyAchievement("first_outfit", "第一画卷", "解锁第一套普通画卷", StudyReward(universalRareFragments = 1, title = "小剧场碎片 x1")),
         StudyAchievement("outfit_collector", "画卷收藏家", "解锁任意3套普通画卷", StudyReward(universalRareFragments = 2, title = "小剧场碎片 x2")),
-        StudyAchievement("theater_open", "剧场开幕", "攒够一次小剧场章节兑换", StudyReward(singleDrawTickets = 3, title = "单抽券 x3")),
-        StudyAchievement("lucky_drawer", "好运初现", "累计获得20个抽卡碎片", StudyReward(kudos = 120, title = "夸夸值 120")),
-        StudyAchievement("epic_touch", "镜头亮起", "获得第一枚视频碎片", StudyReward(singleDrawTickets = 2, kudos = 120, title = "单抽券 x2 + 夸夸值 120")),
-        StudyAchievement("mcdonalds_arrival", "第一支视频", "首次解锁视频奖励", StudyReward(kudos = 500, title = "夸夸值 500")),
+        StudyAchievement("theater_open", "剧场开幕", "攒够一次小剧场章节兑换", StudyReward(singleDrawTickets = 2, title = "单抽券 x2")),
+        StudyAchievement("lucky_drawer", "好运初现", "累计获得20个抽卡碎片", StudyReward(kudos = 80, title = "夸夸值 80")),
+        StudyAchievement("epic_touch", "镜头亮起", "获得第一枚视频碎片", StudyReward(singleDrawTickets = 1, kudos = 80, title = "单抽券 x1 + 夸夸值 80")),
+        StudyAchievement("mcdonalds_arrival", "第一支视频", "首次解锁视频奖励", StudyReward(kudos = 300, title = "夸夸值 300")),
     )
 
     fun rolloverToDate(state: StudyState, date: LocalDate = LocalDate.now()): StudyState {
@@ -110,6 +111,7 @@ object StudyRules {
     }
 
     fun grantInternalTestResources(state: StudyState): StudyState {
+        if (state.internalTestGrantVersion >= OFFICIAL_ECONOMY_RESET_VERSION) return state
         if (state.internalTestGrantVersion >= INTERNAL_TEST_GRANT_VERSION) return state
         val reward = StudyReward(kudos = 100_000, title = "内部测试资源 +100000")
         return state.copy(
@@ -117,6 +119,33 @@ object StudyRules {
             inventory = state.inventory.copy(epicFragments = state.inventory.epicFragments + 2),
             internalTestGrantVersion = INTERNAL_TEST_GRANT_VERSION,
             recentEvents = state.recentEvents.addEvent(StudyEventType.Fragment, "内部测试资源", "夸夸值 100000 · 视频碎片 x2"),
+        )
+    }
+
+    fun resetEconomyForOfficialStart(state: StudyState): StudyState {
+        if (state.internalTestGrantVersion >= OFFICIAL_ECONOMY_RESET_VERSION) return state
+        return state.copy(
+            wallet = StudyWallet(),
+            inventory = StudyInventory(),
+            stats = state.stats.copy(
+                unlockedOutfitSets = 0,
+                unlockedTheaters = 0,
+                videoRewardsRedeemed = 0,
+            ),
+            superMomentAvailable = false,
+            superMomentClaimedDate = null,
+            claimedLevelRewards = emptySet(),
+            claimedAchievementIds = emptySet(),
+            shopDate = null,
+            shopItems = emptyList(),
+            purchasedShopItemIds = emptySet(),
+            manualShopRefreshDate = null,
+            internalTestGrantVersion = OFFICIAL_ECONOMY_RESET_VERSION,
+            recentEvents = state.recentEvents.addEvent(
+                StudyEventType.Fragment,
+                "正式开始攒资源",
+                "已清空测试夸夸值、抽卡券、盲盒和全部碎片",
+            ),
         )
     }
 
@@ -150,11 +179,7 @@ object StudyRules {
         }
         val previous = state.lastSignInDate?.let(LocalDate::parse)
         val streak = if (previous == date.minusDays(1)) state.signInStreak + 1 else 1
-        val kudos = when {
-            streak >= 5 -> 75
-            streak == 3 -> 50
-            else -> 25
-        }
+        val kudos = 50
         val reward = StudyReward(kudos = kudos, title = "签到 +$kudos")
         return StudyActionResult(
             state = state.copy(
@@ -351,10 +376,10 @@ object StudyRules {
     fun claimSuperMoment(state: StudyState, choice: SuperMomentChoice): StudyActionResult {
         if (!state.superMomentAvailable || state.superMomentClaimedDate == state.today) return StudyActionResult(state)
         val selected = when (choice) {
-            SuperMomentChoice.NormalFragments -> StudyReward(universalNormalFragments = 5, title = "通用普通碎片 x5")
-            SuperMomentChoice.RareFragment -> StudyReward(universalRareFragments = 1, title = "小剧场碎片 x1")
+            SuperMomentChoice.NormalFragments,
+            SuperMomentChoice.RareFragment -> StudyReward()
         }
-        val fixed = StudyReward(kudos = 200, tenDrawTickets = 1, title = "十连抽券 x1 + 夸夸值 200")
+        val fixed = StudyReward(tenDrawTickets = 1, title = "十连抽券 x1")
         val reward = selected + fixed
         return StudyActionResult(
             state = state.copy(
@@ -743,10 +768,10 @@ private fun List<StudyEvent>.addEvent(type: StudyEventType, title: String, detai
 
 private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
     return when (this) {
-        StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x1", 90)
-        StudyShopItemType.UniversalRareFragment -> StudyShopItem(id, this, "小剧场碎片 x1", 280)
-        StudyShopItemType.UniversalEpicFragment -> StudyShopItem(id, this, "通用史诗碎片 x1", 750)
-        StudyShopItemType.SingleDrawTicket -> StudyShopItem(id, this, "单抽券 x1", 90)
+        StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x1", 45)
+        StudyShopItemType.UniversalRareFragment -> StudyShopItem(id, this, "小剧场碎片 x1", 160)
+        StudyShopItemType.UniversalEpicFragment -> StudyShopItem(id, this, "通用史诗碎片 x1", 400)
+        StudyShopItemType.SingleDrawTicket -> StudyShopItem(id, this, "单抽券 x1", 40)
     }
 }
 

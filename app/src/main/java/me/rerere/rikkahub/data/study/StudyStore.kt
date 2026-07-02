@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -29,18 +30,39 @@ class StudyStore(
 ) {
     private val stateKey = stringPreferencesKey("state")
 
+    init {
+        scope.launch {
+            context.studyDataStore.edit { prefs ->
+                val current = prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
+                val migrated = StudyRules.resetEconomyForOfficialStart(current.ensureToday())
+                if (migrated.internalTestGrantVersion != current.internalTestGrantVersion) {
+                    prefs[stateKey] = json.encodeToString(migrated)
+                }
+            }
+        }
+    }
+
     val state: StateFlow<StudyState> = context.studyDataStore.data
         .map { prefs ->
             prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
         }
         .catch { emit(StudyState(today = LocalDate.now().toString())) }
-        .map { StudyRules.grantInternalTestResources(StudyRules.refreshShopIfNeeded(it.ensureToday(), LocalDate.now(), Random.Default)) }
+        .map {
+            StudyRules.refreshShopIfNeeded(
+                StudyRules.resetEconomyForOfficialStart(it.ensureToday()),
+                LocalDate.now(),
+                Random.Default,
+            )
+        }
         .stateIn(scope, SharingStarted.Eagerly, StudyState(today = LocalDate.now().toString()))
 
     suspend fun update(transform: (StudyState) -> StudyState) {
         context.studyDataStore.edit { prefs ->
             val current = prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
-            prefs[stateKey] = json.encodeToString(StudyRules.grantInternalTestResources(transform(current.ensureToday())))
+            val migrated = StudyRules.resetEconomyForOfficialStart(current.ensureToday())
+            prefs[stateKey] = json.encodeToString(
+                transform(migrated)
+            )
         }
     }
 
