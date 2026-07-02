@@ -50,6 +50,7 @@ import me.rerere.hugeicons.stroke.BubbleChat
 import me.rerere.hugeicons.stroke.Bug01
 import me.rerere.hugeicons.stroke.Chart
 import me.rerere.hugeicons.stroke.Favourite
+import me.rerere.hugeicons.stroke.Puzzle
 import me.rerere.hugeicons.stroke.Setting07
 import me.rerere.hugeicons.stroke.User
 import me.rerere.rikkahub.Screen
@@ -96,6 +97,7 @@ fun DesktopPage() {
             DesktopApp("记忆", HugeIcons.Brain02, "memory") { navController.navigate(Screen.MemoryBank) },
             DesktopApp("考研", HugeIcons.BookOpen02, "study") { navController.navigate(Screen.Study) },
             DesktopApp("星愿馆", HugeIcons.Bookshelf02, "starwish") { navController.navigate(Screen.StarWish) },
+            DesktopApp("游戏", HugeIcons.Puzzle, "game") { navController.navigate(Screen.GameHub) },
             DesktopApp("聊天", HugeIcons.BubbleChat, "chat") { navController.navigate(Screen.ChatRooms) },
             DesktopApp("我的", HugeIcons.User, "user") { navController.navigate(Screen.UserProfile) },
             DesktopApp("缓存统计", HugeIcons.Chart, "stats") { navController.navigate(Screen.Stats) },

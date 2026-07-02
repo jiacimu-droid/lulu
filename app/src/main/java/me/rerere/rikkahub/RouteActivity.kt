@@ -98,6 +98,8 @@ import me.rerere.rikkahub.ui.pages.extensions.QuickMessagesPage
 import me.rerere.rikkahub.ui.pages.extensions.SkillDetailPage
 import me.rerere.rikkahub.ui.pages.extensions.SkillsPage
 import me.rerere.rikkahub.ui.pages.favorite.FavoritePage
+import me.rerere.rikkahub.ui.pages.game.GameHubPage
+import me.rerere.rikkahub.ui.pages.game.PerfectManGamePage
 import me.rerere.rikkahub.ui.pages.health.HealthPage
 import me.rerere.rikkahub.ui.pages.history.HistoryPage
 import me.rerere.rikkahub.ui.pages.imggen.ImageGenPage
@@ -342,6 +344,14 @@ class RouteActivity : ComponentActivity() {
 
                             entry<Screen.ChatRooms> {
                                 ChatRoomsPage()
+                            }
+
+                            entry<Screen.GameHub> {
+                                GameHubPage()
+                            }
+
+                            entry<Screen.PerfectManGame> {
+                                PerfectManGamePage()
                             }
 
                             entry<Screen.Study> {
@@ -713,6 +723,12 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data object ChatRooms : Screen
+
+    @Serializable
+    data object GameHub : Screen
+
+    @Serializable
+    data object PerfectManGame : Screen
 
     @Serializable
     data object UserProfile : Screen
