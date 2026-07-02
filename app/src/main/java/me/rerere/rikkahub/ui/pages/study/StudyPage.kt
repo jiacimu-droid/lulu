@@ -5,9 +5,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -1255,7 +1253,7 @@ private fun DrawResultCelebration(
         revealState.index !in playedRewardVideoIndexes
     val currentVideoUri = when {
         revealState.phase == DrawRevealPhase.RainbowVideo -> DEFAULT_RAINBOW_DRAW_VIDEO_URI
-        revealState.phase == DrawRevealPhase.RewardVideo -> currentReveal?.video?.uri ?: DEFAULT_RAINBOW_DRAW_VIDEO_URI
+        revealState.phase == DrawRevealPhase.RewardVideo -> currentReveal?.video?.uri
         current?.rarity == StudyRarity.Rainbow -> DEFAULT_RAINBOW_DRAW_VIDEO_URI
         else -> null
     }
@@ -1313,9 +1311,9 @@ private fun DrawResultCelebration(
                 .fillMaxSize()
                 .background(drawFullscreenBrush(current?.rarity ?: best)),
         ) {
-            if (showRainbowBackdrop) {
+            if (showRainbowBackdrop && currentVideoUri != null) {
                 RainbowDrawVideoLayer(
-                    videoUri = currentVideoUri ?: DEFAULT_RAINBOW_DRAW_VIDEO_URI,
+                    videoUri = currentVideoUri,
                     playbackKey = currentVideoPlaybackKey,
                     shouldPlay = revealState.phase == DrawRevealPhase.RainbowVideo ||
                         revealState.phase == DrawRevealPhase.RewardVideo,
@@ -1373,11 +1371,9 @@ private fun DrawResultCelebration(
                         transitionSpec = {
                             val direction = if (targetState.first >= initialState.first) 1 else -1
                             val enter = fadeIn(tween(220)) +
-                                slideInHorizontally(tween(360)) { width -> width * direction } +
-                                slideInVertically(tween(360)) { 28 }
+                                slideInHorizontally(tween(360)) { width -> width * direction }
                             val exit = fadeOut(tween(180)) +
-                                slideOutHorizontally(tween(300)) { width -> -width * direction } +
-                                slideOutVertically(tween(300)) { -28 }
+                                slideOutHorizontally(tween(300)) { width -> -width * direction }
                             enter togetherWith exit
                         },
                         label = "draw-card-fade",

@@ -25,11 +25,9 @@ class StarWishRulesTest {
     }
 
     @Test
-    fun builtInVideosIncludeRainbowDrawReward() {
-        assertTrue(StarWishRules.builtInVideos.any { video ->
-            video.id == "built-in-rainbow-draw" &&
-                video.uri == "raw:star_wish_rainbow_draw" &&
-                video.builtIn
+    fun drawAnimationIsNotExposedAsStarWishVideo() {
+        assertTrue(StarWishRules.builtInVideos.none { video ->
+            video.uri == "raw:star_wish_rainbow_draw"
         })
     }
 
