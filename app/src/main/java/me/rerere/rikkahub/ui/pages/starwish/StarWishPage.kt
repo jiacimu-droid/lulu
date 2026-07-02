@@ -71,7 +71,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import androidx.core.net.toUri
 import java.io.File
 import kotlinx.coroutines.launch
 import me.rerere.hugeicons.HugeIcons
@@ -101,6 +100,7 @@ import me.rerere.rikkahub.ui.components.ui.ImagePreviewDialog
 import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
+import me.rerere.rikkahub.utils.resolveAppVideoUri
 import me.rerere.rikkahub.utils.plus
 import org.koin.androidx.compose.koinViewModel
 
@@ -930,7 +930,7 @@ private fun StarWishVideoPlayerDialog(
                         val controller = MediaController(context)
                         controller.setAnchorView(this)
                         setMediaController(controller)
-                        setVideoURI(video.uri.toUri())
+                        setVideoURI(resolveAppVideoUri(context, video.uri))
                         setOnPreparedListener { player ->
                             player.isLooping = true
                             start()

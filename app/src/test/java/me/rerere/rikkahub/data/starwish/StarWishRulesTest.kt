@@ -24,6 +24,15 @@ class StarWishRulesTest {
         }
     }
 
+    @Test
+    fun builtInVideosIncludeRainbowDrawReward() {
+        assertTrue(StarWishRules.builtInVideos.any { video ->
+            video.id == "built-in-rainbow-draw" &&
+                video.uri == "raw:star_wish_rainbow_draw" &&
+                video.builtIn
+        })
+    }
+
     private fun assertPromptComplete(prompt: String, label: String) {
         listOf("服装", "饰品", "背景", "姿势", "表情", "光影", "画风", "画质").forEach { phrase ->
             assertTrue(prompt.contains(phrase), "$label should include $phrase")

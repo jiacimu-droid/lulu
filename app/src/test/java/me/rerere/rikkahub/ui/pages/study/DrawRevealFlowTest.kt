@@ -39,12 +39,12 @@ class DrawRevealFlowTest {
     }
 
     @Test
-    fun skipEndsTheRevealFlow() {
+    fun skipShowsSummary() {
         val results = listOf(draw(StudyRarity.Rainbow), draw(StudyRarity.Epic))
 
         val skipped = DrawRevealFlow.skip(DrawRevealFlow.start(results))
 
-        assertEquals(DrawRevealPhase.Done, skipped.phase)
+        assertEquals(DrawRevealPhase.Summary, skipped.phase)
         assertEquals(results.lastIndex, skipped.index)
     }
 

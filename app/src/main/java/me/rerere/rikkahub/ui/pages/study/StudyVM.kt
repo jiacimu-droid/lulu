@@ -30,6 +30,7 @@ import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.data.study.SuperMomentChoice
 import me.rerere.rikkahub.data.starwish.StarWishRules
 import me.rerere.rikkahub.data.starwish.StarWishStore
+import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import java.time.LocalDate
 import kotlin.random.Random
 
@@ -156,17 +157,21 @@ class StudyVM(
             }
             var nextStudyState = result.state
             var nextStarWishState = starWishStore.state.value
-            val videoFragments = result.results.count { it.rarity == StudyRarity.Rainbow }
-            repeat(videoFragments) {
-                val unlock = StarWishRules.unlockNextVideo(nextStarWishState, nextStudyState, Random.Default)
-                nextStudyState = unlock.studyState
-                nextStarWishState = unlock.starWishState
+            val revealItems = result.results.map { drawResult ->
+                if (drawResult.rarity == StudyRarity.Rainbow) {
+                    val unlock = StarWishRules.unlockNextVideo(nextStarWishState, nextStudyState, Random.Default)
+                    nextStudyState = unlock.studyState
+                    nextStarWishState = unlock.starWishState
+                    StudyDrawReveal(drawResult, unlock.video)
+                } else {
+                    StudyDrawReveal(drawResult)
+                }
             }
             store.set(nextStudyState)
             if (nextStarWishState != starWishStore.state.value) {
                 starWishStore.update { nextStarWishState }
             }
-            _effects.tryEmit(StudyEffect.DrawResults(result.results))
+            _effects.tryEmit(StudyEffect.DrawResults(revealItems))
         }
     }
 
@@ -253,7 +258,12 @@ sealed interface StudyEffect {
     data class Message(val text: String) : StudyEffect
     data object MysteryBoxReady : StudyEffect
     data class MysteryBox(val reward: StudyMysteryBoxReward) : StudyEffect
-    data class DrawResults(val results: List<StudyDrawResult>) : StudyEffect
+    data class DrawResults(val results: List<StudyDrawReveal>) : StudyEffect
     data object VideoRedeemed : StudyEffect
     data object SuperMomentReady : StudyEffect
 }
+
+data class StudyDrawReveal(
+    val result: StudyDrawResult,
+    val video: StarWishVideoItem? = null,
+)

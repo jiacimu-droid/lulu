@@ -81,11 +81,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import me.rerere.rikkahub.R
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Add01
 import me.rerere.hugeicons.stroke.AiMagic
@@ -129,6 +127,7 @@ import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.context.LocalTTSState
 import me.rerere.rikkahub.ui.theme.CustomColors
+import me.rerere.rikkahub.utils.resolveAppVideoUri
 import me.rerere.rikkahub.utils.plus
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -161,6 +160,8 @@ private enum class DailyDashboardView(val label: String) {
     Tips("Tips"),
 }
 
+private const val DEFAULT_RAINBOW_DRAW_VIDEO_URI = "raw:star_wish_rainbow_draw"
+
 @Composable
 fun StudyPage(vm: StudyVM = koinViewModel()) {
     val navController = LocalNavController.current
@@ -175,7 +176,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
     var section by remember { mutableStateOf(StudySection.Today) }
     var newTask by remember { mutableStateOf("") }
-    var drawDialog by remember { mutableStateOf<List<StudyDrawResult>?>(null) }
+    var drawDialog by remember { mutableStateOf<List<StudyDrawReveal>?>(null) }
     var pendingBoxDialog by remember { mutableStateOf(false) }
     var boxDialog by remember { mutableStateOf<StudyMysteryBoxReward?>(null) }
     var showVideoDialog by remember { mutableStateOf(false) }
@@ -1236,80 +1237,100 @@ private fun SuperMomentCelebration(
 
 @Composable
 private fun DrawResultCelebration(
-    results: List<StudyDrawResult>,
+    results: List<StudyDrawReveal>,
     onDismissRequest: () -> Unit,
 ) {
-    val best = results.maxByOrNull { it.rarity.weight }?.rarity ?: StudyRarity.Normal
-    var revealState by remember(results) { mutableStateOf(DrawRevealFlow.start(results)) }
+    val drawResults = remember(results) { results.map { it.result } }
+    val best = drawResults.maxByOrNull { it.rarity.weight }?.rarity ?: StudyRarity.Normal
+    var revealState by remember(results) { mutableStateOf(DrawRevealFlow.start(drawResults)) }
+    val currentReveal = results.getOrNull(revealState.index)
+    val current = currentReveal?.result
+    val showRainbowBackdrop = current?.rarity == StudyRarity.Rainbow &&
+        revealState.phase != DrawRevealPhase.Summary &&
+        revealState.phase != DrawRevealPhase.Done
     val transition = rememberInfiniteTransition(label = "draw-result")
     val pulse by transition.animateFloat(
         initialValue = 0.96f,
         targetValue = 1.04f,
-        animationSpec = infiniteRepeatable(tween(if (best == StudyRarity.Epic) 520 else 780), RepeatMode.Reverse),
+        animationSpec = infiniteRepeatable(
+            animation = tween(if (current?.rarity == StudyRarity.Epic) 520 else 780),
+            repeatMode = RepeatMode.Reverse,
+        ),
         label = "draw-pulse",
-    )
-    val glow by transition.animateFloat(
-        initialValue = 0.18f,
-        targetValue = if (best == StudyRarity.Epic) 0.72f else 0.38f,
-        animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
-        label = "draw-glow",
     )
     fun skipAll() {
         revealState = DrawRevealFlow.skip(revealState)
-        onDismissRequest()
-    }
-    if (revealState.phase == DrawRevealPhase.RainbowVideo) {
-        RainbowDrawVideo(
-            onFinished = { revealState = DrawRevealFlow.videoFinished(revealState, results) },
-            onDismiss = { skipAll() },
-        )
-        return
     }
     LaunchedEffect(revealState.phase) {
         if (revealState.phase == DrawRevealPhase.Done) {
-            onDismissRequest()
+            revealState = DrawRevealFlow.summary(revealState)
         }
     }
     Dialog(
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = { skipAll() },
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(drawFullscreenBrush(best))
-                .padding(horizontal = 18.dp, vertical = 28.dp),
+                .background(drawFullscreenBrush(current?.rarity ?: best)),
         ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size((260 * pulse).dp)
-                    .background(Color.White.copy(alpha = glow), CircleShape),
-            )
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(18.dp),
-            ) {
-                Spacer(Modifier.height(18.dp))
-                Text(
-                    drawResultTitle(best, results.size),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Black,
-                    color = Color.White,
+            if (showRainbowBackdrop) {
+                RainbowDrawVideoLayer(
+                    videoUri = currentReveal?.video?.uri ?: DEFAULT_RAINBOW_DRAW_VIDEO_URI,
+                    shouldPlay = revealState.phase == DrawRevealPhase.RainbowVideo,
+                    onFinished = {
+                        revealState = DrawRevealFlow.videoFinished(revealState, drawResults)
+                    },
+                    modifier = Modifier.fillMaxSize(),
                 )
-                Spacer(Modifier.weight(0.4f))
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Color.Black.copy(
+                                alpha = if (revealState.phase == DrawRevealPhase.Card) 0.16f else 0.04f,
+                            ),
+                        ),
+                )
+            }
+            if (revealState.phase == DrawRevealPhase.Summary) {
+                DrawResultSummary(
+                    results = drawResults,
+                    onDismissRequest = onDismissRequest,
+                    modifier = Modifier.align(Alignment.Center),
+                )
+                return@Box
+            }
+            IconButton(
+                onClick = { skipAll() },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 18.dp, end = 14.dp)
+                    .background(Color.Black.copy(alpha = 0.42f), CircleShape),
+            ) {
+                Text("×", color = Color.White, style = MaterialTheme.typography.headlineSmall)
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 18.dp, vertical = 28.dp)
+                    .navigationBarsPadding(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Spacer(Modifier.weight(1f))
                 AnimatedContent(
                     targetState = revealState.index to revealState.phase,
                     transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(180)) },
                     label = "draw-card-fade",
                 ) { (index, phase) ->
-                    val current = if (phase == DrawRevealPhase.Card) results.getOrNull(index) else null
-                    if (current == null) {
+                    val cardResult = if (phase == DrawRevealPhase.Card) drawResults.getOrNull(index) else null
+                    if (cardResult == null) {
                         Surface(
-                            color = Color.White.copy(alpha = 0.14f),
-                            shape = RoundedCornerShape(28.dp),
-                            modifier = Modifier.size(width = 248.dp, height = 330.dp),
+                            color = Color.Black.copy(alpha = 0.18f),
+                            shape = RoundedCornerShape(24.dp),
+                            modifier = Modifier.size(width = 236.dp, height = 316.dp),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(
@@ -1320,24 +1341,13 @@ private fun DrawResultCelebration(
                             }
                         }
                     } else {
-                        DrawRevealCard(result = current, pulse = pulse)
+                        DrawRevealCard(result = cardResult, pulse = pulse)
                     }
                 }
-                Spacer(Modifier.weight(0.25f))
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(156.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    val visibleCount = if (revealState.phase == DrawRevealPhase.Card) revealState.index + 1 else revealState.index
-                    items(results.take(visibleCount.coerceAtLeast(0))) { result ->
-                        DrawRevealedRow(result = result)
-                    }
-                }
-                if (revealState.index < results.lastIndex) {
+                Spacer(Modifier.weight(0.8f))
+                if (revealState.index < drawResults.lastIndex) {
                     Button(
-                        onClick = { revealState = DrawRevealFlow.next(revealState, results) },
+                        onClick = { revealState = DrawRevealFlow.next(revealState, drawResults) },
                         enabled = revealState.phase == DrawRevealPhase.Card,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -1351,11 +1361,11 @@ private fun DrawResultCelebration(
                     }
                 } else {
                     Button(
-                        onClick = onDismissRequest,
+                        onClick = { revealState = DrawRevealFlow.summary(revealState) },
                         enabled = revealState.phase == DrawRevealPhase.Card,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("放进背包")
+                        Text("查看结果")
                     }
                 }
             }
@@ -1364,62 +1374,143 @@ private fun DrawResultCelebration(
 }
 
 @Composable
-private fun RainbowDrawVideo(
+private fun RainbowDrawVideoLayer(
+    videoUri: String,
+    shouldPlay: Boolean,
     onFinished: () -> Unit,
-    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    var videoView by remember { mutableStateOf<VideoView?>(null) }
-    DisposableEffect(Unit) {
+    var videoView by remember(videoUri) { mutableStateOf<VideoView?>(null) }
+    var completed by remember(videoUri) { mutableStateOf(false) }
+    fun VideoView.loadDrawVideo() {
+        tag = videoUri
+        completed = false
+        setVideoURI(resolveAppVideoUri(context, videoUri))
+        setOnPreparedListener { player ->
+            player.isLooping = false
+            if (shouldPlay) start()
+        }
+        setOnCompletionListener {
+            if (!completed) {
+                completed = true
+                seekTo((duration - 80).coerceAtLeast(0))
+                pause()
+                onFinished()
+            }
+        }
+    }
+    DisposableEffect(videoUri) {
         onDispose {
             videoView?.stopPlayback()
             videoView = null
         }
     }
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+    AndroidView(
+        modifier = modifier.background(Color.Black),
+        factory = { viewContext ->
+            VideoView(viewContext).apply {
+                videoView = this
+                loadDrawVideo()
+            }
+        },
+        update = { view ->
+            if (videoView !== view) videoView = view
+            if (view.tag != videoUri) {
+                view.stopPlayback()
+                view.loadDrawVideo()
+            } else if (shouldPlay && !completed && !view.isPlaying) {
+                view.start()
+            }
+        },
+    )
+}
+
+@Composable
+private fun DrawResultSummary(
+    results: List<StudyDrawResult>,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        color = Color.White.copy(alpha = 0.9f),
+        shape = RoundedCornerShape(28.dp),
+        tonalElevation = 10.dp,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(18.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .background(drawCardBrush(results.maxByOrNull { it.rarity.weight }?.rarity ?: StudyRarity.Normal))
+                .padding(18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Text(
+                "抽卡结果",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                results.chunked(5).forEach { row ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        row.forEach { result ->
+                            DrawResultSquare(
+                                result = result,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        repeat(5 - row.size) {
+                            Spacer(Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+            Button(onClick = onDismissRequest, modifier = Modifier.fillMaxWidth()) {
+                Text("收下")
+            }
+        }
+    }
+}
+
+@Composable
+private fun DrawResultSquare(
+    result: StudyDrawResult,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        color = Color.White.copy(alpha = 0.88f),
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.aspectRatio(1f),
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black),
+                .background(drawCardBrush(result.rarity))
+                .padding(6.dp),
         ) {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = { viewContext ->
-                    VideoView(viewContext).apply {
-                        videoView = this
-                        setVideoURI("android.resource://${context.packageName}/${R.raw.star_wish_rainbow_draw}".toUri())
-                        setOnPreparedListener { player ->
-                            player.isLooping = false
-                            start()
-                        }
-                        setOnCompletionListener { onFinished() }
-                    }
-                },
-                update = { view ->
-                    if (videoView !== view) videoView = view
-                },
+            Text(
+                result.rarity.label.take(1),
+                color = Color.White.copy(alpha = 0.78f),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.TopStart),
             )
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 18.dp, end = 14.dp)
-                    .background(Color.Black.copy(alpha = 0.42f), CircleShape),
-            ) {
-                Text("×", color = Color.White, style = MaterialTheme.typography.headlineSmall)
-            }
-            OutlinedButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(horizontal = 18.dp, vertical = 28.dp)
-                    .fillMaxWidth(),
-            ) {
-                Text("跳过全部", color = Color.White)
-            }
+            Text(
+                result.title,
+                color = Color.White,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Black,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center),
+            )
         }
     }
 }
@@ -1428,9 +1519,9 @@ private fun RainbowDrawVideo(
 private fun DrawRevealCard(result: StudyDrawResult, pulse: Float) {
     Surface(
         color = Color.White.copy(alpha = 0.9f),
-        shape = RoundedCornerShape(30.dp),
+        shape = RoundedCornerShape(24.dp),
         tonalElevation = 8.dp,
-        modifier = Modifier.size(width = 248.dp, height = 330.dp),
+        modifier = Modifier.size(width = 236.dp, height = 316.dp),
     ) {
         Box(
             modifier = Modifier
@@ -1474,28 +1565,6 @@ private fun DrawRevealCard(result: StudyDrawResult, pulse: Float) {
                     fontWeight = FontWeight.Black,
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun DrawRevealedRow(result: StudyDrawResult) {
-    Surface(
-        color = Color.White.copy(alpha = 0.76f),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Surface(shape = CircleShape, color = rarityColor(result.rarity), modifier = Modifier.size(12.dp)) {}
-            Text(
-                "${result.rarity.label} · ${result.title}",
-                modifier = Modifier.weight(1f),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
         }
     }
 }

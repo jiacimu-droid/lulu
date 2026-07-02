@@ -6,6 +6,7 @@ import me.rerere.rikkahub.data.study.StudyRarity
 enum class DrawRevealPhase {
     RainbowVideo,
     Card,
+    Summary,
     Done,
 }
 
@@ -42,5 +43,7 @@ object DrawRevealFlow {
         )
     }
 
-    fun skip(state: DrawRevealState): DrawRevealState = state.copy(index = state.lastIndex, phase = DrawRevealPhase.Done)
+    fun summary(state: DrawRevealState): DrawRevealState = state.copy(index = state.lastIndex, phase = DrawRevealPhase.Summary)
+
+    fun skip(state: DrawRevealState): DrawRevealState = summary(state)
 }

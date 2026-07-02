@@ -228,6 +228,12 @@ object StarWishRules {
     fun allSpecialStories(custom: List<StarWishTheaterSeed>): List<StarWishTheaterSeed> = specialStories + custom
 
     val builtInVideos: List<StarWishVideoItem> = listOf(
+        StarWishVideoItem(
+            id = "built-in-rainbow-draw",
+            title = "彩色光芒",
+            uri = "raw:star_wish_rainbow_draw",
+            builtIn = true,
+        ),
     )
 
     fun allVideos(custom: List<StarWishVideoItem>): List<StarWishVideoItem> = builtInVideos + custom
