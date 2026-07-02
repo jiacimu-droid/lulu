@@ -1,7 +1,10 @@
 package me.rerere.rikkahub.ui.pages.study
 
-import android.widget.MediaController
 import android.widget.VideoView
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -80,8 +83,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.rerere.rikkahub.R
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Add01
 import me.rerere.hugeicons.stroke.AiMagic
@@ -118,7 +121,6 @@ import me.rerere.rikkahub.data.study.StudyTask
 import me.rerere.rikkahub.data.study.StudyTaskSource
 import me.rerere.rikkahub.data.study.SuperMomentChoice
 import me.rerere.rikkahub.data.starwish.StarWishRules
-import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
@@ -171,8 +173,6 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
     var section by remember { mutableStateOf(StudySection.Today) }
     var newTask by remember { mutableStateOf("") }
     var drawDialog by remember { mutableStateOf<List<StudyDrawResult>?>(null) }
-    var pendingVideos by remember { mutableStateOf<List<StarWishVideoItem>>(emptyList()) }
-    var currentVideo by remember { mutableStateOf<StarWishVideoItem?>(null) }
     var pendingBoxDialog by remember { mutableStateOf(false) }
     var boxDialog by remember { mutableStateOf<StudyMysteryBoxReward?>(null) }
     var showVideoDialog by remember { mutableStateOf(false) }
@@ -188,16 +188,9 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                 StudyEffect.MysteryBoxReady -> pendingBoxDialog = true
                 is StudyEffect.MysteryBox -> boxDialog = effect.reward
                 is StudyEffect.DrawResults -> drawDialog = effect.results
-                is StudyEffect.StarWishVideosUnlocked -> pendingVideos = pendingVideos + effect.videos
                 StudyEffect.VideoRedeemed -> showVideoDialog = true
                 StudyEffect.SuperMomentReady -> showSuperDialog = true
             }
-        }
-    }
-    LaunchedEffect(drawDialog, currentVideo, pendingVideos) {
-        if (drawDialog == null && currentVideo == null && pendingVideos.isNotEmpty()) {
-            currentVideo = pendingVideos.first()
-            pendingVideos = pendingVideos.drop(1)
         }
     }
 
@@ -365,13 +358,6 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
 
     if (showVideoDialog) {
         VideoRewardCelebration(onDismissRequest = { showVideoDialog = false })
-    }
-
-    currentVideo?.let { video ->
-        StudyVideoPlayerDialog(
-            video = video,
-            onDismiss = { currentVideo = null },
-        )
     }
 
     if (showLevelDialog) {
@@ -1168,31 +1154,34 @@ private fun DrawResultCelebration(
     onDismissRequest: () -> Unit,
 ) {
     val best = results.maxByOrNull { it.rarity.weight }?.rarity ?: StudyRarity.Normal
-    var currentIndex by remember(results) { mutableIntStateOf(-1) }
-    var skipReveal by remember(results) { mutableStateOf(false) }
+    var revealState by remember(results) { mutableStateOf(DrawRevealFlow.start(results)) }
     val transition = rememberInfiniteTransition(label = "draw-result")
     val pulse by transition.animateFloat(
         initialValue = 0.96f,
         targetValue = 1.04f,
-        animationSpec = infiniteRepeatable(tween(if (best == StudyRarity.Epic || best == StudyRarity.Rainbow) 520 else 780), RepeatMode.Reverse),
+        animationSpec = infiniteRepeatable(tween(if (best == StudyRarity.Epic) 520 else 780), RepeatMode.Reverse),
         label = "draw-pulse",
     )
     val glow by transition.animateFloat(
         initialValue = 0.18f,
-        targetValue = if (best == StudyRarity.Epic || best == StudyRarity.Rainbow) 0.72f else 0.38f,
+        targetValue = if (best == StudyRarity.Epic) 0.72f else 0.38f,
         animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
         label = "draw-glow",
     )
-    LaunchedEffect(results, skipReveal) {
-        if (skipReveal) {
-            currentIndex = results.lastIndex
-            return@LaunchedEffect
-        }
-        currentIndex = -1
-        delay(520)
-        results.forEachIndexed { index, _ ->
-            currentIndex = index
-            delay(if (results[index].rarity == StudyRarity.Epic || results[index].rarity == StudyRarity.Rainbow) 1180 else 720)
+    fun skipAll() {
+        revealState = DrawRevealFlow.skip(revealState)
+        onDismissRequest()
+    }
+    if (revealState.phase == DrawRevealPhase.RainbowVideo) {
+        RainbowDrawVideo(
+            onFinished = { revealState = DrawRevealFlow.videoFinished(revealState, results) },
+            onDismiss = { skipAll() },
+        )
+        return
+    }
+    LaunchedEffect(revealState.phase) {
+        if (revealState.phase == DrawRevealPhase.Done) {
+            onDismissRequest()
         }
     }
     Dialog(
@@ -1224,23 +1213,29 @@ private fun DrawResultCelebration(
                     color = Color.White,
                 )
                 Spacer(Modifier.weight(0.4f))
-                val current = results.getOrNull(currentIndex)
-                if (current == null) {
-                    Surface(
-                        color = Color.White.copy(alpha = 0.14f),
-                        shape = RoundedCornerShape(28.dp),
-                        modifier = Modifier.size(width = 248.dp, height = 330.dp),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                "愿光正在汇聚",
-                                color = Color.White.copy(alpha = 0.86f),
-                                fontWeight = FontWeight.Black,
-                            )
+                AnimatedContent(
+                    targetState = revealState.index to revealState.phase,
+                    transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(180)) },
+                    label = "draw-card-fade",
+                ) { (index, phase) ->
+                    val current = if (phase == DrawRevealPhase.Card) results.getOrNull(index) else null
+                    if (current == null) {
+                        Surface(
+                            color = Color.White.copy(alpha = 0.14f),
+                            shape = RoundedCornerShape(28.dp),
+                            modifier = Modifier.size(width = 248.dp, height = 330.dp),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    "愿光正在汇聚",
+                                    color = Color.White.copy(alpha = 0.86f),
+                                    fontWeight = FontWeight.Black,
+                                )
+                            }
                         }
+                    } else {
+                        DrawRevealCard(result = current, pulse = pulse)
                     }
-                } else {
-                    DrawRevealCard(result = current, pulse = pulse)
                 }
                 Spacer(Modifier.weight(0.25f))
                 LazyColumn(
@@ -1249,25 +1244,95 @@ private fun DrawResultCelebration(
                         .height(156.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(results.take((currentIndex + 1).coerceAtLeast(0))) { result ->
+                    val visibleCount = if (revealState.phase == DrawRevealPhase.Card) revealState.index + 1 else revealState.index
+                    items(results.take(visibleCount.coerceAtLeast(0))) { result ->
                         DrawRevealedRow(result = result)
                     }
                 }
-                if (currentIndex < results.lastIndex) {
-                    OutlinedButton(
-                        onClick = { skipReveal = true },
+                if (revealState.index < results.lastIndex) {
+                    Button(
+                        onClick = { revealState = DrawRevealFlow.next(revealState, results) },
+                        enabled = revealState.phase == DrawRevealPhase.Card,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("跳过动画")
+                        Text("下一个")
+                    }
+                    OutlinedButton(
+                        onClick = { skipAll() },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("跳过全部")
+                    }
+                } else {
+                    Button(
+                        onClick = onDismissRequest,
+                        enabled = revealState.phase == DrawRevealPhase.Card,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("放进背包")
                     }
                 }
-                Button(
-                    onClick = onDismissRequest,
-                    enabled = currentIndex >= results.lastIndex,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(if (currentIndex >= results.lastIndex) "放进背包" else "揭示中...")
-                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RainbowDrawVideo(
+    onFinished: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    var videoView by remember { mutableStateOf<VideoView?>(null) }
+    DisposableEffect(Unit) {
+        onDispose {
+            videoView?.stopPlayback()
+            videoView = null
+        }
+    }
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black),
+        ) {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { viewContext ->
+                    VideoView(viewContext).apply {
+                        videoView = this
+                        setVideoURI("android.resource://${context.packageName}/${R.raw.star_wish_rainbow_draw}".toUri())
+                        setOnPreparedListener { player ->
+                            player.isLooping = false
+                            start()
+                        }
+                        setOnCompletionListener { onFinished() }
+                    }
+                },
+                update = { view ->
+                    if (videoView !== view) videoView = view
+                },
+            )
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 18.dp, end = 14.dp)
+                    .background(Color.Black.copy(alpha = 0.42f), CircleShape),
+            ) {
+                Text("×", color = Color.White, style = MaterialTheme.typography.headlineSmall)
+            }
+            OutlinedButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 18.dp, vertical = 28.dp)
+                    .fillMaxWidth(),
+            ) {
+                Text("跳过全部", color = Color.White)
             }
         }
     }
@@ -1284,7 +1349,7 @@ private fun DrawRevealCard(result: StudyDrawResult, pulse: Float) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(drawBrush(result.rarity))
+                .background(drawCardBrush(result.rarity))
                 .padding(18.dp),
         ) {
             Surface(
@@ -1353,9 +1418,7 @@ private fun drawFullscreenBrush(rarity: StudyRarity): Brush = when (rarity) {
     StudyRarity.Normal -> Brush.verticalGradient(listOf(Color(0xFF1F3D54), Color(0xFF5A8296), Color(0xFF0F1B2B)))
     StudyRarity.Rare -> Brush.verticalGradient(listOf(Color(0xFF251D52), Color(0xFF8067B7), Color(0xFF120D2C)))
     StudyRarity.Epic -> Brush.verticalGradient(listOf(Color(0xFF3A2400), Color(0xFFFFB938), Color(0xFF6F2E00)))
-    StudyRarity.Rainbow -> Brush.verticalGradient(
-        listOf(Color(0xFF123C69), Color(0xFFFF6B9A), Color(0xFFFFD166), Color(0xFF5DE0E6), Color(0xFF3A176A)),
-    )
+    StudyRarity.Rainbow -> Brush.verticalGradient(listOf(Color(0xFF07111F), Color(0xFF182B40), Color(0xFF05070D)))
 }
 
 @Composable
@@ -1476,60 +1539,6 @@ private fun VideoRewardCelebration(onDismissRequest: () -> Unit) {
             }
         },
     )
-}
-
-@Composable
-private fun StudyVideoPlayerDialog(
-    video: StarWishVideoItem,
-    onDismiss: () -> Unit,
-) {
-    val context = LocalContext.current
-    var videoView by remember(video.id) { mutableStateOf<VideoView?>(null) }
-    DisposableEffect(video.id) {
-        onDispose {
-            videoView?.stopPlayback()
-            videoView = null
-        }
-    }
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-        ) {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = { viewContext ->
-                    VideoView(viewContext).apply {
-                        videoView = this
-                        val controller = MediaController(context)
-                        controller.setAnchorView(this)
-                        setMediaController(controller)
-                        setVideoURI(video.uri.toUri())
-                        setOnPreparedListener { player ->
-                            player.isLooping = true
-                            start()
-                        }
-                    }
-                },
-                update = { view ->
-                    if (videoView !== view) videoView = view
-                },
-            )
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 18.dp, end = 14.dp)
-                    .background(Color.Black.copy(alpha = 0.42f), CircleShape),
-            ) {
-                Text("×", color = Color.White, style = MaterialTheme.typography.headlineSmall)
-            }
-        }
-    }
 }
 
 @Composable
@@ -2268,6 +2277,11 @@ private fun drawBrush(rarity: StudyRarity): Brush = when (rarity) {
     StudyRarity.Rainbow -> Brush.linearGradient(
         listOf(Color(0xFF5DE0E6), Color(0xFFFF6B9A), Color(0xFFFFD166), Color(0xFF9B5DE5)),
     )
+}
+
+private fun drawCardBrush(rarity: StudyRarity): Brush = when (rarity) {
+    StudyRarity.Rainbow -> Brush.linearGradient(listOf(Color(0xFF102032), Color(0xFF28415A), Color(0xFF0B111C)))
+    else -> drawBrush(rarity)
 }
 
 private fun mysteryBoxText(kudos: Int): String = when (kudos) {

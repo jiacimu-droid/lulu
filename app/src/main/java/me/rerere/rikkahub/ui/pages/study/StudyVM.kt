@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import me.rerere.rikkahub.data.study.StudyDrawResult
 import me.rerere.rikkahub.data.study.StudyMysteryBoxReward
+import me.rerere.rikkahub.data.study.StudyRarity
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyShopItem
 import me.rerere.rikkahub.data.study.StudyState
@@ -15,7 +16,6 @@ import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.data.study.SuperMomentChoice
 import me.rerere.rikkahub.data.starwish.StarWishRules
 import me.rerere.rikkahub.data.starwish.StarWishStore
-import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import java.time.LocalDate
 import kotlin.random.Random
 
@@ -82,22 +82,17 @@ class StudyVM(
             }
             var nextStudyState = result.state
             var nextStarWishState = starWishStore.state.value
-            val videosToPlay = mutableListOf<StarWishVideoItem>()
-            val videoFragments = result.results.count { it.rarity == me.rerere.rikkahub.data.study.StudyRarity.Rainbow }
+            val videoFragments = result.results.count { it.rarity == StudyRarity.Rainbow }
             repeat(videoFragments) {
                 val unlock = StarWishRules.unlockNextVideo(nextStarWishState, nextStudyState, Random.Default)
                 nextStudyState = unlock.studyState
                 nextStarWishState = unlock.starWishState
-                unlock.video?.let(videosToPlay::add)
             }
             store.set(nextStudyState)
             if (nextStarWishState != starWishStore.state.value) {
                 starWishStore.update { nextStarWishState }
             }
             _effects.tryEmit(StudyEffect.DrawResults(result.results))
-            if (videosToPlay.isNotEmpty()) {
-                _effects.tryEmit(StudyEffect.StarWishVideosUnlocked(videosToPlay))
-            }
         }
     }
 
@@ -185,7 +180,6 @@ sealed interface StudyEffect {
     data object MysteryBoxReady : StudyEffect
     data class MysteryBox(val reward: StudyMysteryBoxReward) : StudyEffect
     data class DrawResults(val results: List<StudyDrawResult>) : StudyEffect
-    data class StarWishVideosUnlocked(val videos: List<StarWishVideoItem>) : StudyEffect
     data object VideoRedeemed : StudyEffect
     data object SuperMomentReady : StudyEffect
 }
