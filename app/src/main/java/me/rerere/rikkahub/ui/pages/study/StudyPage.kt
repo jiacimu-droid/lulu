@@ -1717,16 +1717,16 @@ private fun CollectionProgressList(
             Text("小剧场碎片不再区分剧情。去星愿馆选择任意小剧场，花 1 个小剧场碎片生成或续写 1 章。", color = MaterialTheme.colorScheme.onSurfaceVariant)
             CollectionProgressRow(
                 title = "当前小剧场碎片",
-                detail = "${inventory.universalRareFragments}/10",
-                progress = (inventory.universalRareFragments.coerceAtMost(10)) / 10f,
-                unlocked = inventory.universalRareFragments >= 10,
+                detail = "${inventory.universalRareFragments} 个 · 每 1 个可兑换 1 章",
+                progress = inventory.universalRareFragments.coerceAtMost(1).toFloat(),
+                unlocked = inventory.universalRareFragments >= 1,
             )
             StudyRules.theaterNames.forEach { theater ->
                 CollectionProgressRow(
                     title = theater,
                     detail = "候选剧情",
                     progress = 0f,
-                    unlocked = inventory.universalRareFragments >= 10,
+                    unlocked = inventory.universalRareFragments >= 1,
                 )
             }
         }
