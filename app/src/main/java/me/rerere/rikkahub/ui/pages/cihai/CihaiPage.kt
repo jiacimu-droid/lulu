@@ -96,7 +96,7 @@ fun CihaiPage(onBack: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(
-                    text = "辞海",
+                    text = "露露日记",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f),
@@ -109,7 +109,7 @@ fun CihaiPage(onBack: () -> Unit) {
                 )
             }
             Text(
-                text = "露露和其他角色的内心日志、行动记录、阅读感悟和记忆沉淀都会在这里留下来，并进入向量记忆。",
+                text = "露露和其他角色没说出口的话、行动记录、阅读感悟和反思总结都会在这里留下来，并进入向量记忆和图谱记忆。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -131,7 +131,7 @@ fun CihaiPage(onBack: () -> Unit) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(selectedAssistant.name.ifBlank { "当前角色" }, fontWeight = FontWeight.SemiBold)
                         Text(
-                            text = "当前查看这个角色的辞海。",
+                            text = "当前查看这个角色的活人感日记。",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -266,7 +266,7 @@ private fun CihaiComposer(
                 enabled = content.isNotBlank(),
                 modifier = Modifier.align(Alignment.End),
             ) {
-                Text("写入辞海")
+                Text("写入日记")
             }
         }
     }
