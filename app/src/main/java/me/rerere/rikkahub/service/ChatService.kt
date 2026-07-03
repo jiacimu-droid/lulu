@@ -1198,18 +1198,26 @@ class ChatService(
         }
 
         val fromIntent = plan.toProactiveReminderPlan(userText = userText)
-        val fallback = ProactiveReminderPlanner.plan(
-            userText = userText,
-            assistantText = assistantText,
-        )
-        val rollingJudgments = LivingPresencePlanner.planRollingJudgments(
-            input = LivingPresenceInput(
-                assistantName = assistantName,
+        val fallback = if (plan.fromModel) {
+            null
+        } else {
+            ProactiveReminderPlanner.plan(
                 userText = userText,
                 assistantText = assistantText,
-                preferredToolNames = plan.toolNames,
             )
-        )
+        }
+        val rollingJudgments = if (plan.fromModel || fromFollowUps.isNotEmpty() || fromIntent != null || fallback != null) {
+            emptyList()
+        } else {
+            LivingPresencePlanner.planRollingJudgments(
+                input = LivingPresenceInput(
+                    assistantName = assistantName,
+                    userText = userText,
+                    assistantText = assistantText,
+                    preferredToolNames = plan.toolNames,
+                )
+            )
+        }
         return (fromFollowUps + listOfNotNull(fromIntent ?: fallback) + rollingJudgments)
             .distinctBy { it.triggerAtMillis to it.reason }
             .sortedBy { it.triggerAtMillis }

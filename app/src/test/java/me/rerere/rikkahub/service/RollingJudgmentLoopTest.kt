@@ -200,6 +200,37 @@ class RollingJudgmentLoopTest {
     }
 
     @Test
+    fun `main api structured judgment controls next evaluation time`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "露露",
+            userText = "我忙三个小时，可能不回你",
+            assistantText = "好，我会自己判断什么时候再想这件事。",
+            nowMillis = NOW,
+        )
+        val trace = LivingJudgmentTrace(
+            source = LivingJudgmentSource.MAIN_API_READY_CONTRACT,
+            belief = "She is probably busy for a long block.",
+            desire = "Stay nearby without checking too soon.",
+            intention = "Wait longer, then reassess.",
+            thought = "Five minutes would be too clingy here.",
+            action = "WAIT, JOURNAL_WRITE, SCHEDULE_NEXT_TICK",
+            observation = "No risk signals.",
+            decision = "Re-evaluate after a character-chosen interval.",
+            nextEvaluateDelayMinutes = 37,
+            createdAt = NOW,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 10 * MINUTE,
+            externalJudgmentTrace = trace,
+        )
+
+        assertEquals(NOW + 47 * MINUTE, decision.updatedIntent.nextEvaluateAt)
+        assertEquals(37, decision.judgmentTrace?.nextEvaluateDelayMinutes)
+    }
+
+    @Test
     fun `emotion state accumulates across restrained silent evaluations`() {
         val intent = RollingJudgmentLoop.createIntent(
             assistantName = "露露",

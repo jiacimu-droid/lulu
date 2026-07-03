@@ -118,6 +118,7 @@ class LuluIntentPlannerTest {
         assertEquals(24 * 60, plan.delayMinutes)
         assertEquals(listOf("camera_capture", "get_app_usage"), plan.toolNames)
         assertTrue(plan.reason.contains("状态"))
+        assertTrue(plan.fromModel)
     }
 
     @Test

@@ -170,6 +170,7 @@ object LuluIntentModelPlanner {
             reason = reason.sanitizePlanReason(),
             tone = tone,
             followUps = parseFollowUps(obj),
+            fromModel = true,
         )
     }
 

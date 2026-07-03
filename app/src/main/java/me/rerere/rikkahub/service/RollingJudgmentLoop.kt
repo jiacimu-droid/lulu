@@ -79,6 +79,7 @@ data class LivingJudgmentTrace(
     val action: String,
     val observation: String,
     val decision: String,
+    val nextEvaluateDelayMinutes: Int? = null,
     val createdAt: Long = System.currentTimeMillis(),
 )
 
@@ -203,7 +204,7 @@ object RollingJudgmentLoop {
             source = LivingJudgmentSource.MAIN_API_STRUCTURED_JUDGMENT,
             createdAt = nowMillis,
         ) ?: buildJudgmentTrace(intent, observation, actions, thought, nowMillis)
-        val nextEvaluateAt = nowMillis + nextDelayMinutes(intent, nextSilentCount) * MINUTE_MILLIS
+        val nextEvaluateAt = nowMillis + nextDelayMinutes(intent, nextSilentCount, trace) * MINUTE_MILLIS
         val evolvedEmotion = evolveEmotion(intent, actions, restrained, nowMillis)
         val updated = intent.copy(
             lastEvaluatedAt = nowMillis,
@@ -465,10 +466,35 @@ object RollingJudgmentLoop {
             .distinct()
     }
 
-    private fun nextDelayMinutes(intent: LivingIntent, silentEvaluationCount: Int): Long =
-        intent.evaluationCadence.delaysMinutes
-            .getOrNull(silentEvaluationCount)
-            ?: intent.evaluationCadence.delaysMinutes.last()
+    private fun nextDelayMinutes(
+        intent: LivingIntent,
+        silentEvaluationCount: Int,
+        trace: LivingJudgmentTrace?,
+    ): Long =
+        trace
+            ?.nextEvaluateDelayMinutes
+            ?.takeIf { it > 0 }
+            ?.coerceIn(minNextDelayMinutes(intent), maxNextDelayMinutes(intent))
+            ?.toLong()
+            ?: (intent.evaluationCadence.delaysMinutes
+                .getOrNull(silentEvaluationCount)
+                ?: intent.evaluationCadence.delaysMinutes.last())
+
+    private fun minNextDelayMinutes(intent: LivingIntent): Int = when (intent.kind) {
+        LivingIntentKind.HEALTH_SAFETY -> 3
+        LivingIntentKind.WAKE_UP -> 1
+        LivingIntentKind.DEADLINE -> 3
+        LivingIntentKind.STUDY_FOCUS -> 10
+        LivingIntentKind.ORDINARY_SILENCE -> 10
+    }
+
+    private fun maxNextDelayMinutes(intent: LivingIntent): Int = when (intent.kind) {
+        LivingIntentKind.HEALTH_SAFETY -> 180
+        LivingIntentKind.WAKE_UP -> 180
+        LivingIntentKind.DEADLINE -> 24 * 60
+        LivingIntentKind.STUDY_FOCUS -> 6 * 60
+        LivingIntentKind.ORDINARY_SILENCE -> 6 * 60
+    }
 
     private fun beliefFor(kind: LivingIntentKind, userText: String, assistantText: String): String = when (kind) {
         LivingIntentKind.HEALTH_SAFETY -> "用户刚才表达了身体不适，需要把安全当作高优先级。"

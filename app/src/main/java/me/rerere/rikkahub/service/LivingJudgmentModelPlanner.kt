@@ -2,6 +2,7 @@ package me.rerere.rikkahub.service
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.provider.Model
@@ -46,8 +47,11 @@ object LivingJudgmentModelPlanner {
         appendLine("必须贴合角色人设：同一事件可以多次判断；每次判断不等于每次发消息。")
         appendLine("先读 observation，再决定 action。工具不可用也是 observation，不能假装知道。")
         appendLine("行动池只能从 MESSAGE, TOOL_CHECK, WAIT, INNER_THOUGHT, JOURNAL_WRITE, READ, MEMORY_UPDATE, SCHEDULE_NEXT_TICK, SET_ALARM, ASK_CAPABILITY 中选。")
+        appendLine("下一轮判断时间不能写死。你必须根据这一次 BDI/ReAct 判断决定 nextEvaluateDelayMinutes；这表示多久后再次想这件事，不等于多久后发消息。")
+        appendLine("普通无风险沉默不要机械 5 分钟；身体安全/起床/DDL 可以更短，学习或忙碌应更克制。")
         appendLine("只返回 JSON，不要 markdown，不要解释。")
-        appendLine("JSON 字段：belief, desire, intention, thought, action, observation, decision。")
+        appendLine("JSON 字段：belief, desire, intention, thought, action, observation, decision, nextEvaluateDelayMinutes。")
+        appendLine("nextEvaluateDelayMinutes 为 1 到 1440 的整数分钟；由角色判断，不要照抄固定表。")
         appendLine("<persona>")
         appendLine(input.persona.take(2400))
         appendLine("</persona>")
@@ -84,6 +88,7 @@ object LivingJudgmentModelPlanner {
             action = obj.string("action")?.take(240)?.ifBlank { null } ?: "SCHEDULE_NEXT_TICK",
             observation = obj.string("observation")?.take(900)?.ifBlank { null } ?: input.observation.summary,
             decision = obj.string("decision")?.take(700)?.ifBlank { null } ?: "保留下一轮判断。",
+            nextEvaluateDelayMinutes = obj["nextEvaluateDelayMinutes"]?.jsonPrimitive?.intOrNull?.coerceIn(1, 24 * 60),
         )
     }
 

@@ -23,6 +23,7 @@ data class LuluIntentPlan(
     val reason: String,
     val tone: String,
     val followUps: List<LuluFollowUpPlan> = emptyList(),
+    val fromModel: Boolean = false,
 )
 
 enum class LuluIntent {
