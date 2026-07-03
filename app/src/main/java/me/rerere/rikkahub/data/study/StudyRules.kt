@@ -125,21 +125,6 @@ object StudyRules {
     fun resetEconomyForOfficialStart(state: StudyState): StudyState {
         if (state.internalTestGrantVersion >= OFFICIAL_ECONOMY_RESET_VERSION) return state
         return state.copy(
-            wallet = StudyWallet(),
-            inventory = StudyInventory(),
-            stats = state.stats.copy(
-                unlockedOutfitSets = 0,
-                unlockedTheaters = 0,
-                videoRewardsRedeemed = 0,
-            ),
-            superMomentAvailable = false,
-            superMomentClaimedDate = null,
-            claimedLevelRewards = emptySet(),
-            claimedAchievementIds = emptySet(),
-            shopDate = null,
-            shopItems = emptyList(),
-            purchasedShopItemIds = emptySet(),
-            manualShopRefreshDate = null,
             internalTestGrantVersion = OFFICIAL_ECONOMY_RESET_VERSION,
             recentEvents = state.recentEvents.addEvent(
                 StudyEventType.Fragment,

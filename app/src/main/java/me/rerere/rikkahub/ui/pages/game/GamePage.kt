@@ -18,11 +18,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -44,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +53,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import me.rerere.asr.ASRStatus
+import me.rerere.ai.core.ReasoningLevel
+import me.rerere.ai.provider.ModelType
+import me.rerere.ai.provider.ProviderManager
+import me.rerere.ai.provider.TextGenerationParams
+import me.rerere.ai.ui.UIMessage
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.ArrowLeft02
 import me.rerere.hugeicons.stroke.MagicWand01
@@ -65,12 +72,17 @@ import me.rerere.hugeicons.stroke.Sparkles
 import me.rerere.hugeicons.stroke.Voice
 import me.rerere.hugeicons.stroke.VolumeHigh
 import me.rerere.rikkahub.Screen
+import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.datastore.findModelById
+import me.rerere.rikkahub.data.datastore.findProvider
+import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.ui.context.LocalASRState
 import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.context.LocalTTSState
 import me.rerere.rikkahub.ui.theme.CustomColors
 import kotlin.math.abs
 import kotlin.random.Random
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -133,19 +145,25 @@ fun PerfectManGamePage() {
     val navController = LocalNavController.current
     val asr = LocalASRState.current
     val tts = LocalTTSState.current
+    val settingsStore = koinInject<SettingsStore>()
+    val providerManager = koinInject<ProviderManager>()
+    val scope = rememberCoroutineScope()
     val asrState by asr.state.collectAsState()
     var round by remember { mutableIntStateOf(1) }
     var targetScore by remember { mutableIntStateOf(Random.nextInt(0, 11)) }
-    var flaw by remember { mutableStateOf("") }
+    var phase by remember { mutableStateOf(PerfectManPhase.UserGuesses) }
+    var generatedPrompt by remember { mutableStateOf("") }
+    var userDescription by remember { mutableStateOf("") }
     var guessText by remember { mutableStateOf("") }
     var result by remember { mutableStateOf<RoundResult?>(null) }
+    var isGenerating by remember { mutableStateOf(false) }
+    var message by remember { mutableStateOf<String?>(null) }
     var opponentVoiceEnabled by remember { mutableStateOf(true) }
-    var openScoreMode by remember { mutableStateOf(false) }
-    var scoreRevealed by remember { mutableStateOf(false) }
     var listeningTarget by remember { mutableStateOf<VoiceInputTarget?>(null) }
 
-    val guesser = if (round % 2 == 1) Player.Me else Player.Partner
+    val guesser = if (phase == PerfectManPhase.UserGuesses) Player.Me else Player.Partner
     val describer = guesser.opposite()
+    val flaw = userDescription
     val isListening = asrState.status != ASRStatus.Idle && asrState.status != ASRStatus.Error
 
     fun speak(text: String) {
@@ -169,7 +187,7 @@ fun PerfectManGamePage() {
             val clean = transcript.trim()
             if (clean.isBlank()) return@start
             when (target) {
-                VoiceInputTarget.Flaw -> flaw = clean
+                VoiceInputTarget.Flaw -> userDescription = clean
                 VoiceInputTarget.Guess -> guessText = clean.filter { it.isDigit() || it == '.' }
             }
         }
@@ -180,10 +198,85 @@ fun PerfectManGamePage() {
         stopVoiceInput()
         round += 1
         targetScore = Random.nextInt(0, 11)
-        flaw = ""
+        phase = if (phase == PerfectManPhase.UserGuesses) PerfectManPhase.PartnerGuesses else PerfectManPhase.UserGuesses
+        generatedPrompt = ""
+        userDescription = ""
         guessText = ""
         result = null
-        scoreRevealed = false
+        message = null
+    }
+
+    suspend fun generatePerfectManText(prompt: String, fallback: String): String {
+        return runCatching {
+            val settings = settingsStore.settingsFlow.first()
+            val assistant = settings.getCurrentAssistant()
+            val model = settings.findModelById(assistant.chatModelId ?: settings.chatModelId)
+                ?.takeIf { it.type == ModelType.CHAT }
+                ?: return@runCatching fallback
+            val providerSetting = model.findProvider(settings.providers) ?: return@runCatching fallback
+            val provider = providerManager.getProviderByType(providerSetting)
+            val chunk = provider.generateText(
+                providerSetting = providerSetting,
+                messages = listOf(
+                    UIMessage.system(
+                        "你是一个适合情侣或朋友玩小游戏的轻松主持人。只输出游戏内容，不要解释规则。文案要短、好猜、有画面感，不要色情，不要羞辱真实群体。",
+                    ),
+                    UIMessage.user(prompt),
+                ),
+                params = TextGenerationParams(
+                    model = model,
+                    temperature = 0.8f,
+                    topP = 0.9f,
+                    maxTokens = 500,
+                    reasoningLevel = ReasoningLevel.OFF,
+                ),
+            )
+            chunk.choices.firstOrNull()?.message?.toText()?.trim()?.takeIf { it.isNotBlank() } ?: fallback
+        }.getOrElse {
+            if (it is CancellationException) throw it
+            fallback
+        }
+    }
+
+    fun startUserGuessRound() {
+        if (isGenerating) return
+        isGenerating = true
+        message = null
+        scope.launch {
+            val fallback = PerfectManNarratives.forScore(targetScore)
+            generatedPrompt = generatePerfectManText(
+                prompt = "随机分数是 $targetScore/10，但不要暴露分数。请生成一段“这是一个满分男，但是……”的描述，让玩家根据描述猜他实际几分。输出 2-4 句。",
+                fallback = fallback,
+            )
+            speak(generatedPrompt)
+            isGenerating = false
+        }
+    }
+
+    fun submitPartnerGuessRound() {
+        val description = userDescription.trim()
+        if (description.isBlank() || isGenerating) return
+        isGenerating = true
+        message = null
+        scope.launch {
+            val fallbackGuess = PerfectManGuess.estimate(description)
+            val reply = generatePerfectManText(
+                prompt = "真实分数是 $targetScore/10。玩家写的描述是：$description\n请扮演对方猜分，只输出一句自然反应，最后必须明确写出“我猜：X分”，X 是 0-10 的整数。尽量根据描述贴近真实分数，但可以有一点误差。",
+                fallback = "我感觉这个人设有点微妙，我猜：${fallbackGuess}分",
+            )
+            val guess = Regex("""(\d{1,2})\s*分""").find(reply)?.groupValues?.getOrNull(1)?.toIntOrNull()
+                ?.coerceIn(0, 10)
+                ?: fallbackGuess
+            generatedPrompt = reply
+            result = RoundResult(
+                guess = guess,
+                score = targetScore,
+                success = abs(guess - targetScore) <= 1,
+                diff = abs(guess - targetScore),
+            )
+            speak(reply)
+            isGenerating = false
+        }
     }
 
     fun submitGuess() {
@@ -222,22 +315,10 @@ fun PerfectManGamePage() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             RoundHeader(round = round, describer = describer, guesser = guesser)
-            ScoreCard(
-                score = targetScore,
-                describer = describer,
-                openScoreMode = openScoreMode,
-                scoreRevealed = scoreRevealed,
-                onToggleOpenScore = {
-                    openScoreMode = it
-                    if (it) scoreRevealed = true
-                },
-                onToggleScoreReveal = { scoreRevealed = !scoreRevealed },
-            )
             VoiceSettingsCard(
                 opponentVoiceEnabled = opponentVoiceEnabled,
                 onOpponentVoiceEnabledChange = {
@@ -245,17 +326,65 @@ fun PerfectManGamePage() {
                     if (!it) tts.stop()
                 },
             )
-            FlawInputCard(
+            if (phase == PerfectManPhase.UserGuesses) {
+                Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
+                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text("你来猜分", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = generatedPrompt.ifBlank { "分数已经随机 roll 好了。点击开始后，对方会按这个隐藏分数生成描述，你不能提前看实际分数。" },
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Button(
+                            onClick = ::startUserGuessRound,
+                            enabled = !isGenerating && result == null,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(HugeIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(if (isGenerating) "生成中" else "开始")
+                        }
+                    }
+                }
+            } else {
+                ScoreCard(
+                    score = targetScore,
+                    describer = Player.Me,
+                    openScoreMode = true,
+                    scoreRevealed = true,
+                    onToggleOpenScore = {},
+                    onToggleScoreReveal = {},
+                )
+            }
+            if (phase == PerfectManPhase.PartnerGuesses) FlawInputCard(
                 describer = describer,
-                flaw = flaw,
-                onFlawChange = { flaw = it },
-                onExample = { flaw = PerfectManExamples.random() },
+                flaw = userDescription,
+                onFlawChange = { userDescription = it },
+                onExample = { userDescription = PerfectManExamples.random() },
                 listening = listeningTarget == VoiceInputTarget.Flaw && isListening,
                 onVoice = { startVoiceInput(VoiceInputTarget.Flaw) },
                 onSpeak = { speak("这是一个满分男，但是${flaw.ifBlank { "他的缺点还没有写" }}") },
                 voiceEnabled = opponentVoiceEnabled,
             )
-            GuessCard(
+            if (phase == PerfectManPhase.PartnerGuesses) {
+                Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
+                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text("让对方猜", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                        if (generatedPrompt.isNotBlank()) {
+                            Text(generatedPrompt, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Button(
+                            onClick = ::submitPartnerGuessRound,
+                            enabled = userDescription.isNotBlank() && !isGenerating && result == null,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(HugeIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(if (isGenerating) "对方思考中" else "确定")
+                        }
+                    }
+                }
+            }
+            if (phase == PerfectManPhase.UserGuesses) GuessCard(
                 guesser = guesser,
                 guessText = guessText,
                 onGuessTextChange = { guessText = it.filter { char -> char.isDigit() || char == '.' }.take(2) },
@@ -267,7 +396,6 @@ fun PerfectManGamePage() {
             result?.let {
                 ResultCard(result = it, onNextRound = ::nextRound)
             }
-            RuleCard()
         }
     }
 }
@@ -598,6 +726,11 @@ private enum class VoiceInputTarget {
     Guess,
 }
 
+private enum class PerfectManPhase {
+    UserGuesses,
+    PartnerGuesses,
+}
+
 private data class RoundResult(
     val guess: Int,
     val score: Int,
@@ -622,6 +755,30 @@ private val PerfectManExamples = listOf(
     "记得所有纪念日，但礼物永远买同款保温杯。",
     "声音特别好听，但睡前故事只讲刑法案例。",
 )
+
+private object PerfectManNarratives {
+    fun forScore(score: Int): String {
+        return when (score) {
+            in 0..2 -> "这是一个满分男，但是他的满分可能是反向满分：见面第一句先点评你的穿搭，吃饭全程讲自己多抢手，还会把服务员叫错三次。"
+            in 3..4 -> "这是一个满分男，但是他优点确实有，缺点也很响亮：会接你下班，也会在车里循环播放自己的语音备忘录。"
+            in 5..6 -> "这是一个满分男，但是他像一份半糖奶茶：能喝，偶尔好喝，就是每次关键时刻都差那么一口气。"
+            in 7..8 -> "这是一个满分男，但是他大部分地方都很好，只是会在浪漫气氛最好的时候突然讲一个冷到沉默的谐音梗。"
+            else -> "这是一个满分男，但是扣分点小到离谱：他太会照顾人了，唯一的问题是每次说晚安都像在念获奖感言。"
+        }
+    }
+}
+
+private object PerfectManGuess {
+    fun estimate(description: String): Int {
+        val text = description.lowercase()
+        return when {
+            listOf("不洗", "骂", "抠", "油", "爹味", "恶心").any { it in text } -> Random.nextInt(0, 4)
+            listOf("但是", "不过", "有点", "偶尔", "一般").any { it in text } -> Random.nextInt(4, 8)
+            listOf("温柔", "帅", "会照顾", "稳定", "尊重", "好听").any { it in text } -> Random.nextInt(7, 11)
+            else -> Random.nextInt(3, 9)
+        }
+    }
+}
 
 private object GameColors {
     val background = Color(0xFFF8F4F0)

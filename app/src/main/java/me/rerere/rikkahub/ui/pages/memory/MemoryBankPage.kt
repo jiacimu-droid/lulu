@@ -515,7 +515,7 @@ private fun StatsRow(stats: MemoryBankService.MemoryStats) {
     ) {
         StatCard("总计", stats.total, Modifier.weight(1f))
         StatCard("消息", stats.messageCount, Modifier.weight(1f))
-        StatCard("手动", stats.manualCount, Modifier.weight(1f))
+        StatCard("固定", stats.manualCount, Modifier.weight(1f))
         StatCard("失效", stats.deprecatedCount, Modifier.weight(1f), MaterialTheme.colorScheme.surfaceVariant)
     }
     Row(
@@ -599,7 +599,7 @@ private fun TypeFilterRow(
     val types = listOf(
         "" to "全部",
         "message" to "消息",
-        "manual" to "手动",
+        "manual" to "固定记忆",
         "deprecated" to "失效",
     )
     FlowRow(
@@ -659,7 +659,7 @@ private fun MemoryCard(
                         Text(
                             text = when (memory.type) {
                                 "message" -> "消息"
-                                "manual" -> "手动"
+                                "manual" -> "固定记忆"
                                 else -> memory.type
                             },
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),

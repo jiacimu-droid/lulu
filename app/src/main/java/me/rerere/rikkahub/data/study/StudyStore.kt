@@ -34,8 +34,8 @@ class StudyStore(
         scope.launch {
             context.studyDataStore.edit { prefs ->
                 val current = prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
-                val migrated = StudyRules.resetEconomyForOfficialStart(current.ensureToday())
-                if (migrated.internalTestGrantVersion != current.internalTestGrantVersion) {
+                val migrated = current.ensureToday().preserveOfficialEconomy()
+                if (migrated != current) {
                     prefs[stateKey] = json.encodeToString(migrated)
                 }
             }
@@ -49,7 +49,7 @@ class StudyStore(
         .catch { emit(StudyState(today = LocalDate.now().toString())) }
         .map {
             StudyRules.refreshShopIfNeeded(
-                StudyRules.resetEconomyForOfficialStart(it.ensureToday()),
+                it.ensureToday().preserveOfficialEconomy(),
                 LocalDate.now(),
                 Random.Default,
             )
@@ -59,7 +59,7 @@ class StudyStore(
     suspend fun update(transform: (StudyState) -> StudyState) {
         context.studyDataStore.edit { prefs ->
             val current = prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
-            val migrated = StudyRules.resetEconomyForOfficialStart(current.ensureToday())
+            val migrated = current.ensureToday().preserveOfficialEconomy()
             prefs[stateKey] = json.encodeToString(
                 transform(migrated)
             )
@@ -89,4 +89,12 @@ private val studyJson = Json(JsonInstant) {
 
 private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState {
     return StudyRules.rolloverToDate(this, date)
+}
+
+private fun StudyState.preserveOfficialEconomy(): StudyState {
+    return if (internalTestGrantVersion >= StudyRules.OFFICIAL_ECONOMY_RESET_VERSION) {
+        this
+    } else {
+        copy(internalTestGrantVersion = StudyRules.OFFICIAL_ECONOMY_RESET_VERSION)
+    }
 }

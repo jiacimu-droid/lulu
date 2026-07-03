@@ -15,10 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +35,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -56,6 +58,7 @@ import me.rerere.hugeicons.stroke.User
 import me.rerere.rikkahub.Screen
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
+import me.rerere.rikkahub.data.desktop.DesktopStore
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.repository.ConversationRepository
@@ -64,6 +67,9 @@ import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
 import org.koin.compose.koinInject
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.longPressDraggableHandle
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.Duration
 import java.time.Instant
 import kotlin.uuid.Uuid
@@ -74,6 +80,8 @@ fun DesktopPage() {
     val settings = LocalSettings.current
     val conversationRepository = koinInject<ConversationRepository>()
     val settingsStore = koinInject<SettingsStore>()
+    val desktopStore = koinInject<DesktopStore>()
+    val storedAppOrder by desktopStore.appOrder.collectAsState()
     val scope = rememberCoroutineScope()
     val currentAssistant = settings.getCurrentAssistant()
     var note by remember { mutableStateOf("今天也想被好好陪着。") }
@@ -107,6 +115,20 @@ fun DesktopPage() {
             DesktopApp("设置", HugeIcons.Setting07, "setting") { navController.navigate(Screen.Setting) },
         )
     }
+    val orderedApps = remember(apps, storedAppOrder) {
+        val appByKey = apps.associateBy { it.key }
+        storedAppOrder.mapNotNull { appByKey[it] } + apps.filterNot { it.key in storedAppOrder }
+    }
+    val appListState = rememberLazyListState()
+    val haptic = LocalHapticFeedback.current
+    val reorderableState = rememberReorderableLazyListState(appListState) { from, to ->
+        val next = orderedApps.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+        scope.launch {
+            desktopStore.setAppOrder(next.map { it.key })
+        }
+    }
 
     Scaffold(containerColor = CustomColors.topBarColors.containerColor) { padding ->
         Column(
@@ -120,16 +142,32 @@ fun DesktopPage() {
                 onNoteChange = { note = it },
                 onOpenChat = { openAssistantChat(currentAssistant) },
             )
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                modifier = Modifier.fillMaxWidth(),
-                userScrollEnabled = false,
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalArrangement = Arrangement.spacedBy(18.dp),
-                contentPadding = PaddingValues(top = 12.dp, bottom = 20.dp),
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                state = appListState,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(top = 8.dp, bottom = 20.dp),
             ) {
-                items(apps, key = { it.key }) { app ->
-                    DesktopAppIcon(app)
+                items(orderedApps, key = { it.key }) { app ->
+                    ReorderableItem(
+                        state = reorderableState,
+                        key = app.key,
+                    ) { isDragging ->
+                        DesktopAppIcon(
+                            app = app,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .scale(if (isDragging) 0.94f else 1f)
+                                .longPressDraggableHandle(
+                                    onDragStarted = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                    },
+                                    onDragStopped = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                                    },
+                                ),
+                        )
+                    }
                 }
             }
         }
@@ -324,17 +362,22 @@ private fun DesktopHero(
 }
 
 @Composable
-private fun DesktopAppIcon(app: DesktopApp) {
-    Column(
-        modifier = Modifier.clickable(onClick = app.onClick),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+private fun DesktopAppIcon(app: DesktopApp, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.clickable(onClick = app.onClick),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        tonalElevation = 2.dp,
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
         Surface(
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-            shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            tonalElevation = 2.dp,
+            modifier = Modifier.size(44.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.primaryContainer,
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
@@ -347,10 +390,15 @@ private fun DesktopAppIcon(app: DesktopApp) {
         }
         Text(
             text = app.label,
-            style = MaterialTheme.typography.labelMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.weight(1f),
         )
+        Text(
+            text = "长按移动",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        }
     }
 }
 
