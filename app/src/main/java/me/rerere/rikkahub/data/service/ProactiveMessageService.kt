@@ -70,6 +70,7 @@ import me.rerere.rikkahub.CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID
 import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.cihai.CihaiService
 import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
@@ -107,6 +108,7 @@ class ProactiveMessageService : KoinComponent {
     private val conversationRepository: ConversationRepository by inject()
     private val studyStore: StudyStore by inject()
     private val cihaiStore: CihaiStore by inject()
+    private val cihaiService: CihaiService by inject()
 
     companion object {
         const val TAG = "ProactiveMessageService"
@@ -910,6 +912,16 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 }
                 if (!isTargetedTrigger && autonomousPlan?.intent == LuluIntent.DO_NOT_DISTURB) {
                     Log.d(TAG, "Lulu intent planner chose not to disturb")
+                    runCatching {
+                        cihaiService.recordSilentJudgment(
+                            assistantId = assistantUuid.toString(),
+                            assistantName = assistant.name,
+                            reason = "自主脉冲判断后决定不打扰：${autonomousPlan.reason}",
+                            userText = historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
+                        )
+                    }.onFailure { error ->
+                        Log.w(ProactiveMessageService.TAG, "Failed to record silent Cihai judgment", error)
+                    }
                     ProactiveMessageService.scheduleNext(
                         context = this@ProactiveMessageTriggerService,
                         settings = settings,
@@ -1062,6 +1074,16 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 if (replyText.isBlank() || replyText.contains("[PASS]")) {
                     // AI 选择跳过，移除本次生成的 aiMessage node（基于 id 匹配，不误删历史）
                     Log.d(ProactiveMessageService.TAG, "AI chose to skip proactive message")
+                    runCatching {
+                        cihaiService.recordSilentJudgment(
+                            assistantId = assistantUuid.toString(),
+                            assistantName = assistant.name,
+                            reason = effectiveTargetedReason ?: "主动触发后，角色判断现在没有必要开口。",
+                            userText = targetedUserText ?: historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
+                        )
+                    }.onFailure { error ->
+                        Log.w(ProactiveMessageService.TAG, "Failed to record skipped Cihai judgment", error)
+                    }
                     val aiId = aiMessage.id
                     chatService.updateConversationState(conversationId) { conv ->
                         conv.copy(

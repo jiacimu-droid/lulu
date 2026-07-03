@@ -46,4 +46,38 @@ class CihaiMemoryTest {
         assertTrue(candidate.embeddingText!!.contains("不该只催"))
         assertTrue(candidate.tags.contains("阅读"))
     }
+
+    @Test
+    fun `silent judgement creates journal entry for cihai memory`() {
+        val entry = CihaiEntry.fromSilentJudgment(
+            assistantId = "lulu",
+            assistantName = "露露",
+            reason = "滚动判断：用户已经 25 分钟没有回复，先观察，不机械追问。",
+            userText = "我先去处理点事",
+            createdAt = 1_700_000_000_000L,
+        )
+
+        assertEquals(CihaiEntryKind.INNER_JOURNAL, entry.kind)
+        assertTrue(entry.title.contains("露露"))
+        assertTrue(entry.content.contains("不机械追问"))
+        assertTrue(entry.toMemoryCandidate().embeddingText!!.contains("滚动判断"))
+    }
+
+    @Test
+    fun `book creates reading reflection entry and advances progress`() {
+        val book = CihaiBook(
+            assistantId = "lulu",
+            title = "亲密关系",
+            content = "第一段。".repeat(80),
+            progressPercent = 0,
+        )
+
+        val result = book.readNextReflection(nowMillis = 1_700_000_000_000L)
+
+        assertTrue(result.entry.title.contains("亲密关系"))
+        assertEquals(CihaiEntryKind.READING_NOTE, result.entry.kind)
+        assertTrue(result.entry.content.contains("我读到"))
+        assertTrue(result.updatedBook.progressPercent > book.progressPercent)
+        assertEquals(1_700_000_000_000L, result.updatedBook.lastReadAt)
+    }
 }

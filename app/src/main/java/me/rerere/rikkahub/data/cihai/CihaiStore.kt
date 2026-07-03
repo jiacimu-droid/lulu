@@ -68,6 +68,14 @@ class CihaiStore(
         }
     }
 
+    suspend fun updateBook(book: CihaiBook) {
+        update { state ->
+            state.copy(books = state.books.map { current ->
+                if (current.id == book.id) book else current
+            })
+        }
+    }
+
     private fun CihaiState.normalized(): CihaiState =
         copy(
             entries = entries

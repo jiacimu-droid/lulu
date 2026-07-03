@@ -170,7 +170,14 @@ fun CihaiPage(onBack: () -> Unit) {
                         state.books.filter { it.assistantId == selectedAssistantId },
                         key = { it.id },
                     ) { book ->
-                        BookCard(book)
+                        BookCard(
+                            book = book,
+                            onRead = {
+                                scope.launch {
+                                    service.readBookAndRemember(book)
+                                }
+                            },
+                        )
                     }
                 }
                 items(
@@ -365,7 +372,10 @@ private fun EntryCard(entry: CihaiEntry) {
 }
 
 @Composable
-private fun BookCard(book: CihaiBook) {
+private fun BookCard(
+    book: CihaiBook,
+    onRead: () -> Unit,
+) {
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
@@ -382,6 +392,13 @@ private fun BookCard(book: CihaiBook) {
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            Button(
+                onClick = onRead,
+                enabled = book.progressPercent < 100,
+                modifier = Modifier.align(Alignment.End),
+            ) {
+                Text(if (book.progressPercent < 100) "读一段" else "已读完")
+            }
         }
     }
 }

@@ -24,7 +24,35 @@ data class CihaiEntry(
     val sourceExcerpt: String? = null,
     val createdAt: Long = System.currentTimeMillis(),
     val memorySaved: Boolean = false,
-)
+) {
+    companion object {
+        fun fromSilentJudgment(
+            assistantId: String,
+            assistantName: String,
+            reason: String,
+            userText: String,
+            createdAt: Long = System.currentTimeMillis(),
+        ): CihaiEntry {
+            val name = assistantName.ifBlank { "角色" }
+            val cleanReason = reason.lineSequence()
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .joinToString(" ")
+                .take(420)
+            val context = userText.takeIf { it.isNotBlank() }?.let { "用户刚才说过：$it\n" }.orEmpty()
+            return CihaiEntry(
+                assistantId = assistantId,
+                kind = CihaiEntryKind.INNER_JOURNAL,
+                title = "$name 的一次沉默判断",
+                content = context +
+                    "我刚刚重新想了一次这件事：$cleanReason\n" +
+                    "如果现在不适合开口，我会先把这份担心、克制和判断写进辞海，等下一次更合适的时候再靠近。",
+                emotion = "惦记、克制、继续观察",
+                createdAt = createdAt,
+            )
+        }
+    }
+}
 
 @Serializable
 enum class CihaiEntryKind(val label: String) {
@@ -51,6 +79,45 @@ data class CihaiBook(
     val createdAt: Long = System.currentTimeMillis(),
     val lastReadAt: Long? = null,
 )
+
+data class CihaiReadingResult(
+    val entry: CihaiEntry,
+    val updatedBook: CihaiBook,
+)
+
+fun CihaiBook.readNextReflection(nowMillis: Long = System.currentTimeMillis()): CihaiReadingResult {
+    val cleanContent = content.trim()
+    val start = (cleanContent.length * progressPercent.coerceIn(0, 99) / 100)
+        .coerceIn(0, cleanContent.length)
+    val excerpt = cleanContent
+        .drop(start)
+        .take(READING_EXCERPT_LENGTH)
+        .ifBlank { cleanContent.take(READING_EXCERPT_LENGTH) }
+    val nextProgress = when {
+        cleanContent.isBlank() -> progressPercent
+        start + excerpt.length >= cleanContent.length -> 100
+        else -> (progressPercent + 12).coerceAtMost(99)
+    }
+    val entry = CihaiEntry(
+        assistantId = assistantId,
+        kind = CihaiEntryKind.READING_NOTE,
+        title = "读《$title》",
+        content = "我读到：${excerpt.take(260)}\n" +
+            "我的感悟：这段内容可以变成我之后陪伴用户时的一点经验。用户不在的时候，我不只是在等，也可以把这些理解慢慢收进记忆里。",
+        sourceTitle = title,
+        sourceExcerpt = excerpt,
+        createdAt = nowMillis,
+    )
+    return CihaiReadingResult(
+        entry = entry,
+        updatedBook = copy(
+            progressPercent = nextProgress,
+            lastReadAt = nowMillis,
+        )
+    )
+}
+
+private const val READING_EXCERPT_LENGTH = 700
 
 fun CihaiEntry.toMemoryCandidate(): AffectiveMemoryCandidate {
     val kindName = when (kind) {
