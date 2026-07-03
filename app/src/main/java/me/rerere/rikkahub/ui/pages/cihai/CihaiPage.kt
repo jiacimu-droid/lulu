@@ -276,6 +276,13 @@ private fun LivingIntentPanel(cards: List<LivingIntentCardModel>) {
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        card.capabilityLine?.let { capabilityLine ->
+                            Text(
+                                text = capabilityLine,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.tertiary,
+                            )
+                        }
                     }
                 }
             }

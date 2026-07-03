@@ -16,6 +16,7 @@ data class LivingIntentCardModel(
     val cadenceLine: String,
     val countLine: String,
     val emotionLine: String,
+    val capabilityLine: String?,
 )
 
 fun buildLivingIntentCards(
@@ -55,6 +56,11 @@ private fun LivingIntent.toCardModel(nowMillis: Long): LivingIntentCardModel {
         cadenceLine = "节奏：${evaluationCadence.delaysMinutes.joinToString("/")} 分钟 · ${evaluationCadence.reason}",
         countLine = "默默判断 $silentEvaluationCount 次 · 开口 $spokenCount 次 · 克制 $restraint/10",
         emotionLine = "情绪：${emotion.label} · 担心 ${emotion.concern}/10 · 依恋 ${emotion.attachment}/10",
+        capabilityLine = capabilityRequests
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString("\n") { request ->
+                "能力请求：${request.capability} · ${request.reason}"
+            },
     )
 }
 

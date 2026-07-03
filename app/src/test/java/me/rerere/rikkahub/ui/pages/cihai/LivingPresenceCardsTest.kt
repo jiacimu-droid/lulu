@@ -1,5 +1,6 @@
 package me.rerere.rikkahub.ui.pages.cihai
 
+import me.rerere.rikkahub.service.LivingCapabilityRequest
 import me.rerere.rikkahub.service.LivingIntentKind
 import me.rerere.rikkahub.service.RollingJudgmentLoop
 import org.junit.Assert.assertEquals
@@ -68,6 +69,35 @@ class LivingPresenceCardsTest {
         assertTrue(card.countLine.contains("默默判断 3 次"))
         assertTrue(card.countLine.contains("开口 1 次"))
         assertTrue(card.countLine.contains("克制 9/10"))
+    }
+
+    @Test
+    fun `cards expose capability requests when role wants new observation ability`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantId = "lulu",
+            assistantName = "露露",
+            userText = "我肚子疼",
+            assistantText = "我想确认你安全。",
+            nowMillis = NOW,
+        ).copy(
+            capabilityRequests = listOf(
+                LivingCapabilityRequest(
+                    capability = "health_or_wearable_status",
+                    reason = "需要更可靠的健康或穿戴设备线索，不能只靠猜。",
+                    createdAt = NOW,
+                )
+            )
+        )
+
+        val card = buildLivingIntentCards(
+            intents = listOf(intent),
+            selectedAssistantId = "lulu",
+            nowMillis = NOW,
+        ).single()
+
+        val capabilityLine = card.capabilityLine!!
+        assertTrue(capabilityLine.contains("health_or_wearable_status"))
+        assertTrue(capabilityLine.contains("健康或穿戴设备线索"))
     }
 
     private companion object {
