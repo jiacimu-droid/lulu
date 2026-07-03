@@ -15,8 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -68,7 +72,7 @@ import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
 import org.koin.compose.koinInject
 import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyListState
+import sh.calvin.reorderable.rememberReorderableLazyGridState
 import java.time.Duration
 import java.time.Instant
 import kotlin.uuid.Uuid
@@ -118,11 +122,11 @@ fun DesktopPage() {
         val appByKey = apps.associateBy { it.key }
         storedAppOrder.mapNotNull { appByKey[it] } + apps.filterNot { it.key in storedAppOrder }
     }
-    val appListState = rememberLazyListState()
+    val appGridState = rememberLazyGridState()
     val haptic = LocalHapticFeedback.current
-    val reorderableState = rememberReorderableLazyListState(appListState) { from, to ->
+    val reorderableState = rememberReorderableLazyGridState(appGridState) { from, to ->
         val next = orderedApps.toMutableList().apply {
-            add(to.index, removeAt(from.index))
+            this[to.index] = this[from.index].also { this[from.index] = this[to.index] }
         }
         scope.launch {
             desktopStore.setAppOrder(next.map { it.key })
@@ -141,13 +145,15 @@ fun DesktopPage() {
                 onNoteChange = { note = it },
                 onOpenChat = { openAssistantChat(currentAssistant) },
             )
-            LazyColumn(
+            LazyVerticalGrid(
                 modifier = Modifier.fillMaxWidth().weight(1f),
-                state = appListState,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                state = appGridState,
+                columns = GridCells.Adaptive(minSize = 72.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(top = 8.dp, bottom = 20.dp),
             ) {
-                items(orderedApps, key = { it.key }) { app ->
+                gridItems(orderedApps, key = { it.key }) { app ->
                     ReorderableItem(
                         state = reorderableState,
                         key = app.key,
@@ -156,7 +162,8 @@ fun DesktopPage() {
                             app = app,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .scale(if (isDragging) 0.94f else 1f)
+                                .aspectRatio(1f)
+                                .scale(if (isDragging) 0.92f else 1f)
                                 .longPressDraggableHandle(
                                     onDragStarted = {
                                         haptic.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
@@ -364,39 +371,36 @@ private fun DesktopHero(
 private fun DesktopAppIcon(app: DesktopApp, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.clickable(onClick = app.onClick),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
         tonalElevation = 2.dp,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        Column(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 6.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-        Surface(
-            modifier = Modifier.size(44.dp),
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.primaryContainer,
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = app.icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(30.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
+            Surface(
+                modifier = Modifier.size(34.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = app.icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(22.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
-        }
-        Text(
-            text = app.label,
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            text = "长按移动",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+            Spacer(Modifier.height(5.dp))
+            Text(
+                text = app.label,
+                style = MaterialTheme.typography.labelSmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
