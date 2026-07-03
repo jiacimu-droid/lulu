@@ -26,40 +26,38 @@ object LivingPresencePlanner {
         input: LivingPresenceInput,
         nowMillis: Long = System.currentTimeMillis(),
     ): List<ProactiveReminderPlan> {
-        val text = "${input.userText}\n${input.assistantText}".lowercase()
-        val profile = when {
-            text.containsAny(HEALTH_WORDS) -> RollingProfile.Health
-            text.containsAny(STUDY_WORDS) -> RollingProfile.Study
-            text.containsAny(DEADLINE_WORDS) -> RollingProfile.Deadline
-            text.isBlank() -> return emptyList()
-            else -> RollingProfile.OrdinarySilence
-        }
-        return profile.delaysMinutes.mapIndexed { index, delay ->
+        if (input.userText.isBlank() && input.assistantText.isBlank()) return emptyList()
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = input.assistantName,
+            userText = input.userText,
+            assistantText = input.assistantText,
+            nowMillis = nowMillis,
+        )
+        return intent.evaluationCadence.delaysMinutes.mapIndexed { index, delay ->
             ProactiveReminderPlan(
                 triggerAtMillis = nowMillis + TimeUnit.MINUTES.toMillis(delay),
-                kind = profile.kind,
-                reason = buildReason(input, profile, index),
+                kind = intent.kind.toReminderKind(),
+                reason = buildReason(intent, index),
                 userText = input.userText.take(160),
-                preferredToolNames = profile.preferredTools(input.preferredToolNames),
-                actionHints = buildActionHints(profile),
+                preferredToolNames = preferredTools(intent.kind, input.preferredToolNames),
+                actionHints = buildActionHints(intent.kind),
             )
         }.take(5)
     }
 
-    private fun buildReason(
-        input: LivingPresenceInput,
-        profile: RollingProfile,
-        index: Int,
-    ): String = buildString {
-        append("${input.assistantName.ifBlank { "角色" }}的滚动判断#${index + 1}：")
-        append(profile.reason)
+    private fun buildReason(intent: LivingIntent, index: Int): String = buildString {
+        append("滚动判断#${index + 1}：")
+        append(intent.belief)
+        append(" BDI: belief=${intent.belief}; desire=${intent.desire}; intention=${intent.intention}.")
+        append(" ReAct: Thought -> Action/Tool -> Observation -> Thought again.")
         append(" RollingJudgmentLoop: event enters -> BDI beliefs/desires/intentions -> ReAct think/check/decide -> action pool.")
         append(" Action pool includes message, tool check, wait, write journal, read, memory reflection.")
         append(" Cihai records heart trace/action/reading/reflection, then memory keeps raw record, vector memory, graph memory, study state, and schedules the next judgement.")
+        append(" Hypotheses: ${intent.hypotheses.joinToString(" / ")}.")
         append(" 生成时必须重新观察当前状态，不要把这段 reason 当成预写消息。")
     }
 
-    private fun buildActionHints(profile: RollingProfile): List<ProactiveActionHint> = buildList {
+    private fun buildActionHints(kind: LivingIntentKind): List<ProactiveActionHint> = buildList {
         add(
             ProactiveActionHint(
                 toolName = LivingPresenceAction.WRITE_JOURNAL.name,
@@ -81,7 +79,7 @@ object LivingPresencePlanner {
                 autoExecutable = false,
             )
         )
-        if (profile == RollingProfile.Health) {
+        if (kind == LivingIntentKind.HEALTH_SAFETY) {
             add(
                 ProactiveActionHint(
                     toolName = LivingPresenceAction.TOOL_CHECK.name,
@@ -92,49 +90,20 @@ object LivingPresencePlanner {
         }
     }
 
-    private fun String.containsAny(words: Set<String>): Boolean = words.any { contains(it) }
-
-    private sealed class RollingProfile(
-        val delaysMinutes: List<Long>,
-        val kind: ProactiveReminderKind,
-        val reason: String,
-    ) {
-        data object Health : RollingProfile(
-            delaysMinutes = listOf(8, 20, 45, 90, 150),
-            kind = ProactiveReminderKind.GENERAL,
-            reason = "用户表达过身体不舒服，不能只判断一次；需要多次确认安全，同时控制打扰强度。",
-        )
-
-        data object Study : RollingProfile(
-            delaysMinutes = listOf(30, 60, 120),
-            kind = ProactiveReminderKind.STUDY,
-            reason = "用户可能在学习或忙任务，应该用低打扰节奏反复判断，优先保护专注。",
-        )
-
-        data object Deadline : RollingProfile(
-            delaysMinutes = listOf(60, 120, 180),
-            kind = ProactiveReminderKind.SCHEDULE,
-            reason = "用户提到任务或截止时间，需要像学习监督员一样滚动检查进度。",
-        )
-
-        data object OrdinarySilence : RollingProfile(
-            delaysMinutes = listOf(10, 25, 60, 120),
-            kind = ProactiveReminderKind.GENERAL,
-            reason = "用户没有继续回复，但原因未知；需要在关心、克制、等待和自我活动之间反复权衡。",
-        )
-
-        fun preferredTools(seed: List<String>): List<String> {
-            val base = when (this) {
-                Health -> listOf("get_gadgetbridge_data", "get_battery_info", "get_app_usage", "get_location")
-                Study -> listOf("get_app_usage", "control_music", "get_battery_info")
-                Deadline -> listOf("calendar_tool", "get_app_usage", "get_battery_info")
-                OrdinarySilence -> listOf("get_app_usage", "get_battery_info")
-            }
-            return (seed + base).distinct().take(5)
-        }
+    private fun LivingIntentKind.toReminderKind(): ProactiveReminderKind = when (this) {
+        LivingIntentKind.STUDY_FOCUS -> ProactiveReminderKind.STUDY
+        LivingIntentKind.DEADLINE, LivingIntentKind.WAKE_UP -> ProactiveReminderKind.SCHEDULE
+        LivingIntentKind.HEALTH_SAFETY, LivingIntentKind.ORDINARY_SILENCE -> ProactiveReminderKind.GENERAL
     }
 
-    private val HEALTH_WORDS = setOf("肚子疼", "肚子痛", "胃疼", "胃痛", "难受", "不舒服", "头疼", "头痛", "疼", "痛")
-    private val STUDY_WORDS = setOf("学习", "复习", "背书", "刷题", "写作业", "自习", "看书", "专业课", "考研")
-    private val DEADLINE_WORDS = setOf("ddl", "截止", "交", "提交", "今晚", "今天之前", "点前", "之前完成")
+    private fun preferredTools(kind: LivingIntentKind, seed: List<String>): List<String> {
+        val base = when (kind) {
+            LivingIntentKind.HEALTH_SAFETY -> listOf("get_gadgetbridge_data", "get_battery_info", "get_app_usage", "get_location")
+            LivingIntentKind.STUDY_FOCUS -> listOf("get_app_usage", "control_music", "get_battery_info")
+            LivingIntentKind.DEADLINE -> listOf("calendar_tool", "get_app_usage", "get_battery_info")
+            LivingIntentKind.WAKE_UP -> listOf("set_alarm", "get_gadgetbridge_data", "get_app_usage", "get_battery_info")
+            LivingIntentKind.ORDINARY_SILENCE -> listOf("get_app_usage", "get_battery_info")
+        }
+        return (seed + base).distinct().take(5)
+    }
 }

@@ -20,9 +20,9 @@ class LivingPresencePlannerTest {
         )
 
         assertEquals(listOf(10L, 25L, 60L, 120L), plans.map { (it.triggerAtMillis - now) / 60_000L })
-        assertTrue(plans.all { it.reason.contains("滚动判断") })
-        assertTrue(plans.any { it.reason.contains("写日志") })
-        assertTrue(plans.any { it.reason.contains("阅读") })
+        assertTrue(plans.all { it.reason.contains("RollingJudgmentLoop") })
+        assertTrue(plans.any { it.reason.contains("write journal") })
+        assertTrue(plans.any { it.reason.contains("read") })
     }
 
     @Test
@@ -39,25 +39,29 @@ class LivingPresencePlannerTest {
             nowMillis = now,
         )
 
-        assertEquals(listOf(8L, 20L, 45L, 90L, 150L), plans.map { (it.triggerAtMillis - now) / 60_000L })
+        assertEquals(listOf(5L, 10L, 20L, 40L, 90L), plans.map { (it.triggerAtMillis - now) / 60_000L })
         assertEquals(ProactiveReminderKind.GENERAL, plans.first().kind)
         assertTrue(plans.first().preferredToolNames.contains("get_gadgetbridge_data"))
         assertTrue(plans.first().reason.contains("ReAct"))
         assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.WRITE_JOURNAL.name })
+        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.MEMORY_REFLECT.name })
+        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.TOOL_CHECK.name })
     }
+
     @Test
-    fun `rolling judgement reason names full loop and memory reflection option`() {
+    fun `study event creates low disturbance cadence`() {
+        val now = 1_700_000_000_000L
+
         val plans = LivingPresencePlanner.planRollingJudgments(
             input = LivingPresenceInput(
-                assistantName = "Lulu",
-                userText = "I need to be busy for a while",
-                assistantText = "I will stay here and check later.",
+                assistantName = "露露",
+                userText = "我要开始学习专业课了",
+                assistantText = "我帮你守住节奏。",
             ),
-            nowMillis = 1_700_000_000_000L,
+            nowMillis = now,
         )
 
-        assertTrue(plans.first().reason.contains("RollingJudgmentLoop"))
-        assertTrue(plans.first().reason.contains("graph memory"))
-        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.MEMORY_REFLECT.name })
+        assertEquals(listOf(30L, 60L, 90L), plans.map { (it.triggerAtMillis - now) / 60_000L })
+        assertEquals(ProactiveReminderKind.STUDY, plans.first().kind)
     }
 }
