@@ -11,7 +11,19 @@ class ExamStudyPlanTest {
     fun tomorrowPlanReadsTheNextCalendarDay() {
         val tomorrow = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 2).plusDays(1))
 
-        assertEquals("法理3 + 民法1", tomorrow?.title)
+        assertEquals("慢启动但能学：法理2 + 刑法1入口", tomorrow?.title)
+    }
+
+    @Test
+    fun recoveryDayStillGivesAtLeastOneHourOfConcreteStudy() {
+        val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 3))
+        val schedule = ExamStudyPlan.todaySchedule(LocalDate.of(2026, 7, 3))
+        val text = schedule.joinToString("\n") { "${it.time} ${it.title} ${it.detail}" }
+
+        assertEquals("慢启动但能学：法理2 + 刑法1入口", plan?.title)
+        assertTrue(text.contains("法理学第 2 章"))
+        assertTrue(text.contains("听众合法硕刑法课程"))
+        assertTrue(text.contains("不背单词 120 个"))
     }
 
     @Test

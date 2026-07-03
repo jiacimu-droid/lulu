@@ -678,9 +678,8 @@ private fun StudyHero(
                     UIAvatar(
                         assistant.name,
                         assistant.avatar,
-                        Modifier
-                            .size(58.dp)
-                            .clickable { showCompanionPicker = true },
+                        Modifier.size(58.dp),
+                        onClick = { showCompanionPicker = true },
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text("${assistant.name}陪你备考", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)

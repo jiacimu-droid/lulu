@@ -238,6 +238,29 @@ class StudyRulesTest {
     }
 
     @Test
+    fun `syncing changed plan tasks clears stale generated schedule`() {
+        val date = LocalDate.of(2026, 7, 3)
+        val staleSchedule = listOf(StudyScheduleBlock("09:30-10:00", "旧计划", "旧的低负荷安排"))
+        val state = StudyState(
+            today = date.toString(),
+            activePlanDate = date.toString(),
+            tasks = listOf(
+                StudyTask(
+                    id = "plan-${date}-0",
+                    title = "旧计划｜今天完全休息",
+                    source = StudyTaskSource.Plan,
+                ),
+            ),
+            generatedSchedules = mapOf(date.toString() to staleSchedule),
+        )
+
+        val synced = StudyRules.syncPlanTasks(state, date)
+
+        assertTrue(synced.tasks.any { it.title.contains("刑法1入口") })
+        assertFalse(synced.generatedSchedules.containsKey(date.toString()))
+    }
+
+    @Test
     fun `perfect streak only increments once per day`() {
         val state = StudyState(
             today = "2026-06-30",

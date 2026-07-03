@@ -169,6 +169,7 @@ object StudyRules {
             tasks = planTasks + manualTasks,
             activePlanDate = dateText,
             superMomentAvailable = false,
+            generatedSchedules = state.generatedSchedules - dateText,
         )
     }
 
