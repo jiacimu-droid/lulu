@@ -11,7 +11,7 @@ class ExamStudyPlanTest {
     fun tomorrowPlanReadsTheNextCalendarDay() {
         val tomorrow = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 2).plusDays(1))
 
-        assertEquals("慢启动但能学：法理2 + 刑法1入口", tomorrow?.title)
+        assertEquals("病后慢启动：保底 + 可加码", tomorrow?.title)
     }
 
     @Test
@@ -20,10 +20,41 @@ class ExamStudyPlanTest {
         val schedule = ExamStudyPlan.todaySchedule(LocalDate.of(2026, 7, 3))
         val text = schedule.joinToString("\n") { "${it.time} ${it.title} ${it.detail}" }
 
-        assertEquals("慢启动但能学：法理2 + 刑法1入口", plan?.title)
+        assertEquals("病后慢启动：保底 + 可加码", plan?.title)
         assertTrue(text.contains("法理学第 2 章"))
         assertTrue(text.contains("听众合法硕刑法课程"))
         assertTrue(text.contains("不背单词 120 个"))
+    }
+
+    @Test
+    fun partialChapterLessonDoesNotScheduleFullChapterPractice() {
+        val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 4))
+        val titles = plan?.tasks.orEmpty().joinToString("\n") { it.title }
+
+        assertTrue(titles.contains("已学内容小测"))
+        assertTrue(titles.contains("不做整章章节题"))
+        assertFalse(titles.contains("做 8-10 题"))
+        assertFalse(titles.contains("章节题 5 道"))
+    }
+
+    @Test
+    fun closedChapterDaySchedulesChapterPracticeAndCorrection() {
+        val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 13))
+        val titles = plan?.tasks.orEmpty().joinToString("\n") { it.title }
+
+        assertTrue(titles.contains("刑法第 1 章：整章章节题"))
+        assertTrue(titles.contains("错题"))
+        assertTrue(titles.contains("第一轮关键词背诵"))
+    }
+
+    @Test
+    fun lawTheoryIsRecitedInsteadOfOnlySkimmed() {
+        val july = ExamStudyPlan.monthlyPlans.single { it.month == "2026-07" }
+        val text = july.tasks.joinToString("\n")
+
+        assertTrue(text.contains("法理学不重听"))
+        assertTrue(text.contains("第一轮背诵"))
+        assertTrue(text.contains("不是只看目录"))
     }
 
     @Test
@@ -40,7 +71,7 @@ class ExamStudyPlanTest {
         val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 2))
         val taskTitles = plan?.tasks.orEmpty().map { it.title }
 
-        assertTrue(taskTitles.any { it.contains("英语长难句 1 句") })
+        assertTrue(taskTitles.any { it.contains("长难句 1 句") })
         assertTrue(taskTitles.any { it.contains("不背单词 120 个（6 组）") })
         assertTrue(taskTitles.any { it.contains("听众合法硕刑法课程") })
         assertFalse(taskTitles.any { it.contains("不背单词 60") || it.contains("不背单词 80") || it.contains("不背单词 100") })
@@ -62,6 +93,7 @@ class ExamStudyPlanTest {
         assertTrue(prompt.contains("不背单词 120 个"))
         assertTrue(prompt.contains("写论文 50分钟"))
         assertTrue(prompt.contains("9点起床，23点睡觉"))
+        assertTrue(prompt.contains("未听完整章前不要安排整章章节题"))
     }
 
     @Test
