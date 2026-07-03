@@ -17,8 +17,14 @@ import kotlinx.serialization.json.put
 import me.rerere.ai.core.InputSchema
 import me.rerere.ai.core.Tool
 import me.rerere.ai.ui.UIMessagePart
+import me.rerere.rikkahub.data.cihai.CihaiEntry
+import me.rerere.rikkahub.data.cihai.CihaiEntryKind
+import me.rerere.rikkahub.data.cihai.CihaiService
+import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.utils.readClipboardText
 import me.rerere.rikkahub.utils.writeClipboardText
+import org.koin.core.context.GlobalContext
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.TextStyle
@@ -333,7 +339,7 @@ class LocalTools(private val context: Context) {
             description = """
                 Write a short private journal entry for the character.
                 Use only when the user explicitly asks you to record, log, remember as a journal, or save an event.
-                This stores the entry in the app private files directory and does not send it elsewhere.
+                This stores the entry in Cihai, keeps the legacy private JSONL backup, and sends it to the memory bank for vectorization.
             """.trimIndent().replace("\n", " "),
             parameters = {
                 InputSchema.Obj(
@@ -371,11 +377,27 @@ class LocalTools(private val context: Context) {
                 val journalDir = File(context.filesDir, "lulu").apply { mkdirs() }
                 val journalFile = File(journalDir, "lulu_journal.jsonl")
                 journalFile.appendText(payload.toString() + "\n")
+                val cihaiSaved = runCatching {
+                    val koin = GlobalContext.get()
+                    val settings = koin.get<SettingsStore>().settingsFlow.value
+                    val assistant = settings.getCurrentAssistant()
+                    koin.get<CihaiService>().addEntryAndRemember(
+                        CihaiEntry(
+                            assistantId = assistant.id.toString(),
+                            kind = CihaiEntryKind.INNER_JOURNAL,
+                            title = params["title"]?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "露露日志" },
+                            content = content,
+                            emotion = params["mood"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+                            createdAt = now.toInstant().toEpochMilli(),
+                        )
+                    )
+                }.isSuccess
                 listOf(
                     UIMessagePart.Text(
                         buildJsonObject {
                             put("success", true)
                             put("path", journalFile.absolutePath)
+                            put("cihai_saved", cihaiSaved)
                             put("message", "Journal entry saved")
                         }.toString()
                     )

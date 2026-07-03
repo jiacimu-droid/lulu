@@ -20,6 +20,7 @@ import me.rerere.rikkahub.data.ai.transformers.TemplateTransformer
 import me.rerere.rikkahub.data.api.RikkaHubAPI
 import me.rerere.rikkahub.data.api.SponsorAPI
 import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.desktop.DesktopStore
 import me.rerere.rikkahub.data.db.AppDatabase
 import me.rerere.rikkahub.data.db.fts.MessageFtsManager
@@ -65,6 +66,10 @@ val dataSourceModule = module {
 
     single {
         DesktopStore(context = get(), scope = get(), json = get())
+    }
+
+    single {
+        CihaiStore(context = get(), scope = get(), json = get())
     }
 
     single {

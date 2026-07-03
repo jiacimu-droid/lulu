@@ -9,6 +9,7 @@ import me.rerere.highlight.Highlighter
 import me.rerere.rikkahub.AppScope
 import me.rerere.rikkahub.data.ai.AILoggingManager
 import me.rerere.rikkahub.data.ai.tools.LocalTools
+import me.rerere.rikkahub.data.cihai.CihaiService
 import me.rerere.rikkahub.data.event.AppEventBus
 import me.rerere.rikkahub.data.service.LuluPerceptionCollector
 import me.rerere.rikkahub.data.service.MemoryBankService
@@ -84,6 +85,13 @@ val appModule = module {
             context = get(),
             settingsStore = get(),
             providerManager = get(),
+        )
+    }
+
+    single {
+        CihaiService(
+            store = get(),
+            memoryBankService = get(),
         )
     }
 

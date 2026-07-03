@@ -1095,6 +1095,7 @@ class ChatService(
             )
             val scheduledPlans = buildProactiveReminderPlansFromTurn(
                 plan = luluIntentPlan,
+                assistantName = assistant.name,
                 userText = lastUserText,
                 assistantText = lastAssistantText,
             )
@@ -1159,6 +1160,7 @@ class ChatService(
 
     private fun buildProactiveReminderPlansFromTurn(
         plan: LuluIntentPlan,
+        assistantName: String,
         userText: String,
         assistantText: String,
     ): List<ProactiveReminderPlan> {
@@ -1171,14 +1173,24 @@ class ChatService(
                 preferredToolNames = plan.toolNames,
             )
         }
-        if (fromFollowUps.isNotEmpty()) return fromFollowUps
 
         val fromIntent = plan.toProactiveReminderPlan(userText = userText)
         val fallback = ProactiveReminderPlanner.plan(
             userText = userText,
             assistantText = assistantText,
         )
-        return listOfNotNull(fromIntent ?: fallback)
+        val rollingJudgments = LivingPresencePlanner.planRollingJudgments(
+            input = LivingPresenceInput(
+                assistantName = assistantName,
+                userText = userText,
+                assistantText = assistantText,
+                preferredToolNames = plan.toolNames,
+            )
+        )
+        return (fromFollowUps + listOfNotNull(fromIntent ?: fallback) + rollingJudgments)
+            .distinctBy { it.triggerAtMillis to it.reason }
+            .sortedBy { it.triggerAtMillis }
+            .take(5)
     }
 
     private fun String?.toProactiveReminderKind(): ProactiveReminderKind = when (this?.lowercase(Locale.ROOT)) {

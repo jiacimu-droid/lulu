@@ -70,6 +70,7 @@ import me.rerere.rikkahub.CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID
 import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.datastore.findModelById
@@ -105,6 +106,7 @@ class ProactiveMessageService : KoinComponent {
     private val settingsStore: SettingsStore by inject()
     private val conversationRepository: ConversationRepository by inject()
     private val studyStore: StudyStore by inject()
+    private val cihaiStore: CihaiStore by inject()
 
     companion object {
         const val TAG = "ProactiveMessageService"
@@ -353,6 +355,12 @@ class ProactiveMessageService : KoinComponent {
             if (preferredToolNames.isNotEmpty()) {
                 appendLine("At trigger time, check these sensing tools first if available: ${preferredToolNames.joinToString(", ")}.")
             }
+            if (actionHints.isNotEmpty()) {
+                appendLine("Available living-presence actions at trigger time:")
+                actionHints.forEach { hint ->
+                    appendLine("- ${hint.toolName}: ${hint.reason}")
+                }
+            }
             appendLine("This is only a proactive-plan reason. Do not treat it as prewritten message text; generate the actual user-facing message fresh.")
         }.trim()
 
@@ -540,6 +548,31 @@ class ProactiveMessageService : KoinComponent {
             }
         } catch (e: Exception) {
             Log.w(TAG, "Failed to get study plan context", e)
+        }
+
+        try {
+            val assistantId = settings.assistantId.toString()
+            val cihaiState = cihaiStore.state.first()
+            val recentEntries = cihaiState.entries.filter { it.assistantId == assistantId }.take(4)
+            val readingBooks = cihaiState.books.filter { it.assistantId == assistantId }.take(3)
+            if (recentEntries.isNotEmpty() || readingBooks.isNotEmpty()) {
+                sb.appendLine("辞海上下文:")
+                if (recentEntries.isNotEmpty()) {
+                    sb.appendLine("  - 最近心迹/行动/阅读/沉淀:")
+                    recentEntries.forEach { entry ->
+                        sb.appendLine("    · ${entry.kind.label}｜${entry.title}: ${entry.content.take(80)}")
+                    }
+                }
+                if (readingBooks.isNotEmpty()) {
+                    sb.appendLine("  - 可阅读材料:")
+                    readingBooks.forEach { book ->
+                        sb.appendLine("    · 《${book.title}》进度 ${book.progressPercent}%: ${book.content.take(100)}")
+                    }
+                    sb.appendLine("  - 如果当前不适合打扰用户，角色可以先阅读这些材料，之后把感悟写入辞海并沉淀进记忆。")
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to get Cihai context", e)
         }
 
         // Battery context
