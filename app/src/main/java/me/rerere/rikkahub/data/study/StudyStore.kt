@@ -2,6 +2,7 @@ package me.rerere.rikkahub.data.study
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -29,14 +30,15 @@ class StudyStore(
     private val json: Json = JsonInstant,
 ) {
     private val stateKey = stringPreferencesKey("state")
+    private val backupStateKey = stringPreferencesKey("state_backup")
 
     init {
         scope.launch {
             context.studyDataStore.edit { prefs ->
-                val current = prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
+                val current = readState(prefs) ?: return@edit
                 val migrated = current.ensureToday().preserveOfficialEconomy()
                 if (migrated != current) {
-                    prefs[stateKey] = json.encodeToString(migrated)
+                    prefs.writeState(migrated)
                 }
             }
         }
@@ -44,7 +46,7 @@ class StudyStore(
 
     val state: StateFlow<StudyState> = context.studyDataStore.data
         .map { prefs ->
-            prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
+            readState(prefs) ?: StudyState(today = LocalDate.now().toString())
         }
         .catch { emit(StudyState(today = LocalDate.now().toString())) }
         .map {
@@ -58,29 +60,36 @@ class StudyStore(
 
     suspend fun update(transform: (StudyState) -> StudyState) {
         context.studyDataStore.edit { prefs ->
-            val current = prefs[stateKey]?.let(::decodeState) ?: StudyState(today = LocalDate.now().toString())
+            val current = readState(prefs) ?: return@edit
             val migrated = current.ensureToday().preserveOfficialEconomy()
-            prefs[stateKey] = json.encodeToString(
-                transform(migrated)
-            )
+            prefs.writeState(transform(migrated))
         }
     }
 
     suspend fun set(state: StudyState) {
         context.studyDataStore.edit { prefs ->
-            prefs[stateKey] = json.encodeToString(state)
+            prefs.writeState(state)
         }
     }
 
-    private fun decodeState(raw: String): StudyState {
-        return runCatching { studyJson.decodeFromString<StudyState>(raw) }
-            .recoverCatching { error ->
-                if (error !is SerializationException && error !is IllegalArgumentException) throw error
-                json.decodeFromString(raw)
-            }
-            .getOrThrow()
+    private fun readState(prefs: Preferences): StudyState? =
+        prefs[stateKey]?.let(::decodeStudyStateOrNull)
+            ?: prefs[backupStateKey]?.let(::decodeStudyStateOrNull)
+
+    private fun MutablePreferences.writeState(state: StudyState) {
+        val encoded = json.encodeToString(state)
+        this[stateKey] = encoded
+        this[backupStateKey] = encoded
     }
 }
+
+internal fun decodeStudyStateOrNull(raw: String): StudyState? =
+    runCatching { studyJson.decodeFromString<StudyState>(raw) }
+        .recoverCatching { error ->
+            if (error !is SerializationException && error !is IllegalArgumentException) throw error
+            JsonInstant.decodeFromString(raw)
+        }
+        .getOrNull()
 
 private val studyJson = Json(JsonInstant) {
     ignoreUnknownKeys = true

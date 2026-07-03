@@ -2,10 +2,21 @@ package me.rerere.rikkahub.data.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 
 @Entity(
     tableName = "memory_graph_edge",
     primaryKeys = ["source_memory_id", "target_memory_id"],
+    indices = [
+        Index(
+            value = ["source_memory_id", "weight"],
+            name = "index_memory_graph_edge_source_weight",
+        ),
+        Index(
+            value = ["target_memory_id"],
+            name = "index_memory_graph_edge_target",
+        ),
+    ],
 )
 data class MemoryGraphEdgeEntity(
     @ColumnInfo("source_memory_id")
