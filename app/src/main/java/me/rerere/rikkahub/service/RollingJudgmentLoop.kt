@@ -80,6 +80,7 @@ data class LivingJudgmentTrace(
 
 @Serializable
 enum class LivingJudgmentSource {
+    MAIN_API_STRUCTURED_JUDGMENT,
     MAIN_API_READY_CONTRACT,
     STRUCTURED_RULE_FALLBACK,
 }
@@ -161,10 +162,15 @@ object RollingJudgmentLoop {
         )
     }
 
-    fun evaluate(intent: LivingIntent, nowMillis: Long = System.currentTimeMillis()): RollingJudgmentDecision {
+    fun evaluate(
+        intent: LivingIntent,
+        nowMillis: Long = System.currentTimeMillis(),
+        externalObservation: LivingObservation? = null,
+        externalJudgmentTrace: LivingJudgmentTrace? = null,
+    ): RollingJudgmentDecision {
         val nextSilentCount = intent.silentEvaluationCount + 1
         val restrained = intent.spokenCount > 0 && intent.lastSpokenAt != null
-        val observation = observe(intent, nowMillis)
+        val observation = externalObservation ?: observe(intent, nowMillis)
         val actions = when {
             restrained -> listOf(
                 LivingAction.WAIT,
@@ -185,7 +191,10 @@ object RollingJudgmentLoop {
         }.filter { it in intent.allowedActions || it == LivingAction.SCHEDULE_NEXT_TICK }
 
         val thought = structuredThought(intent, observation, restrained)
-        val trace = buildJudgmentTrace(intent, observation, actions, thought, nowMillis)
+        val trace = externalJudgmentTrace?.copy(
+            source = LivingJudgmentSource.MAIN_API_STRUCTURED_JUDGMENT,
+            createdAt = nowMillis,
+        ) ?: buildJudgmentTrace(intent, observation, actions, thought, nowMillis)
         val nextEvaluateAt = nowMillis + nextDelayMinutes(intent, nextSilentCount) * MINUTE_MILLIS
         val evolvedEmotion = evolveEmotion(intent, actions, restrained)
         val updated = intent.copy(
@@ -212,6 +221,11 @@ object RollingJudgmentLoop {
             judgmentTrace = trace,
         )
     }
+
+    fun buildObservationRequest(
+        intent: LivingIntent,
+        nowMillis: Long = System.currentTimeMillis(),
+    ): LivingObservation = observe(intent, nowMillis)
 
     private fun observe(intent: LivingIntent, nowMillis: Long): LivingObservation {
         val tools = preferredObservationTools(intent.kind)

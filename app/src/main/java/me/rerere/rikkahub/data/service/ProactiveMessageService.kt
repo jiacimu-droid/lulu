@@ -86,11 +86,16 @@ import me.rerere.rikkahub.data.model.currentProjectedLuluState
 import me.rerere.rikkahub.data.model.thoughtHistory
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
+import me.rerere.rikkahub.data.study.ExamStudyPlan
 import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.data.study.StudyTaskSource
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.service.LivingAction
+import me.rerere.rikkahub.service.LivingIntent
 import me.rerere.rikkahub.service.LivingIntentKind
+import me.rerere.rikkahub.service.LivingJudgmentModelInput
+import me.rerere.rikkahub.service.LivingJudgmentModelPlanner
+import me.rerere.rikkahub.service.LivingObservation
 import me.rerere.rikkahub.service.LuluIntent
 import me.rerere.rikkahub.service.LuluIntentInput
 import me.rerere.rikkahub.service.LuluIntentModelPlanner
@@ -98,10 +103,12 @@ import me.rerere.rikkahub.service.LuluIntentPlan
 import me.rerere.rikkahub.service.LuluIntentPlanner
 import me.rerere.rikkahub.service.LivingPresenceAction
 import me.rerere.rikkahub.service.RollingJudgmentDecision
+import me.rerere.rikkahub.service.RollingJudgmentLoop
 import me.rerere.rikkahub.service.ProactiveReminderPlan
 import me.rerere.rikkahub.service.toProactiveReminderPlan
 import me.rerere.rikkahub.utils.sendNotification
 import java.time.Instant
+import java.time.LocalDate
 import kotlin.uuid.Uuid
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -905,9 +912,47 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
 
                 // 构建工具列表（与 ChatService 保持一致）
                 val tools = buildTools(settings, assistant, model, historyMessages)
+                val nowMillis = System.currentTimeMillis()
+                val dueLivingIntent = livingPresenceStore.nextDueIntent(
+                    assistantId = assistantUuid.toString(),
+                    nowMillis = nowMillis,
+                )
+                val livingPresenceObservation = dueLivingIntent?.let { intent ->
+                    buildLivingPresenceRuntimeObservation(
+                        intent = intent,
+                        tools = tools,
+                        historyMessages = historyMessages,
+                        minutesSinceLastChat = minutesSinceLastChat,
+                        nowMillis = nowMillis,
+                    )
+                }
+                val livingPresenceJudgmentTrace = if (dueLivingIntent != null && livingPresenceObservation != null) {
+                    runCatching {
+                        LivingJudgmentModelPlanner.planOrNull(
+                            input = LivingJudgmentModelInput(
+                                assistantName = assistant.name,
+                                persona = assistant.toLuluPlannerPersona(),
+                                intent = dueLivingIntent,
+                                observation = livingPresenceObservation,
+                                recentConversation = historyMessages.takeLast(8).map { message ->
+                                    "${message.role.name}: ${message.toText().take(500)}"
+                                },
+                            ),
+                            settings = settings,
+                            model = model,
+                            providerManager = providerManager,
+                        )
+                    }.onFailure { error ->
+                        Log.w(ProactiveMessageService.TAG, "LivingPresence main API judgment failed; using rule fallback", error)
+                    }.getOrNull()
+                } else {
+                    null
+                }
                 val livingPresenceDecision = livingPresenceStore.evaluateDueIntent(
                     assistantId = assistantUuid.toString(),
-                    nowMillis = System.currentTimeMillis(),
+                    nowMillis = nowMillis,
+                    externalObservation = livingPresenceObservation,
+                    externalJudgmentTrace = livingPresenceJudgmentTrace,
                 )
                 if (livingPresenceDecision?.shouldResolveSilently() == true) {
                     Log.d(TAG, "LivingPresence decision resolved silently: ${livingPresenceDecision.thought}")
@@ -1202,6 +1247,77 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             }
         }
         return START_NOT_STICKY
+    }
+
+    private fun buildLivingPresenceRuntimeObservation(
+        intent: LivingIntent,
+        tools: List<Tool>,
+        historyMessages: List<UIMessage>,
+        minutesSinceLastChat: Long?,
+        nowMillis: Long,
+    ): LivingObservation {
+        val request = RollingJudgmentLoop.buildObservationRequest(intent, nowMillis)
+        val availableToolNames = tools.map { it.name }.toSet()
+        val availableRequestedTools = request.requestedTools.filter { requested ->
+            availableToolNames.any { available -> available == requested || available.contains(requested) }
+        }
+        val missingRequestedTools = request.requestedTools - availableRequestedTools.toSet()
+        val studyState = studyStore.state.value
+        val openTasks = studyState.tasks.filterNot { it.done }
+        val doneTaskCount = studyState.tasks.count { it.done }
+        val todaySchedule = runCatching {
+            ExamStudyPlan.todaySchedule(LocalDate.now()).take(3)
+        }.getOrDefault(emptyList())
+        val lastUserText = historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty()
+        val signals = buildList {
+            addAll(request.signals)
+            add("observation_pipeline=runtime_before_judgment")
+            add("available_tool_count=${availableToolNames.size}")
+            addAll(availableRequestedTools.map { "available_tool=$it" })
+            addAll(missingRequestedTools.map { "missing_tool=$it" })
+            minutesSinceLastChat?.let { add("minutes_since_last_chat=$it") }
+            add("study_tasks_open=${openTasks.size}")
+            add("study_tasks_done=$doneTaskCount")
+            add("recent_user_text_present=${lastUserText.isNotBlank()}")
+            batterySignal()?.let(::add)
+            if (todaySchedule.isNotEmpty()) {
+                add("today_schedule_blocks=${todaySchedule.size}")
+            }
+        }.distinct()
+        val summary = buildString {
+            append("Runtime observation before RollingJudgmentLoop: ")
+            append("requested_tools=${request.requestedTools.joinToString(", ").ifBlank { "none" }}; ")
+            append("available_requested_tools=${availableRequestedTools.joinToString(", ").ifBlank { "none" }}; ")
+            append("missing_requested_tools=${missingRequestedTools.joinToString(", ").ifBlank { "none" }}; ")
+            append("minutes_since_last_chat=${minutesSinceLastChat ?: "unknown"}; ")
+            append("study_tasks_open=${openTasks.size}; study_tasks_done=$doneTaskCount")
+            if (openTasks.isNotEmpty()) {
+                append("; open_tasks=")
+                append(openTasks.take(3).joinToString(" / ") { it.title.take(48) })
+            }
+            if (todaySchedule.isNotEmpty()) {
+                append("; today_schedule=")
+                append(todaySchedule.joinToString(" / ") { "${it.time} ${it.title}".take(64) })
+            }
+            batterySignal()?.let { append("; $it") }
+            append(". This observation must be used before deciding MESSAGE, TOOL_CHECK, WAIT, JOURNAL_WRITE, READ, MEMORY_UPDATE, or ASK_CAPABILITY.")
+        }
+        return LivingObservation(
+            summary = summary,
+            requestedTools = request.requestedTools,
+            signals = signals,
+            createdAt = nowMillis,
+        )
+    }
+
+    private fun batterySignal(): String? {
+        val batteryStatus = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED)) ?: return null
+        val level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+        val scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+        if (level < 0 || scale <= 0) return null
+        val percent = (level * 100 / scale).coerceIn(0, 100)
+        val plugged = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0
+        return "battery_percent=$percent,charging=$plugged"
     }
 
     private fun RollingJudgmentDecision.shouldResolveSilently(): Boolean =

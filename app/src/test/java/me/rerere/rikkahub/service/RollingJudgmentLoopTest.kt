@@ -107,6 +107,64 @@ class RollingJudgmentLoopTest {
         assertEquals(LivingJudgmentSource.MAIN_API_READY_CONTRACT, decision.judgmentTrace?.source)
     }
 
+    @Test
+    fun `external observation is used before structured judgment`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "露露",
+            userText = "我要去学习专业课",
+            assistantText = "嗯，我帮你守着节奏。",
+            nowMillis = NOW,
+        )
+        val observation = LivingObservation(
+            summary = "Runtime observation: available_tools=get_app_usage,today_study_plan; study_tasks_open=3",
+            requestedTools = listOf("get_app_usage", "today_study_plan"),
+            signals = listOf("available_tool=get_app_usage", "available_tool=today_study_plan", "study_tasks_open=3"),
+            createdAt = NOW + 30 * MINUTE,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 30 * MINUTE,
+            externalObservation = observation,
+        )
+
+        assertEquals(observation.summary, decision.observation?.summary)
+        assertTrue(decision.updatedIntent.lastObservation?.signals?.contains("study_tasks_open=3") == true)
+        assertTrue(decision.judgmentTrace?.observation?.contains("available_tools=get_app_usage") == true)
+        assertTrue(decision.thought.contains("Runtime observation"))
+    }
+
+    @Test
+    fun `main api structured trace overrides rule fallback trace`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "露露",
+            userText = "我先忙三个小时",
+            assistantText = "好，我会自己判断什么时候靠近。",
+            nowMillis = NOW,
+        )
+        val trace = LivingJudgmentTrace(
+            source = LivingJudgmentSource.MAIN_API_READY_CONTRACT,
+            belief = "She may be busy, not ignoring me.",
+            desire = "Stay near without interrupting.",
+            intention = "Wait and write journal first.",
+            thought = "I checked the observation and chose restraint.",
+            action = "WAIT, JOURNAL_WRITE, SCHEDULE_NEXT_TICK",
+            observation = "Runtime observation is available.",
+            decision = "Do not message now.",
+            createdAt = NOW,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 10 * MINUTE,
+            externalJudgmentTrace = trace,
+        )
+
+        assertEquals(LivingJudgmentSource.MAIN_API_STRUCTURED_JUDGMENT, decision.judgmentTrace?.source)
+        assertEquals("I checked the observation and chose restraint.", decision.judgmentTrace?.thought)
+        assertEquals("Do not message now.", decision.updatedIntent.lastJudgmentTrace?.decision)
+    }
+
     private companion object {
         const val NOW = 1_700_000_000_000L
         const val MINUTE = 60_000L

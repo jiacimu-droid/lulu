@@ -20,6 +20,8 @@ import me.rerere.rikkahub.service.LivingBeliefStore
 import me.rerere.rikkahub.service.LivingIntent
 import me.rerere.rikkahub.service.LivingIntentKind
 import me.rerere.rikkahub.service.LivingIntentStatus
+import me.rerere.rikkahub.service.LivingJudgmentTrace
+import me.rerere.rikkahub.service.LivingObservation
 import me.rerere.rikkahub.service.LivingPresenceEvent
 import me.rerere.rikkahub.service.RollingJudgmentDecision
 import me.rerere.rikkahub.service.RollingJudgmentLoop
@@ -123,9 +125,16 @@ class LivingPresenceStore(
     suspend fun evaluateDueIntent(
         assistantId: String,
         nowMillis: Long = System.currentTimeMillis(),
+        externalObservation: LivingObservation? = null,
+        externalJudgmentTrace: LivingJudgmentTrace? = null,
     ): RollingJudgmentDecision? {
         val intent = nextDueIntent(assistantId = assistantId, nowMillis = nowMillis) ?: return null
-        val decision = RollingJudgmentLoop.evaluate(intent, nowMillis)
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = nowMillis,
+            externalObservation = externalObservation,
+            externalJudgmentTrace = externalJudgmentTrace,
+        )
         updateIntent(decision.updatedIntent)
         return decision
     }
