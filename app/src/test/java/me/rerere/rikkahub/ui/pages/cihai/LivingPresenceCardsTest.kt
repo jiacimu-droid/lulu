@@ -1,0 +1,77 @@
+package me.rerere.rikkahub.ui.pages.cihai
+
+import me.rerere.rikkahub.service.LivingIntentKind
+import me.rerere.rikkahub.service.RollingJudgmentLoop
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class LivingPresenceCardsTest {
+    @Test
+    fun `cards show only selected assistant intents sorted by next evaluation`() {
+        val later = RollingJudgmentLoop.createIntent(
+            assistantId = "lulu",
+            assistantName = "露露",
+            userText = "我先去学习",
+            assistantText = "我守着你。",
+            nowMillis = NOW,
+        )
+        val sooner = RollingJudgmentLoop.createIntent(
+            assistantId = "lulu",
+            assistantName = "露露",
+            userText = "我肚子疼",
+            assistantText = "我先确认你安全。",
+            nowMillis = NOW,
+        )
+        val otherAssistant = RollingJudgmentLoop.createIntent(
+            assistantId = "other",
+            assistantName = "别的角色",
+            userText = "我先忙",
+            assistantText = "好。",
+            nowMillis = NOW,
+        )
+
+        val cards = buildLivingIntentCards(
+            intents = listOf(later, otherAssistant, sooner),
+            selectedAssistantId = "lulu",
+            nowMillis = NOW,
+        )
+
+        assertEquals(listOf(LivingIntentKind.HEALTH_SAFETY, LivingIntentKind.STUDY_FOCUS), cards.map { it.kind })
+        assertTrue(cards.first().title.contains("身体"))
+        assertTrue(cards.first().bdiLine.contains("信念"))
+        assertTrue(cards.first().cadenceLine.contains("5/10/20/40/90"))
+    }
+
+    @Test
+    fun `cards summarize overdue and repeated silent judgments`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantId = "lulu",
+            assistantName = "露露",
+            userText = "我先忙一下",
+            assistantText = "好，我等你。",
+            nowMillis = NOW,
+        ).copy(
+            nextEvaluateAt = NOW - MINUTE,
+            spokenCount = 1,
+            silentEvaluationCount = 3,
+            restraint = 9,
+        )
+
+        val card = buildLivingIntentCards(
+            intents = listOf(intent),
+            selectedAssistantId = "lulu",
+            nowMillis = NOW,
+        ).single()
+
+        assertEquals("现在该重新判断", card.nextEvaluateText)
+        assertTrue(card.countLine.contains("默默判断 3 次"))
+        assertTrue(card.countLine.contains("开口 1 次"))
+        assertTrue(card.countLine.contains("克制 9/10"))
+    }
+
+    private companion object {
+        const val NOW = 1_700_000_000_000L
+        const val MINUTE = 60_000L
+    }
+}

@@ -46,6 +46,7 @@ import me.rerere.rikkahub.data.cihai.CihaiEntryKind
 import me.rerere.rikkahub.data.cihai.CihaiService
 import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
+import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
@@ -59,7 +60,9 @@ fun CihaiPage(onBack: () -> Unit) {
     val settings = LocalSettings.current
     val store = koinInject<CihaiStore>()
     val service = koinInject<CihaiService>()
+    val livingPresenceStore = koinInject<LivingPresenceStore>()
     val state by store.state.collectAsState()
+    val livingPresenceState by livingPresenceStore.state.collectAsState()
     val scope = rememberCoroutineScope()
     val fallbackAssistant = settings.getCurrentAssistant()
     val selectedAssistantId = state.selectedAssistantId
@@ -67,6 +70,12 @@ fun CihaiPage(onBack: () -> Unit) {
         ?: fallbackAssistant.id.toString()
     val selectedAssistant = settings.assistants.firstOrNull { it.id.toString() == selectedAssistantId }
         ?: fallbackAssistant
+    val livingIntentCards = remember(livingPresenceState.activeIntents, selectedAssistantId) {
+        buildLivingIntentCards(
+            intents = livingPresenceState.activeIntents,
+            selectedAssistantId = selectedAssistantId,
+        )
+    }
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf(
         CihaiEntryKind.INNER_JOURNAL,
@@ -152,6 +161,11 @@ fun CihaiPage(onBack: () -> Unit) {
                 contentPadding = PaddingValues(bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                if (livingIntentCards.isNotEmpty()) {
+                    item {
+                        LivingIntentPanel(cards = livingIntentCards)
+                    }
+                }
                 item {
                     CihaiComposer(
                         assistantId = selectedAssistantId,
@@ -187,6 +201,82 @@ fun CihaiPage(onBack: () -> Unit) {
                     key = { it.id },
                 ) { entry ->
                     EntryCard(entry)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LivingIntentPanel(cards: List<LivingIntentCardModel>) {
+    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("挂在心里的事", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    text = "这些不是随机主动消息，而是角色正在滚动判断、克制、观察和等待的事件。",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            cards.forEach { card ->
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.62f),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(7.dp),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = card.title,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Surface(
+                                shape = RoundedCornerShape(999.dp),
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                            ) {
+                                Text(
+                                    text = card.statusText,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                )
+                            }
+                        }
+                        Text(
+                            text = card.nextEvaluateText,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(card.bdiLine, style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            text = card.hypothesesLine,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = card.cadenceLine,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = "${card.countLine}\n${card.emotionLine}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }
