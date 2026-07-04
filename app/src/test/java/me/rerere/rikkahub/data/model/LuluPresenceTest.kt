@@ -132,6 +132,21 @@ class LuluPresenceTest {
     }
 
     @Test
+    fun `fallback inner voice is first person instead of narrator summary`() {
+        val state = buildLuluStateFromTurn(
+            assistantId = assistantId,
+            userText = "今天好开心",
+            assistantText = "我也很开心。",
+            assistantName = "露露",
+            nowMillis = 1_000L,
+        )
+
+        assertTrue(state.innerVoice.startsWith("我"))
+        assertFalse(state.innerVoice.contains("露露其实"))
+        assertFalse(state.innerVoice.contains("会先"))
+    }
+
+    @Test
     fun `pending action is marked expressed when user returns`() {
         val pending = LuluThought(
             assistantId = assistantId,
