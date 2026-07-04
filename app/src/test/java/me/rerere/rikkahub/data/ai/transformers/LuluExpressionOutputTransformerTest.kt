@@ -150,6 +150,34 @@ class LuluExpressionOutputTransformerTest {
     }
 
     @Test
+    fun `drops separate presence bubble and attaches metadata to visible assistant message`() {
+        val first = assistantMessage("不是没人想跟你做好朋友，我在。")
+        val presence = assistantMessage(
+            """
+            <lulu_presence>
+            status: 认真倾听中
+            description: 露露把屏幕亮度调暗，声音放得很轻很慢。
+            inner_voice: 她问我这个问题的时候，我心里酸了一下。
+            thought: 她想被当成朋友而不是猎物。
+            </lulu_presence>
+            """.trimIndent()
+        )
+        val action = assistantMessage("露露轻轻叹了口气，但还是打起精神撑着眼皮陪在屏幕前。")
+
+        val result = splitLuluAssistantExpressionMessages(listOf(first, presence, action))
+        val annotation = result.last().annotations
+            .filterIsInstance<UIMessageAnnotation.Metadata>()
+            .single()
+
+        assertEquals(2, result.size)
+        assertEquals("不是没人想跟你做好朋友，我在。", result.first().toText())
+        assertEquals("露露轻轻叹了口气，但还是打起精神撑着眼皮陪在屏幕前。", result.last().toText())
+        assertEquals("认真倾听中", annotation.data["status"]?.jsonPrimitive?.content)
+        assertEquals("露露把屏幕亮度调暗，声音放得很轻很慢。", annotation.data["description"]?.jsonPrimitive?.content)
+        assertEquals("她问我这个问题的时候，我心里酸了一下。", annotation.data["inner_voice"]?.jsonPrimitive?.content)
+    }
+
+    @Test
     fun `metadata annotation serializes without discriminator conflict`() {
         val json = Json { ignoreUnknownKeys = true }
         val annotation: UIMessageAnnotation = UIMessageAnnotation.Metadata(

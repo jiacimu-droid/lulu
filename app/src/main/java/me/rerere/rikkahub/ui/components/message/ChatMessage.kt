@@ -109,7 +109,8 @@ import me.rerere.rikkahub.ui.components.ui.toComposeColor
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.extendColors
 import me.rerere.rikkahub.data.datastore.ChatFontFamily
-import me.rerere.rikkahub.data.ai.transformers.LULU_PRESENCE_METADATA_TYPE
+import me.rerere.rikkahub.data.ai.transformers.luluPresenceMetadata
+import me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.Image
@@ -129,6 +130,7 @@ fun ChatMessage(
     loading: Boolean = false,
     model: Model? = null,
     assistant: Assistant? = null,
+    luluPresenceDescriptionOverride: String? = null,
     lastMessage: Boolean = false,
     onFork: () -> Unit,
     onRegenerate: () -> Unit,
@@ -223,7 +225,8 @@ fun ChatMessage(
         if (lastMessage && message.role == MessageRole.ASSISTANT) {
             LuluExpressionInlineState(
                 messageKey = message.id.toString(),
-                annotations = message.annotations,
+                message = message,
+                descriptionOverride = luluPresenceDescriptionOverride,
                 loading = loading,
             )
         }
@@ -312,12 +315,13 @@ private fun isFreshMessage(createdAt: LocalDateTime): Boolean {
 @Composable
 private fun LuluExpressionInlineState(
     messageKey: String,
-    annotations: List<UIMessageAnnotation>,
+    message: UIMessage,
+    descriptionOverride: String?,
     loading: Boolean,
 ) {
     val context = LocalContext.current
-    val presenceSnapshot = remember(messageKey, annotations) {
-        annotations.latestLuluPresenceSnapshot()
+    val presenceSnapshot = remember(messageKey, message.annotations, message.parts, descriptionOverride) {
+        message.latestLuluPresenceSnapshot(descriptionOverride)
     }
     var state by remember(messageKey) { mutableStateOf<LuluExpressionSnapshot?>(presenceSnapshot) }
 
@@ -362,21 +366,26 @@ private data class LuluExpressionSnapshot(
     }
 }
 
-private fun List<UIMessageAnnotation>.latestLuluPresenceSnapshot(): LuluExpressionSnapshot? =
-    asReversed()
-        .asSequence()
-        .filterIsInstance<UIMessageAnnotation.Metadata>()
-        .firstOrNull { it.type == LULU_PRESENCE_METADATA_TYPE }
-        ?.data
-        ?.let { obj ->
-            LuluExpressionSnapshot(
-                description = obj["description"]?.jsonPrimitive?.contentOrNull.orEmpty(),
-                emoji = "",
-                sticker = "",
-                gesture = "",
-            )
-        }
-        ?.takeIf { it.toDisplayText().isNotBlank() }
+private fun UIMessage.latestLuluPresenceSnapshot(descriptionOverride: String?): LuluExpressionSnapshot? {
+    val description = descriptionOverride
+        ?.trim()
+        ?.takeIf { it.isNotBlank() }
+        ?: luluPresenceMetadata()
+            ?.data
+            ?.get("description")
+            ?.jsonPrimitive
+            ?.contentOrNull
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+    return description?.let {
+        LuluExpressionSnapshot(
+            description = it,
+            emoji = "",
+            sticker = "",
+            gesture = "",
+        )
+    }
+}
 
 private fun readLatestLuluExpressionSnapshot(file: File): LuluExpressionSnapshot? {
     if (!file.exists()) return null
@@ -489,11 +498,16 @@ private fun MessagePartsBlock(
                 when (val part = block.part) {
                     is UIMessagePart.Text -> {
                         // 从显示文本中移除[zip:...]标记
-                        val displayText = remember(part.text) {
-                            part.text.replace(Regex("\\[zip:[^\\]]+\\]", RegexOption.IGNORE_CASE), "")
+                        val displayText = remember(part.text, role) {
+                            val withoutZip = part.text.replace(Regex("\\[zip:[^\\]]+\\]", RegexOption.IGNORE_CASE), "")
+                            if (role == MessageRole.ASSISTANT) {
+                                sanitizeLuluVisibleExpression(withoutZip)
+                            } else {
+                                withoutZip
+                            }
                         }
                         
-                        SelectionContainer {
+                        if (displayText.isNotBlank()) SelectionContainer {
                             Column {
                                 if (role == MessageRole.USER) {
                                     Surface(

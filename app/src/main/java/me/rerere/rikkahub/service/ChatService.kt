@@ -52,7 +52,6 @@ import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.ui.ToolApprovalState
 import me.rerere.ai.ui.UIMessage
-import me.rerere.ai.ui.UIMessageAnnotation
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.ai.ui.canResumeToolExecution
 import me.rerere.ai.ui.finishPendingTools
@@ -80,13 +79,13 @@ import me.rerere.rikkahub.plugin.loader.PluginLoader
 import me.rerere.rikkahub.plugin.provider.PluginToolProvider
 import me.rerere.rikkahub.data.ai.transformers.Base64ImageToLocalFileTransformer
 import me.rerere.rikkahub.data.ai.transformers.DocumentAsPromptTransformer
-import me.rerere.rikkahub.data.ai.transformers.LULU_PRESENCE_METADATA_TYPE
 import me.rerere.rikkahub.data.ai.transformers.LuluStateTransformer
 import me.rerere.rikkahub.data.ai.transformers.LuluExpressionOutputTransformer
 import me.rerere.rikkahub.data.ai.transformers.OcrTransformer
 import me.rerere.rikkahub.data.ai.transformers.PlaceholderTransformer
 import me.rerere.rikkahub.data.ai.transformers.PromptInjectionTransformer
 import me.rerere.rikkahub.data.ai.transformers.RegexOutputTransformer
+import me.rerere.rikkahub.data.ai.transformers.luluPresenceMetadata
 import me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression
 import me.rerere.rikkahub.data.ai.transformers.StudyStateTransformer
 import me.rerere.rikkahub.data.ai.transformers.TemplateTransformer
@@ -796,9 +795,8 @@ class ChatService(
     private fun List<UIMessage>.extractLuluPresenceMetadata(): LuluModelPresence? =
         asReversed()
             .asSequence()
-            .flatMap { message -> message.annotations.asReversed().asSequence() }
-            .filterIsInstance<UIMessageAnnotation.Metadata>()
-            .firstOrNull { it.type == LULU_PRESENCE_METADATA_TYPE }
+            .mapNotNull { message -> message.luluPresenceMetadata() }
+            .firstOrNull()
             ?.data
             ?.let { json ->
                 LuluModelPresence(

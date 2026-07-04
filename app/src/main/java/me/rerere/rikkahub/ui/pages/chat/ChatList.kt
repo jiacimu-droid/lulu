@@ -90,6 +90,8 @@ import kotlinx.coroutines.launch
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
 import me.rerere.rikkahub.R
+import me.rerere.rikkahub.data.ai.transformers.luluPresenceMetadata
+import me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.getAssistantById
@@ -103,12 +105,29 @@ import me.rerere.rikkahub.ui.components.ui.RabbitLoadingIndicator
 import me.rerere.rikkahub.ui.components.ui.Tooltip
 import me.rerere.rikkahub.ui.hooks.ImeLazyListAutoScroller
 import me.rerere.rikkahub.utils.plus
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.math.roundToInt
 import kotlin.uuid.Uuid
 
 private const val TAG = "ChatList"
 private const val LoadingIndicatorKey = "LoadingIndicator"
 private const val ScrollBottomKey = "ScrollBottomKey"
+
+private fun List<MessageNode>.latestLuluPresenceDescription(): String? =
+    asReversed()
+        .asSequence()
+        .mapNotNull { node ->
+            node.currentMessage
+                .luluPresenceMetadata()
+                ?.data
+                ?.get("description")
+                ?.jsonPrimitive
+                ?.contentOrNull
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
+        }
+        .firstOrNull()
 
 @Composable
 fun ChatList(
@@ -298,6 +317,7 @@ private fun ChatListNormal(
                 val msg = node.currentMessage
                 val text = msg.toText().trim()
                 !(msg.role == MessageRole.ASSISTANT && text == "[SKIP]") &&
+                !(msg.role == MessageRole.ASSISTANT && sanitizeLuluVisibleExpression(text).isBlank()) &&
                 !(msg.role == MessageRole.USER && text.contains("[主动消息上下文]"))
             }
         }
@@ -316,6 +336,13 @@ private fun ChatListNormal(
                 items = displayNodes,
                 key = { index, item -> item.id },
             ) { index, node ->
+                val latestPresenceDescription = remember(conversation.messageNodes, displayNodes.lastIndex, index) {
+                    if (index == displayNodes.lastIndex) {
+                        conversation.messageNodes.latestLuluPresenceDescription()
+                    } else {
+                        null
+                    }
+                }
                 Column {
                     ListSelectableItem(
                         key = node.id,
@@ -333,6 +360,7 @@ private fun ChatListNormal(
                             node = node,
                             model = node.currentMessage.modelId?.let { settings.findModelById(it) },
                             assistant = settings.getAssistantById(conversation.assistantId),
+                            luluPresenceDescriptionOverride = latestPresenceDescription,
                             loading = loading && index == displayNodes.lastIndex,
                             onRegenerate = {
                                 onRegenerate(node.currentMessage)
