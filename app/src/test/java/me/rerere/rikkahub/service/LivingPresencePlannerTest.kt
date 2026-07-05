@@ -1,6 +1,7 @@
 package me.rerere.rikkahub.service
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -41,10 +42,46 @@ class LivingPresencePlannerTest {
         assertTrue(plans.first().preferredToolNames.contains("get_gadgetbridge_data"))
         assertTrue(plans.first().reason.contains("七层活人感滚动判断"))
         assertTrue(plans.first().reason.contains("Appraisal="))
-        assertTrue(plans.first().reason.contains("motive="))
-        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.WRITE_JOURNAL.name })
-        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.MEMORY_REFLECT.name })
-        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.TOOL_CHECK.name })
+        assertTrue(plans.first().reason.contains("traitMotive="))
+        assertTrue(plans.first().reason.contains("situationalMotive="))
+        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceConsolidationHint.WRITE_JOURNAL.name })
+        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceConsolidationHint.MEMORY_REFLECT.name })
+        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.TOOL_USE.name })
+    }
+
+    @Test
+    fun `action pool stays separate from expression affordance pool`() {
+        val actionNames = LivingPresenceAction.entries.map { it.name }.toSet()
+        val expressionNames = LivingPresenceExpressionAffordance.entries.map { it.name }.toSet()
+
+        assertEquals(
+            setOf(
+                "MESSAGE",
+                "WAIT",
+                "TOOL_USE",
+                "SET_ALARM",
+                "JOURNAL_WRITE",
+                "MEMORY_UPDATE",
+                "SCHEDULE_NEXT_TICK",
+                "ASK_USER",
+                "PASS",
+            ),
+            actionNames,
+        )
+        assertEquals(
+            setOf(
+                "TEXT",
+                "KAOMOJI",
+                "STICKER",
+                "VOICE",
+                "STATUS_BAR",
+                "LIGHT_REMINDER",
+                "LONG_EXPLANATION",
+                "SILENT_RECORD",
+            ),
+            expressionNames,
+        )
+        assertFalse(actionNames.any { it in expressionNames })
     }
 
     @Test

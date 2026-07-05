@@ -106,7 +106,7 @@ import me.rerere.rikkahub.service.LuluIntentInput
 import me.rerere.rikkahub.service.LuluIntentModelPlanner
 import me.rerere.rikkahub.service.LuluIntentPlan
 import me.rerere.rikkahub.service.LuluIntentPlanner
-import me.rerere.rikkahub.service.LivingPresenceAction
+import me.rerere.rikkahub.service.LivingPresenceConsolidationHint
 import me.rerere.rikkahub.service.RollingJudgmentDecision
 import me.rerere.rikkahub.service.RollingJudgmentLoop
 import me.rerere.rikkahub.service.ProactiveReminderPlan
@@ -1360,7 +1360,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
     }
 
     private fun RollingJudgmentDecision.shouldResolveSilently(): Boolean =
-        LivingAction.MESSAGE !in actions && updatedIntent.spokenCount > 0
+        LivingAction.PASS in actions || (LivingAction.MESSAGE !in actions && updatedIntent.spokenCount > 0)
 
     private fun RollingJudgmentDecision.toTargetedReason(assistantName: String): String = buildString {
         appendLine("${assistantName.ifBlank { "当前角色" }}正在重新判断一件挂念的事。")
@@ -1383,11 +1383,16 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
     }.trim()
 
     private fun RollingJudgmentDecision.toCihaiActionHints(): List<String> = buildList {
-        if (LivingAction.JOURNAL_WRITE in actions || LivingAction.INNER_THOUGHT in actions || LivingAction.WAIT in actions) {
-            add(LivingPresenceAction.WRITE_JOURNAL.name)
+        if (
+            LivingAction.JOURNAL_WRITE in actions ||
+            LivingAction.PASS in actions ||
+            LivingAction.WAIT in actions ||
+            LivingAction.INNER_THOUGHT in actions
+        ) {
+            add(LivingPresenceConsolidationHint.WRITE_JOURNAL.name)
         }
         if (LivingAction.READ in actions) {
-            add(LivingPresenceAction.READ_BOOK.name)
+            add(LivingPresenceConsolidationHint.READ_BOOK.name)
         }
     }.ifEmpty { defaultSilentPresenceActionHints() }
 
@@ -1824,7 +1829,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             hasToolCalls = true
             Log.d(TAG, "Tool calls detected: ${toolCalls.size}")
 
-            // 执行工具（后台模式下自动执行，不需要用户审批）
+            // 执行工具：后台主动消息把工具当作角色的本地感知/行动能力。
             val executedTools = mutableListOf<UIMessagePart.Tool>()
             for (toolCall in toolCalls) {
                 val toolDef = tools.find { it.name == toolCall.toolName }
@@ -1838,7 +1843,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
 
                 try {
                     val args = json.parseToJsonElement(toolCall.input.ifBlank { "{}" })
-                    Log.d(TAG, "Executing proactive tool ${toolDef.name} with args: $args, needsApproval=${toolDef.needsApproval}")
+                    Log.d(TAG, "Executing proactive tool ${toolDef.name} with args: $args")
                     val result = toolDef.execute(args)
                     executedTools.add(toolCall.copy(output = result))
                 } catch (e: Exception) {
@@ -1919,8 +1924,8 @@ internal fun Settings.markTargetedProactiveThoughtExpressed(
 }
 
 private fun defaultSilentPresenceActionHints(): List<String> = listOf(
-    LivingPresenceAction.WRITE_JOURNAL.name,
-    LivingPresenceAction.READ_BOOK.name,
+    LivingPresenceConsolidationHint.WRITE_JOURNAL.name,
+    LivingPresenceConsolidationHint.READ_BOOK.name,
 )
 
 internal fun buildTargetedProactiveSensingInstruction(

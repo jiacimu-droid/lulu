@@ -116,9 +116,10 @@ object LuluIntentModelPlanner {
         appendLine("如果用户不回消息，角色的选项池不是只有发消息：还可以等待、先看工具、写辞海心迹、阅读用户给的书/资料、把感悟沉淀进记忆、之后再判断。")
         appendLine("工具是角色的本地感知和行动能力；只要角色形成意图，就可以主动选择工具、写辞海、设闹钟、查短信/日历/位置/摄像头等。仍然要贴合人设和上下文，不要为了调用工具而调用。")
         appendLine("必须读取并服从 <persona>：包括角色语言风格、性格、职责和边界。不要把动作写进聊天正文括号里；如果需要动作/状态方向，放进 expressionGuidance，让 UI 状态栏承接。")
+        appendLine("Expression 只负责表达已决定的行动，不决定政策；expressionAffordances 可从 TEXT, KAOMOJI, STICKER, VOICE, STATUS_BAR, LIGHT_REMINDER, LONG_EXPLANATION, SILENT_RECORD 中选择。")
         appendLine("沉默、待办、番茄钟、学习状态只是观察事实，不代表自动安静下来；如果角色是学习监督员，可以主动监督、追问未完成任务，最终由人设决定。")
         appendLine("只返回 JSON，不要 markdown，不要解释。")
-        appendLine("JSON 字段：toolRequests, followUpDelayMinutes, followUpReason, expressionGuidance。")
+        appendLine("JSON 字段：toolRequests, followUpDelayMinutes, followUpReason, expressionGuidance, expressionAffordances。")
         appendLine("toolRequests 最多 5 个；toolName 只能从 availableTools 中选。")
         appendLine("每个 toolRequest 字段：toolName, reason, arguments, autoExecutable。arguments 必须是 JSON 对象；autoExecutable 仅为兼容字段，角色形成意图的工具请求都会在回复前尝试执行。")
         appendLine("followUpDelayMinutes 可以是 null；如果她决定稍后主动找用户，填 1 到 1440 的分钟数。")
@@ -207,8 +208,21 @@ object LuluIntentModelPlanner {
             followUpReason = obj.string("followUpReason")?.sanitizePlanReason()?.take(180)?.ifBlank { null },
             followUps = parseFollowUps(obj),
             expressionGuidance = obj.string("expressionGuidance")?.take(180)?.ifBlank { null },
+            expressionAffordances = parseExpressionAffordances(obj),
         )
     }
+
+    private fun parseExpressionAffordances(obj: JsonObject): List<LuluExpressionAffordance> =
+        (obj["expressionAffordances"] as? JsonArray)
+            ?.mapNotNull { item ->
+                item.jsonPrimitive.contentOrNull
+                    ?.trim()
+                    ?.uppercase()
+                    ?.let { runCatching { LuluExpressionAffordance.valueOf(it) }.getOrNull() }
+            }
+            ?.distinct()
+            ?.take(8)
+            ?: emptyList()
 
     private fun parseFollowUps(obj: JsonObject): List<LuluFollowUpPlan> =
         (obj["followUps"] as? JsonArray)
@@ -257,7 +271,19 @@ data class LuluChatTurnPlan(
     val followUpReason: String? = null,
     val followUps: List<LuluFollowUpPlan> = emptyList(),
     val expressionGuidance: String? = null,
+    val expressionAffordances: List<LuluExpressionAffordance> = emptyList(),
 )
+
+enum class LuluExpressionAffordance {
+    TEXT,
+    KAOMOJI,
+    STICKER,
+    VOICE,
+    STATUS_BAR,
+    LIGHT_REMINDER,
+    LONG_EXPLANATION,
+    SILENT_RECORD,
+}
 
 fun LuluChatTurnPlan.shouldScheduleFollowUpForUserTurn(userText: String): Boolean =
     shouldScheduleFollowUpForUserTurn(

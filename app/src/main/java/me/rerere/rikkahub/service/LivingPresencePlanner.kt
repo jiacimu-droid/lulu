@@ -11,14 +11,31 @@ data class LivingPresenceInput(
 
 enum class LivingPresenceAction {
     MESSAGE,
-    TOOL_CHECK,
     WAIT,
-    INNER_THOUGHT,
+    TOOL_USE,
+    SET_ALARM,
+    JOURNAL_WRITE,
+    MEMORY_UPDATE,
+    SCHEDULE_NEXT_TICK,
+    ASK_USER,
+    PASS,
+}
+
+enum class LivingPresenceConsolidationHint {
     WRITE_JOURNAL,
     READ_BOOK,
     MEMORY_REFLECT,
-    PLAN_SUPPORT,
-    ASK_CAPABILITY,
+}
+
+enum class LivingPresenceExpressionAffordance {
+    TEXT,
+    KAOMOJI,
+    STICKER,
+    VOICE,
+    STATUS_BAR,
+    LIGHT_REMINDER,
+    LONG_EXPLANATION,
+    SILENT_RECORD,
 }
 
 object LivingPresencePlanner {
@@ -49,13 +66,15 @@ object LivingPresencePlanner {
     }
 
     private fun buildReason(intent: LivingIntent, index: Int): String = buildString {
-        append("情境感知-意义评估-状态保持-审议决策-行为实现-人格表达-经验沉淀#${index + 1}：")
+        append("七层活人感滚动判断#${index + 1}：情境感知-意义评估-状态保持-审议决策-行为实现-人格表达-经验沉淀。")
         append(intent.belief)
         append(" 情境感知=时间/上下文/考研计划/工具结果/工具状态/召回记忆/状态栏/辞海/历史挂心记录先进入感知层。")
-        append(" 意义评估=${intent.appraisal.meaning} 威胁/风险=${intent.appraisal.risk} 机会/价值=${intent.appraisal.value} 成本=${intent.appraisal.cost} 资源=${intent.appraisal.resources}.")
+        append(" 意义评估 Appraisal=${intent.appraisal.meaning} 威胁/风险=${intent.appraisal.risk} 机会/价值=${intent.appraisal.value} 成本=${intent.appraisal.cost} 资源=${intent.appraisal.resources}.")
+        append(" Motive=${intent.motive}.")
         append(" 状态保持: belief=${intent.belief}; traitMotive=${intent.traitMotive}; situationalMotive=${intent.situationalMotive}; intention=${intent.intention}; emotion=${intent.emotion.emotionLabel}/${intent.emotion.feltSense}.")
         append(" 审议决策: ReAct 在这里边想、边查、边修正，决定是否开口、是否查工具、是否等待、是否写辞海、是否安排下一轮。")
-        append(" 行动池 includes MESSAGE, TOOL_CHECK, WAIT, INNER_THOUGHT, JOURNAL_WRITE, READ, MEMORY_UPDATE, SCHEDULE_NEXT_TICK, SET_ALARM, ASK_CAPABILITY；这是候选能力池，不是系统层安全拦截。")
+        append(" 行动池 includes MESSAGE, WAIT, TOOL_USE, SET_ALARM, JOURNAL_WRITE, MEMORY_UPDATE, SCHEDULE_NEXT_TICK, ASK_USER, PASS；这是审议层候选能力池，不是系统层安全拦截。")
+        append(" 表达池 includes TEXT, KAOMOJI, STICKER, VOICE, STATUS_BAR, LIGHT_REMINDER, LONG_EXPLANATION, SILENT_RECORD；表达层只把已决定的行动说成人话，不决定政策。")
         append(" Consolidation=${intent.consolidation.episodicTrace} / ${intent.consolidation.policyLearning}.")
         append(" Hypotheses: ${intent.hypotheses.joinToString(" / ")}.")
         append(" 生成时必须重新观察当前状态，不要把这段 reason 当成预写消息。")
@@ -64,26 +83,26 @@ object LivingPresencePlanner {
     private fun buildActionHints(kind: LivingIntentKind): List<ProactiveActionHint> = buildList {
         add(
             ProactiveActionHint(
-                toolName = LivingPresenceAction.WRITE_JOURNAL.name,
+                toolName = LivingPresenceConsolidationHint.WRITE_JOURNAL.name,
                 reason = "如果不适合打扰用户，把这次未说出口的担心、克制和判断写入辞海心迹，并进入向量记忆。",
             )
         )
         add(
             ProactiveActionHint(
-                toolName = LivingPresenceAction.READ_BOOK.name,
+                toolName = LivingPresenceConsolidationHint.READ_BOOK.name,
                 reason = "如果用户持续沉默且没有紧急风险，可以阅读辞海里用户交给角色的材料，留下阅读感悟并进入记忆。",
             )
         )
         add(
             ProactiveActionHint(
-                toolName = LivingPresenceAction.MEMORY_REFLECT.name,
+                toolName = LivingPresenceConsolidationHint.MEMORY_REFLECT.name,
                 reason = "把本轮感知、意义评估、审议判断、辞海记录、向量记忆和图谱记忆整理成沉淀，供下一轮判断复用。",
             )
         )
         if (kind == LivingIntentKind.HEALTH_SAFETY) {
             add(
                 ProactiveActionHint(
-                    toolName = LivingPresenceAction.TOOL_CHECK.name,
+                    toolName = LivingPresenceAction.TOOL_USE.name,
                     reason = "身体不适场景优先查看健康、电量、应用或位置线索，再决定是否发消息。",
                 )
             )

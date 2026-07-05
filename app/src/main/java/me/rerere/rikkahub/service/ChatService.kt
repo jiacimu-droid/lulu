@@ -1497,7 +1497,11 @@ class ChatService(
             emptyList()
         }
         val requests = (toolRequests + fallbackRequests).distinctBy { it.toolName }.take(5)
-        if (requests.isEmpty() && plan.expressionGuidance.isNullOrBlank()) return ""
+        if (
+            requests.isEmpty() &&
+            plan.expressionGuidance.isNullOrBlank() &&
+            plan.expressionAffordances.isEmpty()
+        ) return ""
 
         val toolsByName = tools.associateBy { it.name }
         val results = requests.mapNotNull { request ->
@@ -1517,11 +1521,20 @@ class ChatService(
             """.trimIndent()
         }
 
-        if (results.isEmpty() && plan.expressionGuidance.isNullOrBlank()) return ""
+        if (
+            results.isEmpty() &&
+            plan.expressionGuidance.isNullOrBlank() &&
+            plan.expressionAffordances.isEmpty()
+        ) return ""
         return buildString {
             plan.expressionGuidance?.takeIf { it.isNotBlank() }?.let { guidance ->
                 appendLine("本轮露露自己的表达打算：$guidance")
                 appendLine("这只是后台表达方向，不要把它原样说给用户。")
+                appendLine()
+            }
+            if (plan.expressionAffordances.isNotEmpty()) {
+                appendLine("本轮可用表达池：${plan.expressionAffordances.joinToString(", ") { it.name }}")
+                appendLine("表达池只是表达层 affordance，不决定是否行动，也不要逐字复述这些标签。")
                 appendLine()
             }
             if (results.isNotEmpty()) {

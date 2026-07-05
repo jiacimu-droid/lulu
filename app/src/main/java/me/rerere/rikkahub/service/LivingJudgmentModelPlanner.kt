@@ -49,11 +49,11 @@ object LivingJudgmentModelPlanner {
         appendLine("意义评估 Appraisal 评估重要性、威胁、机会、身体安全、精神安全、时间压力、行动成本、可能收益、不行动后果、可用资源；它接近 Lazarus appraisal theory，是给行动选择提供重量，不是直接选择行动。")
         appendLine("状态保持 State 保存持续心理状态，不重新裁判：belief 是第一视角解释，不是原始感知；traitMotive 是长期人设底层动机；situationalMotive 是本次 concern 为什么在意；emotion 用 emotionLabel/feltSense/impulse/restraint/intensity 表达。")
         appendLine("审议决策 Deliberation 综合前三层回答是否行动、是否开口、是否查工具、是否等待、是否写辞海、是否安排下一轮、优先级和不行动理由；ReAct 属于这里，是边想、边查、边修正的审议过程，不是另一个想法层。")
-        appendLine("行为实现 Action Planning 决定怎么做：调哪个工具、参数、先后顺序、失败怎么办、是否需要确认、结果如何反馈给表达层。涉及时钟动作必须先 Temporal Grounding，确认当前时间和目标时间。")
+        appendLine("行为实现 Action Planning 决定怎么做：调哪个工具、参数、先后顺序、失败怎么办、结果如何反馈给表达层。涉及时钟动作必须先 Temporal Grounding，锚定当前时间和目标时间。它不设置系统层工具安全门。")
         appendLine("人格表达 Expression 只把已决定的行动说成人话，不决定政策；经验沉淀 Consolidation 输出情节痕迹、情感残留、语义记忆、行为经验。")
         appendLine("必须贴合角色人设：同一事件可以多次判断；每次判断不等于每次发消息。")
-        appendLine("先读 observation，再决定 action。工具不可用也是 observation，不能假装知道；工具可用时可以把它当作角色本地感知/行动能力。")
-        appendLine("行动池只能从 MESSAGE, TOOL_CHECK, WAIT, INNER_THOUGHT, JOURNAL_WRITE, READ, MEMORY_UPDATE, SCHEDULE_NEXT_TICK, SET_ALARM, ASK_CAPABILITY 中选。")
+        appendLine("先读 observation，再决定 action。工具不可用也是 observation，不能假装知道；工具可用时把它当作角色本地感知/行动能力，不要在活人感架构里额外设置系统层阻拦。")
+        appendLine("行动池只能从 MESSAGE, WAIT, TOOL_USE, SET_ALARM, JOURNAL_WRITE, MEMORY_UPDATE, SCHEDULE_NEXT_TICK, ASK_USER, PASS 中选；旧名 TOOL_CHECK 等同 TOOL_USE，旧名 ASK_CAPABILITY 等同 ASK_USER。")
         appendLine("下一轮判断时间不能写死。你必须根据这一次意义评估和审议判断决定 nextEvaluateDelayMinutes；这表示多久后再次想这件事，不等于多久后发消息。")
         appendLine("普通无风险沉默不要机械 5 分钟；身体安全/起床/DDL 可以更短，学习或忙碌应更克制。")
         appendLine("只返回 JSON，不要 markdown，不要解释。")
@@ -100,7 +100,7 @@ object LivingJudgmentModelPlanner {
                 ?: input.intent.motive,
             intention = obj.string("intention")?.take(500)?.ifBlank { null } ?: input.intent.intention,
             thought = obj.string("thought")?.take(900)?.ifBlank { null } ?: "主 API 已读取 observation，但没有给出可用 thought。",
-            action = obj.string("action")?.take(240)?.ifBlank { null } ?: "SCHEDULE_NEXT_TICK",
+            action = obj.string("action")?.normalizeActionNames()?.take(240)?.ifBlank { null } ?: "SCHEDULE_NEXT_TICK",
             observation = obj.string("observation")?.take(900)?.ifBlank { null } ?: input.observation.summary,
             decision = obj.string("decision")?.take(700)?.ifBlank { null } ?: "保留下一轮判断。",
             nextEvaluateDelayMinutes = obj["nextEvaluateDelayMinutes"]?.jsonPrimitive?.intOrNull?.coerceIn(1, 24 * 60),
@@ -127,6 +127,10 @@ object LivingJudgmentModelPlanner {
 
     private fun JsonObject.string(key: String): String? =
         this[key]?.jsonPrimitive?.contentOrNull
+
+    private fun String.normalizeActionNames(): String =
+        replace(Regex("\\bTOOL_CHECK\\b", RegexOption.IGNORE_CASE), "TOOL_USE")
+            .replace(Regex("\\bASK_CAPABILITY\\b", RegexOption.IGNORE_CASE), "ASK_USER")
 
     private fun JsonObject.appraisal(key: String): MeaningAppraisal? {
         val obj = this[key] as? JsonObject ?: return null

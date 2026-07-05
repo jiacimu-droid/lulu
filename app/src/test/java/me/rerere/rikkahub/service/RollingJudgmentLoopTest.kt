@@ -18,7 +18,9 @@ class RollingJudgmentLoopTest {
         assertEquals(listOf(5L, 10L, 20L, 40L, 90L), intent.evaluationCadence.delaysMinutes)
         assertEquals(NOW + 5 * MINUTE, intent.nextEvaluateAt)
         assertTrue(intent.hypotheses.contains("用户身体不舒服，可能需要安全确认"))
-        assertTrue(intent.candidateActions.contains(LivingAction.TOOL_CHECK))
+        assertTrue(intent.candidateActions.contains(LivingAction.TOOL_USE))
+        assertTrue(intent.candidateActions.contains(LivingAction.PASS))
+        assertTrue(intent.candidateActions.contains(LivingAction.ASK_USER))
     }
 
     @Test
@@ -84,9 +86,9 @@ class RollingJudgmentLoopTest {
     @Test
     fun `structured judgment can keep any local action from capability pool`() {
         val intent = RollingJudgmentLoop.createIntent(
-            assistantName = "闇查湶",
-            userText = "鎴戝厛蹇欎竴涓?,
-            assistantText = "濂斤紝鎴戜細鑷繁鍒ゆ柇瑕佷笉瑕佸仛浜嬨€?,
+            assistantName = "Lulu",
+            userText = "I will be busy for a while.",
+            assistantText = "Okay, I will decide by myself whether to act later.",
             nowMillis = NOW,
         )
         val trace = LivingJudgmentTrace(
@@ -135,7 +137,7 @@ class RollingJudgmentLoopTest {
         assertTrue(decision.updatedIntent.restraint > intent.restraint)
         assertEquals(1, decision.updatedIntent.silentEvaluationCount)
         assertTrue(decision.observation?.requestedTools?.contains("get_app_usage") == true)
-        assertTrue(decision.judgmentTrace?.thought?.contains("七层流水线") == true)
+        assertTrue(decision.judgmentTrace?.thought?.contains("情境感知-意义评估-状态保持-审议决策-行为实现-人格表达-经验沉淀") == true)
         assertEquals(LivingJudgmentSource.MAIN_API_READY_CONTRACT, decision.judgmentTrace?.source)
     }
 
@@ -164,6 +166,43 @@ class RollingJudgmentLoopTest {
         assertTrue(decision.updatedIntent.lastObservation?.signals?.contains("study_tasks_open=3") == true)
         assertTrue(decision.judgmentTrace?.observation?.contains("available_tools=get_app_usage") == true)
         assertTrue(decision.thought.contains("Runtime observation"))
+    }
+
+    @Test
+    fun `rule fallback uses public pass action instead of legacy inner thought`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "Lulu",
+            userText = "I may not reply for a while.",
+            assistantText = "I will stay nearby.",
+            nowMillis = NOW,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 10 * MINUTE,
+        )
+
+        assertTrue(decision.actions.contains(LivingAction.PASS))
+        assertTrue(LivingAction.INNER_THOUGHT !in decision.actions)
+    }
+
+    @Test
+    fun `evaluation restores candidate action pool for old stored intents`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "Lulu",
+            userText = "I may not reply for a while.",
+            assistantText = "I will stay nearby.",
+            nowMillis = NOW,
+        ).copy(candidateActions = emptyList())
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 10 * MINUTE,
+        )
+
+        assertTrue(decision.updatedIntent.candidateActions.contains(LivingAction.TOOL_USE))
+        assertTrue(decision.updatedIntent.candidateActions.contains(LivingAction.PASS))
+        assertTrue(decision.updatedIntent.candidateActions.contains(LivingAction.ASK_USER))
     }
 
     @Test
@@ -199,7 +238,7 @@ class RollingJudgmentLoopTest {
     }
 
     @Test
-    fun `main api structured action can choose restraint from allowed action pool`() {
+    fun `main api structured action can choose restraint from action pool`() {
         val intent = RollingJudgmentLoop.createIntent(
             assistantName = "露露",
             userText = "我现在肚子好痛",
@@ -213,7 +252,7 @@ class RollingJudgmentLoopTest {
             motiveText = "Care without making panic.",
             intention = "Check quietly first and write down the concern.",
             thought = "A message is not the only caring action.",
-            action = "TOOL_CHECK, JOURNAL_WRITE, SCHEDULE_NEXT_TICK",
+            action = "TOOL_USE, JOURNAL_WRITE, SCHEDULE_NEXT_TICK",
             observation = "Battery and app usage are available; health data is missing.",
             decision = "Do not send another message yet.",
             createdAt = NOW,
@@ -226,11 +265,75 @@ class RollingJudgmentLoopTest {
         )
 
         assertEquals(
-            listOf(LivingAction.TOOL_CHECK, LivingAction.JOURNAL_WRITE, LivingAction.SCHEDULE_NEXT_TICK),
+            listOf(LivingAction.TOOL_USE, LivingAction.JOURNAL_WRITE, LivingAction.SCHEDULE_NEXT_TICK),
             decision.actions,
         )
         assertTrue(LivingAction.MESSAGE !in decision.actions)
         assertEquals("Do not send another message yet.", decision.judgmentTrace?.decision)
+    }
+
+    @Test
+    fun `legacy tool action names normalize to public deliberation names`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "Lulu",
+            userText = "I may be busy for a while.",
+            assistantText = "I will check later.",
+            nowMillis = NOW,
+        )
+        val trace = LivingJudgmentTrace(
+            source = LivingJudgmentSource.MAIN_API_READY_CONTRACT,
+            belief = "She may need local context.",
+            desire = "Use the tool if it helps.",
+            intention = "Observe first.",
+            thought = "Old planner name should still be accepted.",
+            action = "TOOL_CHECK, ASK_CAPABILITY, SCHEDULE_NEXT_TICK",
+            observation = "No tool has run yet.",
+            decision = "Normalize legacy action names.",
+            createdAt = NOW,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 10 * MINUTE,
+            externalJudgmentTrace = trace,
+        )
+
+        assertTrue(decision.actions.contains(LivingAction.TOOL_USE))
+        assertTrue(decision.actions.contains(LivingAction.ASK_USER))
+        assertTrue(LivingAction.TOOL_CHECK !in decision.actions)
+        assertTrue(LivingAction.ASK_CAPABILITY !in decision.actions)
+        assertTrue(decision.observationRequest != null)
+    }
+
+    @Test
+    fun `pass action resolves as silent judgment action`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "Lulu",
+            userText = "I will be quiet for a bit.",
+            assistantText = "I am here.",
+            nowMillis = NOW,
+        )
+        val trace = LivingJudgmentTrace(
+            source = LivingJudgmentSource.MAIN_API_READY_CONTRACT,
+            belief = "She is probably occupied.",
+            desire = "Stay present without speaking.",
+            intention = "Do not speak this round.",
+            thought = "Silence is the chosen action.",
+            action = "PASS, JOURNAL_WRITE, SCHEDULE_NEXT_TICK",
+            observation = "No urgent signal.",
+            decision = "Record and wait.",
+            createdAt = NOW,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 10 * MINUTE,
+            externalJudgmentTrace = trace,
+        )
+
+        assertTrue(decision.actions.contains(LivingAction.PASS))
+        assertTrue(decision.actions.contains(LivingAction.JOURNAL_WRITE))
+        assertTrue(LivingAction.MESSAGE !in decision.actions)
     }
 
     @Test
@@ -268,9 +371,9 @@ class RollingJudgmentLoopTest {
     @Test
     fun `structured judgment emotion updates state layer`() {
         val intent = RollingJudgmentLoop.createIntent(
-            assistantName = "闇查湶",
-            userText = "鎴戣倸瀛愭湁鐐逛笉鑸掓湇",
-            assistantText = "鎴戜細鐪嬬潃涓€鐐广€?,
+            assistantName = "Lulu",
+            userText = "My stomach feels a little uncomfortable.",
+            assistantText = "I will keep an eye on it.",
             nowMillis = NOW,
         )
         val traceEmotion = intent.emotion.copy(

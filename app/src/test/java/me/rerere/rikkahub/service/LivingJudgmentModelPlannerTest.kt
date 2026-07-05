@@ -31,6 +31,7 @@ class LivingJudgmentModelPlannerTest {
         assertTrue(prompt.contains("ReAct 属于这里"))
         assertTrue(prompt.contains("不要照抄固定表"))
         assertTrue(prompt.contains("不等于多久后发消息"))
+        assertTrue(prompt.contains("不设置系统层工具安全门"))
     }
 
     @Test
@@ -97,7 +98,7 @@ class LivingJudgmentModelPlannerTest {
         )
 
         assertEquals(LivingJudgmentSource.MAIN_API_STRUCTURED_JUDGMENT, trace?.source)
-        assertEquals("TOOL_CHECK, MESSAGE, SCHEDULE_NEXT_TICK", trace?.action)
+        assertEquals("TOOL_USE, MESSAGE, SCHEDULE_NEXT_TICK", trace?.action)
         assertEquals(17, trace?.nextEvaluateDelayMinutes)
         assertTrue(trace?.thought?.contains("不能假装知道") == true)
         assertTrue(trace?.motive?.contains("确认安全") == true)

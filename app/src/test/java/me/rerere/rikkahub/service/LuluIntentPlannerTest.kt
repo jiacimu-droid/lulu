@@ -198,6 +198,29 @@ class LuluIntentPlannerTest {
     }
 
     @Test
+    fun `model planner parses expression affordance pool`() {
+        val plan = LuluIntentModelPlanner.parseChatTurnPlan(
+            rawText = """
+                {
+                  "expressionGuidance": "short, warm, and not policy-making",
+                  "expressionAffordances": ["TEXT", "KAOMOJI", "STATUS_BAR", "UNKNOWN", "TEXT"]
+                }
+            """.trimIndent(),
+            availableToolNames = emptySet(),
+        )
+
+        assertEquals("short, warm, and not policy-making", plan.expressionGuidance)
+        assertEquals(
+            listOf(
+                LuluExpressionAffordance.TEXT,
+                LuluExpressionAffordance.KAOMOJI,
+                LuluExpressionAffordance.STATUS_BAR,
+            ),
+            plan.expressionAffordances,
+        )
+    }
+
+    @Test
     fun `chat turn follow up rejects ordinary return even when model asks for five minutes`() {
         val plan = LuluChatTurnPlan(
             followUpDelayMinutes = 5,

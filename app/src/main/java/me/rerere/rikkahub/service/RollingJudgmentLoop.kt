@@ -1,6 +1,5 @@
 package me.rerere.rikkahub.service
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.UUID
 import kotlin.math.max
@@ -27,8 +26,7 @@ data class LivingIntent(
     val urgency: Int,
     val restraint: Int,
     val emotion: EmotionSnapshot,
-    @SerialName("allowedActions")
-    val candidateActions: List<LivingAction>,
+    val candidateActions: List<LivingAction> = emptyList(),
     val status: LivingIntentStatus = LivingIntentStatus.ACTIVE,
     val lastObservation: LivingObservation? = null,
     val lastJudgmentTrace: LivingJudgmentTrace? = null,
@@ -153,14 +151,19 @@ data class LivingCapabilityRequest(
 @Serializable
 enum class LivingAction {
     MESSAGE,
+    TOOL_USE,
+    SET_ALARM,
+    JOURNAL_WRITE,
+    MEMORY_UPDATE,
+    SCHEDULE_NEXT_TICK,
+    ASK_USER,
+    PASS,
+    @Deprecated("Use TOOL_USE for the public deliberation contract.")
     TOOL_CHECK,
     WAIT,
     INNER_THOUGHT,
-    JOURNAL_WRITE,
     READ,
-    MEMORY_UPDATE,
-    SCHEDULE_NEXT_TICK,
-    SET_ALARM,
+    @Deprecated("Use ASK_USER for the public deliberation contract.")
     ASK_CAPABILITY,
 }
 
@@ -241,13 +244,13 @@ object RollingJudgmentLoop {
                 LivingAction.SCHEDULE_NEXT_TICK,
             )
             intent.kind == LivingIntentKind.HEALTH_SAFETY -> listOf(
-                LivingAction.TOOL_CHECK,
+                LivingAction.TOOL_USE,
                 LivingAction.MESSAGE,
                 LivingAction.SCHEDULE_NEXT_TICK,
             )
             else -> listOf(
-                LivingAction.INNER_THOUGHT,
-                LivingAction.TOOL_CHECK,
+                LivingAction.PASS,
+                LivingAction.TOOL_USE,
                 LivingAction.SCHEDULE_NEXT_TICK,
             )
         }
@@ -273,6 +276,7 @@ object RollingJudgmentLoop {
             lastObservation = observation,
             lastJudgmentTrace = trace,
             capabilityRequests = updateCapabilityRequests(intent, observation, nowMillis),
+            candidateActions = intent.candidateActions.ifEmpty { actionsFor() },
             motiveText = trace.motive.ifBlank { intent.motive },
             traitMotive = trace.traitMotive.ifBlank { intent.traitMotive },
             situationalMotive = trace.situationalMotive.ifBlank { intent.situationalMotive },
@@ -284,7 +288,7 @@ object RollingJudgmentLoop {
             updatedIntent = updated,
             actions = actions,
             thought = thought,
-            observationRequest = if (LivingAction.TOOL_CHECK in actions) {
+            observationRequest = if (actions.hasToolUseAction()) {
                 observation.summary
             } else {
                 null
@@ -451,7 +455,7 @@ object RollingJudgmentLoop {
         val raw = trace?.action?.takeIf { it.isNotBlank() } ?: return null
         val parsed = LivingAction.entries.filter { action ->
             raw.contains(action.name, ignoreCase = true)
-        }
+        }.map { it.normalized() }
         return parsed
             .takeIf { it.isNotEmpty() }
             ?.let { actions ->
@@ -462,6 +466,15 @@ object RollingJudgmentLoop {
                 }
             }
             ?.distinct()
+    }
+
+    private fun List<LivingAction>.hasToolUseAction(): Boolean =
+        LivingAction.TOOL_USE in this || LivingAction.TOOL_CHECK in this
+
+    private fun LivingAction.normalized(): LivingAction = when (this) {
+        LivingAction.TOOL_CHECK -> LivingAction.TOOL_USE
+        LivingAction.ASK_CAPABILITY -> LivingAction.ASK_USER
+        else -> this
     }
 
     private fun updateCapabilityRequests(
@@ -783,15 +796,14 @@ object RollingJudgmentLoop {
     private fun actionsFor(): List<LivingAction> {
         return listOf(
             LivingAction.MESSAGE,
-            LivingAction.TOOL_CHECK,
             LivingAction.WAIT,
-            LivingAction.INNER_THOUGHT,
+            LivingAction.TOOL_USE,
+            LivingAction.SET_ALARM,
             LivingAction.JOURNAL_WRITE,
-            LivingAction.READ,
             LivingAction.MEMORY_UPDATE,
             LivingAction.SCHEDULE_NEXT_TICK,
-            LivingAction.SET_ALARM,
-            LivingAction.ASK_CAPABILITY,
+            LivingAction.ASK_USER,
+            LivingAction.PASS,
         )
     }
 
