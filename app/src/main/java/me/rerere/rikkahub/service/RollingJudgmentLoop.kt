@@ -1,5 +1,6 @@
 package me.rerere.rikkahub.service
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.UUID
 import kotlin.math.max
@@ -26,7 +27,8 @@ data class LivingIntent(
     val urgency: Int,
     val restraint: Int,
     val emotion: EmotionSnapshot,
-    val allowedActions: List<LivingAction>,
+    @SerialName("allowedActions")
+    val candidateActions: List<LivingAction>,
     val status: LivingIntentStatus = LivingIntentStatus.ACTIVE,
     val lastObservation: LivingObservation? = null,
     val lastJudgmentTrace: LivingJudgmentTrace? = null,
@@ -120,6 +122,7 @@ data class LivingJudgmentTrace(
     val motiveText: String = "",
     val traitMotive: String = "",
     val situationalMotive: String = "",
+    val emotion: EmotionSnapshot? = null,
     val appraisal: MeaningAppraisal = MeaningAppraisal(),
     val consolidation: ConsolidationPlan = ConsolidationPlan(),
     val historyNote: String = "",
@@ -211,7 +214,7 @@ object RollingJudgmentLoop {
             urgency = urgencyFor(kind),
             restraint = restraintFor(kind),
             emotion = emotion,
-            allowedActions = actionsFor(kind),
+            candidateActions = actionsFor(),
             targetAtMillis = targetAtMillis,
             deadlineAtMillis = deadlineAtMillis,
             traitMotive = traitMotiveFor(kind, assistantName),
@@ -247,11 +250,10 @@ object RollingJudgmentLoop {
                 LivingAction.TOOL_CHECK,
                 LivingAction.SCHEDULE_NEXT_TICK,
             )
-        }.filter { it in intent.allowedActions || it == LivingAction.SCHEDULE_NEXT_TICK }
+        }
 
         val actions = actionsFromStructuredTrace(
             trace = externalJudgmentTrace,
-            allowedActions = intent.allowedActions,
         ) ?: ruleActions
         val thought = structuredThought(intent, observation, restrained)
         val trace = externalJudgmentTrace?.copy(
@@ -445,12 +447,11 @@ object RollingJudgmentLoop {
 
     private fun actionsFromStructuredTrace(
         trace: LivingJudgmentTrace?,
-        allowedActions: List<LivingAction>,
     ): List<LivingAction>? {
         val raw = trace?.action?.takeIf { it.isNotBlank() } ?: return null
         val parsed = LivingAction.entries.filter { action ->
             raw.contains(action.name, ignoreCase = true)
-        }.filter { it in allowedActions || it == LivingAction.SCHEDULE_NEXT_TICK }
+        }
         return parsed
             .takeIf { it.isNotEmpty() }
             ?.let { actions ->
@@ -779,8 +780,8 @@ object RollingJudgmentLoop {
         )
     }
 
-    private fun actionsFor(kind: LivingIntentKind): List<LivingAction> {
-        val common = listOf(
+    private fun actionsFor(): List<LivingAction> {
+        return listOf(
             LivingAction.MESSAGE,
             LivingAction.TOOL_CHECK,
             LivingAction.WAIT,
@@ -789,12 +790,9 @@ object RollingJudgmentLoop {
             LivingAction.READ,
             LivingAction.MEMORY_UPDATE,
             LivingAction.SCHEDULE_NEXT_TICK,
+            LivingAction.SET_ALARM,
             LivingAction.ASK_CAPABILITY,
         )
-        return when (kind) {
-            LivingIntentKind.WAKE_UP -> common + LivingAction.SET_ALARM
-            else -> common
-        }
     }
 
     private fun preferredObservationTools(kind: LivingIntentKind): List<String> = when (kind) {

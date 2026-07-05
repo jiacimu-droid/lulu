@@ -55,7 +55,7 @@ object LivingPresencePlanner {
         append(" 意义评估=${intent.appraisal.meaning} 威胁/风险=${intent.appraisal.risk} 机会/价值=${intent.appraisal.value} 成本=${intent.appraisal.cost} 资源=${intent.appraisal.resources}.")
         append(" 状态保持: belief=${intent.belief}; traitMotive=${intent.traitMotive}; situationalMotive=${intent.situationalMotive}; intention=${intent.intention}; emotion=${intent.emotion.emotionLabel}/${intent.emotion.feltSense}.")
         append(" 审议决策: ReAct 在这里边想、边查、边修正，决定是否开口、是否查工具、是否等待、是否写辞海、是否安排下一轮。")
-        append(" 行动池 includes MESSAGE, WAIT, TOOL_USE, SET_ALARM, JOURNAL_WRITE, MEMORY_UPDATE, SCHEDULE_NEXT_TICK, ASK_USER, PASS.")
+        append(" 行动池 includes MESSAGE, TOOL_CHECK, WAIT, INNER_THOUGHT, JOURNAL_WRITE, READ, MEMORY_UPDATE, SCHEDULE_NEXT_TICK, SET_ALARM, ASK_CAPABILITY；这是候选能力池，不是系统层安全拦截。")
         append(" Consolidation=${intent.consolidation.episodicTrace} / ${intent.consolidation.policyLearning}.")
         append(" Hypotheses: ${intent.hypotheses.joinToString(" / ")}.")
         append(" 生成时必须重新观察当前状态，不要把这段 reason 当成预写消息。")

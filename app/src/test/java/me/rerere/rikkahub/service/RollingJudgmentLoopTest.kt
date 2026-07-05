@@ -18,7 +18,7 @@ class RollingJudgmentLoopTest {
         assertEquals(listOf(5L, 10L, 20L, 40L, 90L), intent.evaluationCadence.delaysMinutes)
         assertEquals(NOW + 5 * MINUTE, intent.nextEvaluateAt)
         assertTrue(intent.hypotheses.contains("用户身体不舒服，可能需要安全确认"))
-        assertTrue(intent.allowedActions.contains(LivingAction.TOOL_CHECK))
+        assertTrue(intent.candidateActions.contains(LivingAction.TOOL_CHECK))
     }
 
     @Test
@@ -46,7 +46,7 @@ class RollingJudgmentLoopTest {
 
         assertEquals(LivingIntentKind.STUDY_FOCUS, intent.kind)
         assertEquals(listOf(30L, 60L, 90L), intent.evaluationCadence.delaysMinutes)
-        assertTrue(intent.allowedActions.contains(LivingAction.MEMORY_UPDATE))
+        assertTrue(intent.candidateActions.contains(LivingAction.MEMORY_UPDATE))
     }
 
     @Test
@@ -78,7 +78,39 @@ class RollingJudgmentLoopTest {
 
         assertEquals(LivingIntentKind.WAKE_UP, intent.kind)
         assertEquals(listOf(55L, 60L, 70L, 85L), intent.evaluationCadence.delaysMinutes)
-        assertTrue(intent.allowedActions.contains(LivingAction.SET_ALARM))
+        assertTrue(intent.candidateActions.contains(LivingAction.SET_ALARM))
+    }
+
+    @Test
+    fun `structured judgment can keep any local action from capability pool`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "闇查湶",
+            userText = "鎴戝厛蹇欎竴涓?,
+            assistantText = "濂斤紝鎴戜細鑷繁鍒ゆ柇瑕佷笉瑕佸仛浜嬨€?,
+            nowMillis = NOW,
+        )
+        val trace = LivingJudgmentTrace(
+            source = LivingJudgmentSource.MAIN_API_READY_CONTRACT,
+            belief = "She may need a later reminder even though this started as ordinary silence.",
+            desire = "Act like a local digital caretaker.",
+            motiveText = "Act like a local digital caretaker.",
+            intention = "Keep the reminder action available when deliberation wants it.",
+            thought = "The system should not block a tool action just because the concern kind is ordinary silence.",
+            action = "SET_ALARM, JOURNAL_WRITE, SCHEDULE_NEXT_TICK",
+            observation = "The user mentioned being busy and may need a later reminder.",
+            decision = "Keep the alarm action selected by deliberation.",
+            createdAt = NOW,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 10 * MINUTE,
+            externalJudgmentTrace = trace,
+        )
+
+        assertTrue(intent.candidateActions.contains(LivingAction.SET_ALARM))
+        assertTrue(decision.actions.contains(LivingAction.SET_ALARM))
+        assertTrue(decision.actions.contains(LivingAction.JOURNAL_WRITE))
     }
 
     @Test
@@ -231,6 +263,47 @@ class RollingJudgmentLoopTest {
 
         assertEquals(NOW + 47 * MINUTE, decision.updatedIntent.nextEvaluateAt)
         assertEquals(37, decision.judgmentTrace?.nextEvaluateDelayMinutes)
+    }
+
+    @Test
+    fun `structured judgment emotion updates state layer`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "闇查湶",
+            userText = "鎴戣倸瀛愭湁鐐逛笉鑸掓湇",
+            assistantText = "鎴戜細鐪嬬潃涓€鐐广€?,
+            nowMillis = NOW,
+        )
+        val traceEmotion = intent.emotion.copy(
+            label = "Quiet concern",
+            emotionLabel = "Quiet concern",
+            feltSense = "attention pulled toward the user's safety",
+            impulse = "check in gently",
+            restraintText = "do not create panic",
+            intensity = 8,
+        )
+        val trace = LivingJudgmentTrace(
+            source = LivingJudgmentSource.MAIN_API_READY_CONTRACT,
+            belief = "The user may be physically uncomfortable.",
+            desire = "Care without making panic.",
+            motiveText = "Care without making panic.",
+            intention = "Check quietly first.",
+            thought = "The state layer should keep the model-generated felt emotion.",
+            action = "TOOL_CHECK, SCHEDULE_NEXT_TICK",
+            observation = "Health data is worth checking.",
+            decision = "Update state with structured emotion.",
+            emotion = traceEmotion,
+            createdAt = NOW,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + 5 * MINUTE,
+            externalJudgmentTrace = trace,
+        )
+
+        assertEquals("Quiet concern", decision.updatedIntent.emotion.emotionLabel)
+        assertEquals("attention pulled toward the user's safety", decision.updatedIntent.emotion.feltSense)
+        assertEquals(8, decision.updatedIntent.emotion.intensity)
     }
 
     @Test
