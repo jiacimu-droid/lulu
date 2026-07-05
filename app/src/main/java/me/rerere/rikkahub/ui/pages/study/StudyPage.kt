@@ -1903,11 +1903,12 @@ private fun GachaCard(
                     Icon(HugeIcons.AiMagic, null, tint = Color.White)
                     Column {
                         Text("奖励抽卡", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = Color.White)
-                        Text("普通碎片 92% · 小剧场 5% · 特殊剧情 2% · 视频 1%", color = Color.White.copy(alpha = 0.84f))
+                        Text("专属普通 88% · 通用普通 4% · 小剧场 5% · 特殊剧情 2% · 视频 1%", color = Color.White.copy(alpha = 0.84f))
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    DrawPoolChip("普通", "92%", StudyColors.blue)
+                    DrawPoolChip("专属", "88%", StudyColors.blue)
+                    DrawPoolChip("通用", "4%", Color(0xFF4F8F6A))
                     DrawPoolChip("剧场", "5%", StudyColors.purple)
                     DrawPoolChip("特殊", "2%", StudyColors.goldText)
                     DrawPoolChip("视频", "1%", Color(0xFF41D6C3))
@@ -2354,18 +2355,18 @@ private fun StudyGuideCard() {
             lines = listOf(
                 "单抽 ${StudyRules.SINGLE_DRAW_COST} 夸夸值。",
                 "十连 ${StudyRules.TEN_DRAW_COST} 夸夸值。",
-                "普通碎片 92%，小剧场碎片 5%，特殊剧情碎片 2%，视频碎片 1%。",
-                "每套画卷需要 10 个专属碎片；通用普通碎片可以补任意未满画卷。",
+                "专属普通碎片 88%，通用普通碎片 4%，小剧场碎片 5%，特殊剧情碎片 2%，视频碎片 1%。",
+                "每套画卷需要 10 个专属碎片；通用普通碎片仍可补任意未满画卷，但现在主要靠少量抽卡、盲盒和阶段奖励获得。",
                 "小剧场碎片不区分剧情，1 个小剧场碎片可在星愿馆兑换或续写 1 章小剧场。",
             ),
         )
         GuideBlock(
             title = "每周 5 天全清模拟",
             lines = listOf(
-                "约 4155 夸夸值，可折算 83 次单抽。",
+                "约 4155 夸夸值，可折算 41 次单抽；十连 800 会比单抽省 200。",
                 "超神 5 天给 5 张十连券；等级、成就和商店会追加抽卡券。",
-                "按 133 抽估算：普通碎片约 122，小剧场约 7，特殊剧情约 3，视频约 1。",
-                "超神不再发碎片，画卷进度主要来自抽卡、盲盒、等级、成就和神秘商店。",
+                "按基础约 91 抽估算：专属普通约 80，通用普通约 4，小剧场约 5，特殊剧情约 2，视频约 1。",
+                "超神不再发碎片，神秘商店也不再直接刷通用普通碎片；画卷进度主要来自抽卡、盲盒、等级和成就。",
             ),
         )
         GuideBlock(
@@ -2389,7 +2390,7 @@ private fun StudyGuideCard() {
             lines = listOf(
                 "签到、待办、番茄钟、盲盒、惩罚、抽卡、超神、等级、成就、商店都已接入本地状态。",
                 "收藏已按 20 套画卷、每套 10 个专属碎片展示。",
-                "通用普通碎片可以自动补最佳目标，也可以在收藏里指定补某个部件；小剧场碎片用于星愿馆章节兑换。",
+                "通用普通碎片可以自动补最佳目标，也可以在收藏里指定补某个部件；它的产出已收紧，小剧场碎片用于星愿馆章节兑换。",
                 "Lv14 会自动补齐一套未完成画卷；已解锁画卷可以直接跳到生图页。",
                 "番茄钟已接入角色陪伴、语音鼓励和轻聊天。",
                 "更深的角色主动督学、画卷提示词自动带入、星愿馆视频收藏柜可以作为后续增强。",

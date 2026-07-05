@@ -82,19 +82,44 @@ class StudyRulesTest {
     @Test
     fun `draws consume coupons before kudos and add fragments`() {
         val state = StudyState(
-            wallet = StudyWallet(kudos = 400, singleDrawTickets = 1, tenDrawTickets = 1)
+            wallet = StudyWallet(kudos = 800, singleDrawTickets = 1, tenDrawTickets = 1)
         )
 
         val single = StudyRules.draw(state, count = 1, random = Random(3))
         val ten = StudyRules.draw(single.state, count = 10, random = Random(4))
         val paidTen = StudyRules.draw(ten.state, count = 10, random = Random(5))
 
-        assertEquals(400, single.state.wallet.kudos)
+        assertEquals(800, single.state.wallet.kudos)
         assertEquals(0, single.state.wallet.singleDrawTickets)
-        assertEquals(400, ten.state.wallet.kudos)
+        assertEquals(800, ten.state.wallet.kudos)
         assertEquals(0, ten.state.wallet.tenDrawTickets)
         assertEquals(0, paidTen.state.wallet.kudos)
         assertEquals(21, paidTen.results.size + ten.results.size + single.results.size)
+    }
+
+    @Test
+    fun `single draw costs one hundred even after discount milestone`() {
+        val state = StudyState(
+            wallet = StudyWallet(kudos = 200, totalKudosEarned = 80_000)
+        )
+
+        val drawn = StudyRules.draw(state, count = 1, random = Random(3))
+
+        assertEquals(100, StudyRules.SINGLE_DRAW_COST)
+        assertEquals(100, StudyRules.DISCOUNT_SINGLE_DRAW_COST)
+        assertEquals(100, drawn.state.wallet.kudos)
+        assertEquals(1, drawn.results.size)
+    }
+
+    @Test
+    fun `ten draw costs eight hundred kudos`() {
+        val state = StudyState(wallet = StudyWallet(kudos = 900))
+
+        val drawn = StudyRules.draw(state, count = 10, random = Random(4))
+
+        assertEquals(800, StudyRules.TEN_DRAW_COST)
+        assertEquals(100, drawn.state.wallet.kudos)
+        assertEquals(10, drawn.results.size)
     }
 
     @Test
@@ -140,7 +165,7 @@ class StudyRulesTest {
             claimedLevelRewards = setOf(1, 2),
             claimedAchievementIds = setOf("warm_start"),
             shopDate = "2026-07-02",
-            shopItems = listOf(StudyShopItem("a", StudyShopItemType.SingleDrawTicket, "单抽券 x1", 40)),
+            shopItems = listOf(StudyShopItem("a", StudyShopItemType.SingleDrawTicket, "单抽券 x1", 80)),
             purchasedShopItemIds = setOf("a"),
             internalTestGrantVersion = 1,
         )
@@ -204,6 +229,39 @@ class StudyRulesTest {
         assertEquals(3, refreshed.shopItems.size)
         assertEquals(1_000 - item.price, bought.state.wallet.kudos)
         assertTrue(bought.state.purchasedShopItemIds.contains(item.id))
+    }
+
+    @Test
+    fun `daily shop no longer sells universal normal fragments directly`() {
+        val state = StudyState(wallet = StudyWallet(kudos = 1_000))
+
+        val refreshed = StudyRules.refreshShopIfNeeded(state, LocalDate.of(2026, 7, 6), Random(8))
+
+        assertEquals(3, refreshed.shopItems.size)
+        assertTrue(refreshed.shopItems.none { it.type == StudyShopItemType.UniversalNormalFragment })
+    }
+
+    @Test
+    fun `mystery boxes make universal normal fragments uncommon`() {
+        val none = StudyRules.completePomodoro(
+            state = StudyState(today = "2026-07-06"),
+            minutes = 25,
+            random = FixedDrawRandom(ints = mutableListOf(0, 69)),
+        )
+        val one = StudyRules.completePomodoro(
+            state = StudyState(today = "2026-07-06"),
+            minutes = 25,
+            random = FixedDrawRandom(ints = mutableListOf(0, 70)),
+        )
+        val two = StudyRules.completePomodoro(
+            state = StudyState(today = "2026-07-06"),
+            minutes = 25,
+            random = FixedDrawRandom(ints = mutableListOf(0, 99)),
+        )
+
+        assertEquals(0, none.reward.universalNormalFragments)
+        assertEquals(1, one.reward.universalNormalFragments)
+        assertEquals(2, two.reward.universalNormalFragments)
     }
 
     @Test
@@ -403,6 +461,25 @@ class StudyRulesTest {
         assertEquals(1, rare.inventory.universalRareFragments)
         assertEquals(1, special.inventory.specialStoryFragments)
         assertEquals(1, video.inventory.epicFragments)
+    }
+
+    @Test
+    fun `draw pool keeps universal normal fragments scarce`() {
+        val state = StudyState(wallet = StudyWallet(singleDrawTickets = 2))
+        val universal = StudyRules.draw(
+            state,
+            count = 1,
+            random = FixedDrawRandom(doubles = mutableListOf(0.039), ints = mutableListOf(99)),
+        ).state
+        val outfit = StudyRules.draw(
+            universal,
+            count = 1,
+            random = FixedDrawRandom(doubles = mutableListOf(0.04), ints = mutableListOf(0, 0)),
+        ).state
+
+        assertEquals(1, universal.inventory.universalNormalFragments)
+        assertEquals(1, outfit.inventory.universalNormalFragments)
+        assertEquals(1, outfit.inventory.normalFragments.values.sum())
     }
 
     @Test

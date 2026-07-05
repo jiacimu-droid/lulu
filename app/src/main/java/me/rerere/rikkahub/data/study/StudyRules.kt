@@ -5,9 +5,9 @@ import kotlin.math.max
 import kotlin.random.Random
 
 object StudyRules {
-    const val SINGLE_DRAW_COST = 50
-    const val DISCOUNT_SINGLE_DRAW_COST = 50
-    const val TEN_DRAW_COST = 400
+    const val SINGLE_DRAW_COST = 100
+    const val DISCOUNT_SINGLE_DRAW_COST = 100
+    const val TEN_DRAW_COST = 800
     const val OFFICIAL_ECONOMY_RESET_VERSION = 2
     const val DATA_LOSS_COMPENSATION_VERSION = 3
     const val NORMAL_FRAGMENTS_PER_OUTFIT = 10
@@ -450,10 +450,9 @@ object StudyRules {
         val dateText = date.toString()
         if (state.shopDate == dateText && state.shopItems.size == 3) return state
         val pool = listOf(
-            StudyShopItemType.UniversalNormalFragment to 65,
             StudyShopItemType.UniversalRareFragment to 12,
             StudyShopItemType.UniversalEpicFragment to 3,
-            StudyShopItemType.SingleDrawTicket to 20,
+            StudyShopItemType.SingleDrawTicket to 85,
         )
         val items = (1..3).map { slot ->
             val type = weighted(pool, random)
@@ -638,15 +637,15 @@ object StudyRules {
 
     private fun mysteryBox(random: Random): StudyMysteryBoxReward {
         val kudos = weighted(listOf(15 to 40, 25 to 30, 50 to 15, 100 to 4, 200 to 1), random)
-        val normalFragments = weighted(listOf(0 to 20, 1 to 55, 2 to 20, 3 to 5), random)
+        val normalFragments = weighted(listOf(0 to 70, 1 to 28, 2 to 2), random)
         return StudyMysteryBoxReward(kudos = kudos, universalNormalFragments = normalFragments)
     }
 
     private fun drawOne(random: Random): StudyDrawResult {
         val roll = random.nextDouble()
         return when {
-            roll < 0.12 -> {
-                val amount = if (random.nextInt(100) < 18) 2 else 1
+            roll < 0.04 -> {
+                val amount = if (random.nextInt(100) < 5) 2 else 1
                 StudyDrawResult(StudyRarity.Normal, "normal:universal:$amount", "通用普通碎片 x$amount")
             }
             roll < 0.92 -> {
@@ -780,10 +779,10 @@ private fun List<StudyEvent>.addEvent(type: StudyEventType, title: String, detai
 
 private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
     return when (this) {
-        StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x1", 45)
+        StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x1", 120)
         StudyShopItemType.UniversalRareFragment -> StudyShopItem(id, this, "小剧场碎片 x1", 160)
         StudyShopItemType.UniversalEpicFragment -> StudyShopItem(id, this, "通用史诗碎片 x1", 400)
-        StudyShopItemType.SingleDrawTicket -> StudyShopItem(id, this, "单抽券 x1", 40)
+        StudyShopItemType.SingleDrawTicket -> StudyShopItem(id, this, "单抽券 x1", 80)
     }
 }
 
