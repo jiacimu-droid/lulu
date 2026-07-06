@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -163,9 +161,6 @@ fun PerfectManGamePage() {
     var opponentVoiceEnabled by remember { mutableStateOf(true) }
     var listeningTarget by remember { mutableStateOf<VoiceInputTarget?>(null) }
 
-    val guesser = if (phase == PerfectManPhase.UserGuesses) Player.Me else Player.Partner
-    val describer = guesser.opposite()
-    val flaw = userDescription
     val isListening = asrState.status != ASRStatus.Idle && asrState.status != ASRStatus.Error
 
     fun speak(text: String) {
@@ -230,7 +225,9 @@ fun PerfectManGamePage() {
                 providerSetting = providerSetting,
                 messages = listOf(
                     UIMessage.system(
-                        "你是坐在用户对面一起玩“满分男”的真人玩家，不是主持人、裁判或旁白。只输出你会当面说出口的话。语气自然、会吐槽、会犹豫、会互动。不要播报系统结果，不要解释规则。文案短、好猜、有画面感，不要色情，不要羞辱真实群体。",
+                        "你是坐在用户对面一起玩“满分男”的真人玩家，不是主持人、裁判或旁白。" +
+                            "只输出你会当面说出口的话。语气自然、会吐槽、会犹豫、会互动。" +
+                            "不要播报系统结果，不要解释规则。文案短、好猜、有画面感，不要色情，不要羞辱真实群体。",
                     ),
                     UIMessage.user(prompt),
                 ),
@@ -252,10 +249,13 @@ fun PerfectManGamePage() {
     fun startUserGuessRound() {
         if (isGenerating) return
         isGenerating = true
+        opponentLine = "我想一下怎么讲这个人，你等我一句。"
         scope.launch {
             val fallback = PerfectManNarratives.forScore(targetScore)
             generatedPrompt = generatePerfectManText(
-                prompt = "你现在负责出题。隐藏分数是 $targetScore/10，但绝对不能暴露分数。请像坐在对面说话一样，用“这是一个满分男，但是……”开头描述这个男的，让用户猜他实际几分。只输出你的台词，2-4 句。",
+                prompt = "你现在负责出题。隐藏分数是 $targetScore/10，但绝对不能暴露分数。" +
+                    "请像坐在对面说话一样，用“这是一个满分男，但是……”开头描述这个男的，" +
+                    "让用户猜他实际几分。只输出你的台词，2-4 句。",
                 fallback = fallback,
             )
             opponentLine = generatedPrompt
@@ -268,10 +268,15 @@ fun PerfectManGamePage() {
         val description = userDescription.trim()
         if (description.isBlank() || isGenerating) return
         isGenerating = true
+        opponentLine = "我看完了，等下，我先按感觉猜一下。"
         scope.launch {
             val fallbackGuess = PerfectManGuess.estimate(description)
             val reply = generatePerfectManText(
-                prompt = "你现在坐在用户对面猜分。真实分数是 $targetScore/10，只用来校准你的猜测。用户给你的描述是：$description\n请像真人一样先对这个描述吐槽或犹豫一句，再给出猜分。最后必须明确写出“我猜：X分”，X 是 0-10 的整数。只输出你的台词，不要说系统分或结果。",
+                prompt = "你现在坐在用户对面猜分。真实分数是 $targetScore/10，只用来校准你的猜测。" +
+                    "用户给你的描述是：$description\n" +
+                    "请像真人一样先对这个描述吐槽或犹豫一句，再给出猜分。" +
+                    "最后必须明确写出“我猜：X分”，X 是 0-10 的整数。" +
+                    "只输出你的台词，不要说系统分或结果。",
                 fallback = "等下，这个缺点有点东西。我感觉不能太高，但也没死透，我猜：${fallbackGuess}分",
             )
             val guess = Regex("""(\d{1,2})\s*分""").find(reply)?.groupValues?.getOrNull(1)?.toIntOrNull()
@@ -292,16 +297,29 @@ fun PerfectManGamePage() {
 
     fun submitGuess() {
         val guess = guessText.trim().toFloatOrNull()?.toInt()?.coerceIn(0, 10) ?: return
+        if (isGenerating || generatedPrompt.isBlank()) return
         val diff = abs(guess - targetScore)
-        val nextResult = RoundResult(guess = guess, score = targetScore, success = diff <= 1, diff = diff)
-        result = nextResult
-        opponentLine =
-            if (nextResult.success) {
-                "你这也能猜中？我服了，这个分感你有点太准了。"
-            } else {
-                "哈哈哈偏了 $diff 分，但你刚才那个判断也不是完全没道理。"
-            }
-        speak(opponentLine)
+        isGenerating = true
+        opponentLine = "我看看你猜得准不准。"
+        scope.launch {
+            val nextResult = RoundResult(guess = guess, score = targetScore, success = diff <= 1, diff = diff)
+            val reply = generatePerfectManText(
+                prompt = "你刚才给用户描述的是：$generatedPrompt\n" +
+                    "用户猜这个男的是 $guess 分，真实分数是 $targetScore/10，差值 $diff 分。" +
+                    "请以对面玩家身份自然回应用户：先接住用户的猜法，再说出真实分数和差值；" +
+                    "如果差值在 1 分内就夸一句默契，如果偏了就轻松吐槽一句。" +
+                    "只输出你会说出口的话，不要写标题，不要用系统播报口吻。",
+                fallback = if (nextResult.success) {
+                    "你这也能猜中？我服了，真实分是 ${targetScore} 分，你只差 $diff 分，这个分感有点太准了。"
+                } else {
+                    "哈哈哈你猜的是 ${guess} 分，真实分是 ${targetScore} 分，偏了 $diff 分。但你刚才那个判断也不是完全没道理。"
+                },
+            )
+            result = nextResult
+            opponentLine = reply
+            speak(reply)
+            isGenerating = false
+        }
     }
 
     Scaffold(
@@ -330,7 +348,7 @@ fun PerfectManGamePage() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            RoundHeader(round = round, describer = describer, guesser = guesser)
+            RoundHeader(round = round, phase = phase)
             OpponentSeatCard(
                 line = opponentLine,
                 speakingEnabled = opponentVoiceEnabled,
@@ -343,61 +361,26 @@ fun PerfectManGamePage() {
                     if (!it) tts.stop()
                 },
             )
-            if (phase == PerfectManPhase.UserGuesses) {
-                Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text("你来猜分", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                        Text(
-                            text = generatedPrompt.ifBlank { "分数已经随机 roll 好了。点击开始后，对方会按这个隐藏分数生成描述，你不能提前看实际分数。" },
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Button(
-                            onClick = ::startUserGuessRound,
-                            enabled = !isGenerating && result == null,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(HugeIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text(if (isGenerating) "生成中" else "开始")
-                        }
-                    }
-                }
-            } else {
-                ScoreCard(
-                    score = targetScore,
-                    describer = Player.Me,
-                    openScoreMode = true,
-                    scoreRevealed = true,
-                    onToggleOpenScore = {},
-                    onToggleScoreReveal = {},
-                )
-            }
-            if (phase == PerfectManPhase.PartnerGuesses) FlawInputCard(
-                describer = describer,
-                flaw = userDescription,
-                onFlawChange = { userDescription = it },
+            PerfectManActionCard(
+                phase = phase,
+                score = targetScore,
+                promptReady = generatedPrompt.isNotBlank(),
+                result = result,
+                description = userDescription,
+                onDescriptionChange = { userDescription = it },
                 onExample = { userDescription = PerfectManExamples.random() },
-                listening = listeningTarget == VoiceInputTarget.Flaw && isListening,
-                onVoice = { startVoiceInput(VoiceInputTarget.Flaw) },
-                onSpeak = { speak("这是一个满分男，但是${flaw.ifBlank { "他的缺点还没有写" }}") },
-                onSubmit = ::submitPartnerGuessRound,
-                voiceEnabled = opponentVoiceEnabled,
-                submitting = isGenerating,
-                canSubmit = userDescription.isNotBlank() && result == null,
-            )
-            if (phase == PerfectManPhase.UserGuesses) GuessCard(
-                guesser = guesser,
                 guessText = guessText,
                 onGuessTextChange = { guessText = it.filter { char -> char.isDigit() || char == '.' }.take(2) },
-                listening = listeningTarget == VoiceInputTarget.Guess && isListening,
-                onVoice = { startVoiceInput(VoiceInputTarget.Guess) },
-                onSubmit = ::submitGuess,
-                canSubmit = guessText.trim().toFloatOrNull() != null,
+                listeningTarget = listeningTarget,
+                isListening = isListening,
+                onVoiceDescription = { startVoiceInput(VoiceInputTarget.Flaw) },
+                onVoiceGuess = { startVoiceInput(VoiceInputTarget.Guess) },
+                isGenerating = isGenerating,
+                onStartPrompt = ::startUserGuessRound,
+                onSubmitDescription = ::submitPartnerGuessRound,
+                onSubmitGuess = ::submitGuess,
+                onNextRound = ::nextRound,
             )
-            result?.let {
-                ResultCard(result = it, onNextRound = ::nextRound)
-            }
-            RuleCard()
         }
     }
 }
@@ -476,15 +459,14 @@ private fun GameTileCard(game: GameTile) {
 }
 
 @Composable
-private fun RoundHeader(round: Int, describer: Player, guesser: Player) {
+private fun RoundHeader(round: Int, phase: PerfectManPhase) {
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("第 $round 轮", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(
-                "${describer.label}看分并描述缺点，${guesser.label}猜最后值几分。",
+                if (phase == PerfectManPhase.UserGuesses) "对面描述，我来猜分。" else "我来描述，对面猜分。",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Text("下一轮会自动交换角色。", style = MaterialTheme.typography.bodySmall, color = GameColors.accent)
         }
     }
 }
@@ -501,7 +483,11 @@ private fun OpponentSeatCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Surface(shape = CircleShape, color = GameColors.accent.copy(alpha = 0.16f), modifier = Modifier.size(44.dp)) {
+            Surface(
+                shape = CircleShape,
+                color = GameColors.accent.copy(alpha = 0.16f),
+                modifier = Modifier.size(44.dp),
+            ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(HugeIcons.MagicWand01, contentDescription = null, tint = GameColors.accent)
                 }
@@ -512,66 +498,6 @@ private fun OpponentSeatCard(
             }
             IconButton(onClick = onSpeak, enabled = speakingEnabled && line.isNotBlank()) {
                 Icon(HugeIcons.VolumeHigh, contentDescription = "播放对面玩家的话")
-            }
-        }
-    }
-}
-
-@Composable
-private fun ScoreCard(
-    score: Int,
-    describer: Player,
-    openScoreMode: Boolean,
-    scoreRevealed: Boolean,
-    onToggleOpenScore: (Boolean) -> Unit,
-    onToggleScoreReveal: () -> Unit,
-) {
-    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        if (openScoreMode) "明拍分数" else "只给${describer.label}看的分数",
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        "系统随机 roll 0-10 分。",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (!openScoreMode) {
-                    Switch(checked = openScoreMode, onCheckedChange = onToggleOpenScore)
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(GameColors.scoreBrush, RoundedCornerShape(18.dp))
-                    .clickable(enabled = !openScoreMode, onClick = onToggleScoreReveal)
-                    .padding(vertical = 24.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Text(
-                        if (openScoreMode || scoreRevealed) "$score" else "?",
-                        style = MaterialTheme.typography.displayLarge,
-                        fontWeight = FontWeight.Black,
-                        color = Color.White,
-                    )
-                    Text(
-                        when {
-                            openScoreMode -> "明拍模式"
-                            scoreRevealed -> "${describer.label}看完后点这里隐藏"
-                            else -> "${describer.label}点这里偷看分数"
-                        },
-                        color = Color.White.copy(alpha = 0.82f),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
             }
         }
     }
@@ -591,11 +517,6 @@ private fun VoiceSettingsCard(
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text("对方语音", fontWeight = FontWeight.SemiBold)
-                Text(
-                    "只念对面玩家说的话，不念系统结果。",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             }
             Switch(checked = opponentVoiceEnabled, onCheckedChange = onOpponentVoiceEnabledChange)
         }
@@ -603,167 +524,168 @@ private fun VoiceSettingsCard(
 }
 
 @Composable
-private fun FlawInputCard(
-    describer: Player,
-    flaw: String,
-    onFlawChange: (String) -> Unit,
+private fun PerfectManActionCard(
+    phase: PerfectManPhase,
+    score: Int,
+    promptReady: Boolean,
+    result: RoundResult?,
+    description: String,
+    onDescriptionChange: (String) -> Unit,
     onExample: () -> Unit,
-    listening: Boolean,
-    onVoice: () -> Unit,
-    onSpeak: () -> Unit,
-    onSubmit: () -> Unit,
-    voiceEnabled: Boolean,
-    submitting: Boolean,
-    canSubmit: Boolean,
-) {
-    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(
-                "${describer.label}描述缺点",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            OutlinedTextField(
-                value = flaw,
-                onValueChange = onFlawChange,
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 3,
-                label = { Text("这是一个满分男，但是...") },
-                placeholder = { Text("例如：10天不洗脚，也不洗澡。") },
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                FilledTonalButton(onClick = onVoice, modifier = Modifier.weight(1f)) {
-                    Icon(HugeIcons.Voice, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text(if (listening) "停止听写" else "语音输入")
-                }
-                OutlinedButton(onClick = onExample, modifier = Modifier.weight(1f)) {
-                    Icon(HugeIcons.Sparkles, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text("随机缺点")
-                }
-            }
-            OutlinedButton(
-                onClick = onSpeak,
-                enabled = voiceEnabled && flaw.isNotBlank(),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(HugeIcons.VolumeHigh, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("朗读给猜分方")
-            }
-            Button(
-                onClick = onSubmit,
-                enabled = canSubmit && !submitting,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(HugeIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(6.dp))
-                Text(if (submitting) "对方正在想" else "发送给对方猜分")
-            }
-        }
-    }
-}
-
-@Composable
-private fun GuessCard(
-    guesser: Player,
     guessText: String,
     onGuessTextChange: (String) -> Unit,
-    listening: Boolean,
-    onVoice: () -> Unit,
-    onSubmit: () -> Unit,
-    canSubmit: Boolean,
+    listeningTarget: VoiceInputTarget?,
+    isListening: Boolean,
+    onVoiceDescription: () -> Unit,
+    onVoiceGuess: () -> Unit,
+    isGenerating: Boolean,
+    onStartPrompt: () -> Unit,
+    onSubmitDescription: () -> Unit,
+    onSubmitGuess: () -> Unit,
+    onNextRound: () -> Unit,
 ) {
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                "${guesser.label}猜分",
+                actionTitle(phase, promptReady),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(
-                    value = guessText,
-                    onValueChange = onGuessTextChange,
-                    modifier = Modifier.weight(1f),
-                    label = { Text("0-10 分") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                )
-                IconButton(onClick = onVoice) {
-                    Icon(HugeIcons.Voice, contentDescription = if (listening) "停止听写" else "语音猜分")
-                }
-            }
-            Button(onClick = onSubmit, enabled = canSubmit, modifier = Modifier.fillMaxWidth()) {
-                Icon(HugeIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("揭晓默契")
-            }
-        }
-    }
-}
 
-@Composable
-private fun ResultCard(result: RoundResult, onNextRound: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = {},
-        confirmButton = {
-            Button(onClick = onNextRound) {
-                Text("下一轮")
-            }
-        },
-        title = { Text(if (result.success) "你们真的太有默契啦" else "这轮偏了 ${result.diff} 分") },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+            if (phase == PerfectManPhase.PartnerGuesses) {
                 Surface(
-                    modifier = Modifier.size(96.dp),
-                    shape = CircleShape,
-                    color = if (result.success) GameColors.success else GameColors.soft,
+                    color = GameColors.accent.copy(alpha = 0.10f),
+                    shape = RoundedCornerShape(16.dp),
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = if (result.success) HugeIcons.Sparkles else HugeIcons.Puzzle,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(42.dp),
-                        )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("本轮分数", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("$score / 10", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black)
                     }
                 }
-                Text(
-                    "系统分：${result.score}，猜分：${result.guess}",
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    if (result.success) "差值在 ±1 内，默契通关。" else "失败也没关系，这个游戏主要就是好笑。",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             }
-        },
-    )
-}
 
-@Composable
-private fun RuleCard() {
-    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("规则", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text("满分男基础设定是能想到的地方全满分，但有一个缺点。")
-            Text("系统每轮随机 0-10 分。看分方描述缺点，猜分方给出判断。")
-            Text("猜分和系统分差值在 ±1 内就算默契通关；输赢不重要，笑出来更重要。")
+            when {
+                result != null -> {
+                    ResultInline(result = result)
+                    Button(onClick = onNextRound, modifier = Modifier.fillMaxWidth()) {
+                        Icon(HugeIcons.Refresh03, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("下一轮")
+                    }
+                }
+
+                phase == PerfectManPhase.UserGuesses && !promptReady -> {
+                    Button(
+                        onClick = onStartPrompt,
+                        enabled = !isGenerating,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(HugeIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(if (isGenerating) "对面正在想" else "开始")
+                    }
+                }
+
+                phase == PerfectManPhase.UserGuesses -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        OutlinedTextField(
+                            value = guessText,
+                            onValueChange = onGuessTextChange,
+                            modifier = Modifier.weight(1f),
+                            label = { Text("0-10 分") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        )
+                        IconButton(onClick = onVoiceGuess) {
+                            Icon(
+                                HugeIcons.Voice,
+                                contentDescription = if (listeningTarget == VoiceInputTarget.Guess && isListening) {
+                                    "停止听写"
+                                } else {
+                                    "语音猜分"
+                                },
+                            )
+                        }
+                    }
+                    Button(
+                        onClick = onSubmitGuess,
+                        enabled = !isGenerating && guessText.trim().toFloatOrNull() != null,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(HugeIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(if (isGenerating) "对面正在回应" else "发送分数")
+                    }
+                }
+
+                else -> {
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = onDescriptionChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 4,
+                        label = { Text("这是一个满分男，但是...") },
+                        placeholder = { Text("例如：10天不洗脚，也不洗澡。") },
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        FilledTonalButton(onClick = onVoiceDescription, modifier = Modifier.weight(1f)) {
+                            Icon(HugeIcons.Voice, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(if (listeningTarget == VoiceInputTarget.Flaw && isListening) "停止听写" else "语音输入")
+                        }
+                        OutlinedButton(onClick = onExample, modifier = Modifier.weight(1f)) {
+                            Icon(HugeIcons.Sparkles, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("随机缺点")
+                        }
+                    }
+                    Button(
+                        onClick = onSubmitDescription,
+                        enabled = !isGenerating && description.isNotBlank(),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(HugeIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(if (isGenerating) "对方正在想" else "发送给对方")
+                    }
+                }
+            }
         }
     }
 }
 
-private enum class Player(val label: String) {
-    Me("我"),
-    Partner("对方");
-
-    fun opposite(): Player = if (this == Me) Partner else Me
+@Composable
+private fun ResultInline(result: RoundResult) {
+    Surface(
+        color = if (result.success) GameColors.success.copy(alpha = 0.14f) else GameColors.soft.copy(alpha = 0.18f),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                if (result.success) "差值 ${result.diff} 分，算默契。" else "差值 ${result.diff} 分。",
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                "真实分：${result.score}，猜分：${result.guess}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }
+
+private fun actionTitle(phase: PerfectManPhase, promptReady: Boolean): String =
+    when (phase) {
+        PerfectManPhase.UserGuesses -> if (promptReady) "我猜分" else "开始这一轮"
+        PerfectManPhase.PartnerGuesses -> "我来描述"
+    }
 
 private enum class VoiceInputTarget {
     Flaw,
@@ -830,5 +752,4 @@ private object GameColors {
     val success = Color(0xFF2E8B68)
     val soft = Color(0xFF6F6A87)
     val heroBrush = Brush.linearGradient(listOf(Color(0xFF8B3D5E), Color(0xFFBD7E64), Color(0xFF4D314E)))
-    val scoreBrush = Brush.linearGradient(listOf(Color(0xFF1F2747), Color(0xFF8B3D5E), Color(0xFFBD7E64)))
 }
