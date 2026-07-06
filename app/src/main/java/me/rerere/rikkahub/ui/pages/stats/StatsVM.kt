@@ -9,12 +9,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.rerere.rikkahub.data.db.dao.ConversationDAO
-import me.rerere.rikkahub.data.db.dao.MessageCacheRecord
 import me.rerere.rikkahub.data.db.dao.MessageNodeDAO
-import me.rerere.rikkahub.data.db.dao.getCacheRecords
 import me.rerere.rikkahub.data.db.dao.getMessageCountPerDay
 import me.rerere.rikkahub.data.db.dao.getTokenStats
 import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.ai.ApiUsageRecord
+import me.rerere.rikkahub.data.ai.ApiUsageStore
+import me.rerere.rikkahub.data.ai.ApiUsageSummary
+import me.rerere.rikkahub.data.ai.summarizeApiUsage
 import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
 import me.rerere.rikkahub.data.voicecall.VoiceCallStatsSummary
 import java.time.DayOfWeek
@@ -28,7 +30,8 @@ data class AppStats(
     val totalPromptTokens: Long = 0L,
     val totalCompletionTokens: Long = 0L,
     val totalCachedTokens: Long = 0L,
-    val cacheRecords: List<MessageCacheRecord> = emptyList(),
+    val cacheRecords: List<ApiUsageRecord> = emptyList(),
+    val cacheSummaries: List<ApiUsageSummary> = emptyList(),
     val voiceCallStats: VoiceCallStatsSummary = VoiceCallStatsSummary(),
     val conversationsPerDay: Map<LocalDate, Int> = emptyMap(),
     val launchCount: Int = 0,
@@ -39,6 +42,7 @@ class StatsVM(
     private val messageNodeDAO: MessageNodeDAO,
     private val settingsStore: SettingsStore,
     private val voiceCallRepository: VoiceCallRepository,
+    private val apiUsageStore: ApiUsageStore,
 ) : ViewModel() {
 
     private val _stats = MutableStateFlow(AppStats())
@@ -73,7 +77,8 @@ class StatsVM(
 
         // json_each() + json_extract() 在 SQLite 侧聚合，不再加载完整 JSON 到 Kotlin
         val tokenStats = messageNodeDAO.getTokenStats()
-        val cacheRecords = messageNodeDAO.getCacheRecords()
+        val cacheRecords = apiUsageStore.state.value.records
+        val cacheSummaries = cacheRecords.summarizeApiUsage()
         val voiceCallStats = withContext(Dispatchers.IO) {
             voiceCallRepository.getSummary()
         }
@@ -86,8 +91,10 @@ class StatsVM(
             totalMessages = tokenStats.totalMessages,
             totalPromptTokens = tokenStats.promptTokens,
             totalCompletionTokens = tokenStats.completionTokens,
-            totalCachedTokens = tokenStats.cachedTokens,
+            totalCachedTokens = cacheRecords.sumOf { it.cachedTokens }.takeIf { cacheRecords.isNotEmpty() }
+                ?: tokenStats.cachedTokens,
             cacheRecords = cacheRecords,
+            cacheSummaries = cacheSummaries,
             voiceCallStats = voiceCallStats,
             conversationsPerDay = conversationsPerDay,
             launchCount = launchCount,

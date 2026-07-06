@@ -1,4 +1,4 @@
-package me.rerere.rikkahub.ui.pages.cihai
+﻿package me.rerere.rikkahub.ui.pages.cihai
 
 import android.content.Context
 import android.net.Uri
@@ -18,10 +18,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -45,6 +48,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.rerere.document.DocxParser
+import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.Delete01
 import me.rerere.rikkahub.data.cihai.CihaiBook
 import me.rerere.rikkahub.data.cihai.CihaiService
 import me.rerere.rikkahub.data.cihai.CihaiStore
@@ -92,7 +97,7 @@ fun CihaiReadingPage(onBack: () -> Unit) {
                 selectedBookId = imported.id
                 selectedPage = 0
             }.onFailure { error ->
-                importError = error.message ?: "导入失败"
+                importError = error.message ?: "瀵煎叆澶辫触"
             }
         }
     }
@@ -120,13 +125,13 @@ fun CihaiReadingPage(onBack: () -> Unit) {
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
-                        text = "阅读",
+                        text = "闃呰",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = "返回",
+                        text = "杩斿洖",
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable(onClick = onBack).padding(8.dp),
@@ -145,9 +150,9 @@ fun CihaiReadingPage(onBack: () -> Unit) {
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("书架", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                                Text("涔︽灦", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                                 Text(
-                                    text = "上传 txt 或 docx，系统会拆成页码和章节入口。",
+                                    text = "涓婁紶 txt 鎴?docx锛岀郴缁熶細鎷嗘垚椤电爜鍜岀珷鑺傚叆鍙ｃ€?,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -162,7 +167,7 @@ fun CihaiReadingPage(onBack: () -> Unit) {
                                     )
                                 },
                             ) {
-                                Text("上传")
+                                Text("涓婁紶")
                             }
                         }
                         if (importError.isNotBlank()) {
@@ -195,12 +200,19 @@ fun CihaiReadingPage(onBack: () -> Unit) {
             }
             selectedBook?.let { book ->
                 item {
-                    ReadingBookSurface(
+                    ReadingBookSurfaceV2(
                         book = book,
                         pages = pages,
                         chapters = chapters,
                         selectedPage = selectedPage,
                         onPageSelect = { selectedPage = it },
+                        onDelete = {
+                            scope.launch {
+                                store.deleteBook(book.id)
+                                selectedBookId = null
+                                selectedPage = 0
+                            }
+                        },
                         onRead = {
                             scope.launch {
                                 service.readBookAndRemember(book)
@@ -211,7 +223,7 @@ fun CihaiReadingPage(onBack: () -> Unit) {
             } ?: item {
                 Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
                     Text(
-                        text = "还没有阅读材料。先上传一本 txt 或 docx。",
+                        text = "杩樻病鏈夐槄璇绘潗鏂欍€傚厛涓婁紶涓€鏈?txt 鎴?docx銆?,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.fillMaxWidth().padding(18.dp),
                     )
@@ -222,14 +234,17 @@ fun CihaiReadingPage(onBack: () -> Unit) {
 }
 
 @Composable
-private fun ReadingBookSurface(
+private fun ReadingBookSurfaceV2(
     book: CihaiBook,
     pages: List<String>,
     chapters: List<ChapterRange>,
     selectedPage: Int,
     onPageSelect: (Int) -> Unit,
+    onDelete: () -> Unit,
     onRead: () -> Unit,
 ) {
+    val pageListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -239,13 +254,16 @@ private fun ReadingBookSurface(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(book.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Text(
-                        text = "进度 ${book.progressPercent}% · ${formatReadingTime(book.createdAt)}",
+                        text = "杩涘害 ${book.progressPercent}% 路 ${formatReadingTime(book.createdAt)}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+                IconButton(onClick = onDelete) {
+                    Icon(HugeIcons.Delete01, contentDescription = "鍒犻櫎")
+                }
                 Button(onClick = onRead, enabled = book.progressPercent < 100) {
-                    Text(if (book.progressPercent < 100) "让角色读一段" else "已读完")
+                    Text(if (book.progressPercent < 100) "璁╄鑹茶涓€娈? else "宸茶瀹?)
                 }
             }
             if (chapters.isNotEmpty()) {
@@ -253,7 +271,10 @@ private fun ReadingBookSurface(
                     items(chapters, key = { it.title + it.pageIndex }) { chapter ->
                         FilterChip(
                             selected = selectedPage == chapter.pageIndex,
-                            onClick = { onPageSelect(chapter.pageIndex) },
+                            onClick = {
+                                onPageSelect(chapter.pageIndex)
+                                scope.launch { pageListState.animateScrollToItem(chapter.pageIndex) }
+                            },
                             label = { Text(chapter.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                         )
                     }
@@ -264,8 +285,12 @@ private fun ReadingBookSurface(
                     items(pageGroups(pages.size), key = { it.first }) { range ->
                         FilterChip(
                             selected = selectedPage + 1 in range,
-                            onClick = { onPageSelect(range.first - 1) },
-                            label = { Text("${range.first}~${range.last}页") },
+                            onClick = {
+                                val pageIndex = range.first - 1
+                                onPageSelect(pageIndex)
+                                scope.launch { pageListState.animateScrollToItem(pageIndex) }
+                            },
+                            label = { Text("${range.first}~${range.last}椤?) },
                         )
                     }
                 }
@@ -275,19 +300,25 @@ private fun ReadingBookSurface(
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 18.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                LazyColumn(
+                    state = pageListState,
+                    modifier = Modifier.fillMaxWidth().height(520.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 18.dp),
+                    verticalArrangement = Arrangement.spacedBy(18.dp),
                 ) {
-                    Text(
-                        text = "第 ${selectedPage + 1} 页 / 共 ${pages.size.coerceAtLeast(1)} 页",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        text = pages.getOrNull(selectedPage).orEmpty().ifBlank { "这一页没有内容。" },
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                    items(pages.size, key = { it }) { pageIndex ->
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "绗?${pageIndex + 1} 椤?/ 鍏?${pages.size.coerceAtLeast(1)} 椤?,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = pages.getOrNull(pageIndex).orEmpty().ifBlank { "杩欎竴椤垫病鏈夊唴瀹广€? },
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -300,7 +331,7 @@ private data class ChapterRange(
 )
 
 private fun Context.readBookFromUri(uri: Uri, assistantId: String): CihaiBook {
-    val name = displayName(uri).ifBlank { "未命名阅读材料" }
+    val name = displayName(uri).ifBlank { "鏈懡鍚嶉槄璇绘潗鏂? }
     val mime = contentResolver.getType(uri).orEmpty()
     val content = when {
         name.endsWith(".docx", ignoreCase = true) ||
@@ -308,15 +339,15 @@ private fun Context.readBookFromUri(uri: Uri, assistantId: String): CihaiBook {
             val file = File.createTempFile("cihai-reading-", ".docx", cacheDir)
             contentResolver.openInputStream(uri)?.use { input ->
                 file.outputStream().use { output -> input.copyTo(output) }
-            } ?: error("无法读取文件")
+            } ?: error("鏃犳硶璇诲彇鏂囦欢")
             runCatching { DocxParser.parse(file) }
                 .also { file.delete() }
-                .getOrElse { error("docx 解析失败：${it.message}") }
+                .getOrElse { error("docx 瑙ｆ瀽澶辫触锛?{it.message}") }
         }
         else -> contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
-            ?: error("无法读取文件")
+            ?: error("鏃犳硶璇诲彇鏂囦欢")
     }.trim()
-    require(content.isNotBlank()) { "文件内容为空" }
+    require(content.isNotBlank()) { "鏂囦欢鍐呭涓虹┖" }
     return CihaiBook(
         assistantId = assistantId,
         title = name.removeSuffix(".txt").removeSuffix(".docx"),
@@ -346,7 +377,7 @@ private fun String.detectChapterRanges(pageSize: Int = 900): List<ChapterRange> 
         .runningFold(0 to "") { acc, line -> acc.first + line.length + 1 to line }
         .drop(1)
         .mapNotNull { (offset, line) ->
-            val title = line.trim().takeIf { it.matches(Regex("""^(第.{1,9}[章节回篇部].*|#{1,3}\s+.+)$""")) }
+            val title = line.trim().takeIf { it.matches(Regex("""^(绗?{1,9}[绔犺妭鍥炵瘒閮╙.*|#{1,3}\s+.+)$""")) }
             title?.let { ChapterRange(it.removePrefix("#").trim().take(18), (offset / pageSize).coerceAtLeast(0)) }
         }
         .take(20)

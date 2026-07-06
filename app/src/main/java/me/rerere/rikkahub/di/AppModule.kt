@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 import me.rerere.highlight.Highlighter
 import me.rerere.rikkahub.AppScope
 import me.rerere.rikkahub.data.ai.AILoggingManager
+import me.rerere.rikkahub.data.ai.ApiUsageStore
 import me.rerere.rikkahub.data.ai.tools.LocalTools
 import me.rerere.rikkahub.data.cihai.CihaiService
 import me.rerere.rikkahub.data.event.AppEventBus
@@ -72,6 +73,10 @@ val appModule = module {
 
     single {
         AILoggingManager()
+    }
+
+    single {
+        ApiUsageStore(context = get(), scope = get(), json = get())
     }
 
     single {

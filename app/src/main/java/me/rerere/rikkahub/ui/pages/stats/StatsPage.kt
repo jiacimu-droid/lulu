@@ -32,6 +32,7 @@ import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -47,7 +48,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.rerere.rikkahub.R
-import me.rerere.rikkahub.data.db.dao.MessageCacheRecord
+import me.rerere.rikkahub.data.ai.ApiUsageRecord
+import me.rerere.rikkahub.data.ai.ApiUsageSummary
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.utils.plus
@@ -122,8 +124,12 @@ fun StatsPage(vm: StatsVM = koinViewModel()) {
 
 @Composable
 private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
-    val cacheRate = if (stats.totalPromptTokens > 0) {
-        stats.totalCachedTokens.toFloat() / stats.totalPromptTokens.toFloat()
+    val cachePromptTokens = stats.cacheRecords.sumOf { it.promptTokens }.takeIf { stats.cacheRecords.isNotEmpty() }
+        ?: stats.totalPromptTokens
+    val cacheCachedTokens = stats.cacheRecords.sumOf { it.cachedTokens }.takeIf { stats.cacheRecords.isNotEmpty() }
+        ?: stats.totalCachedTokens
+    val cacheRate = if (cachePromptTokens > 0) {
+        cacheCachedTokens.toFloat() / cachePromptTokens.toFloat()
     } else {
         0f
     }
@@ -171,18 +177,22 @@ private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
                 CacheMetric(
                     modifier = Modifier.weight(1f),
                     label = "输入",
-                    value = formatTokens(stats.totalPromptTokens),
+                    value = formatTokens(cachePromptTokens),
                 )
                 CacheMetric(
                     modifier = Modifier.weight(1f),
                     label = "缓存读取",
-                    value = formatTokens(stats.totalCachedTokens),
+                    value = formatTokens(cacheCachedTokens),
                 )
                 CacheMetric(
                     modifier = Modifier.weight(1f),
                     label = "记录数",
                     value = stats.cacheRecords.size.toString(),
                 )
+            }
+
+            stats.cacheSummaries.forEach { summary ->
+                CacheSourceSummaryRow(summary)
             }
 
             if (stats.voiceCallStats.sessionCount > 0) {
@@ -213,7 +223,37 @@ private fun CacheStatsCard(stats: AppStats, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun CacheRecordsCard(records: List<MessageCacheRecord>, modifier: Modifier = Modifier) {
+private fun CacheSourceSummaryRow(summary: ApiUsageSummary) {
+    val cacheRate = (summary.cacheRate * 100).formatPercent()
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.66f),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column {
+                Text(summary.source.label, style = MaterialTheme.typography.labelLarge)
+                Text(
+                    "${summary.callCount} 次调用",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(
+                "缓存 ${formatTokens(summary.cachedTokens)} / $cacheRate%",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CacheRecordsCard(records: List<ApiUsageRecord>, modifier: Modifier = Modifier) {
     val visibleRecords = remember(records) { records.visibleCacheRecords() }
 
     Card(
@@ -261,18 +301,13 @@ private fun CacheRecordsCard(records: List<MessageCacheRecord>, modifier: Modifi
 
 internal const val MAX_VISIBLE_CACHE_RECORDS = 15
 
-internal fun List<MessageCacheRecord>.visibleCacheRecords(): List<MessageCacheRecord> =
+internal fun List<ApiUsageRecord>.visibleCacheRecords(): List<ApiUsageRecord> =
     take(MAX_VISIBLE_CACHE_RECORDS)
 
-internal fun MessageCacheRecord.stableCacheRecordKey(): String =
-    if (nodeId.isNotBlank()) {
-        "$nodeId-$messageIndex"
-    } else {
-        messageId.ifBlank { "$conversationId-$createdAt" }
-    }
+internal fun ApiUsageRecord.stableCacheRecordKey(): String = id
 
 @Composable
-private fun CacheRecordRow(record: MessageCacheRecord) {
+private fun CacheRecordRow(record: ApiUsageRecord) {
     val cacheRate = if (record.promptTokens > 0) {
         record.cachedTokens.toFloat() / record.promptTokens.toFloat() * 100
     } else {
@@ -285,14 +320,14 @@ private fun CacheRecordRow(record: MessageCacheRecord) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = record.title.ifBlank { "聊天/电话请求" },
+                text = record.title.ifBlank { record.source.label },
                 style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = record.createdAt.asShortTime(),
+                text = record.createdAtMillis.asShortTime(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -625,6 +660,9 @@ private fun formatTokens(count: Long): String = when {
 }
 
 private fun Float.formatPercent(): String = "%.1f".format(this)
+
+private fun Long.asShortTime(): String =
+    java.text.SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(java.util.Date(this))
 
 private fun String.asShortTime(): String {
     if (isBlank()) return "--"

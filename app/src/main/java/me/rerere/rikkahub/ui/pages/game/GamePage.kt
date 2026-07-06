@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -72,12 +75,15 @@ import me.rerere.hugeicons.stroke.Sparkles
 import me.rerere.hugeicons.stroke.Voice
 import me.rerere.hugeicons.stroke.VolumeHigh
 import me.rerere.rikkahub.Screen
+import me.rerere.rikkahub.data.ai.ApiUsageSource
+import me.rerere.rikkahub.data.ai.ApiUsageStore
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
-import me.rerere.rikkahub.data.datastore.getCurrentAssistant
+import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.ui.context.LocalASRState
 import me.rerere.rikkahub.ui.context.LocalNavController
+import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.context.LocalTTSState
 import me.rerere.rikkahub.ui.theme.CustomColors
 import kotlin.math.abs
@@ -145,8 +151,10 @@ fun PerfectManGamePage() {
     val navController = LocalNavController.current
     val asr = LocalASRState.current
     val tts = LocalTTSState.current
+    val settings = LocalSettings.current
     val settingsStore = koinInject<SettingsStore>()
     val providerManager = koinInject<ProviderManager>()
+    val apiUsageStore = koinInject<ApiUsageStore>()
     val scope = rememberCoroutineScope()
     val asrState by asr.state.collectAsState()
     var round by remember { mutableIntStateOf(1) }
@@ -160,6 +168,8 @@ fun PerfectManGamePage() {
     var isGenerating by remember { mutableStateOf(false) }
     var opponentVoiceEnabled by remember { mutableStateOf(true) }
     var listeningTarget by remember { mutableStateOf<VoiceInputTarget?>(null) }
+    var selectedPlayerAssistantId by remember { mutableStateOf<String?>(null) }
+    val selectedPlayer = settings.assistants.firstOrNull { it.id.toString() == selectedPlayerAssistantId }
 
     val isListening = asrState.status != ASRStatus.Idle && asrState.status != ASRStatus.Error
 
@@ -215,22 +225,28 @@ fun PerfectManGamePage() {
     suspend fun generatePerfectManText(prompt: String, fallback: String): String {
         return runCatching {
             val settings = settingsStore.settingsFlow.first()
-            val assistant = settings.getCurrentAssistant()
-            val model = settings.findModelById(assistant.chatModelId ?: settings.chatModelId)
+            val player = selectedPlayerAssistantId
+                ?.let { id -> settings.assistants.firstOrNull { it.id.toString() == id } }
+            val model = settings.findModelById(player?.chatModelId ?: settings.chatModelId)
                 ?.takeIf { it.type == ModelType.CHAT }
                 ?: return@runCatching fallback
             val providerSetting = model.findProvider(settings.providers) ?: return@runCatching fallback
             val provider = providerManager.getProviderByType(providerSetting)
+            val playerPrompt = player?.let {
+                "你现在扮演坐在用户对面一起玩游戏的“${it.name.ifBlank { "玩家" }}”。" +
+                    "沿用这个角色的说话习惯、关系感和性格边界，但只输出当面会说出口的话。"
+            }.orEmpty()
             val chunk = provider.generateText(
                 providerSetting = providerSetting,
-                messages = listOf(
-                    UIMessage.system(
+                messages = buildList {
+                    add(UIMessage.system(
                         "你是坐在用户对面一起玩“满分男”的真人玩家，不是主持人、裁判或旁白。" +
                             "只输出你会当面说出口的话。语气自然、会吐槽、会犹豫、会互动。" +
                             "不要播报系统结果，不要解释规则。文案短、好猜、有画面感，不要色情，不要羞辱真实群体。",
-                    ),
-                    UIMessage.user(prompt),
-                ),
+                    ))
+                    if (playerPrompt.isNotBlank()) add(UIMessage.system(playerPrompt))
+                    add(UIMessage.user(prompt))
+                },
                 params = TextGenerationParams(
                     model = model,
                     temperature = 0.8f,
@@ -239,6 +255,15 @@ fun PerfectManGamePage() {
                     reasoningLevel = ReasoningLevel.OFF,
                 ),
             )
+            chunk.usage?.let { usage ->
+                apiUsageStore.record(
+                    source = ApiUsageSource.GAME,
+                    title = "满分男：${player?.name?.takeIf { it.isNotBlank() } ?: "默认 API"}",
+                    model = model.displayName.ifBlank { model.modelId },
+                    provider = providerSetting.name.ifBlank { providerSetting.id.toString() },
+                    usage = usage,
+                )
+            }
             chunk.choices.firstOrNull()?.message?.toText()?.trim()?.takeIf { it.isNotBlank() } ?: fallback
         }.getOrElse {
             if (it is CancellationException) throw it
@@ -349,6 +374,11 @@ fun PerfectManGamePage() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             RoundHeader(round = round, phase = phase)
+            PerfectManPlayerSelector(
+                selectedPlayer = selectedPlayer,
+                assistants = settings.assistants,
+                onSelect = { selectedPlayerAssistantId = it },
+            )
             OpponentSeatCard(
                 line = opponentLine,
                 speakingEnabled = opponentVoiceEnabled,
@@ -467,6 +497,52 @@ private fun RoundHeader(round: Int, phase: PerfectManPhase) {
                 if (phase == PerfectManPhase.UserGuesses) "对面描述，我来猜分。" else "我来描述，对面猜分。",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+@Composable
+private fun PerfectManPlayerSelector(
+    selectedPlayer: Assistant?,
+    assistants: List<Assistant>,
+    onSelect: (String?) -> Unit,
+) {
+    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("选择玩家", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    selectedPlayer?.name?.takeIf { it.isNotBlank() } ?: "默认 API",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                item(key = "default-api") {
+                    FilterChip(
+                        selected = selectedPlayer == null,
+                        onClick = { onSelect(null) },
+                        label = { Text("默认 API") },
+                    )
+                }
+                items(assistants, key = { it.id.toString() }) { assistant ->
+                    FilterChip(
+                        selected = selectedPlayer?.id == assistant.id,
+                        onClick = { onSelect(assistant.id.toString()) },
+                        label = {
+                            Text(
+                                assistant.name.ifBlank { "玩家" },
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
+                    )
+                }
+            }
         }
     }
 }

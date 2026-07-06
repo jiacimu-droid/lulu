@@ -62,6 +62,12 @@ class CihaiStore(
         }
     }
 
+    suspend fun deleteEntry(entryId: String) {
+        update { state ->
+            state.copy(entries = state.entries.filterNot { it.id == entryId })
+        }
+    }
+
     suspend fun addBook(book: CihaiBook) {
         update { state ->
             state.copy(books = (listOf(book) + state.books).take(CIHAI_BOOK_LIMIT))
@@ -73,6 +79,12 @@ class CihaiStore(
             state.copy(books = state.books.map { current ->
                 if (current.id == book.id) book else current
             })
+        }
+    }
+
+    suspend fun deleteBook(bookId: String) {
+        update { state ->
+            state.copy(books = state.books.filterNot { it.id == bookId })
         }
     }
 

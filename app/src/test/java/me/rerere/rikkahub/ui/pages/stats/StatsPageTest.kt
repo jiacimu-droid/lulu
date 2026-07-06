@@ -1,60 +1,45 @@
 package me.rerere.rikkahub.ui.pages.stats
 
-import me.rerere.rikkahub.data.db.dao.MessageCacheRecord
+import me.rerere.rikkahub.data.ai.ApiUsageRecord
+import me.rerere.rikkahub.data.ai.ApiUsageSource
+import me.rerere.rikkahub.data.ai.summarizeApiUsage
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 class StatsPageTest {
     @Test
     fun `visible cache records should keep only the latest fifteen records`() {
         val records = (0 until 20).map { index ->
-            MessageCacheRecord(nodeId = "node-$index")
+            ApiUsageRecord(id = "record-$index", source = ApiUsageSource.CHAT)
         }
 
         val visibleRecords = records.visibleCacheRecords()
 
         assertEquals(15, visibleRecords.size)
-        assertEquals("node-0", visibleRecords.first().nodeId)
-        assertEquals("node-14", visibleRecords.last().nodeId)
+        assertEquals("record-0", visibleRecords.first().id)
+        assertEquals("record-14", visibleRecords.last().id)
     }
 
     @Test
-    fun `cache record key should distinguish records with duplicate message fallback fields`() {
-        val first = MessageCacheRecord(
-            conversationId = "conversation-1",
-            messageId = "",
-            createdAt = "2026-06-29T10:00:00",
-            nodeId = "node-1",
-            messageIndex = 0,
-        )
-        val second = first.copy(messageIndex = 1)
+    fun `cache record key should use persisted api usage id`() {
+        val record = ApiUsageRecord(id = "usage-1", source = ApiUsageSource.GAME)
 
-        assertNotEquals(first.stableCacheRecordKey(), second.stableCacheRecordKey())
+        assertEquals("usage-1", record.stableCacheRecordKey())
     }
 
     @Test
-    fun `cache record key should distinguish records with duplicate persisted message ids`() {
-        val first = MessageCacheRecord(
-            conversationId = "conversation-1",
-            messageId = "message-1",
-            createdAt = "2026-06-29T10:00:00",
-            nodeId = "node-1",
-            messageIndex = 0,
-        )
-        val second = first.copy(nodeId = "node-2")
+    fun `api usage summary should keep chat phone and game separate`() {
+        val summaries = listOf(
+            ApiUsageRecord(source = ApiUsageSource.CHAT, promptTokens = 100L, cachedTokens = 20L),
+            ApiUsageRecord(source = ApiUsageSource.PHONE, promptTokens = 50L, cachedTokens = 10L),
+            ApiUsageRecord(source = ApiUsageSource.GAME, promptTokens = 30L, cachedTokens = 3L),
+            ApiUsageRecord(source = ApiUsageSource.CHAT, promptTokens = 100L, cachedTokens = 40L),
+        ).summarizeApiUsage()
 
-        assertNotEquals(first.stableCacheRecordKey(), second.stableCacheRecordKey())
-    }
-
-    @Test
-    fun `cache record key should fall back to message id when row identity is unavailable`() {
-        val record = MessageCacheRecord(
-            conversationId = "conversation-1",
-            messageId = "message-1",
-            createdAt = "2026-06-29T10:00:00",
-        )
-
-        assertEquals("message-1", record.stableCacheRecordKey())
+        assertEquals(3, summaries.size)
+        assertEquals(2, summaries.first { it.source == ApiUsageSource.CHAT }.callCount)
+        assertEquals(60L, summaries.first { it.source == ApiUsageSource.CHAT }.cachedTokens)
+        assertEquals(10L, summaries.first { it.source == ApiUsageSource.PHONE }.cachedTokens)
+        assertEquals(3L, summaries.first { it.source == ApiUsageSource.GAME }.cachedTokens)
     }
 }

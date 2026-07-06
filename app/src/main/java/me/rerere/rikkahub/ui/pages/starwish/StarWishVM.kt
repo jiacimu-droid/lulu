@@ -20,6 +20,8 @@ import me.rerere.ai.provider.ModelType
 import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.ui.UIMessage
+import me.rerere.rikkahub.data.ai.ApiUsageSource
+import me.rerere.rikkahub.data.ai.ApiUsageStore
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.repository.GenMediaRepository
 import me.rerere.rikkahub.data.datastore.SettingsStore
@@ -45,6 +47,7 @@ class StarWishVM(
     private val filesManager: FilesManager,
     private val settingsStore: SettingsStore,
     private val providerManager: ProviderManager,
+    private val apiUsageStore: ApiUsageStore,
 ) : ViewModel() {
     val state: StateFlow<StarWishState> = store.state
     val studyState = studyStore.state
@@ -415,6 +418,15 @@ class StarWishVM(
                 reasoningLevel = ReasoningLevel.OFF,
             ),
         )
+        chunk.usage?.let { usage ->
+            apiUsageStore.record(
+                source = ApiUsageSource.OTHER,
+                title = "星愿馆：小剧场",
+                model = model.displayName.ifBlank { model.modelId },
+                provider = providerSetting.name.ifBlank { providerSetting.id.toString() },
+                usage = usage,
+            )
+        }
         return chunk.choices.firstOrNull()?.message?.toText()?.trim()
             ?.takeIf { it.isNotBlank() }
             ?: error("小剧场 API 没有返回正文。")

@@ -13,11 +13,9 @@ data class LivingIntentCardModel(
     val statusText: String,
     val eventLine: String,
     val goalLine: String,
-    val stateLine: String,
     val appraisalLine: String,
     val hypothesesLine: String,
     val perceptionLine: String,
-    val countLine: String,
     val emotionLine: String,
     val consolidationLine: String,
     val capabilityLine: String?,
@@ -57,11 +55,9 @@ private fun LivingIntent.toCardModel(nowMillis: Long): LivingIntentCardModel {
         },
         eventLine = "事件：$concernEvent",
         goalLine = "目标：$concernGoal",
-        stateLine = "本轮判断：$intention",
         appraisalLine = "意义：${appraisal.meaning}\n风险：${appraisal.risk}\n资源：${appraisal.resources}",
         hypothesesLine = "可能情况：${hypotheses.joinToString(" / ")}",
         perceptionLine = "下次感知由本轮判断动态决定；到点后重新从感知层开始。",
-        countLine = "默默判断 $silentEvaluationCount 次 · 开口 $spokenCount 次 · 克制 $restraint/10",
         emotionLine = "情绪：${emotion.emotionLabel} · ${emotion.feltSense}\n冲动：${emotion.impulse}\n克制：${emotion.restraintText}",
         consolidationLine = "沉淀：${consolidation.episodicTrace}\n策略：${consolidation.policyLearning}",
         capabilityLine = capabilityRequests
@@ -73,9 +69,9 @@ private fun LivingIntent.toCardModel(nowMillis: Long): LivingIntentCardModel {
 }
 
 private fun LivingIntentKind.title(): String = when (this) {
-    LivingIntentKind.HEALTH_SAFETY -> "身体安全挂心"
-    LivingIntentKind.ORDINARY_SILENCE -> "沉默回复挂心"
-    LivingIntentKind.STUDY_FOCUS -> "学习节奏挂心"
-    LivingIntentKind.DEADLINE -> "任务节点挂心"
-    LivingIntentKind.WAKE_UP -> "起床时间挂心"
+    LivingIntentKind.HEALTH_SAFETY -> "身体安全"
+    LivingIntentKind.ORDINARY_SILENCE -> "等你回来"
+    LivingIntentKind.STUDY_FOCUS -> "学习节奏"
+    LivingIntentKind.DEADLINE -> "时间提醒"
+    LivingIntentKind.WAKE_UP -> "起床提醒"
 }

@@ -65,6 +65,7 @@ import me.rerere.rikkahub.R
 import me.rerere.rikkahub.RouteActivity
 import me.rerere.rikkahub.data.ai.GenerationChunk
 import me.rerere.rikkahub.data.ai.GenerationHandler
+import me.rerere.rikkahub.data.ai.ApiUsageSource
 import me.rerere.rikkahub.data.ai.mcp.McpManager
 import me.rerere.rikkahub.data.ai.tools.LocalTools
 import me.rerere.rikkahub.data.ai.tools.SystemTools
@@ -745,6 +746,8 @@ class ChatService(
             outputTransformers = outputTransformers,
             tools = availableTools,
             pluginPromptInjections = pluginToolProvider.getPluginPromptInjections(),
+            apiUsageSource = ApiUsageSource.PHONE,
+            apiUsageTitle = "电话：${assistant.name.ifBlank { "当前角色" }}",
         ).collect { chunk ->
             when (chunk) {
                 is GenerationChunk.Messages -> generatedMessages = chunk.messages

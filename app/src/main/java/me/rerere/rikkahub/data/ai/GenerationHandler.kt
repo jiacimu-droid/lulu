@@ -16,6 +16,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.core.ReasoningLevel
+import me.rerere.ai.core.TokenUsage
 import me.rerere.ai.core.Tool
 import me.rerere.ai.core.merge
 import me.rerere.ai.provider.CustomBody
@@ -58,6 +59,7 @@ class GenerationHandler(
     private val providerManager: ProviderManager,
     private val json: Json,
     private val aiLoggingManager: AILoggingManager,
+    private val apiUsageStore: ApiUsageStore,
 ) {
     fun generateText(
         settings: Settings,
@@ -71,6 +73,8 @@ class GenerationHandler(
         processingStatus: MutableStateFlow<String?> = MutableStateFlow(null),
         conversationSystemPrompt: String? = null,
         pluginPromptInjections: List<String> = emptyList(),
+        apiUsageSource: ApiUsageSource = ApiUsageSource.CHAT,
+        apiUsageTitle: String = "",
     ): Flow<GenerationChunk> = flow {
         val provider = model.findProvider(settings.providers) ?: error("Provider not found")
         val providerImpl = providerManager.getProviderByType(provider)
@@ -128,6 +132,8 @@ class GenerationHandler(
                     stream = assistant.streamOutput,
                     processingStatus = processingStatus,
                     conversationSystemPrompt = conversationSystemPrompt,
+                    apiUsageSource = apiUsageSource,
+                    apiUsageTitle = apiUsageTitle,
                 )
                 messages = messages.visualTransforms(
                     transformers = outputTransformers,
@@ -329,6 +335,8 @@ class GenerationHandler(
         stream: Boolean,
         processingStatus: MutableStateFlow<String?> = MutableStateFlow(null),
         conversationSystemPrompt: String? = null,
+        apiUsageSource: ApiUsageSource = ApiUsageSource.CHAT,
+        apiUsageTitle: String = "",
     ) {
         val effectiveSystemPrompt =
             if (assistant.allowConversationSystemPrompt && !conversationSystemPrompt.isNullOrBlank()) {
@@ -412,6 +420,7 @@ class GenerationHandler(
                 addAll(model.customBodies)
             }
         )
+        var recordedUsage: TokenUsage? = null
         if (stream) {
             val apiLog = AILogging.Generation(
                 params = params,
@@ -430,6 +439,7 @@ class GenerationHandler(
                 ).collect {
                     messages = messages.handleMessageChunk(chunk = it, model = model)
                     it.usage?.let { usage ->
+                        recordedUsage = recordedUsage.merge(usage)
                         aiLoggingManager.updateGenerationUsage(apiLog.id, usage)
                         messages = messages.mapIndexed { index, message ->
                             if (index == messages.lastIndex) {
@@ -442,6 +452,15 @@ class GenerationHandler(
                     onUpdateMessages(messages)
                 }
                 aiLoggingManager.finishGeneration(apiLog.id)
+                recordedUsage?.let { usage ->
+                    apiUsageStore.record(
+                        source = apiUsageSource,
+                        title = apiUsageTitle.ifBlank { assistant.name }.ifBlank { apiUsageSource.label },
+                        model = model.displayName.ifBlank { model.modelId },
+                        provider = provider.name.ifBlank { provider.id.toString() },
+                        usage = usage,
+                    )
+                }
             } catch (e: Throwable) {
                 aiLoggingManager.finishGeneration(apiLog.id, e.message ?: e::class.simpleName)
                 throw e
@@ -464,6 +483,7 @@ class GenerationHandler(
                 )
                 messages = messages.handleMessageChunk(chunk = chunk, model = model)
                 chunk.usage?.let { usage ->
+                    recordedUsage = recordedUsage.merge(usage)
                     aiLoggingManager.updateGenerationUsage(apiLog.id, usage)
                     messages = messages.mapIndexed { index, message ->
                         if (index == messages.lastIndex) {
@@ -477,6 +497,15 @@ class GenerationHandler(
                 }
                 onUpdateMessages(messages)
                 aiLoggingManager.finishGeneration(apiLog.id)
+                recordedUsage?.let { usage ->
+                    apiUsageStore.record(
+                        source = apiUsageSource,
+                        title = apiUsageTitle.ifBlank { assistant.name }.ifBlank { apiUsageSource.label },
+                        model = model.displayName.ifBlank { model.modelId },
+                        provider = provider.name.ifBlank { provider.id.toString() },
+                        usage = usage,
+                    )
+                }
             } catch (e: Throwable) {
                 aiLoggingManager.finishGeneration(apiLog.id, e.message ?: e::class.simpleName)
                 throw e

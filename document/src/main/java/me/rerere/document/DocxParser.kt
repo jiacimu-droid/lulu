@@ -4,7 +4,7 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
 import java.io.InputStream
-import java.util.zip.ZipInputStream
+import java.util.zip.ZipFile
 
 private data class ListInfo(
     val level: Int,
@@ -20,16 +20,15 @@ private data class ParagraphProperties(
 object DocxParser {
     fun parse(file: File): String {
         return try {
-            file.inputStream().use { fileInputStream ->
-                ZipInputStream(fileInputStream).use { zipStream ->
-                    var entry = zipStream.nextEntry
-                    while (entry != null) {
-                        if (entry.name == "word/document.xml") {
-                            return parseDocumentXml(zipStream)
-                        }
-                        entry = zipStream.nextEntry
+            ZipFile(file).use { zipFile ->
+                val entry = zipFile.getEntry("word/document.xml")
+                    ?: zipFile.entries().asSequence().firstOrNull { it.name.endsWith("/word/document.xml") }
+                    ?: zipFile.entries().asSequence().firstOrNull {
+                        it.name.startsWith("word/") && it.name.endsWith("document.xml")
                     }
-                    "Unable to find document content in DOCX file"
+                    ?: return "Unable to find document content in DOCX file"
+                zipFile.getInputStream(entry).use { input ->
+                    parseDocumentXml(input)
                 }
             }
         } catch (e: Exception) {

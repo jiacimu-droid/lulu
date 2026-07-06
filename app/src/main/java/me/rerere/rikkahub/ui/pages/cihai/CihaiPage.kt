@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -45,6 +47,8 @@ import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
+import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.Delete01
 import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -186,7 +190,10 @@ fun CihaiPage(onBack: () -> Unit) {
                             }
                         } else {
                             items(entries, key = { it.id }) { entry ->
-                                EntryCard(entry)
+                                EntryCard(
+                                    entry = entry,
+                                    onDelete = { scope.launch { store.deleteEntry(entry.id) } },
+                                )
                             }
                         }
                     }
@@ -282,17 +289,12 @@ private fun ConcernCard(card: LivingIntentCardModel) {
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = listOf(card.eventLine, card.goalLine, card.stateLine).joinToString("\n"),
+                text = listOf(card.eventLine, card.goalLine).joinToString("\n"),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Text(
                 text = card.perceptionLine,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = card.countLine,
-                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -345,7 +347,7 @@ private fun AssistantSelector(
 }
 
 @Composable
-private fun EntryCard(entry: CihaiEntry) {
+private fun EntryCard(entry: CihaiEntry, onDelete: () -> Unit) {
     val displayBody = remember(entry.content, entry.kind) { entry.displayBody() }
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
@@ -354,6 +356,9 @@ private fun EntryCard(entry: CihaiEntry) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(entry.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                IconButton(onClick = onDelete) {
+                    Icon(HugeIcons.Delete01, contentDescription = "删除")
+                }
                 Surface(
                     shape = RoundedCornerShape(999.dp),
                     color = MaterialTheme.colorScheme.primaryContainer,

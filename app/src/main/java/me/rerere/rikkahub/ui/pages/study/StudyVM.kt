@@ -15,6 +15,8 @@ import me.rerere.ai.provider.ModelType
 import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.ui.UIMessage
+import me.rerere.rikkahub.data.ai.ApiUsageSource
+import me.rerere.rikkahub.data.ai.ApiUsageStore
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
@@ -39,6 +41,7 @@ class StudyVM(
     private val starWishStore: StarWishStore,
     private val settingsStore: SettingsStore,
     private val providerManager: ProviderManager,
+    private val apiUsageStore: ApiUsageStore,
 ) : ViewModel() {
     val state: StateFlow<StudyState> = store.state
 
@@ -101,6 +104,15 @@ class StudyVM(
                         reasoningLevel = ReasoningLevel.OFF,
                     ),
                 )
+                chunk.usage?.let { usage ->
+                    apiUsageStore.record(
+                        source = ApiUsageSource.OTHER,
+                        title = "学习：今日计划",
+                        model = model.displayName.ifBlank { model.modelId },
+                        provider = providerSetting.name.ifBlank { providerSetting.id.toString() },
+                        usage = usage,
+                    )
+                }
                 val text = chunk.choices.firstOrNull()?.message?.toText().orEmpty()
                 val schedule = ExamStudyPlan.parseScheduleBlocks(text)
                 if (schedule.isEmpty()) {
