@@ -1,5 +1,6 @@
 package me.rerere.rikkahub.ui.pages.assistant.detail
 
+import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -148,6 +149,7 @@ class AssistantDetailVM(
                         if (it.id == assistant.id) {
                             checkAvatarDelete(old = it, new = assistant) // 删除旧头像
                             checkBackgroundDelete(old = it, new = assistant) // 删除旧背景
+                            checkFaceReferenceDelete(old = it, new = assistant)
                             assistant
                         } else {
                             it
@@ -163,6 +165,14 @@ class AssistantDetailVM(
             conversationRepository.deleteConversationOfAssistant(assistantId)
             memoryBankService.deleteMemoriesByAssistant(assistantIdString)
             voiceCallRepository.deleteSessionsByAssistant(assistantIdString)
+        }
+    }
+
+    fun setFaceReferenceImage(assistant: Assistant, uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            filesManager.createChatFilesByContents(listOf(uri)).firstOrNull()?.let { localUri ->
+                update(assistant.copy(faceReferenceImage = localUri.toString()))
+            }
         }
     }
 
@@ -184,6 +194,19 @@ class AssistantDetailVM(
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to delete background file: $oldBackground", e)
+            }
+        }
+    }
+
+    fun checkFaceReferenceDelete(old: Assistant, new: Assistant) {
+        val oldFace = old.faceReferenceImage
+        val newFace = new.faceReferenceImage
+
+        if (oldFace != null && oldFace != newFace) {
+            try {
+                filesManager.deleteChatFiles(listOf(oldFace.toUri()))
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to delete face reference file: $oldFace", e)
             }
         }
     }

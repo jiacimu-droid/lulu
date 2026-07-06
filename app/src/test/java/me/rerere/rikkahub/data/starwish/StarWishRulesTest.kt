@@ -86,6 +86,45 @@ class StarWishRulesTest {
         assertTrue(!replay.consumedFragment)
     }
 
+    @Test
+    fun theaterGuideKeepsAdditionalChaptersBeyondSix() {
+        val guide = StarWishTheaterGuide(
+            chapters = (1..8).map { "chapter-$it" },
+        ).normalized()
+
+        assertEquals(8, guide.chapters.size)
+        assertEquals("chapter-8", guide.chapters.last())
+    }
+
+    @Test
+    fun theaterChapterPromptIncludesPreviousChapterBodyAndRoleRules() {
+        val seed = StarWishTheaterSeed(
+            id = "test",
+            title = "测试小剧场",
+            prompt = "总剧情",
+        )
+        val previous = StarWishTheaterChapter(
+            id = "chapter-1",
+            theater = seed.title,
+            chapter = 1,
+            title = "第一章",
+            content = "上一章完整正文，需要被下一章承接。",
+            createdAt = 1L,
+        )
+
+        val prompt = StarWishRules.theaterChapterPrompt(
+            seed = seed,
+            previousChapters = listOf(previous),
+            chapter = 2,
+            guide = StarWishTheaterGuide(chapters = (1..8).map { "chapter-$it" }),
+        )
+
+        assertTrue(prompt.contains("8 章"))
+        assertTrue(prompt.contains("上一章完整正文，需要被下一章承接。"))
+        assertTrue(prompt.contains("女主就是用户本人"))
+        assertTrue(prompt.contains("名字含露"))
+    }
+
     private fun assertPromptComplete(prompt: String, label: String) {
         listOf("服装", "饰品", "背景", "姿势", "表情", "光影", "画风", "画质").forEach { phrase ->
             assertTrue(prompt.contains(phrase), "$label should include $phrase")

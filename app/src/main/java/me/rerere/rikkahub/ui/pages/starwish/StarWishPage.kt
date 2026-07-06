@@ -49,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -458,11 +459,50 @@ fun StarWishTheaterPage(
     } else {
         StarWishRules.allTheaters(state.customTheaters).firstOrNull { it.title == theaterTitle }
     }
+    val guide = theater?.let {
+        if (special) {
+            state.specialStoryGuides[it.title] ?: StarWishRules.defaultTheaterGuide(it, includeChapterPlan = false)
+        } else {
+            state.theaterGuides[it.title] ?: StarWishRules.defaultTheaterGuide(it)
+        }
+    }
+    var showGuideMenu by remember(theaterTitle, special) { mutableStateOf(false) }
+    var showGuideEditor by remember(theaterTitle, special) { mutableStateOf(false) }
+    val saveGuide: (StarWishTheaterGuide) -> Unit = { updatedGuide ->
+        theater?.let {
+            if (special) vm.saveSpecialStoryGuide(it.title, updatedGuide) else vm.saveTheaterGuide(it.title, updatedGuide)
+        }
+    }
     Scaffold(
         topBar = {
             LargeFlexibleTopAppBar(
                 title = { Text(theaterTitle) },
                 navigationIcon = { BackButton() },
+                actions = {
+                    if (theater != null && guide != null) {
+                        Box {
+                            IconButton(onClick = { showGuideMenu = true }) {
+                                Icon(HugeIcons.MoreVertical, contentDescription = "剧情规划")
+                            }
+                            DropdownMenu(expanded = showGuideMenu, onDismissRequest = { showGuideMenu = false }) {
+                                DropdownMenuItem(
+                                    text = { Text("剧情规划") },
+                                    onClick = {
+                                        showGuideMenu = false
+                                        showGuideEditor = true
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("增加章节") },
+                                    onClick = {
+                                        showGuideMenu = false
+                                        saveGuide(guide.copy(chapters = guide.chapters + ""))
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
                 colors = CustomColors.topBarColors,
             )
         },
@@ -476,14 +516,8 @@ fun StarWishTheaterPage(
                 Text("这个小剧场暂时找不到了")
             }
         } else {
-            val guide = if (special) {
-                state.specialStoryGuides[theater.title] ?: StarWishRules.defaultTheaterGuide(theater, includeChapterPlan = false)
-            } else {
-                state.theaterGuides[theater.title] ?: StarWishRules.defaultTheaterGuide(theater)
-            }
             TheaterDetailContent(
                 theater = theater,
-                guide = guide,
                 credits = if (special) {
                     studyState.inventory.specialStoryFragments / StarWishRules.SPECIAL_FRAGMENTS_PER_CHAPTER
                 } else {
@@ -502,11 +536,20 @@ fun StarWishTheaterPage(
                 onDeleteChapter = { chapterId ->
                     if (special) vm.deleteSpecialStoryChapter(theater.title, chapterId) else vm.deleteChapter(theater.title, chapterId)
                 },
-                onSaveGuide = { updatedGuide ->
-                    if (special) vm.saveSpecialStoryGuide(theater.title, updatedGuide) else vm.saveTheaterGuide(theater.title, updatedGuide)
-                },
             )
         }
+    }
+    if (theater != null && guide != null && showGuideEditor) {
+        TheaterGuideDialog(
+            theaterTitle = theater.title,
+            guide = guide,
+            overviewFallback = theater.prompt,
+            onDismiss = { showGuideEditor = false },
+            onSave = {
+                saveGuide(it)
+                showGuideEditor = false
+            },
+        )
     }
 }
 
@@ -990,7 +1033,6 @@ private fun StarWishVideoPlayerDialog(
 @Composable
 private fun TheaterDetailContent(
     theater: StarWishTheaterSeed,
-    guide: StarWishTheaterGuide,
     credits: Int,
     rareFragments: Int,
     chapters: List<me.rerere.rikkahub.data.starwish.StarWishTheaterChapter>,
@@ -1001,11 +1043,9 @@ private fun TheaterDetailContent(
     fragmentLabel: String = "小剧场碎片",
     onCreateChapter: (String) -> Unit,
     onDeleteChapter: (String) -> Unit,
-    onSaveGuide: (StarWishTheaterGuide) -> Unit,
 ) {
     val visibleChapters = remember(theater, chapters) { chapters.filterNot { it.isPromptPlaceholder(theater) } }
     var influence by remember(theater.title, visibleChapters.size) { mutableStateOf("") }
-    var showGuideEditor by remember { mutableStateOf(false) }
     var showCatalog by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -1023,9 +1063,6 @@ private fun TheaterDetailContent(
                         modifier = Modifier.weight(1f),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    IconButton(onClick = { showGuideEditor = true }) {
-                        Icon(HugeIcons.MoreVertical, contentDescription = "剧情规划")
-                    }
                 }
             }
             if (visibleChapters.isEmpty()) {
@@ -1123,18 +1160,6 @@ private fun TheaterDetailContent(
             }
         }
     }
-    if (showGuideEditor) {
-        TheaterGuideDialog(
-            theaterTitle = theater.title,
-            guide = guide,
-            overviewFallback = theater.prompt,
-            onDismiss = { showGuideEditor = false },
-            onSave = {
-                onSaveGuide(it)
-                showGuideEditor = false
-            },
-        )
-    }
 }
 
 @Composable
@@ -1147,17 +1172,16 @@ private fun TheaterGuideDialog(
 ) {
     var overview by remember(guide) { mutableStateOf(guide.overview) }
     var wordCount by remember(guide) { mutableStateOf(guide.wordCount) }
-    var chapter1 by remember(guide) { mutableStateOf(guide.chapters.getOrNull(0).orEmpty()) }
-    var chapter2 by remember(guide) { mutableStateOf(guide.chapters.getOrNull(1).orEmpty()) }
-    var chapter3 by remember(guide) { mutableStateOf(guide.chapters.getOrNull(2).orEmpty()) }
-    var chapter4 by remember(guide) { mutableStateOf(guide.chapters.getOrNull(3).orEmpty()) }
-    var chapter5 by remember(guide) { mutableStateOf(guide.chapters.getOrNull(4).orEmpty()) }
-    var chapter6 by remember(guide) { mutableStateOf(guide.chapters.getOrNull(5).orEmpty()) }
-    val chapters = listOf(chapter1, chapter2, chapter3, chapter4, chapter5, chapter6)
-    val preview = remember(overview, wordCount, chapters, overviewFallback) {
+    val chapters = remember(guide) {
+        mutableStateListOf<String>().apply {
+            addAll(guide.chapters.ifEmpty { List(6) { "" } })
+        }
+    }
+    val chapterSnapshot = chapters.toList()
+    val preview = remember(overview, wordCount, chapterSnapshot, overviewFallback) {
         val normalized = StarWishTheaterGuide(
             overview = overview,
-            chapters = chapters,
+            chapters = chapterSnapshot,
             wordCount = wordCount,
         ).normalized()
         buildString {
@@ -1180,7 +1204,7 @@ private fun TheaterGuideDialog(
                     onSave(
                         StarWishTheaterGuide(
                             overview = overview,
-                            chapters = chapters,
+                            chapters = chapters.toList(),
                             wordCount = wordCount,
                         ),
                     )
@@ -1214,22 +1238,19 @@ private fun TheaterGuideDialog(
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                val setters = listOf<(String) -> Unit>(
-                    { chapter1 = it },
-                    { chapter2 = it },
-                    { chapter3 = it },
-                    { chapter4 = it },
-                    { chapter5 = it },
-                    { chapter6 = it },
-                )
                 items(chapters.size) { index ->
                     OutlinedTextField(
                         value = chapters[index],
-                        onValueChange = setters[index],
+                        onValueChange = { chapters[index] = it },
                         label = { Text("第 ${index + 1} 章剧情") },
                         minLines = 2,
                         modifier = Modifier.fillMaxWidth(),
                     )
+                }
+                item {
+                    TextButton(onClick = { chapters.add("") }) {
+                        Text("增加章节")
+                    }
                 }
                 item {
                     Text("保存后预览", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)

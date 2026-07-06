@@ -21,6 +21,7 @@ data class Assistant(
     val tags: List<Uuid> = emptyList(),
     val systemPrompt: String = "",
     val appearancePrompt: String = "",
+    val faceReferenceImage: String? = null,
     val temperature: Float? = null,
     val topP: Float? = null,
     val contextMessageSize: Int = 60,

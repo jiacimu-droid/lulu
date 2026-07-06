@@ -4,14 +4,21 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -22,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,13 +41,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import me.rerere.ai.provider.ModelType
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.datastore.forAssistant
@@ -111,6 +122,9 @@ internal fun AssistantBasicContent(
 ) {
     val context = LocalContext.current
     var showClearHistoryDialog by remember { mutableStateOf(false) }
+    val faceReferencePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { vm.setFaceReferenceImage(assistant, it) }
+    }
 
     RikkaConfirmDialog(
         show = showClearHistoryDialog,
@@ -234,6 +248,53 @@ internal fun AssistantBasicContent(
                     minLines = 3,
                     maxLines = 6,
                 )
+            }
+
+            HorizontalDivider()
+
+            FormItem(
+                label = {
+                    Text("角色脸部参考图")
+                },
+                description = {
+                    Text("用于生图时尽量锁住脸型、眼睛、发型和气质；如果站子或模型不支持图片参考，会退化为文字提示。")
+                },
+                modifier = Modifier.padding(8.dp),
+            ) {
+                val faceReference = assistant.faceReferenceImage
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (faceReference != null) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            modifier = Modifier.size(96.dp),
+                        ) {
+                            AsyncImage(
+                                model = faceReference,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(96.dp)
+                                    .clip(RoundedCornerShape(12.dp)),
+                            )
+                        }
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(onClick = { faceReferencePicker.launch("image/*") }) {
+                            Text(if (faceReference == null) "上传脸图" else "更换脸图")
+                        }
+                        if (faceReference != null) {
+                            Spacer(Modifier.width(8.dp))
+                            TextButton(
+                                onClick = {
+                                    onUpdate(assistant.copy(faceReferenceImage = null))
+                                },
+                            ) {
+                                Text("删除")
+                            }
+                        }
+                    }
+                }
             }
 
             HorizontalDivider()

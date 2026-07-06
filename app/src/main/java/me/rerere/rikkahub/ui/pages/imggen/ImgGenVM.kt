@@ -29,6 +29,7 @@ import me.rerere.ai.ui.ImageGenerationItem
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
+import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.db.entity.GenMediaEntity
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.repository.GenMediaRepository
@@ -58,6 +59,24 @@ private fun GenMediaEntity.toGeneratedImage(filesManager: FilesManager): Generat
         timestamp = this.createAt,
         model = this.modelId
     )
+}
+
+internal fun mergeEffectiveReferenceImages(
+    assistantFaceReference: String?,
+    manualReferences: List<String>,
+    maxImages: Int = 16,
+): List<String> = buildList {
+    assistantFaceReference?.takeIf { it.isNotBlank() }?.let(::add)
+    manualReferences.filter { it.isNotBlank() }.forEach(::add)
+}.distinct().take(maxImages)
+
+private fun promptWithFaceReferenceFallback(prompt: String, hasFaceReference: Boolean): String {
+    if (!hasFaceReference) return prompt
+    return buildString {
+        append("请尽量保持当前角色脸部参考图中的脸型、眼睛、发型和整体气质一致。")
+        append("如果图片参考接口不可用，请仅按这条文字要求稳定角色脸，不要改变角色核心辨识度。\n")
+        append(prompt)
+    }
 }
 
 class ImgGenVM(
@@ -227,7 +246,7 @@ class ImgGenVM(
     }
 
     fun editImage() {
-        if (prompt.value.isBlank() || referenceImages.value.isEmpty()) return
+        if (prompt.value.isBlank()) return
         cancelJob?.cancel()
         val runId = ++generationRunId
         cancelJob = viewModelScope.launch {
@@ -249,19 +268,81 @@ class ImgGenVM(
                 val providerSetting = settings.providers.find { it.id == provider.id }
                     ?: throw IllegalStateException("Provider setting not found")
 
-                val sourceImages = _referenceImages.value
-                val params = ImageEditParams(
-                    model = model,
-                    prompt = _prompt.value,
-                    images = sourceImages,
-                    numOfImages = _numberOfImages.value,
-                    aspectRatio = _aspectRatio.value,
-                    customHeaders = model.customHeaders,
-                    customBody = model.customBodies
+                val assistantFaceReference = settings.getCurrentAssistant().faceReferenceImage
+                val sourceImages = mergeEffectiveReferenceImages(
+                    assistantFaceReference = assistantFaceReference,
+                    manualReferences = _referenceImages.value,
+                    maxImages = MAX_REFERENCE_IMAGES,
                 )
+                if (sourceImages.isEmpty()) {
+                    val params = ImageGenerationParams(
+                        model = model,
+                        prompt = _prompt.value,
+                        numOfImages = _numberOfImages.value,
+                        aspectRatio = _aspectRatio.value,
+                        customHeaders = model.customHeaders,
+                        customBody = model.customBodies
+                    )
+                    val result = providerManager.getProviderByType(provider)
+                        .generateImage(providerSetting, params)
+                    val newImages = mutableListOf<GeneratedImage>()
 
-                val result = providerManager.getProviderByType(provider)
-                    .editImage(providerSetting, params)
+                    result.items.forEachIndexed { index, item ->
+                        coroutineContext.ensureActive()
+                        val imageFile = saveImageToStorage(
+                            item = item,
+                            prompt = _prompt.value,
+                            modelName = model.displayName,
+                            index = index,
+                            type = GenMediaEntity.TYPE_IMAGE_GENERATION,
+                        )
+                        val generatedImage = GeneratedImage(
+                            id = 0,
+                            prompt = _prompt.value,
+                            filePath = imageFile.absolutePath,
+                            timestamp = System.currentTimeMillis(),
+                            model = model.displayName
+                        )
+                        newImages.add(generatedImage)
+                    }
+
+                    if (runId == generationRunId) {
+                        _currentGeneratedImages.value = newImages
+                    }
+                    return@launch
+                }
+
+                var resultType = GenMediaEntity.TYPE_IMAGE_EDIT
+                val result = try {
+                    val params = ImageEditParams(
+                        model = model,
+                        prompt = _prompt.value,
+                        images = sourceImages,
+                        numOfImages = _numberOfImages.value,
+                        aspectRatio = _aspectRatio.value,
+                        customHeaders = model.customHeaders,
+                        customBody = model.customBodies
+                    )
+
+                    providerManager.getProviderByType(provider)
+                        .editImage(providerSetting, params)
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+                    resultType = GenMediaEntity.TYPE_IMAGE_GENERATION
+                    val fallbackParams = ImageGenerationParams(
+                        model = model,
+                        prompt = promptWithFaceReferenceFallback(
+                            prompt = _prompt.value,
+                            hasFaceReference = assistantFaceReference != null,
+                        ),
+                        numOfImages = _numberOfImages.value,
+                        aspectRatio = _aspectRatio.value,
+                        customHeaders = model.customHeaders,
+                        customBody = model.customBodies
+                    )
+                    providerManager.getProviderByType(provider)
+                        .generateImage(providerSetting, fallbackParams)
+                }
 
                 val newImages = mutableListOf<GeneratedImage>()
 
@@ -272,7 +353,8 @@ class ImgGenVM(
                         prompt = _prompt.value,
                         modelName = model.displayName,
                         index = index,
-                        type = GenMediaEntity.TYPE_IMAGE_EDIT,
+                        type = resultType,
+                        sourcePaths = sourceImages.joinToString("|"),
                     )
                     val generatedImage = GeneratedImage(
                         id = 0, // Will be updated after database insertion

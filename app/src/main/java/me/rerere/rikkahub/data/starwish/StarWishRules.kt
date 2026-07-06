@@ -383,7 +383,7 @@ object StarWishRules {
             appendLine("总剧情介绍：")
             appendLine(normalizedGuide.overview.ifBlank { seed.prompt })
             appendLine()
-            appendLine("6 章剧情规划：")
+            appendLine("${normalizedGuide.chapters.size} 章剧情规划：")
             normalizedGuide.chapters.forEachIndexed { index, chapterPlan ->
                 appendLine("第 ${index + 1} 章：${chapterPlan.ifBlank { "可自由发挥，但必须承接总剧情介绍。" }}")
             }
@@ -395,6 +395,7 @@ object StarWishRules {
             appendLine("1. 只输出正文，不要输出标题、简介、提示词、创作说明、章节大纲。")
             appendLine("2. 女主是用户代入位，拥有主动权、选择权和爽感。")
             appendLine("3. 另一位核心角色名字必须含“露”，并与女主有明显感情关系、主从关系或强烈命运绑定。")
+            appendLine("3A. 女主就是用户本人；名字含露的角色默认是他/男主/陪伴角色，不要把含露角色写成女主。")
             appendLine("4. 每章要有钩子、冲突、反转、情绪波动和让人想继续看的结尾。")
             appendLine("5. 风格要有趣、爽、好读，允许抽象搞笑、打脸、救赎、求生、强者臣服等元素。")
             appendLine("6. 第 $chapter 章字数控制在 ${normalizedGuide.wordCount} 字。")
@@ -404,6 +405,9 @@ object StarWishRules {
                 previousChapters.takeLast(3).forEach { previous ->
                     appendLine("第 ${previous.chapter} 章：${previous.content.take(500)}")
                 }
+                appendLine()
+                appendLine("上一章完整正文（必须承接其情绪、事件、伏笔和人物关系）：")
+                appendLine(previousChapters.last().content.take(4000))
             }
             if (influence.isNotBlank()) {
                 appendLine()

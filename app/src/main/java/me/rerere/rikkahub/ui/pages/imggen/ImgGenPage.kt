@@ -99,6 +99,7 @@ import me.rerere.hugeicons.stroke.Tools
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.findModelById
+import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.files.FileUtils
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.ui.components.ai.ModelSelector
@@ -258,6 +259,7 @@ private fun ImageGenScreen(
     val sheetState = rememberModalBottomSheetState()
     val selectedImageModel = settings.findModelById(settings.imageGenerationModelId)
     val imageModelReady = selectedImageModel?.type == ModelType.IMAGE
+    val assistantFaceReference = settings.getCurrentAssistant().faceReferenceImage
 
     LaunchedEffect(error) {
         error?.let { errorMessage ->
@@ -330,6 +332,7 @@ private fun ImageGenScreen(
             vm = vm,
             isGenerating = isGenerating,
             referenceImages = referenceImages,
+            assistantFaceReference = assistantFaceReference,
             settings = settings,
             onShowSettings = { showSettingsSheet = true },
             modifier = Modifier
@@ -355,6 +358,7 @@ private fun InputBar(
     vm: ImgGenVM,
     isGenerating: Boolean,
     referenceImages: List<String>,
+    assistantFaceReference: String?,
     settings: Settings,
     onShowSettings: () -> Unit,
     modifier: Modifier = Modifier
@@ -387,9 +391,14 @@ private fun InputBar(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        if (referenceImages.isNotEmpty()) {
+        val effectiveReferenceImages = mergeEffectiveReferenceImages(
+            assistantFaceReference = assistantFaceReference,
+            manualReferences = referenceImages,
+        )
+        if (effectiveReferenceImages.isNotEmpty()) {
             ReferenceImagesRow(
-                images = referenceImages,
+                images = effectiveReferenceImages,
+                lockedImages = setOfNotNull(assistantFaceReference),
                 onRemove = vm::removeReferenceImage
             )
         }
@@ -447,11 +456,7 @@ private fun InputBar(
             Surface(
                 onClick = {
                     if (!isGenerating) {
-                        if (referenceImages.isEmpty()) {
-                            vm.generateImage()
-                        } else {
-                            vm.editImage()
-                        }
+                        vm.editImage()
                     } else {
                         vm.cancelGeneration()
                     }
@@ -488,6 +493,7 @@ private fun InputBar(
 @Composable
 private fun ReferenceImagesRow(
     images: List<String>,
+    lockedImages: Set<String> = emptySet(),
     onRemove: (String) -> Unit,
 ) {
     Row(
@@ -511,22 +517,24 @@ private fun ReferenceImagesRow(
                         modifier = Modifier.fillMaxSize()
                     )
 
-                    Surface(
-                        onClick = { onRemove(image) },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(3.dp)
-                            .size(20.dp),
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.55f),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = HugeIcons.Delete01,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.inverseOnSurface,
-                                modifier = Modifier.size(12.dp)
-                            )
+                    if (image !in lockedImages) {
+                        Surface(
+                            onClick = { onRemove(image) },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(3.dp)
+                                .size(20.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.55f),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = HugeIcons.Delete01,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.inverseOnSurface,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
                         }
                     }
                 }

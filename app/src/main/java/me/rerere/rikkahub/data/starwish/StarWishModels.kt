@@ -64,7 +64,7 @@ data class StarWishTheaterGuide(
 ) {
     fun normalized(): StarWishTheaterGuide = copy(
         overview = overview.trim(),
-        chapters = (chapters.take(6) + List((6 - chapters.size).coerceAtLeast(0)) { "" }).take(6).map { it.trim() },
+        chapters = chapters.ifEmpty { List(6) { "" } }.map { it.trim() },
         wordCount = wordCount.trim().ifBlank { "1200-2200" },
     )
 }
