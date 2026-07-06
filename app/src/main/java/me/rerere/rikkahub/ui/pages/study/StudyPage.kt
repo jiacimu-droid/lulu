@@ -1082,10 +1082,10 @@ private fun StudyTipsContent(tips: List<StudyTip>) {
 private fun PlanOverviewCard() {
     var planView by remember { mutableStateOf(PlanView.Weekly) }
     val today = LocalDate.now()
-    val week = ExamStudyPlan.julyWeeks.firstOrNull { week ->
+    val week = ExamStudyPlan.weeklyPlans.firstOrNull { week ->
         val parts = week.dateRange.split(" 至 ")
         parts.size == 2 && today >= LocalDate.parse(parts[0]) && today <= LocalDate.parse(parts[1])
-    } ?: ExamStudyPlan.julyWeeks.firstOrNull()
+    } ?: ExamStudyPlan.weeklyPlans.firstOrNull()
 
     StudyCard {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
