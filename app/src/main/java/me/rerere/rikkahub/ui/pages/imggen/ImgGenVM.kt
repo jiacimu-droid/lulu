@@ -9,13 +9,16 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import me.rerere.ai.provider.ImageEditParams
 import me.rerere.ai.provider.ImageGenerationParams
@@ -30,7 +33,10 @@ import me.rerere.rikkahub.data.db.entity.GenMediaEntity
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.repository.GenMediaRepository
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.coroutineContext
 
 @Serializable
 data class GeneratedImage(
@@ -73,6 +79,7 @@ class ImgGenVM(
     private val _isGenerating = MutableStateFlow(false)
     val isGenerating: StateFlow<Boolean> = _isGenerating
     private var cancelJob: Job? = null
+    private var generationRunId: Long = 0L
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -137,7 +144,9 @@ class ImgGenVM(
     }
 
     fun startNewSession() {
+        generationRunId++
         cancelJob?.cancel()
+        cancelJob = null
         clearReferenceImages()
         _prompt.value = ""
         _currentGeneratedImages.value = emptyList()
@@ -148,6 +157,7 @@ class ImgGenVM(
     fun generateImage() {
         if(prompt.value.isBlank()) return
         cancelJob?.cancel()
+        val runId = ++generationRunId
         cancelJob = viewModelScope.launch {
             try {
                 _isGenerating.value = true
@@ -182,6 +192,7 @@ class ImgGenVM(
                 val newImages = mutableListOf<GeneratedImage>()
 
                 result.items.forEachIndexed { index, item ->
+                    coroutineContext.ensureActive()
                     val imageFile = saveImageToStorage(
                         item = item,
                         prompt = _prompt.value,
@@ -198,13 +209,19 @@ class ImgGenVM(
                     newImages.add(generatedImage)
                 }
 
-                _currentGeneratedImages.value = newImages
+                if (runId == generationRunId) {
+                    _currentGeneratedImages.value = newImages
+                }
             } catch (e: Exception) {
                 if(e is CancellationException) return@launch
                 Log.e(TAG, "Failed to generate image", e)
-                _error.value = e.toFriendlyImageError()
+                if (runId == generationRunId) {
+                    _error.value = e.toFriendlyImageError()
+                }
             } finally {
-                _isGenerating.value = false
+                if (runId == generationRunId) {
+                    _isGenerating.value = false
+                }
             }
         }
     }
@@ -212,6 +229,7 @@ class ImgGenVM(
     fun editImage() {
         if (prompt.value.isBlank() || referenceImages.value.isEmpty()) return
         cancelJob?.cancel()
+        val runId = ++generationRunId
         cancelJob = viewModelScope.launch {
             try {
                 _isGenerating.value = true
@@ -248,6 +266,7 @@ class ImgGenVM(
                 val newImages = mutableListOf<GeneratedImage>()
 
                 result.items.forEachIndexed { index, item ->
+                    coroutineContext.ensureActive()
                     val imageFile = saveImageToStorage(
                         item = item,
                         prompt = _prompt.value,
@@ -265,19 +284,28 @@ class ImgGenVM(
                     newImages.add(generatedImage)
                 }
 
-                _currentGeneratedImages.value = newImages
+                if (runId == generationRunId) {
+                    _currentGeneratedImages.value = newImages
+                }
             } catch (e: Exception) {
                 if (e is CancellationException) return@launch
                 Log.e(TAG, "Failed to edit image", e)
-                _error.value = e.toFriendlyImageError()
+                if (runId == generationRunId) {
+                    _error.value = e.toFriendlyImageError()
+                }
             } finally {
-                _isGenerating.value = false
+                if (runId == generationRunId) {
+                    _isGenerating.value = false
+                }
             }
         }
     }
 
     fun cancelGeneration() {
+        generationRunId++
         cancelJob?.cancel()
+        cancelJob = null
+        _isGenerating.value = false
     }
 
     private suspend fun saveImageToStorage(
@@ -291,10 +319,14 @@ class ImgGenVM(
         val imagesDir = filesManager.getImagesDir()
 
         val timestamp = System.currentTimeMillis()
-        val filename = "${timestamp}_${modelName}_$index.png"
+        val filename = "${timestamp}_${modelName.toSafeFileNamePart()}_$index.png"
         val imageFile = File(imagesDir, filename)
 
-        val createdFile = filesManager.createImageFileFromBase64(item.data, imageFile.absolutePath)
+        val createdFile = when {
+            item.sourceUrl != null -> downloadGeneratedImageToFile(item.sourceUrl, imageFile)
+            item.data != null -> filesManager.createImageFileFromBase64(item.data, imageFile.absolutePath)
+            else -> error("Generated image has neither data nor source URL")
+        }
 
         // Save to database with relative path
         val relativePath = "images/${imageFile.name}"
@@ -309,6 +341,30 @@ class ImgGenVM(
         genMediaRepository.insertMedia(entity)
 
         return createdFile
+    }
+
+    private suspend fun downloadGeneratedImageToFile(url: String, imageFile: File): File = withContext(Dispatchers.IO) {
+        coroutineContext.ensureActive()
+        imageFile.parentFile?.mkdirs()
+        val connection = (URL(url).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 15_000
+            readTimeout = 30_000
+        }
+        try {
+            connection.connect()
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                error("Failed to download generated image: ${connection.responseCode}")
+            }
+            connection.inputStream.use { input ->
+                imageFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            coroutineContext.ensureActive()
+            imageFile
+        } finally {
+            connection.disconnect()
+        }
     }
 
     fun deleteImage(image: GeneratedImage) {
@@ -346,6 +402,13 @@ class ImgGenVM(
         private const val IMAGE_MODEL_NOT_SELECTED = "当前默认图像模型不是图片生成模型。请点输入框旁边的模型按钮，选择类型为 IMAGE 的生图模型后再生成。"
     }
 }
+
+internal fun String.toSafeFileNamePart(): String =
+    replace(Regex("""[\\/:*?"<>|]"""), "_")
+        .replace(Regex("""\s+"""), "_")
+        .trim('_')
+        .ifBlank { "image_model" }
+        .take(80)
 
 private fun Throwable.toFriendlyImageError(): String {
     val raw = message.orEmpty()

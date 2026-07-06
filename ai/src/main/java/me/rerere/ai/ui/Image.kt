@@ -9,8 +9,9 @@ data class ImageGenerationResult(
 
 @Serializable
 data class ImageGenerationItem(
-    val data: String,
     val mimeType: String,
+    val data: String? = null,
+    val sourceUrl: String? = null,
 )
 
 @Serializable
