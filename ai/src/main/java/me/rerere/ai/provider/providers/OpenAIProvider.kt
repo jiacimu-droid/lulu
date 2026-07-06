@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -40,6 +42,8 @@ import me.rerere.ai.util.mergeCustomBody
 import me.rerere.ai.util.toHeaders
 import me.rerere.common.http.await
 import me.rerere.common.http.getByKey
+import me.rerere.common.http.jsonObjectOrNull
+import me.rerere.common.http.jsonPrimitiveOrNull
 import okhttp3.MultipartBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -292,14 +296,9 @@ class OpenAIProvider(
 
         val bodyStr = response.body?.string() ?: ""
         val bodyJson = json.parseToJsonElement(bodyStr).jsonObject
-        val data = bodyJson["data"]?.jsonArray
-            ?: return@withContext generateImageWithChatCompletionsFallback(providerSetting, params, "No data in response: $bodyStr")
-
-        val items = data.mapNotNull { imageJson ->
-            imageJson.jsonObject.toImageGenerationItemOrNull()
-        }
+        val items = parseOpenAIImageGenerationItems(bodyJson)
         if (items.isEmpty()) {
-            return@withContext generateImageWithChatCompletionsFallback(providerSetting, params, "No supported image payload in response: $bodyStr")
+            error("No supported image payload in successful /images/generations response: $bodyStr")
         }
 
         ImageGenerationResult(items = items)
@@ -431,7 +430,21 @@ internal fun JsonObject.withImageTransportDefaults(modelId: String): JsonObject 
     }
 }
 
-private fun kotlinx.serialization.json.JsonObject.toImageGenerationItemOrNull(): ImageGenerationItem? {
+internal fun parseOpenAIImageGenerationItems(bodyJson: JsonObject): List<ImageGenerationItem> {
+    bodyJson.toImageGenerationItemOrNull()?.let { return listOf(it) }
+    val data = bodyJson["data"] ?: return emptyList()
+    return when (data) {
+        is JsonArray -> data.mapNotNull { it.toImageGenerationItemOrNull() }
+        is JsonObject -> listOfNotNull(data.toImageGenerationItemOrNull())
+        is JsonPrimitive -> listOfNotNull(data.contentOrNull?.toImageGenerationItem())
+        else -> emptyList()
+    }
+}
+
+private fun JsonElement.toImageGenerationItemOrNull(): ImageGenerationItem? =
+    jsonObjectOrNull?.toImageGenerationItemOrNull() ?: jsonPrimitiveOrNull?.contentOrNull?.toImageGenerationItem()
+
+private fun JsonObject.toImageGenerationItemOrNull(): ImageGenerationItem? {
     val b64Json = this["b64_json"]?.jsonPrimitive?.contentOrNull
     if (!b64Json.isNullOrBlank()) {
         return b64Json.toImageGenerationItem()
@@ -439,6 +452,18 @@ private fun kotlinx.serialization.json.JsonObject.toImageGenerationItemOrNull():
     val url = this["url"]?.jsonPrimitive?.contentOrNull
     if (!url.isNullOrBlank()) {
         return url.toImageGenerationItem()
+    }
+    val imageUrl = this["image_url"]
+    if (imageUrl is JsonPrimitive) {
+        imageUrl.contentOrNull?.takeIf { it.isNotBlank() }?.let { return it.toImageGenerationItem() }
+    }
+    val nestedImageUrl = imageUrl
+        ?.jsonObjectOrNull
+        ?.get("url")
+        ?.jsonPrimitiveOrNull
+        ?.contentOrNull
+    if (!nestedImageUrl.isNullOrBlank()) {
+        return nestedImageUrl.toImageGenerationItem()
     }
     return null
 }
