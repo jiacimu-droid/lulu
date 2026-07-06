@@ -87,6 +87,34 @@ class ExamStudyPlanTest {
     }
 
     @Test
+    fun movementPlanUsesMusicBasedIndoorOptionsForEnergyRecovery() {
+        val habit = ExamStudyPlan.studyHabitReference
+        val julyMovement = listOf(
+            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 8)),
+            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 10)),
+            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 12)),
+            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 14)),
+            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 21)),
+            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 28)),
+        ).flatMap { it?.tasks.orEmpty() }.joinToString("\n") { it.title }
+        val scheduleText = ExamStudyPlan.todaySchedule(LocalDate.of(2026, 7, 9))
+            .joinToString("\n") { "${it.title} ${it.detail}" }
+
+        assertTrue(habit.contains("音乐"))
+        assertTrue(habit.contains("手势舞"))
+        assertTrue(habit.contains("第八套广播体操"))
+        assertTrue(habit.contains("天气热"))
+        assertTrue(habit.contains("少量多次"))
+        assertTrue(habit.contains("补充精力"))
+        assertTrue(julyMovement.contains("手势舞"))
+        assertTrue(julyMovement.contains("第八套广播体操"))
+        assertTrue(julyMovement.contains("羽毛球"))
+        assertTrue(scheduleText.contains("音乐"))
+        assertTrue(scheduleText.contains("开窗站"))
+        assertFalse(habit.contains("每天保留 15-30 分钟散步/拉伸"))
+    }
+
+    @Test
     fun formalStudyDaysIncludeFixedVocabularyReview() {
         val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 2))
         val taskTitles = plan?.tasks.orEmpty().map { it.title }
