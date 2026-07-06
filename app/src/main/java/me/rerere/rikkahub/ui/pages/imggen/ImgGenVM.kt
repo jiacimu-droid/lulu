@@ -321,10 +321,12 @@ class ImgGenVM(
         val timestamp = System.currentTimeMillis()
         val filename = "${timestamp}_${modelName.toSafeFileNamePart()}_$index.png"
         val imageFile = File(imagesDir, filename)
+        val sourceUrl = item.sourceUrl
+        val data = item.data
 
         val createdFile = when {
-            item.sourceUrl != null -> downloadGeneratedImageToFile(item.sourceUrl, imageFile)
-            item.data != null -> filesManager.createImageFileFromBase64(item.data, imageFile.absolutePath)
+            sourceUrl != null -> downloadGeneratedImageToFile(sourceUrl, imageFile)
+            data != null -> filesManager.createImageFileFromBase64(data, imageFile.absolutePath)
             else -> error("Generated image has neither data nor source URL")
         }
 
