@@ -171,6 +171,7 @@ private enum class DailyDashboardView(val label: String) {
 }
 
 private const val DEFAULT_RAINBOW_DRAW_VIDEO_URI = "raw:star_wish_rainbow_draw"
+private const val DEFAULT_EPIC_DRAW_VIDEO_URI = "raw:star_wish_epic_draw"
 
 @Composable
 fun StudyPage(vm: StudyVM = koinViewModel()) {
@@ -1256,11 +1257,22 @@ private fun DrawResultCelebration(
     var playedRewardVideoIndexes by remember(results) { mutableStateOf(emptySet<Int>()) }
     val currentReveal = results.getOrNull(revealState.index)
     val current = currentReveal?.result
-    val hasRainbowDraw = remember(drawResults) { drawResults.any { it.rarity == StudyRarity.Rainbow } }
+    val hasOpeningVideo = remember(drawResults) {
+        drawResults.any { it.rarity == StudyRarity.Rainbow || it.rarity == StudyRarity.Epic }
+    }
+    val openingVideoUri = when (revealState.phase) {
+        DrawRevealPhase.RainbowOpeningVideo -> DEFAULT_RAINBOW_DRAW_VIDEO_URI
+        DrawRevealPhase.EpicOpeningVideo -> DEFAULT_EPIC_DRAW_VIDEO_URI
+        else -> when {
+            drawResults.any { it.rarity == StudyRarity.Rainbow } -> DEFAULT_RAINBOW_DRAW_VIDEO_URI
+            drawResults.any { it.rarity == StudyRarity.Epic } -> DEFAULT_EPIC_DRAW_VIDEO_URI
+            else -> null
+        }
+    }
     val rewardVideoPending = revealState.phase == DrawRevealPhase.Card &&
         currentReveal?.video != null &&
         revealState.index !in playedRewardVideoIndexes
-    val showRainbowBackdrop = hasRainbowDraw &&
+    val showOpeningBackdrop = hasOpeningVideo &&
         revealState.phase != DrawRevealPhase.Summary &&
         revealState.phase != DrawRevealPhase.Done
     val rewardVideoUri = currentReveal?.video?.uri
@@ -1296,7 +1308,8 @@ private fun DrawResultCelebration(
     }
     fun closeCurrentVideo() {
         revealState = when (revealState.phase) {
-            DrawRevealPhase.RainbowVideo -> DrawRevealFlow.videoFinished(revealState, drawResults)
+            DrawRevealPhase.RainbowOpeningVideo -> DrawRevealFlow.videoFinished(revealState, drawResults)
+            DrawRevealPhase.EpicOpeningVideo -> DrawRevealFlow.videoFinished(revealState, drawResults)
             DrawRevealPhase.RewardVideo -> {
                 playedRewardVideoIndexes = playedRewardVideoIndexes + revealState.index
                 revealState.copy(phase = DrawRevealPhase.Card)
@@ -1327,25 +1340,30 @@ private fun DrawResultCelebration(
             modifier = Modifier
                 .fillMaxSize()
                 .then(
-                    if (showRainbowBackdrop) {
+                    if (showOpeningBackdrop) {
                         Modifier
                     } else {
                         Modifier.background(drawFullscreenBrush(current?.rarity ?: best))
                     }
                 ),
         ) {
-            if (showRainbowBackdrop) {
-                RainbowDrawBackdropLayer(
-                    videoUri = DEFAULT_RAINBOW_DRAW_VIDEO_URI,
-                    shouldPlay = revealState.phase == DrawRevealPhase.RainbowVideo,
+            if (showOpeningBackdrop && openingVideoUri != null) {
+                DrawOpeningVideoLayer(
+                    videoUri = openingVideoUri,
+                    shouldPlay = revealState.phase == DrawRevealPhase.RainbowOpeningVideo ||
+                        revealState.phase == DrawRevealPhase.EpicOpeningVideo,
                     onFinished = {
-                        if (revealState.phase == DrawRevealPhase.RainbowVideo) {
+                        if (revealState.phase == DrawRevealPhase.RainbowOpeningVideo ||
+                            revealState.phase == DrawRevealPhase.EpicOpeningVideo
+                        ) {
                             revealState = DrawRevealFlow.videoFinished(revealState, drawResults)
                         }
                     },
                     modifier = Modifier.fillMaxSize(),
                 )
-                if (revealState.phase == DrawRevealPhase.RainbowVideo) {
+                if (revealState.phase == DrawRevealPhase.RainbowOpeningVideo ||
+                    revealState.phase == DrawRevealPhase.EpicOpeningVideo
+                ) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -1381,7 +1399,8 @@ private fun DrawResultCelebration(
             ) {
                 Text("×", color = Color.White, style = MaterialTheme.typography.headlineSmall)
             }
-            if (revealState.phase != DrawRevealPhase.RainbowVideo &&
+            if (revealState.phase != DrawRevealPhase.RainbowOpeningVideo &&
+                revealState.phase != DrawRevealPhase.EpicOpeningVideo &&
                 revealState.phase != DrawRevealPhase.RewardVideo
             ) {
                 Column(
@@ -1461,7 +1480,7 @@ private fun DrawResultCelebration(
 }
 
 @Composable
-private fun RainbowDrawBackdropLayer(
+private fun DrawOpeningVideoLayer(
     videoUri: String,
     shouldPlay: Boolean,
     onFinished: () -> Unit,
@@ -1470,7 +1489,7 @@ private fun RainbowDrawBackdropLayer(
     if (shouldPlay) {
         DrawVideoLayer(
             videoUri = videoUri,
-            playbackKey = "rainbow-opening",
+            playbackKey = "draw-opening:$videoUri",
             shouldPlay = true,
             freezeAtEnd = true,
             onFinished = onFinished,

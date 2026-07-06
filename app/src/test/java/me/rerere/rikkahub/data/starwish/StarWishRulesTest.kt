@@ -28,9 +28,14 @@ class StarWishRulesTest {
     }
 
     @Test
-    fun drawAnimationIsNotExposedAsStarWishVideo() {
+    fun drawOpeningAnimationsAreNotExposedAsStarWishVideos() {
+        val openingUris = setOf(
+            "raw:star_wish_rainbow_draw",
+            "raw:star_wish_epic_draw",
+        )
+
         assertTrue(StarWishRules.builtInVideos.none { video ->
-            video.uri == "raw:star_wish_rainbow_draw"
+            video.uri in openingUris
         })
     }
 

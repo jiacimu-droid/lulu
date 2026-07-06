@@ -4,7 +4,8 @@ import me.rerere.rikkahub.data.study.StudyDrawResult
 import me.rerere.rikkahub.data.study.StudyRarity
 
 enum class DrawRevealPhase {
-    RainbowVideo,
+    RainbowOpeningVideo,
+    EpicOpeningVideo,
     Card,
     RewardVideo,
     Summary,
@@ -22,17 +23,17 @@ object DrawRevealFlow {
         if (results.isEmpty()) return DrawRevealState(index = -1, phase = DrawRevealPhase.Done, lastIndex = -1)
         return DrawRevealState(
             index = 0,
-            phase = if (results.any { it.rarity == StudyRarity.Rainbow }) {
-                DrawRevealPhase.RainbowVideo
-            } else {
-                DrawRevealPhase.Card
+            phase = when {
+                results.any { it.rarity == StudyRarity.Rainbow } -> DrawRevealPhase.RainbowOpeningVideo
+                results.any { it.rarity == StudyRarity.Epic } -> DrawRevealPhase.EpicOpeningVideo
+                else -> DrawRevealPhase.Card
             },
             lastIndex = results.lastIndex,
         )
     }
 
     fun videoFinished(state: DrawRevealState, results: List<StudyDrawResult>): DrawRevealState {
-        if (state.phase != DrawRevealPhase.RainbowVideo || state.index !in results.indices) return state
+        if (state.phase !in openingVideoPhases || state.index !in results.indices) return state
         return state.copy(phase = DrawRevealPhase.Card)
     }
 
@@ -52,7 +53,12 @@ object DrawRevealFlow {
 
     fun skip(state: DrawRevealState, results: List<StudyDrawResult>): DrawRevealState {
         if (results.isEmpty()) return DrawRevealState(index = -1, phase = DrawRevealPhase.Done, lastIndex = -1)
-        if (state.phase == DrawRevealPhase.RainbowVideo) return videoFinished(state, results)
+        if (state.phase in openingVideoPhases) return videoFinished(state, results)
         return summary(state)
     }
+
+    private val openingVideoPhases = setOf(
+        DrawRevealPhase.RainbowOpeningVideo,
+        DrawRevealPhase.EpicOpeningVideo,
+    )
 }

@@ -109,6 +109,21 @@ class ExamStudyPlanTest {
     }
 
     @Test
+    fun vocabularyCanBeMovedEarlierAsAvoidanceStartup() {
+        val habit = ExamStudyPlan.studyHabitReference
+        val scheduleText = ExamStudyPlan.todaySchedule(LocalDate.of(2026, 7, 9))
+            .joinToString("\n") { "${it.time} ${it.title} ${it.detail}" }
+
+        assertTrue(habit.contains("畏难"))
+        assertTrue(habit.contains("想逃避"))
+        assertTrue(habit.contains("不背单词 20 个（1 组）"))
+        assertTrue(habit.contains("学习一点反而会清醒"))
+        assertTrue(scheduleText.contains("09:45-10:05 单词启动"))
+        assertTrue(scheduleText.contains("畏难"))
+        assertTrue(scheduleText.contains("20 个（1 组）"))
+    }
+
+    @Test
     fun movementPlanUsesMusicBasedIndoorOptionsForEnergyRecovery() {
         val habit = ExamStudyPlan.studyHabitReference
         val julyMovement = listOf(

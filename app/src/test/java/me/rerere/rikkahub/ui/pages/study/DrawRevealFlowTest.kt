@@ -7,12 +7,12 @@ import org.junit.Test
 
 class DrawRevealFlowTest {
     @Test
-    fun drawWithAnyRainbowStartsWithOneOpeningVideoBeforeFirstCard() {
+    fun drawWithAnyRainbowStartsWithRainbowOpeningVideoBeforeFirstCard() {
         val results = listOf(draw(StudyRarity.Normal), draw(StudyRarity.Rainbow))
 
         val start = DrawRevealFlow.start(results)
 
-        assertEquals(DrawRevealPhase.RainbowVideo, start.phase)
+        assertEquals(DrawRevealPhase.RainbowOpeningVideo, start.phase)
         assertEquals(0, start.index)
 
         val revealed = DrawRevealFlow.videoFinished(start, results)
@@ -21,25 +21,49 @@ class DrawRevealFlowTest {
     }
 
     @Test
+    fun drawWithAnyEpicStartsWithOneOpeningVideoBeforeFirstCard() {
+        val results = listOf(draw(StudyRarity.Normal), draw(StudyRarity.Epic))
+
+        val start = DrawRevealFlow.start(results)
+
+        assertEquals(DrawRevealPhase.EpicOpeningVideo, start.phase)
+        assertEquals(0, start.index)
+
+        val revealed = DrawRevealFlow.videoFinished(start, results)
+        assertEquals(DrawRevealPhase.Card, revealed.phase)
+        assertEquals(0, revealed.index)
+    }
+
+    @Test
+    fun rainbowOpeningTakesPriorityWhenDrawContainsRainbowAndEpic() {
+        val results = listOf(draw(StudyRarity.Epic), draw(StudyRarity.Rainbow))
+
+        val start = DrawRevealFlow.start(results)
+
+        assertEquals(DrawRevealPhase.RainbowOpeningVideo, start.phase)
+        assertEquals(0, start.index)
+    }
+
+    @Test
     fun nextMovesHorizontallyThroughCardsWithoutAnotherOpeningVideoGate() {
-        val results = listOf(draw(StudyRarity.Normal), draw(StudyRarity.Rainbow), draw(StudyRarity.Rare))
+        val results = listOf(draw(StudyRarity.Normal), draw(StudyRarity.Epic), draw(StudyRarity.Rare))
 
         val start = DrawRevealFlow.start(results)
         val firstCard = DrawRevealFlow.videoFinished(start, results)
         assertEquals(DrawRevealPhase.Card, firstCard.phase)
         assertEquals(0, firstCard.index)
 
-        val rainbowCard = DrawRevealFlow.next(firstCard, results)
-        assertEquals(DrawRevealPhase.Card, rainbowCard.phase)
-        assertEquals(1, rainbowCard.index)
+        val epicCard = DrawRevealFlow.next(firstCard, results)
+        assertEquals(DrawRevealPhase.Card, epicCard.phase)
+        assertEquals(1, epicCard.index)
 
-        val rareCard = DrawRevealFlow.next(rainbowCard, results)
+        val rareCard = DrawRevealFlow.next(epicCard, results)
         assertEquals(DrawRevealPhase.Card, rareCard.phase)
         assertEquals(2, rareCard.index)
     }
 
     @Test
-    fun drawWithoutRainbowStartsOnFirstCard() {
+    fun drawWithoutEpicOrRainbowStartsOnFirstCard() {
         val results = listOf(draw(StudyRarity.Normal), draw(StudyRarity.Rare))
 
         val start = DrawRevealFlow.start(results)
@@ -50,7 +74,7 @@ class DrawRevealFlowTest {
 
     @Test
     fun skipMovesToSummaryAfterTheBatchOpeningVideo() {
-        val results = listOf(draw(StudyRarity.Normal), draw(StudyRarity.Rainbow), draw(StudyRarity.Epic))
+        val results = listOf(draw(StudyRarity.Normal), draw(StudyRarity.Epic), draw(StudyRarity.Rare))
         val firstCard = DrawRevealFlow.videoFinished(DrawRevealFlow.start(results), results)
 
         val skipped = DrawRevealFlow.skip(firstCard, results)
@@ -70,11 +94,11 @@ class DrawRevealFlowTest {
     }
 
     @Test
-    fun skipShowsSummaryWhenNoMoreRainbowVideosRemain() {
-        val results = listOf(draw(StudyRarity.Rainbow), draw(StudyRarity.Epic))
-        val rainbowCard = DrawRevealFlow.videoFinished(DrawRevealFlow.start(results), results)
+    fun skipShowsSummaryWhenNoMoreOpeningVideosRemain() {
+        val results = listOf(draw(StudyRarity.Epic), draw(StudyRarity.Rainbow))
+        val firstCard = DrawRevealFlow.videoFinished(DrawRevealFlow.start(results), results)
 
-        val skipped = DrawRevealFlow.skip(rainbowCard, results)
+        val skipped = DrawRevealFlow.skip(firstCard, results)
 
         assertEquals(DrawRevealPhase.Summary, skipped.phase)
         assertEquals(results.lastIndex, skipped.index)
