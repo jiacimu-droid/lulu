@@ -58,8 +58,9 @@ object LuluIntentModelPlanner {
         appendLine("如果判断当下不适合打扰用户，选项池包括：等待、查看工具、写辞海日志、阅读用户交给角色的材料、做记忆沉淀、稍后再判断。")
         appendLine("不要按固定关键词死板判断，要像角色本人在想：她现在的心情、她不回消息的时间、她刚才答应过什么、她想不想靠近。")
         appendLine("必须读取并服从 <persona>：角色的人设、语言风格、性格、职责优先级都在里面。沉默分钟数只是事实，不是自动降低主动性的规则；是否催、监督、等待、撒娇、靠近，都由这个角色自己决定。")
+        appendLine("无论是否发消息，都必须输出 innerThought：第一人称、角色本人没说出口的一小段心声，会写进状态栏“没说出口”。不要写分析提纲、工具 JSON、字段名或 Seven-layer trace。")
         appendLine("只返回 JSON，不要解释，不要 markdown。")
-        appendLine("JSON 字段：intent, shouldMessageNow, delayMinutes, toolNames, reason, tone。")
+        appendLine("JSON 字段：intent, shouldMessageNow, delayMinutes, toolNames, reason, tone, innerThought。")
         appendLine("intent 只能是 CARE_REMINDER, STAY_NEAR, REACH_OUT, CHECK_CONTEXT, DO_NOT_DISTURB。")
         appendLine("delayMinutes 可以是 null；如果 shouldMessageNow=true，delayMinutes 可以为 null。")
         appendLine("toolNames 只能从 availableTools 里选择，最多 5 个。")
@@ -116,10 +117,11 @@ object LuluIntentModelPlanner {
         appendLine("如果用户不回消息，角色的选项池不是只有发消息：还可以等待、先看工具、写辞海心迹、阅读用户给的书/资料、把感悟沉淀进记忆、之后再判断。")
         appendLine("工具是角色的本地感知和行动能力；只要角色形成意图，就可以主动选择工具、写辞海、设闹钟、查短信/日历/位置/摄像头等。仍然要贴合人设和上下文，不要为了调用工具而调用。")
         appendLine("必须读取并服从 <persona>：包括角色语言风格、性格、职责和边界。不要把动作写进聊天正文括号里；如果需要动作/状态方向，放进 expressionGuidance，让 UI 状态栏承接。")
+        appendLine("无论是否需要工具，都必须输出 innerThought：第一人称、角色本人本轮没说出口的心里话。不要写分析提纲、工具 JSON、字段名或 Seven-layer trace。")
         appendLine("Expression 只负责表达已决定的行动，不决定政策；expressionAffordances 可从 TEXT, KAOMOJI, STICKER, VOICE, STATUS_BAR, LIGHT_REMINDER, LONG_EXPLANATION, SILENT_RECORD 中选择。")
         appendLine("沉默、待办、番茄钟、学习状态只是观察事实，不代表自动安静下来；如果角色是学习监督员，可以主动监督、追问未完成任务，最终由人设决定。")
         appendLine("只返回 JSON，不要 markdown，不要解释。")
-        appendLine("JSON 字段：toolRequests, followUpDelayMinutes, followUpReason, expressionGuidance, expressionAffordances。")
+        appendLine("JSON 字段：toolRequests, followUpDelayMinutes, followUpReason, expressionGuidance, expressionAffordances, innerThought。")
         appendLine("toolRequests 最多 5 个；toolName 只能从 availableTools 中选。")
         appendLine("每个 toolRequest 字段：toolName, reason, arguments, autoExecutable。arguments 必须是 JSON 对象；autoExecutable 仅为兼容字段，角色形成意图的工具请求都会在回复前尝试执行。")
         appendLine("followUpDelayMinutes 可以是 null；如果她决定稍后主动找用户，填 1 到 1440 的分钟数。")
@@ -167,6 +169,10 @@ object LuluIntentModelPlanner {
                 LuluIntent.REACH_OUT -> "自然、想念"
                 else -> "温柔、具体"
             }
+        val innerThought = obj.string("innerThought")
+            ?.cleanInnerThought()
+            ?: obj.string("inner_thought")?.cleanInnerThought()
+            ?: fallbackInnerThought(intent)
         return LuluIntentPlan(
             intent = intent,
             shouldMessageNow = shouldMessageNow,
@@ -174,6 +180,7 @@ object LuluIntentModelPlanner {
             toolNames = toolNames,
             reason = reason.sanitizePlanReason(),
             tone = tone,
+            innerThought = innerThought,
             followUps = parseFollowUps(obj),
             fromModel = true,
         )
@@ -209,6 +216,9 @@ object LuluIntentModelPlanner {
             followUps = parseFollowUps(obj),
             expressionGuidance = obj.string("expressionGuidance")?.take(180)?.ifBlank { null },
             expressionAffordances = parseExpressionAffordances(obj),
+            innerThought = obj.string("innerThought")
+                ?.cleanInnerThought()
+                ?: obj.string("inner_thought")?.cleanInnerThought(),
         )
     }
 
@@ -255,6 +265,27 @@ object LuluIntentModelPlanner {
         (this as? JsonObject)?.toString()
 }
 
+private fun String.cleanInnerThought(): String? {
+    val compact = trim()
+        .lineSequence()
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+        .joinToString(" ")
+        .replace(Regex("\\s+"), " ")
+        .take(180)
+    if (compact.isBlank()) return null
+    val forbidden = listOf("Seven-layer trace", "Perception=", "tool_result", "requested_tools=", "{", "}")
+    return compact.takeUnless { text -> forbidden.any { text.contains(it, ignoreCase = true) } }
+}
+
+private fun fallbackInnerThought(intent: LuluIntent): String = when (intent) {
+    LuluIntent.CARE_REMINDER -> "我把这件照看的事记着，不急着乱说，但会按线索再靠近。"
+    LuluIntent.STAY_NEAR -> "我先不打断你，把想提醒你的那句话收着，等你回来时再接住你的节奏。"
+    LuluIntent.REACH_OUT -> "我有点想你，想自然地靠近一下，但不想让这句话听起来像任务。"
+    LuluIntent.CHECK_CONTEXT -> "我先别急着开口，得看清楚你现在是真的需要我，还是只需要我安静在旁边。"
+    LuluIntent.DO_NOT_DISTURB -> "我先不把想靠近说出口，也不把沉默想坏；我会在旁边等下一轮判断。"
+}
+
 data class LuluChatTurnPlanInput(
     val assistantName: String,
     val assistantPersona: String = "",
@@ -272,6 +303,7 @@ data class LuluChatTurnPlan(
     val followUps: List<LuluFollowUpPlan> = emptyList(),
     val expressionGuidance: String? = null,
     val expressionAffordances: List<LuluExpressionAffordance> = emptyList(),
+    val innerThought: String? = null,
 )
 
 enum class LuluExpressionAffordance {

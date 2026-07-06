@@ -1026,6 +1026,20 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 }
                 if (!isTargetedTrigger && autonomousPlan?.intent == LuluIntent.DO_NOT_DISTURB) {
                     Log.d(TAG, "Lulu intent planner chose not to disturb")
+                    settingsStore.update { currentSettings ->
+                        val previous = currentSettings.luluStates.currentProjectedLuluState(assistantUuid, nowMillis)
+                        currentSettings.copy(
+                            luluStates = currentSettings.luluStates.appendLuluState(
+                                buildAutonomousPlanPresenceState(
+                                    assistantId = assistantUuid,
+                                    previous = previous,
+                                    assistantName = assistant.name,
+                                    plan = autonomousPlan,
+                                    nowMillis = nowMillis,
+                                )
+                            )
+                        )
+                    }
                     runCatching {
                         cihaiService.recordSilentPresenceAction(
                             assistantId = assistantUuid.toString(),
@@ -1053,6 +1067,22 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     )
                 if (deferredPlan != null && deferredPlan.triggerAtMillis > System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1)) {
                     Log.d(TAG, "Lulu intent planner deferred proactive message: ${deferredPlan.reason}")
+                    autonomousPlan?.let { plan ->
+                        settingsStore.update { currentSettings ->
+                            val previous = currentSettings.luluStates.currentProjectedLuluState(assistantUuid, nowMillis)
+                            currentSettings.copy(
+                                luluStates = currentSettings.luluStates.appendLuluState(
+                                    buildAutonomousPlanPresenceState(
+                                        assistantId = assistantUuid,
+                                        previous = previous,
+                                        assistantName = assistant.name,
+                                        plan = plan,
+                                        nowMillis = nowMillis,
+                                    )
+                                )
+                            )
+                        }
+                    }
                     ProactiveMessageService.scheduleTargeted(
                         context = this@ProactiveMessageTriggerService,
                         setting = proactiveSetting,
@@ -1973,6 +2003,43 @@ internal fun buildSilentLivingPresenceState(
         selfScene = "$name 刚刚重新判断了一次，没有发消息，只把那句没说出口的话放进状态栏里。",
         perceptionSummary = observation,
         reason = "静默判断：$decisionText",
+    )
+}
+
+internal fun buildAutonomousPlanPresenceState(
+    assistantId: Uuid,
+    previous: LuluState,
+    assistantName: String,
+    plan: LuluIntentPlan,
+    nowMillis: Long = System.currentTimeMillis(),
+): LuluState {
+    val innerVoice = plan.innerThought.cleanSilentInnerVoice()
+        ?: when (plan.intent) {
+            LuluIntent.CARE_REMINDER -> "我把这件照看的事记着，不急着乱说，但会按线索再靠近。"
+            LuluIntent.STAY_NEAR -> "我先不打断你，把想提醒你的那句话收着，等你回来时再接住你的节奏。"
+            LuluIntent.REACH_OUT -> "我有点想你，想自然地靠近一下，但不想让这句话听起来像任务。"
+            LuluIntent.CHECK_CONTEXT -> "我先别急着开口，得看清楚你现在是真的需要我，还是只需要我安静在旁边。"
+            LuluIntent.DO_NOT_DISTURB -> "我先不把想靠近说出口，也不把沉默想坏；我会在旁边等下一轮判断。"
+        }
+    val name = assistantName.ifBlank { "露露" }
+    return previous.copy(
+        statusText = when (plan.intent) {
+            LuluIntent.DO_NOT_DISTURB -> "安静判断中"
+            LuluIntent.STAY_NEAR, LuluIntent.CHECK_CONTEXT -> "在心里记着"
+            LuluIntent.CARE_REMINDER -> "惦记着提醒"
+            LuluIntent.REACH_OUT -> "想靠近一点"
+        },
+        innerVoice = innerVoice,
+        mode = LuluMode.THINKING,
+        updatedAt = nowMillis,
+        sinceAt = nowMillis,
+        selfScene = "$name 刚刚做了一次后台判断，还没开口，但状态栏留下了那句没说出口的话。",
+        perceptionSummary = plan.reason,
+        reason = if (plan.fromModel) {
+            "副 API 判断：${plan.reason}"
+        } else {
+            "本地规划兜底：${plan.reason}"
+        },
     )
 }
 

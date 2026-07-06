@@ -6,6 +6,8 @@ import me.rerere.rikkahub.service.LivingAction
 import me.rerere.rikkahub.service.LivingIntentKind
 import me.rerere.rikkahub.service.LivingJudgmentSource
 import me.rerere.rikkahub.service.LivingJudgmentTrace
+import me.rerere.rikkahub.service.LuluIntent
+import me.rerere.rikkahub.service.LuluIntentPlan
 import me.rerere.rikkahub.service.RollingJudgmentLoop
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
@@ -135,6 +137,34 @@ class ProactiveMessageContextTest {
         assertFalse(state.innerVoice.contains("Seven-layer trace"))
         assertFalse(state.innerVoice.contains("Perception="))
         assertFalse(state.innerVoice.contains("requested_tools="))
+    }
+
+    @Test
+    fun `autonomous api plan updates status bar with model inner thought when not speaking`() {
+        val assistantId = Uuid.parse("33333333-3333-3333-3333-333333333333")
+        val plan = LuluIntentPlan(
+            intent = LuluIntent.DO_NOT_DISTURB,
+            shouldMessageNow = false,
+            delayMinutes = null,
+            toolNames = emptyList(),
+            reason = "副 API 判断现在不适合打扰用户。",
+            tone = "安静",
+            innerThought = "我先不把想靠近说出口，等你自己的节奏回来。",
+            fromModel = true,
+        )
+
+        val state = buildAutonomousPlanPresenceState(
+            assistantId = assistantId,
+            previous = LuluState(assistantId = assistantId, innerVoice = "旧心声"),
+            assistantName = "露露",
+            plan = plan,
+            nowMillis = NOW,
+        )
+
+        assertEquals("安静判断中", state.statusText)
+        assertEquals("我先不把想靠近说出口，等你自己的节奏回来。", state.innerVoice)
+        assertEquals(LuluMode.THINKING, state.mode)
+        assertTrue(state.reason.contains("副 API"))
     }
 
     private companion object {

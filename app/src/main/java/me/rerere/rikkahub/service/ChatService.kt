@@ -1500,7 +1500,8 @@ class ChatService(
         if (
             requests.isEmpty() &&
             plan.expressionGuidance.isNullOrBlank() &&
-            plan.expressionAffordances.isEmpty()
+            plan.expressionAffordances.isEmpty() &&
+            plan.innerThought.isNullOrBlank()
         ) return ""
 
         val toolsByName = tools.associateBy { it.name }
@@ -1524,9 +1525,15 @@ class ChatService(
         if (
             results.isEmpty() &&
             plan.expressionGuidance.isNullOrBlank() &&
-            plan.expressionAffordances.isEmpty()
+            plan.expressionAffordances.isEmpty() &&
+            plan.innerThought.isNullOrBlank()
         ) return ""
         return buildString {
+            plan.innerThought?.takeIf { it.isNotBlank() }?.let { thought ->
+                appendLine("本轮露露没说出口的心里话：$thought")
+                appendLine("这只是后台第一人称心声，不要把它当成工具结果，也不要原样复述。")
+                appendLine()
+            }
             plan.expressionGuidance?.takeIf { it.isNotBlank() }?.let { guidance ->
                 appendLine("本轮露露自己的表达打算：$guidance")
                 appendLine("这只是后台表达方向，不要把它原样说给用户。")

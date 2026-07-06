@@ -106,7 +106,8 @@ class LuluIntentPlannerTest {
                   "delayMinutes": 99999,
                   "toolNames": ["camera_capture", "unknown_tool", "get_app_usage", "camera_capture"],
                   "reason": "露露想先看一下用户现在的状态，再决定怎么开口。",
-                  "tone": "轻一点"
+                  "tone": "轻一点",
+                  "innerThought": "我先不急着说话，想先看清楚你现在是不是还好。"
                 }
                 ```
             """.trimIndent(),
@@ -118,6 +119,7 @@ class LuluIntentPlannerTest {
         assertEquals(24 * 60, plan.delayMinutes)
         assertEquals(listOf("camera_capture", "get_app_usage"), plan.toolNames)
         assertTrue(plan.reason.contains("状态"))
+        assertEquals("我先不急着说话，想先看清楚你现在是不是还好。", plan.innerThought)
         assertTrue(plan.fromModel)
     }
 
@@ -157,7 +159,8 @@ class LuluIntentPlannerTest {
                   ],
                   "followUpDelayMinutes": 25,
                   "followUpReason": "等一会儿确认他有没有准备好",
-                  "expressionGuidance": "短一点，像自然想起来"
+                  "expressionGuidance": "短一点，像自然想起来",
+                  "innerThought": "我先看清楚他的状态，再决定这句话要不要轻轻递过去。"
                 }
             """.trimIndent(),
             availableToolNames = setOf("get_location", "set_alarm", "get_app_usage"),
@@ -172,6 +175,7 @@ class LuluIntentPlannerTest {
         assertEquals(25, plan.followUpDelayMinutes)
         assertTrue(plan.followUpReason!!.contains("确认"))
         assertTrue(plan.expressionGuidance!!.contains("短一点"))
+        assertEquals("我先看清楚他的状态，再决定这句话要不要轻轻递过去。", plan.innerThought)
     }
 
     @Test

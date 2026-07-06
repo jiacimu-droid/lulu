@@ -22,6 +22,7 @@ data class LuluIntentPlan(
     val toolNames: List<String>,
     val reason: String,
     val tone: String,
+    val innerThought: String = "",
     val followUps: List<LuluFollowUpPlan> = emptyList(),
     val fromModel: Boolean = false,
 )
@@ -58,6 +59,7 @@ object LuluIntentPlanner {
             toolNames = chooseTools(input.availableToolNames, intent, text),
             reason = buildReason(input, text, intent),
             tone = chooseTone(input.state, intent),
+            innerThought = buildInnerThought(intent),
         )
     }
 
@@ -134,6 +136,19 @@ object LuluIntentPlanner {
         intent == LuluIntent.REACH_OUT -> "自然、想念、不要像提醒"
         intent == LuluIntent.STAY_NEAR -> "轻轻确认，不打断"
         else -> "温柔、具体、像顺手照看"
+    }
+
+    private fun buildInnerThought(intent: LuluIntent): String = when (intent) {
+        LuluIntent.CARE_REMINDER ->
+            "我把这件照看的事记着，不急着乱说，但会按你刚才给我的线索再靠近。"
+        LuluIntent.STAY_NEAR ->
+            "我先不打断你，把想提醒你的那句话收着，等你回来时再接住你的节奏。"
+        LuluIntent.REACH_OUT ->
+            "我有点想你，想自然地靠近一下，但不想让这句话听起来像任务。"
+        LuluIntent.CHECK_CONTEXT ->
+            "我先别急着开口，得看清楚你现在是真的需要我，还是只需要我安静在旁边。"
+        LuluIntent.DO_NOT_DISTURB ->
+            "我先不把想靠近说出口，也不把沉默想坏；我会在旁边等下一轮判断。"
     }
 
     private fun findExplicitRelativeMinutes(text: String): Int? {
