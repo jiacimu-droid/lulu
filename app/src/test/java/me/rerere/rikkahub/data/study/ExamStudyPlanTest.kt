@@ -28,7 +28,7 @@ class ExamStudyPlanTest {
 
     @Test
     fun partialChapterLessonDoesNotScheduleSeparatePractice() {
-        val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 4))
+        val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 5))
         val titles = plan?.tasks.orEmpty().joinToString("\n") { it.title }
 
         assertTrue(titles.contains("不单独安排题目"))
@@ -37,6 +37,30 @@ class ExamStudyPlanTest {
         assertFalse(titles.contains("例题回忆"))
         assertFalse(titles.contains("做 8-10 题"))
         assertFalse(titles.contains("章节题 5 道"))
+    }
+
+    @Test
+    fun menstrualDiscomfortMovesCurrentWeekRestDayToJulySeven() {
+        val restPlan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 7))
+        val restSchedule = ExamStudyPlan.todaySchedule(LocalDate.of(2026, 7, 7))
+        val restPrompt = ExamStudyPlan.dynamicSchedulePrompt(
+            date = LocalDate.of(2026, 7, 7),
+            presetPlan = restPlan,
+            defaultSchedule = restSchedule,
+            tasks = emptyList(),
+        )
+        val julyEightTasks = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 8))
+            ?.tasks
+            .orEmpty()
+            .joinToString("\n") { it.title }
+
+        assertEquals("例假不适完整休息日：今天无学习任务", restPlan?.title)
+        assertTrue(restPlan?.tasks.orEmpty().isEmpty())
+        assertTrue(restSchedule.joinToString("\n") { it.detail }.contains("不安排单词、听课、背诵或题目"))
+        assertTrue(restPrompt.contains("今天是用户明确选择的完整休息日"))
+        assertTrue(julyEightTasks.contains("顺延自 7 月 7 日"))
+        assertTrue(julyEightTasks.contains("刑法第 1 章：做文运/众合章节题"))
+        assertTrue(julyEightTasks.contains("民法第 1 章：课前目录预览"))
     }
 
     @Test
