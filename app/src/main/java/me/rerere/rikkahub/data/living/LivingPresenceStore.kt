@@ -94,16 +94,23 @@ class LivingPresenceStore(
         if (userText.isBlank()) return
         update { current ->
             val updated = current.activeIntents.map { intent ->
-                if (
-                    intent.matchesAssistant(assistantId) &&
-                    LivingIntentReturnClassifier.shouldCompleteOnUserReturn(intent, userText, nowMillis)
-                ) {
-                    intent.copy(
-                        status = LivingIntentStatus.COMPLETED,
-                        lastEvaluatedAt = nowMillis,
-                        completedReason = LivingIntentReturnClassifier.completeReason(intent, userText, nowMillis),
-                        nextEvaluateAt = nowMillis,
-                    )
+                if (intent.matchesAssistant(assistantId)) {
+                    when {
+                        intent.shouldScheduleWakeReplyRecheck(nowMillis) -> intent.copy(
+                            status = LivingIntentStatus.ACTIVE,
+                            lastEvaluatedAt = nowMillis,
+                            completedReason = null,
+                            wakeReplyRecheckAt = nowMillis,
+                            nextEvaluateAt = nowMillis + WAKE_REPLY_RECHECK_DELAY_MILLIS,
+                        )
+                        LivingIntentReturnClassifier.shouldCompleteOnUserReturn(intent, userText, nowMillis) -> intent.copy(
+                            status = LivingIntentStatus.COMPLETED,
+                            lastEvaluatedAt = nowMillis,
+                            completedReason = LivingIntentReturnClassifier.completeReason(intent, userText, nowMillis),
+                            nextEvaluateAt = nowMillis,
+                        )
+                        else -> intent
+                    }
                 } else {
                     intent
                 }
@@ -138,8 +145,23 @@ class LivingPresenceStore(
             externalObservation = externalObservation,
             externalJudgmentTrace = externalJudgmentTrace,
         )
-        updateIntent(decision.updatedIntent)
-        return decision
+        val updatedIntent = if (
+            intent.kind == me.rerere.rikkahub.service.LivingIntentKind.WAKE_UP &&
+            intent.wakeReplyRecheckAt != null &&
+            nowMillis >= intent.wakeReplyRecheckAt + WAKE_REPLY_RECHECK_DELAY_MILLIS
+        ) {
+            decision.updatedIntent.copy(
+                status = LivingIntentStatus.COMPLETED,
+                lastEvaluatedAt = nowMillis,
+                completedReason = "用户醒来后已经回复过，完成一次防睡回笼复查后归档。",
+                nextEvaluateAt = nowMillis,
+            )
+        } else {
+            decision.updatedIntent
+        }
+        updateIntent(updatedIntent)
+        archiveCompleted()
+        return decision.copy(updatedIntent = updatedIntent)
     }
 
     suspend fun markIntentSpoken(intentId: String, nowMillis: Long = System.currentTimeMillis()) {
@@ -187,8 +209,17 @@ class LivingPresenceStore(
     private fun LivingIntent.matchesAssistant(assistantId: String): Boolean =
         this.assistantId.isBlank() || this.assistantId == assistantId
 
+    private fun LivingIntent.shouldScheduleWakeReplyRecheck(nowMillis: Long): Boolean {
+        if (kind != me.rerere.rikkahub.service.LivingIntentKind.WAKE_UP) return false
+        if (wakeReplyRecheckAt != null) return false
+        val hasBeenActivelyHeld = spokenCount > 0 || silentEvaluationCount > 0 || lastEvaluatedAt != null
+        val targetReached = targetAtMillis?.let { nowMillis >= it } ?: hasBeenActivelyHeld
+        return hasBeenActivelyHeld && targetReached
+    }
+
     private companion object {
         const val ACTIVE_LIMIT = 60
         const val ARCHIVED_LIMIT = 120
+        const val WAKE_REPLY_RECHECK_DELAY_MILLIS = 20 * 60_000L
     }
 }

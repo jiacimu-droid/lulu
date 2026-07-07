@@ -56,6 +56,25 @@ class CihaiMemoryTest {
     }
 
     @Test
+    fun `cihai diary entry uses diary memory kind and first person relationship effect`() {
+        val entry = CihaiEntry(
+            assistantId = "lulu",
+            kind = CihaiEntryKind.DIARY,
+            title = "露露的日记",
+            content = "我其实还是有点惦记她，看到她回消息以后，心里松了一下，但还是想晚点再确认她没有睡回去。",
+            emotion = "松一口气、继续惦记",
+            createdAt = 1_700_000_000_000L,
+        )
+
+        val candidate = entry.toMemoryCandidate()
+
+        assertEquals("cihai_diary", candidate.type)
+        assertTrue(candidate.relationshipEffect!!.startsWith("我用日记"))
+        assertEquals(entry.content, candidate.unspokenThought)
+        assertTrue(candidate.tags.contains("日记"))
+    }
+
+    @Test
     fun `reading note keeps source book and reflection in memory text`() {
         val entry = CihaiEntry(
             assistantId = "lulu",
@@ -115,7 +134,7 @@ class CihaiMemoryTest {
     }
 
     @Test
-    fun `silent presence can read a user book while recording cihai inner thought`() {
+    fun `silent presence planner can read a user book without creating internal journal`() {
         val book = CihaiBook(
             assistantId = "lulu",
             title = "陪伴方法",
@@ -129,17 +148,17 @@ class CihaiMemoryTest {
                 assistantName = "露露",
                 reason = "用户已经 25 分钟没有回复，当前没有危险信号，先不打扰。",
                 userText = "我先忙一下",
-                actionHintNames = listOf("WRITE_JOURNAL", "READ_BOOK"),
+                actionHintNames = listOf("WRITE_DIARY", "READ_BOOK"),
                 books = listOf(book),
                 createdAt = 1_700_000_000_000L,
             )
         )
 
         assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL, CihaiEntryKind.READING_NOTE),
+            listOf(CihaiEntryKind.READING_NOTE),
             result.entries.map { it.kind },
         )
-        assertTrue(result.entries[1].sourceTitle!!.contains("陪伴方法"))
+        assertTrue(result.entries[0].sourceTitle!!.contains("陪伴方法"))
         assertTrue(result.updatedBook!!.progressPercent > book.progressPercent)
         assertTrue(result.entries.all { it.toMemoryCandidate().type.startsWith("cihai_") })
     }
@@ -152,14 +171,14 @@ class CihaiMemoryTest {
                 assistantName = "露露",
                 reason = "主动判断后决定不打扰。",
                 userText = "",
-                actionHintNames = listOf("WRITE_JOURNAL", "READ_BOOK"),
+                actionHintNames = listOf("WRITE_DIARY", "READ_BOOK"),
                 books = emptyList(),
                 createdAt = 1_700_000_000_000L,
             )
         )
 
         assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL),
+            emptyList<CihaiEntryKind>(),
             result.entries.map { it.kind },
         )
         assertEquals(null, result.updatedBook)
@@ -173,14 +192,14 @@ class CihaiMemoryTest {
                 assistantName = "露露",
                 reason = "事件进入多次判断系统，本轮选择等待和整理记忆。",
                 userText = "我先忙三个小时",
-                actionHintNames = listOf("WRITE_JOURNAL", "MEMORY_REFLECT"),
+                actionHintNames = listOf("WRITE_DIARY", "MEMORY_REFLECT"),
                 books = emptyList(),
                 createdAt = 1_700_000_000_000L,
             )
         )
 
         assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL, CihaiEntryKind.REFLECTION),
+            listOf(CihaiEntryKind.REFLECTION),
             result.entries.map { it.kind },
         )
         assertTrue(result.entries.last().content.contains("下一轮判断"))

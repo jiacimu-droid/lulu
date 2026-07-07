@@ -583,7 +583,9 @@ class ChatService(
         }
 
         val session = getOrCreateSession(conversationId)
-        session.getJob()?.cancel()
+        if (answer) {
+            session.getJob()?.cancel()
+        }
 
         val job = appScope.launch {
             try {
@@ -631,7 +633,9 @@ class ChatService(
                 addError(e, conversationId, title = context.getString(R.string.error_title_send_message))
             }
         }
-        session.setJob(job)
+        if (answer) {
+            session.setJob(job)
+        }
     }
 
     fun requestReply(conversationId: Uuid) {

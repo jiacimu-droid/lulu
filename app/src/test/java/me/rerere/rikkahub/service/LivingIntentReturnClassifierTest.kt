@@ -125,6 +125,28 @@ class LivingIntentReturnClassifierTest {
     }
 
     @Test
+    fun `wake intent closes on any user reply after wake recheck was scheduled`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "露露",
+            userText = "九点叫我起床",
+            assistantText = "好，到点我叫你。",
+            nowMillis = NOW,
+            targetAtMillis = NOW + 60 * MINUTE,
+        ).copy(
+            spokenCount = 1,
+            wakeReplyRecheckAt = NOW + 62 * MINUTE,
+        )
+
+        assertTrue(
+            LivingIntentReturnClassifier.shouldCompleteOnUserReturn(
+                intent = intent,
+                userText = "嗯嗯我在",
+                nowMillis = NOW + 70 * MINUTE,
+            )
+        )
+    }
+
+    @Test
     fun `study intent closes when user says study block started or finished`() {
         val intent = RollingJudgmentLoop.createIntent(
             assistantName = "露露",

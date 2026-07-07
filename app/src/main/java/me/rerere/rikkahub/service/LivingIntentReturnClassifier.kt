@@ -64,7 +64,8 @@ object LivingIntentReturnClassifier {
                 "已经起",
                 "我起来了",
                 "我起床了",
-            ) || intent.targetAtMillis?.let { nowMillis >= it + 25 * MINUTE_MILLIS && hasBeenActivelyHeld } == true
+            ) || (intent.wakeReplyRecheckAt != null && text.isNotBlank()) ||
+                intent.targetAtMillis?.let { nowMillis >= it + 25 * MINUTE_MILLIS && hasBeenActivelyHeld } == true
         }
     }
 

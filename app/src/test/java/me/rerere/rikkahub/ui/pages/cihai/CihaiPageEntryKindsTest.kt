@@ -8,16 +8,17 @@ import org.junit.Test
 
 class CihaiPageEntryKindsTest {
     @Test
-    fun `cihai page exposes concern journal and memory sections without action tab`() {
+    fun `cihai page exposes concern diary and memory sections without internal tabs`() {
         val sections = visibleCihaiSections()
 
         assertEquals(
-            listOf("挂心", "心迹", "沉淀"),
+            listOf("挂心", "日记", "沉淀"),
             sections.map { it.label },
         )
         assertEquals(null, CihaiSection.CONCERNS.entryKind)
-        assertEquals(CihaiEntryKind.INNER_JOURNAL, CihaiSection.INNER_JOURNAL.entryKind)
+        assertEquals(CihaiEntryKind.DIARY, CihaiSection.DIARY.entryKind)
         assertEquals(CihaiEntryKind.REFLECTION, CihaiSection.REFLECTION.entryKind)
+        assertFalse(sections.any { it.entryKind == CihaiEntryKind.INNER_JOURNAL })
         assertFalse(sections.any { it.entryKind == CihaiEntryKind.ACTION_LOG })
         assertFalse(sections.any { it.entryKind == CihaiEntryKind.READING_NOTE })
     }
@@ -25,6 +26,7 @@ class CihaiPageEntryKindsTest {
     @Test
     fun `cihai sections filter different entry kinds instead of showing the same list`() {
         val entries = listOf(
+            entry("diary", "lulu", CihaiEntryKind.DIARY),
             entry("journal", "lulu", CihaiEntryKind.INNER_JOURNAL),
             entry("action", "lulu", CihaiEntryKind.ACTION_LOG),
             entry("reflection", "lulu", CihaiEntryKind.REFLECTION),
@@ -33,8 +35,8 @@ class CihaiPageEntryKindsTest {
         )
 
         assertEquals(
-            listOf("journal"),
-            entriesForCihaiSection(entries, "lulu", CihaiSection.INNER_JOURNAL).map { it.id },
+            listOf("diary"),
+            entriesForCihaiSection(entries, "lulu", CihaiSection.DIARY).map { it.id },
         )
         assertEquals(
             listOf("reflection"),

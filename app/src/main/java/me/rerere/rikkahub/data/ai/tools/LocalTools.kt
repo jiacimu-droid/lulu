@@ -342,10 +342,10 @@ class LocalTools(private val context: Context) {
         Tool(
             name = "write_lulu_journal",
             description = """
-                Write a Cihai inner note for the character, not a Lulu diary entry.
-                Use when the character wants to record a first-person inner trace or reflection for later Cihai memory.
-                This stores the entry only in Cihai and sends it to the memory bank for vectorization; do not count Cihai notes as diary.
-                The content must be written in first person, in character, as what I remember or did not say aloud; do not write detached third-person notes.
+                Write a visible Cihai diary entry for the character.
+                Use when the character wants to record a first-person diary about real feelings, private thoughts, and what was not said aloud.
+                The content must be 100-500 Chinese characters, in character, first person, and grounded in the current context.
+                Do not write detached third-person notes, field labels, or internal trace dumps.
             """.trimIndent().replace("\n", " "),
             parameters = {
                 InputSchema.Obj(
@@ -379,8 +379,8 @@ class LocalTools(private val context: Context) {
                     koin.get<CihaiService>().addEntryAndRemember(
                         CihaiEntry(
                             assistantId = assistant.id.toString(),
-                            kind = CihaiEntryKind.INNER_JOURNAL,
-                            title = params["title"]?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "辞海心迹" },
+                            kind = CihaiEntryKind.DIARY,
+                            title = params["title"]?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "辞海日记" },
                             content = content,
                             emotion = params["mood"]?.jsonPrimitive?.contentOrNull.orEmpty(),
                             createdAt = now.toInstant().toEpochMilli(),
@@ -392,7 +392,7 @@ class LocalTools(private val context: Context) {
                         buildJsonObject {
                             put("success", cihaiSaved)
                             put("cihai_saved", cihaiSaved)
-                            put("message", "Cihai inner note saved")
+                            put("message", "Cihai diary saved")
                         }.toString()
                     )
                 )

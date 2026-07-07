@@ -104,7 +104,7 @@ object ProactiveToolPlanner {
 
         if (normalized.containsAny(JOURNAL_WORDS)) {
             if (normalized.hasExplicitActionConsent()) {
-                addAuto("write_lulu_journal", "用户明确提到写入记录，可以主动把这件事写进辞海心迹；不计入露露日记。")
+                addAuto("write_lulu_journal", "用户明确提到写入记录，可以主动把这件事写成第一人称辞海日记。")
             } else {
                 addCandidate("write_lulu_journal", "用户提到写入记录；内容不够明确时先作为候选动作。")
             }

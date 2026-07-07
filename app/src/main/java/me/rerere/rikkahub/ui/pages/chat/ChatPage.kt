@@ -43,8 +43,10 @@ import me.rerere.ai.provider.Model
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.ArrowLeft02
+import me.rerere.hugeicons.stroke.Call02
 import me.rerere.hugeicons.stroke.Cancel01
 import me.rerere.hugeicons.stroke.LeftToRightListBullet
+import me.rerere.hugeicons.stroke.TransactionHistory
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.Screen
 import me.rerere.rikkahub.data.datastore.Settings
@@ -198,6 +200,22 @@ private fun ChatPageContent(
                     onUpdateSettings = {
                         vm.updateSettings(it)
                     },
+                    onStartVoiceCall = {
+                        navController.navigate(
+                            Screen.VoiceCall(
+                                conversationId = conversation.id.toString(),
+                                assistantId = conversation.assistantId.toString(),
+                            )
+                        )
+                    },
+                    onOpenVoiceCallHistory = {
+                        navController.navigate(
+                            Screen.VoiceCallHistory(
+                                conversationId = conversation.id.toString(),
+                                assistantId = conversation.assistantId.toString(),
+                            )
+                        )
+                    },
                 )
             },
             bottomBar = {
@@ -273,22 +291,6 @@ private fun ChatPageContent(
                         scope.launch {
                             chatListState.requestScrollToItem(conversation.currentMessages.size + 5)
                         }
-                    },
-                    onStartVoiceCall = {
-                        navController.navigate(
-                            me.rerere.rikkahub.Screen.VoiceCall(
-                                conversationId = conversation.id.toString(),
-                                assistantId = conversation.assistantId.toString(),
-                            )
-                        )
-                    },
-                    onOpenVoiceCallHistory = {
-                        navController.navigate(
-                            me.rerere.rikkahub.Screen.VoiceCallHistory(
-                                conversationId = conversation.id.toString(),
-                                assistantId = conversation.assistantId.toString(),
-                            )
-                        )
                     },
                     onUpdateChatModel = {
                         vm.setChatModel(assistant = setting.getCurrentAssistant(), model = it)
@@ -408,6 +410,8 @@ private fun TopBar(
     onClickMenu: () -> Unit,
     onUpdateTitle: (String) -> Unit,
     onUpdateSettings: (Settings) -> Unit,
+    onStartVoiceCall: () -> Unit,
+    onOpenVoiceCallHistory: () -> Unit,
 ) {
     val toaster = LocalToaster.current
     val titleState = useEditState<String> {
@@ -471,6 +475,12 @@ private fun TopBar(
             }
         },
         actions = {
+            IconButton(onClick = onStartVoiceCall) {
+                Icon(HugeIcons.Call02, contentDescription = "电话")
+            }
+            IconButton(onClick = onOpenVoiceCallHistory) {
+                Icon(HugeIcons.TransactionHistory, contentDescription = "电话历史")
+            }
             IconButton(
                 onClick = {
                     onClickMenu()
