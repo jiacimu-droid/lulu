@@ -155,6 +155,53 @@ class ExamStudyPlanTest {
     }
 
     @Test
+    fun examAnalysisAndExamStructureDriveStudyPlanCadence() {
+        val habit = ExamStudyPlan.studyHabitReference
+        val subject = ExamStudyPlan.subjectExecutionReference
+        val july = ExamStudyPlan.monthlyPlans.single { it.month == "2026-07" }.tasks.joinToString("\n")
+        val august = ExamStudyPlan.monthlyPlans.single { it.month == "2026-08" }.tasks.joinToString("\n")
+        val september = ExamStudyPlan.monthlyPlans.single { it.month == "2026-09" }.tasks.joinToString("\n")
+        val october = ExamStudyPlan.monthlyPlans.single { it.month == "2026-10" }.tasks.joinToString("\n")
+        val november = ExamStudyPlan.monthlyPlans.single { it.month == "2026-11" }.tasks.joinToString("\n")
+        val week = ExamStudyPlan.julyWeeks.single { it.id == "2026-07-w2" }.tasks.joinToString("\n")
+        val julyEight = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 8))
+            ?.tasks
+            .orEmpty()
+            .joinToString("\n") { it.title }
+        val julyNine = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 9))
+            ?.tasks
+            .orEmpty()
+            .joinToString("\n") { it.title }
+        val all = listOf(habit, subject, july, august, september, october, november, week, julyEight, julyNine)
+            .joinToString("\n")
+
+        assertTrue(habit.contains("考试分析已到手"))
+        assertTrue(habit.contains("每张卷 180 分钟、150 分"))
+        assertTrue(habit.contains("专业基础课"))
+        assertTrue(habit.contains("民法 75 分"))
+        assertTrue(habit.contains("刑法 75 分"))
+        assertTrue(habit.contains("单选 40 个 40 分"))
+        assertTrue(habit.contains("多选 10 个 20 分"))
+        assertTrue(habit.contains("简答 4 题 40 分"))
+        assertTrue(habit.contains("分析题 2 个 20 分"))
+        assertTrue(habit.contains("案例分析 2 个 30 分"))
+        assertTrue(habit.contains("综合课"))
+        assertTrue(habit.contains("法理 60 分"))
+        assertTrue(habit.contains("宪法 50 分"))
+        assertTrue(habit.contains("法制史 40 分"))
+        assertTrue(habit.contains("简答 3 题 30 分"))
+        assertTrue(habit.contains("分析 3 题 30 分"))
+        assertTrue(habit.contains("论述 2 题 30 分"))
+        assertTrue(habit.contains("主观题 90 分"))
+        assertTrue(all.contains("选择题陷阱"))
+        assertTrue(all.contains("答题骨架"))
+        assertTrue(all.contains("规范表述"))
+        assertTrue(all.contains("3 小时"))
+        assertTrue(julyEight.contains("考试分析"))
+        assertTrue(julyNine.contains("考试分析"))
+    }
+
+    @Test
     fun vocabularyPlanTreatsBacklogAsTwentyWordGroups() {
         assertEquals(1550, ExamStudyPlan.vocabularyBacklog)
         assertEquals(120, ExamStudyPlan.dailyVocabularyTarget)
