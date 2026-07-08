@@ -1,6 +1,7 @@
 package me.rerere.rikkahub.data.study
 
 import java.time.LocalDate
+import java.time.LocalTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -204,6 +205,74 @@ class ExamStudyPlanTest {
         assertTrue(prompt.contains("9点起床，23点睡觉"))
         assertTrue(prompt.contains("这一章没有结束前不要单独安排题目"))
         assertTrue(prompt.contains("单纯看框架不算"))
+    }
+
+    @Test
+    fun schedulePromptRegeneratesFromCurrentTimeWithAllUnfinishedTasks() {
+        val prompt = ExamStudyPlan.dynamicSchedulePrompt(
+            date = LocalDate.of(2026, 7, 8),
+            presetPlan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 8)),
+            defaultSchedule = ExamStudyPlan.todaySchedule(LocalDate.of(2026, 7, 8)),
+            tasks = listOf(
+                StudyTask(
+                    id = "plan-review-criminal",
+                    title = "复盘 | 刑法第 1 章：画一张方便背诵的犯罪论入口框架/思维导图",
+                    source = StudyTaskSource.Plan,
+                ),
+                StudyTask(
+                    id = "plan-civil",
+                    title = "专业课 | 民法第 1 章：课前目录预览 10-15 分钟",
+                    source = StudyTaskSource.Plan,
+                ),
+                StudyTask(
+                    id = "plan-vocab",
+                    title = "英语 | 不背单词 120 个（6组）",
+                    source = StudyTaskSource.Plan,
+                ),
+                StudyTask(
+                    id = "manual-paper",
+                    title = "修改并且打印六分开题报告",
+                    source = StudyTaskSource.Manual,
+                ),
+                StudyTask(
+                    id = "manual-badminton",
+                    title = "打羽毛球在晚上",
+                    source = StudyTaskSource.Manual,
+                ),
+                StudyTask(
+                    id = "done-task",
+                    title = "已经完成的任务不要再排",
+                    done = true,
+                    source = StudyTaskSource.Manual,
+                ),
+            ),
+            currentTime = LocalTime.of(16, 16),
+        )
+
+        assertTrue(prompt.contains("当前时间：16:16"))
+        assertTrue(prompt.contains("不允许输出早于当前时间的时间块"))
+        assertTrue(prompt.contains("不要从早上补排"))
+        assertTrue(prompt.contains("所有未完成待办必须在剩余时间里出现"))
+        assertTrue(prompt.contains("复盘 | 刑法第 1 章"))
+        assertTrue(prompt.contains("专业课 | 民法第 1 章"))
+        assertTrue(prompt.contains("英语 | 不背单词 120 个"))
+        assertTrue(prompt.contains("修改并且打印六分开题报告"))
+        assertTrue(prompt.contains("打羽毛球在晚上"))
+        assertFalse(prompt.substringAfter("当前未完成待办").contains("已经完成的任务不要再排"))
+        assertFalse(prompt.substringAfter("剩余日程骨架").substringBefore("请重新生成").contains("09:"))
+    }
+
+    @Test
+    fun scheduleBlocksFromTimeRemovesPastBlocksBeforeSaving() {
+        val blocks = listOf(
+            StudyScheduleBlock("09:45-10:05", "单词启动", "不背单词 20 个"),
+            StudyScheduleBlock("16:20-17:00", "专业课", "从当前时间后重新排"),
+            StudyScheduleBlock("19:30-20:10", "英语", "不背单词 120 个"),
+        )
+
+        val remaining = ExamStudyPlan.scheduleBlocksFromTime(blocks, LocalTime.of(16, 16))
+
+        assertEquals(listOf("16:20-17:00", "19:30-20:10"), remaining.map { it.time })
     }
 
     @Test

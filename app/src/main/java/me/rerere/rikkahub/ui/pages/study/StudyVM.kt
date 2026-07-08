@@ -34,6 +34,7 @@ import me.rerere.rikkahub.data.starwish.StarWishRules
 import me.rerere.rikkahub.data.starwish.StarWishStore
 import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.random.Random
 
 class StudyVM(
@@ -75,6 +76,7 @@ class StudyVM(
             _isGeneratingSchedule.value = true
             try {
                 val date = LocalDate.now()
+                val currentTime = LocalTime.now()
                 val currentState = state.value
                 val settings = settingsStore.settingsFlow.first()
                 val assistant = settings.getCurrentAssistant()
@@ -89,6 +91,7 @@ class StudyVM(
                     presetPlan = ExamStudyPlan.todayPlan(date),
                     defaultSchedule = ExamStudyPlan.todaySchedule(date),
                     tasks = currentState.tasks,
+                    currentTime = currentTime,
                 )
                 val chunk = provider.generateText(
                     providerSetting = providerSetting,
@@ -114,7 +117,10 @@ class StudyVM(
                     )
                 }
                 val text = chunk.choices.firstOrNull()?.message?.toText().orEmpty()
-                val schedule = ExamStudyPlan.parseScheduleBlocks(text)
+                val schedule = ExamStudyPlan.scheduleBlocksFromTime(
+                    blocks = ExamStudyPlan.parseScheduleBlocks(text),
+                    currentTime = currentTime,
+                )
                 if (schedule.isEmpty()) {
                     error("主 API 没有返回可读取的时间表，请再点一次生成。")
                 }

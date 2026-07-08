@@ -2,6 +2,8 @@ package me.rerere.rikkahub.data.study
 
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlinx.serialization.Serializable
 
@@ -66,6 +68,7 @@ object ExamStudyPlan {
         - 每天保留轻量活动，但不强制出门。目标是补充精力、缓解疲劳，并给僵硬的身体“上机油”；优先少量多次，天气热时用寝室内活动替代散步。
         - 用户更喜欢配音乐运动：手势舞、简单舞蹈、第八套广播体操、原地踏步、开窗站一会儿、转腰、转肩膀、脚踝/膝盖轻活动都可以写进日计划；散步和羽毛球只作为天气、朋友和身体状态合适时的加餐。
         - 用户吃饱后容易犯困，犯困后会明显不想学习。饭后不要立刻安排高压背诵、难题或长时间听课，优先安排 10-20 分钟音乐轻活动、散步、洗漱、整理桌面、轻量复盘或低阻力任务，等困劲过去后再进入深度学习。
+        - 点击生成今日计划时，计划必须从当前时间开始重新编排；如果当前已经是下午且上午待办未完成，不要从早上补排，也不要输出早于当前时间的时间块。所有未完成待办必须从现在起压缩、改序或拆成小块排入剩余时间；已完成待办不要重复安排。
         - 2026-07-02 用户因前一晚睡得很晚、当天早晚肠胃不适，只完成英语。后续 1-2 天要降量恢复：保留英语最小闭环，专业课只补最小入口，不要把漏掉的法理/刑法整包惩罚式滚到下一天。
         - 2026-07-03 用户昨天肚子不舒服、喝了药，又熬夜到 4 点，12 点才起来；但起床后感觉比较清醒，至少可以完成 1 小时学习，也希望被安排一点点任务。当天按“慢启动 + 可完成 1-2 小时”处理：下午先低阻力启动，再安排 30-40 分钟法理框架/错题、30-40 分钟众合法硕刑法课程入口、固定不背单词 120 个；仍然不要安排硬背诵、难题、长时间听课，也不要把昨天漏掉的任务整包追补。
         - 肠胃不适或睡眠不足后的恢复日，早晚不要安排硬背诵、难题或长时间听课；优先安排休息、清淡饮食、热水、音乐轻活动、散步或拉伸、错题回看、目录框架或 30-60 分钟低压听课入口。
@@ -720,6 +723,7 @@ object ExamStudyPlan {
         presetPlan: DailyStudyPlan?,
         defaultSchedule: List<StudyScheduleBlock>,
         tasks: List<StudyTask>,
+        currentTime: LocalTime = LocalTime.now(),
     ): String {
         if (isRestDay(date)) {
             return """
@@ -730,14 +734,19 @@ object ExamStudyPlan {
                 只输出时间表，每行：HH:mm-HH:mm｜标题｜具体安排。
             """.trimIndent()
         }
-        val planTasks = tasks.filter { it.source == StudyTaskSource.Plan }
-        val manualTasks = tasks.filter { it.source == StudyTaskSource.Manual }
+        val currentMinute = currentTime.truncatedTo(ChronoUnit.MINUTES)
+        val currentTimeText = currentMinute.format(DateTimeFormatter.ofPattern("HH:mm"))
+        val unfinishedTasks = tasks.filterNot { it.done }
+        val unfinishedPlanTasks = unfinishedTasks.filter { it.source == StudyTaskSource.Plan }
+        val unfinishedManualTasks = unfinishedTasks.filter { it.source == StudyTaskSource.Manual }
+        val remainingDefaultSchedule = scheduleBlocksFromTime(defaultSchedule, currentMinute)
         return buildString {
             appendLine(studyHabitReference)
             appendLine()
             appendLine(subjectExecutionReference)
             appendLine()
             appendLine("日期：$date")
+            appendLine("当前时间：$currentTimeText")
             appendLine("今日预制主题：${presetPlan?.title ?: "无预制主题，按最小闭环安排"}")
             appendLine("今日预制任务：")
             presetPlan?.tasks.orEmpty().forEachIndexed { index, task ->
@@ -745,20 +754,27 @@ object ExamStudyPlan {
             }
             if (presetPlan == null) appendLine("1. 专业课小块 + 英语小块 + 音乐轻活动/收尾")
             appendLine()
-            appendLine("当前待办（包含用户手动新增和系统计划任务）：")
-            if (tasks.isEmpty()) {
-                appendLine("- 暂无待办，请按预制主题安排。")
+            appendLine("当前未完成待办（包含用户手动新增和系统计划任务，必须全部从当前时间后排入）：")
+            if (unfinishedTasks.isEmpty()) {
+                appendLine("- 暂无未完成待办，请按预制主题安排剩余时间。")
             } else {
-                planTasks.forEach { task -> appendLine("- 计划：${task.title}") }
-                manualTasks.forEach { task -> appendLine("- 手动：${task.title}") }
+                unfinishedPlanTasks.forEach { task -> appendLine("- 计划：${task.title}") }
+                unfinishedManualTasks.forEach { task -> appendLine("- 手动：${task.title}") }
             }
             appendLine()
-            appendLine("默认日程骨架，可调整但不要丢掉饭点、休息、音乐轻活动/运动和睡前收尾：")
-            defaultSchedule.forEach { block ->
-                appendLine("${block.time}｜${block.title}｜${block.detail}")
+            appendLine("剩余日程骨架，可调整但不要丢掉饭点、休息、音乐轻活动/运动和睡前收尾；早于当前时间的默认块已剔除，不可原样补排：")
+            if (remainingDefaultSchedule.isEmpty()) {
+                appendLine("- 默认骨架没有剩余块，请从 $currentTimeText 起按待办和作息重新压缩安排。")
+            } else {
+                remainingDefaultSchedule.forEach { block ->
+                    appendLine("${block.time}｜${block.title}｜${block.detail}")
+                }
             }
             appendLine()
             appendLine("请重新生成今天的计划表。要求：")
+            appendLine("- 生成时间是 $currentTimeText；如果日期是今天，第一段时间必须从 $currentTimeText 或之后开始，不允许输出早于当前时间的时间块。")
+            appendLine("- 不要从早上补排；已经过去但未完成的待办，要从现在开始压缩、改序或拆成可执行小块。")
+            appendLine("- 所有未完成待办必须在剩余时间里出现一次；已完成待办不要重复安排。")
             appendLine("- 如果用户手动待办里写了起床/睡觉时间，按它调整时间段。")
             appendLine("- 如果用户说睡太晚、肚子不舒服或身体难受，优先降量恢复；不要把昨天漏项整包顺延，只补最小入口。")
             appendLine("- 如果用户手动待办里写了临时任务和分钟数，必须插入计划表。")
@@ -775,6 +791,25 @@ object ExamStudyPlan {
             appendLine("- 专业课要按倍数考虑：听课后还要做题、错题总结、框架和三轮背诵；不要把听完课当作学完。")
             appendLine("- 只输出时间表，每行：HH:mm-HH:mm｜标题｜具体安排。")
         }
+    }
+
+    fun scheduleBlocksFromTime(
+        blocks: List<StudyScheduleBlock>,
+        currentTime: LocalTime,
+    ): List<StudyScheduleBlock> {
+        val currentMinute = currentTime.truncatedTo(ChronoUnit.MINUTES)
+        return blocks.filter { block ->
+            blockStartTime(block)?.let { !it.isBefore(currentMinute) } ?: true
+        }
+    }
+
+    private fun blockStartTime(block: StudyScheduleBlock): LocalTime? {
+        val rawStart = block.time
+            .substringBefore('-')
+            .substringBefore('–')
+            .substringBefore('—')
+            .trim()
+        return runCatching { LocalTime.parse(rawStart, DateTimeFormatter.ofPattern("H:mm")) }.getOrNull()
     }
 
     fun parseScheduleBlocks(text: String): List<StudyScheduleBlock> {
