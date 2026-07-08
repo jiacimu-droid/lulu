@@ -6,7 +6,7 @@ import org.junit.Test
 
 class RollingJudgmentLoopTest {
     @Test
-    fun `health event uses dense semantic cadence`() {
+    fun `health event uses bootstrap judgment instead of fixed semantic cadence`() {
         val intent = RollingJudgmentLoop.createIntent(
             assistantName = "闇查湶",
             userText = "鎴戠幇鍦ㄨ倸瀛愬ソ闅惧彈",
@@ -15,8 +15,8 @@ class RollingJudgmentLoopTest {
         )
 
         assertEquals(LivingIntentKind.HEALTH_SAFETY, intent.kind)
-        assertEquals(listOf(5L, 10L, 20L, 40L, 90L), intent.evaluationCadence.delaysMinutes)
-        assertEquals(NOW + 5 * MINUTE, intent.nextEvaluateAt)
+        assertEquals(listOf(1L), intent.evaluationCadence.delaysMinutes)
+        assertEquals(NOW + MINUTE, intent.nextEvaluateAt)
         assertTrue(intent.hypotheses.contains("鐢ㄦ埛韬綋涓嶈垝鏈嶏紝鍙兘闇€瑕佸畨鍏ㄧ‘璁?))
         assertTrue(intent.candidateActions.contains(LivingAction.TOOL_USE))
         assertTrue(intent.candidateActions.contains(LivingAction.PASS))
@@ -24,7 +24,7 @@ class RollingJudgmentLoopTest {
     }
 
     @Test
-    fun `ordinary silence uses non random rolling cadence`() {
+    fun `ordinary silence uses bootstrap judgment instead of fixed rolling cadence`() {
         val intent = RollingJudgmentLoop.createIntent(
             assistantName = "闇查湶",
             userText = "鎴戝厛蹇欎竴涓?,
@@ -33,12 +33,12 @@ class RollingJudgmentLoopTest {
         )
 
         assertEquals(LivingIntentKind.ORDINARY_SILENCE, intent.kind)
-        assertEquals(listOf(10L, 25L, 60L, 120L), intent.evaluationCadence.delaysMinutes)
+        assertEquals(listOf(1L), intent.evaluationCadence.delaysMinutes)
         assertEquals("鐢ㄦ埛鍙兘鍦ㄥ繖", intent.hypotheses.first())
     }
 
     @Test
-    fun `study event protects focus with slower cadence`() {
+    fun `study event uses bootstrap judgment instead of fixed focus cadence`() {
         val intent = RollingJudgmentLoop.createIntent(
             assistantName = "闇查湶",
             userText = "鎴戣鍘诲涔犱笓涓氳",
@@ -47,13 +47,13 @@ class RollingJudgmentLoopTest {
         )
 
         assertEquals(LivingIntentKind.STUDY_FOCUS, intent.kind)
-        assertEquals(listOf(30L, 60L, 90L), intent.evaluationCadence.delaysMinutes)
+        assertEquals(listOf(1L), intent.evaluationCadence.delaysMinutes)
         assertTrue(intent.candidateActions.contains(LivingAction.WRITE_DIARY))
         assertTrue(LivingAction.MEMORY_UPDATE !in intent.candidateActions)
     }
 
     @Test
-    fun `deadline event schedules checks before due time`() {
+    fun `deadline event bootstraps judgment instead of fixed due time checkpoints`() {
         val dueAt = NOW + 6 * 60 * MINUTE
         val intent = RollingJudgmentLoop.createIntent(
             assistantName = "闇查湶",
@@ -64,12 +64,12 @@ class RollingJudgmentLoopTest {
         )
 
         assertEquals(LivingIntentKind.DEADLINE, intent.kind)
-        assertEquals(listOf(180L, 300L, 330L, 350L, 360L), intent.evaluationCadence.delaysMinutes)
-        assertEquals(NOW + 180 * MINUTE, intent.nextEvaluateAt)
+        assertEquals(listOf(1L), intent.evaluationCadence.delaysMinutes)
+        assertEquals(NOW + MINUTE, intent.nextEvaluateAt)
     }
 
     @Test
-    fun `wake up event schedules before and after target`() {
+    fun `wake up event bootstraps judgment instead of fixed target checkpoints`() {
         val wakeAt = NOW + 60 * MINUTE
         val intent = RollingJudgmentLoop.createIntent(
             assistantName = "闇查湶",
@@ -80,7 +80,7 @@ class RollingJudgmentLoopTest {
         )
 
         assertEquals(LivingIntentKind.WAKE_UP, intent.kind)
-        assertEquals(listOf(55L, 60L, 70L, 85L), intent.evaluationCadence.delaysMinutes)
+        assertEquals(listOf(1L), intent.evaluationCadence.delaysMinutes)
         assertTrue(intent.candidateActions.contains(LivingAction.SET_ALARM))
     }
 
@@ -428,6 +428,38 @@ class RollingJudgmentLoopTest {
 
         assertEquals(NOW + 47 * MINUTE, decision.updatedIntent.nextEvaluateAt)
         assertEquals(37, decision.judgmentTrace?.nextEvaluateDelayMinutes)
+    }
+
+    @Test
+    fun `main api chosen next perception delay is not clamped by intent kind`() {
+        val intent = RollingJudgmentLoop.createIntent(
+            assistantName = "Lulu",
+            userText = "I will be busy today.",
+            assistantText = "I will decide later from context.",
+            nowMillis = NOW,
+        )
+        val trace = LivingJudgmentTrace(
+            source = LivingJudgmentSource.MAIN_API_READY_CONTRACT,
+            belief = "She is busy and there is no risk signal.",
+            desire = "Respect the long quiet block.",
+            motiveText = "Respect the long quiet block.",
+            intention = "Wait until the context is likely to change.",
+            thought = "There is no reason to keep checking every hour.",
+            action = "WAIT, SCHEDULE_NEXT_PERCEPTION",
+            observation = "No urgent signal.",
+            decision = "Let the character-selected delay stand.",
+            nextPerceptionDelayMinutes = 720,
+            createdAt = NOW,
+        )
+
+        val decision = RollingJudgmentLoop.evaluate(
+            intent = intent,
+            nowMillis = NOW + MINUTE,
+            externalJudgmentTrace = trace,
+        )
+
+        assertEquals(NOW + 721 * MINUTE, decision.updatedIntent.nextEvaluateAt)
+        assertEquals(720, decision.judgmentTrace?.nextPerceptionDelayMinutes)
     }
 
     @Test

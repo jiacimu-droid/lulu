@@ -55,7 +55,7 @@ object LivingJudgmentModelPlanner {
         appendLine("辞海保存挂心任务、第一人称日记和沉淀；日记记录角色真实感受和没说出口的想法。挂心任务展示事件、目标、下次感知；不要把 belief、traitMotive、situationalMotive 当成用户可见状态栏。")
         appendLine("行动池只能从 MESSAGE, WAIT, TOOL_USE, SET_ALARM, WRITE_DIARY, SCHEDULE_NEXT_PERCEPTION, READ, ASK_USER, PASS 中选；旧名 TOOL_CHECK 等同 TOOL_USE，旧名 JOURNAL_WRITE 等同 WRITE_DIARY，旧名 SCHEDULE_NEXT_TICK 等同 SCHEDULE_NEXT_PERCEPTION，MEMORY_UPDATE 不要再输出。")
         appendLine("下一次感知时间不能写死。你必须根据这一次意义评估和动态判断决定 nextPerceptionDelayMinutes；这表示多久后重新从感知层开始，不等于多久后发消息。")
-        appendLine("普通无风险沉默不要机械 5 分钟；身体安全/起床/DDL 可以更短，学习或忙碌应更克制。")
+        appendLine("不要套用系统预设的几分钟/几小时模板；nextPerceptionDelayMinutes 必须是角色基于本轮完整感知、意义评估、风险、新信息可能性和打扰成本作出的判断。")
         appendLine("thought 必须是第一人称、角色本人没有说出口的一小段心声，会进入状态栏“没说出口”；不要写 Seven-layer trace、Perception=、工具 JSON、字段名或分析提纲。")
         appendLine("只返回 JSON，不要 markdown，不要解释。")
         appendLine("JSON 字段：belief, motive, emotion, intention, thought, action, observation, decision, nextPerceptionDelayMinutes, appraisal, consolidation, historyNote。")

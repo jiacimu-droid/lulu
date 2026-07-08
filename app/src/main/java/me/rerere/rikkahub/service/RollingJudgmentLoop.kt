@@ -2,7 +2,6 @@ package me.rerere.rikkahub.service
 
 import kotlinx.serialization.Serializable
 import java.util.UUID
-import kotlin.math.max
 
 const val LIVING_SEVEN_LAYER_ARCHITECTURE_NAME = "感知世界包-意义评估-动态判断-行动实现-状态生成-辞海记忆"
 
@@ -245,7 +244,7 @@ object RollingJudgmentLoop {
         deadlineAtMillis: Long? = null,
     ): LivingIntent {
         val kind = classify(userText = userText, assistantText = assistantText, targetAtMillis, deadlineAtMillis)
-        val cadence = cadenceFor(kind, nowMillis, targetAtMillis, deadlineAtMillis)
+        val cadence = cadenceFor(kind)
         val hypotheses = hypothesesFor(kind)
         val emotion = emotionFor(kind)
         return LivingIntent(
@@ -638,56 +637,24 @@ object RollingJudgmentLoop {
         }
     }
 
-    private fun cadenceFor(
-        kind: LivingIntentKind,
-        nowMillis: Long,
-        targetAtMillis: Long?,
-        deadlineAtMillis: Long?,
-    ): EvaluationCadence {
+    private fun cadenceFor(kind: LivingIntentKind): EvaluationCadence {
         val delays = when (kind) {
-            LivingIntentKind.HEALTH_SAFETY -> listOf(5L, 10L, 20L, 40L, 90L)
-            LivingIntentKind.ORDINARY_SILENCE -> listOf(10L, 25L, 60L, 120L)
-            LivingIntentKind.STUDY_FOCUS -> listOf(30L, 60L, 90L)
-            LivingIntentKind.DEADLINE -> deadlineCadence(nowMillis, deadlineAtMillis)
-            LivingIntentKind.WAKE_UP -> wakeCadence(nowMillis, targetAtMillis)
+            LivingIntentKind.HEALTH_SAFETY,
+            LivingIntentKind.ORDINARY_SILENCE,
+            LivingIntentKind.STUDY_FOCUS,
+            LivingIntentKind.DEADLINE,
+            LivingIntentKind.WAKE_UP -> listOf(1L)
         }
         return EvaluationCadence(
             delaysMinutes = delays,
             reason = when (kind) {
-                LivingIntentKind.HEALTH_SAFETY -> "身体安全优先，短间隔确认，逐步拉长。"
-                LivingIntentKind.ORDINARY_SILENCE -> "普通沉默不随机打扰；只安排下一次感知，之后每轮动态判断。"
-                LivingIntentKind.STUDY_FOCUS -> "学习中默认少说多看，保护专注。"
-                LivingIntentKind.DEADLINE -> "DDL 按到期前关键节点提醒和复盘。"
-                LivingIntentKind.WAKE_UP -> "起床按提前、到点、到点后复查的节奏。"
+                LivingIntentKind.HEALTH_SAFETY -> "先启动一次后台判断；后续感知时间由角色本轮判断决定。"
+                LivingIntentKind.ORDINARY_SILENCE -> "先启动一次后台判断；后续感知时间由角色本轮判断决定。"
+                LivingIntentKind.STUDY_FOCUS -> "先启动一次后台判断；后续感知时间由角色本轮判断决定。"
+                LivingIntentKind.DEADLINE -> "先启动一次后台判断；后续感知时间由角色本轮判断决定。"
+                LivingIntentKind.WAKE_UP -> "先启动一次后台判断；后续感知时间由角色本轮判断决定。"
             },
         )
-    }
-
-    private fun deadlineCadence(nowMillis: Long, deadlineAtMillis: Long?): List<Long> {
-        val dueAt = deadlineAtMillis ?: return listOf(180L, 60L, 30L, 10L)
-        val checkpoints = listOf(
-            dueAt - 180 * MINUTE_MILLIS,
-            dueAt - 60 * MINUTE_MILLIS,
-            dueAt - 30 * MINUTE_MILLIS,
-            dueAt - 10 * MINUTE_MILLIS,
-            dueAt,
-        )
-        return checkpoints
-            .map { max(1L, (it - nowMillis) / MINUTE_MILLIS) }
-            .distinct()
-    }
-
-    private fun wakeCadence(nowMillis: Long, targetAtMillis: Long?): List<Long> {
-        val wakeAt = targetAtMillis ?: return listOf(5L, 10L, 25L)
-        val checkpoints = listOf(
-            wakeAt - 5 * MINUTE_MILLIS,
-            wakeAt,
-            wakeAt + 10 * MINUTE_MILLIS,
-            wakeAt + 25 * MINUTE_MILLIS,
-        )
-        return checkpoints
-            .map { max(1L, (it - nowMillis) / MINUTE_MILLIS) }
-            .distinct()
     }
 
     private fun nextDelayMinutes(
@@ -698,27 +665,11 @@ object RollingJudgmentLoop {
         trace
             ?.effectiveNextPerceptionDelayMinutes
             ?.takeIf { it > 0 }
-            ?.coerceIn(minNextDelayMinutes(intent), maxNextDelayMinutes(intent))
+            ?.coerceIn(1, 24 * 60)
             ?.toLong()
             ?: (intent.evaluationCadence.delaysMinutes
                 .getOrNull(silentEvaluationCount)
                 ?: intent.evaluationCadence.delaysMinutes.last())
-
-    private fun minNextDelayMinutes(intent: LivingIntent): Int = when (intent.kind) {
-        LivingIntentKind.HEALTH_SAFETY -> 3
-        LivingIntentKind.WAKE_UP -> 1
-        LivingIntentKind.DEADLINE -> 3
-        LivingIntentKind.STUDY_FOCUS -> 10
-        LivingIntentKind.ORDINARY_SILENCE -> 10
-    }
-
-    private fun maxNextDelayMinutes(intent: LivingIntent): Int = when (intent.kind) {
-        LivingIntentKind.HEALTH_SAFETY -> 180
-        LivingIntentKind.WAKE_UP -> 180
-        LivingIntentKind.DEADLINE -> 24 * 60
-        LivingIntentKind.STUDY_FOCUS -> 6 * 60
-        LivingIntentKind.ORDINARY_SILENCE -> 6 * 60
-    }
 
     private fun beliefFor(kind: LivingIntentKind, userText: String, assistantText: String): String = when (kind) {
         LivingIntentKind.HEALTH_SAFETY -> "用户刚才表达了身体不适，需要把安全当作高优先级。"

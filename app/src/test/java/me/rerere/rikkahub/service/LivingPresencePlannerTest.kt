@@ -85,7 +85,7 @@ class LivingPresencePlannerTest {
     }
 
     @Test
-    fun `study event creates low disturbance cadence`() {
+    fun `study event creates bootstrap judgment instead of fixed focus cadence`() {
         val now = 1_700_000_000_000L
 
         val plans = LivingPresencePlanner.planRollingJudgments(
@@ -97,7 +97,8 @@ class LivingPresencePlannerTest {
             nowMillis = now,
         )
 
-        assertEquals(listOf(30L), plans.map { (it.triggerAtMillis - now) / 60_000L })
+        assertEquals(listOf(1L), plans.map { (it.triggerAtMillis - now) / 60_000L })
         assertEquals(ProactiveReminderKind.STUDY, plans.first().kind)
+        assertTrue(plans.first().reason.contains("下一次什么时候感知，都必须根据本轮感知和人设重新决定"))
     }
 }

@@ -1,6 +1,7 @@
 package me.rerere.rikkahub.service
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -30,6 +31,9 @@ class LivingJudgmentModelPlannerTest {
         assertTrue(prompt.contains("emotionLabel"))
         assertTrue(prompt.contains("同步查询工具的结果补入本轮上下文"))
         assertTrue(prompt.contains("不要照抄固定表"))
+        assertTrue(prompt.contains("不要套用系统预设的几分钟/几小时模板"))
+        assertFalse(prompt.contains("身体安全/起床/DDL 可以更短"))
+        assertFalse(prompt.contains("学习或忙碌应更克制"))
         assertTrue(prompt.contains("不等于多久后发消息"))
         assertTrue(prompt.contains("WRITE_DIARY"))
         assertTrue(prompt.contains("SCHEDULE_NEXT_PERCEPTION"))
