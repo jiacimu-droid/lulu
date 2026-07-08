@@ -576,14 +576,12 @@ class ProactiveMessageService : KoinComponent {
             val assistantId = settings.assistantId.toString()
             val cihaiState = cihaiStore.state.first()
             val recentEntries = cihaiState.entries
-                .asSequence()
                 .filter { entry ->
                     entry.assistantId == assistantId &&
                         (entry.kind == CihaiEntryKind.DIARY || entry.kind == CihaiEntryKind.INNER_JOURNAL)
                 }
                 .sortedBy { it.createdAt }
                 .takeLast(3)
-                .toList()
             val readingBooks = cihaiState.books.filter { it.assistantId == assistantId }.take(3)
             if (recentEntries.isNotEmpty() || readingBooks.isNotEmpty()) {
                 sb.appendLine("辞海上下文:")
