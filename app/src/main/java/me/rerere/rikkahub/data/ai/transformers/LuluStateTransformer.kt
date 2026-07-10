@@ -27,7 +27,7 @@ object LuluStateTransformer : InputMessageTransformer {
 internal fun applyLuluStateContext(
     messages: List<UIMessage>,
     assistantId: Uuid,
-    assistantName: String = "露露",
+    assistantName: String = "当前角色",
     states: List<LuluState>,
     thoughts: List<LuluThought> = emptyList(),
     nowMillis: Long = System.currentTimeMillis(),
@@ -54,7 +54,7 @@ internal fun applyLuluStateContext(
 internal fun buildLuluPresenceContext(
     state: LuluState,
     userText: String,
-    assistantName: String = "露露",
+    assistantName: String = "当前角色",
     thoughts: List<LuluThought> = emptyList(),
 ): String = buildString {
     val name = assistantName.ifBlank { "当前角色" }
@@ -63,13 +63,13 @@ internal fun buildLuluPresenceContext(
     val expression = buildLuluExpressionPlan(state, reply = userText)
     appendLine("<lulu_presence>")
     appendLine("这是$name 此刻的内在状态、感知、推测和未说出口的想法，只作为角色参考。不要机械复述这些内容。")
-    appendLine("未说出口只用于影响语气和选择：它必须是$name 选择藏在心里的判断、顾虑、靠近冲动或暂时压住的动作；最终回复仍只输出自然说出口的话。")
+    appendLine("未说出口只用于影响语气和选择：它必须是$name 选择藏在心里的判断、顾虑、未表达意图或暂时压住的动作；最终回复仍只输出自然说出口的话。")
     appendLine("当前状态：${state.statusText}")
     appendLine("没说出口：${state.innerVoice}")
     appendLine("${name}自己的场景：${state.selfScene}")
     appendLine("心情：${state.mood.label}（强度 ${state.moodIntensity.formatPresenceIntensity()}）")
     appendLine("精力：${state.energy.label}（强度 ${state.energyIntensity.formatPresenceIntensity()}）")
-    appendLine("亲密感：${state.relationship.label}（强度 ${state.relationshipIntensity.formatPresenceIntensity()}）")
+    appendLine("关系位置：${state.relationship.label}（强度 ${state.relationshipIntensity.formatPresenceIntensity()}）")
     appendLine("行动状态：${state.mode.label}")
     appendLine("状态持续：约 ${state.durationMillis().formatPresenceDuration()}")
     state.reason.takeIf { it.isNotBlank() }?.let {

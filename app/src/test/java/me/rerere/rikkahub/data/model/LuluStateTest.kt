@@ -18,8 +18,9 @@ class LuluStateTest {
 
         assertEquals(assistantId, state.assistantId)
         assertEquals("在发呆", state.statusText)
-        assertEquals("今天也想被好好陪着。", state.innerVoice)
-        assertEquals("在手机这边安静待着，等你开口。", state.selfScene)
+        assertEquals("我先保持当前角色的自然状态，不预设关系，也不急着开口。", state.innerVoice)
+        assertEquals("保持当前角色的自然状态，留意对话是否继续。", state.selfScene)
+        assertEquals(LuluRelationship.RESERVED, state.relationship)
         assertEquals("默认状态", state.reason)
         assertEquals("在发呆", projected.statusText)
         assertEquals("默认状态", projected.reason)
@@ -70,7 +71,8 @@ class LuluStateTest {
         assertEquals(LuluMood.WORRIED, state.mood)
         assertEquals(LuluEnergy.LOW, state.energy)
         assertEquals(LuluMode.COMPANION, state.mode)
-        assertTrue(state.selfScene.contains("贴近屏幕"))
+        assertTrue(state.selfScene.contains("权衡"))
+        assertTrue(!state.selfScene.contains("贴近"))
         assertEquals(1000L, state.updatedAt)
         assertTrue(state.reason.contains("I feel sad"))
     }
@@ -90,11 +92,12 @@ class LuluStateTest {
         assertEquals(LuluMood.SOFT, state.mood)
         assertEquals(LuluEnergy.SLEEPY, state.energy)
         assertEquals(LuluMode.RESTING, state.mode)
-        assertTrue(state.selfScene.contains("被窝"))
+        assertTrue(state.selfScene.contains("低刺激"))
+        assertTrue(!state.selfScene.contains("被窝"))
     }
 
     @Test
-    fun `study turn gives lulu a quiet waiting scene`() {
+    fun `study turn gives the current role a low interruption scene`() {
         val assistantId = Uuid.parse("55555555-6666-7777-8888-999999999999")
 
         val state = buildLuluStateFromTurn(
@@ -106,8 +109,8 @@ class LuluStateTest {
         )
 
         assertEquals(LuluMode.LEARNING, state.mode)
-        assertTrue(state.selfScene.contains("摊开"))
-        assertTrue(state.selfScene.contains("等你回来"))
+        assertTrue(state.selfScene.contains("低干扰"))
+        assertTrue(state.selfScene.contains("人设"))
     }
 
     @Test
@@ -124,12 +127,13 @@ class LuluStateTest {
 
         assertEquals(LuluMood.CALM, projected.mood)
         assertEquals(LuluMode.COMPANION, projected.mode)
-        assertTrue(projected.selfScene.contains("刚放下手机"))
+        assertTrue(projected.selfScene.contains("刚安静"))
+        assertTrue(!projected.selfScene.contains("很近"))
         assertTrue(projected.reason.contains("沉默"))
     }
 
     @Test
-    fun `long silence makes lulu quietly miss the user`() {
+    fun `long silence remains an unknown pause instead of automatic loneliness`() {
         val assistantId = Uuid.parse("13131313-1313-1313-1313-131313131313")
         val base = LuluState(
             assistantId = assistantId,
@@ -140,10 +144,10 @@ class LuluStateTest {
 
         val projected = base.projectForSilence(nowMillis = 2 * 60 * 60_000L + 1_000L)
 
-        assertEquals(LuluMood.LONELY, projected.mood)
+        assertTrue(projected.mood != LuluMood.LONELY)
         assertEquals(LuluMode.THINKING, projected.mode)
-        assertTrue(projected.selfScene.contains("反复看了几次"))
-        assertTrue(projected.innerVoice.contains("想你"))
+        assertTrue(projected.selfScene.contains("原因未知"))
+        assertTrue(!projected.innerVoice.contains("想你"))
     }
 
     @Test

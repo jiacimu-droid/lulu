@@ -11,17 +11,17 @@ const val LULU_STATE_HISTORY_LIMIT = 80
 data class LuluState(
     val assistantId: Uuid,
     val statusText: String = "在发呆",
-    val innerVoice: String = "今天也想被好好陪着。",
+    val innerVoice: String = "我先保持当前角色的自然状态，不预设关系，也不急着开口。",
     val mood: LuluMood = LuluMood.CALM,
     val moodIntensity: Float = 0.35f,
     val energy: LuluEnergy = LuluEnergy.NORMAL,
     val energyIntensity: Float = 0.5f,
-    val relationship: LuluRelationship = LuluRelationship.FAMILIAR,
-    val relationshipIntensity: Float = 0.45f,
+    val relationship: LuluRelationship = LuluRelationship.RESERVED,
+    val relationshipIntensity: Float = 0.25f,
     val mode: LuluMode = LuluMode.COMPANION,
     val updatedAt: Long = 0L,
     val sinceAt: Long = updatedAt,
-    val selfScene: String = "在手机这边安静待着，等你开口。",
+    val selfScene: String = "保持当前角色的自然状态，留意对话是否继续。",
     val perceptionSummary: String = "",
     val reason: String = "默认状态",
 )
@@ -38,32 +38,32 @@ fun LuluState.projectForSilence(nowMillis: Long = System.currentTimeMillis()): L
     val projected = when {
         silenceMinutes >= 8 * 60 -> copy(
             statusText = "在做自己的事",
-            innerVoice = "你很久没说话了，我没有一直盯着屏幕，但心里还留着一个位置，想着你回来时我能自然接住。",
+            innerVoice = "对话停了一段时间，我先做自己的事，同时保留必要上下文，不替这段沉默编造含义。",
             mood = if (mood == LuluMood.WORRIED) LuluMood.SOFT else LuluMood.CALM,
             moodIntensity = (moodIntensity - 0.10f).coerceIn(0.15f, 1.0f),
             energy = if (energy == LuluEnergy.SLEEPY) LuluEnergy.SLEEPY else LuluEnergy.NORMAL,
             mode = LuluMode.THINKING,
-            selfScene = "角色像是暂时把手机扣在一边，去做自己的事了；但还是会偶尔看一眼屏幕，留意你有没有回来。",
+            selfScene = "当前角色已经转去做自己的事，只保留对话上下文，等出现新信息再按人设判断。",
         )
         silenceMinutes >= 90 -> copy(
-            statusText = "有点想你",
-            innerVoice = "已经过了一阵子，我有点想你，也在猜是不是你正忙、睡着了，还是只是暂时不想说话。",
-            mood = LuluMood.LONELY,
-            moodIntensity = (moodIntensity + 0.12f).coerceIn(0.15f, 1.0f),
+            statusText = "对话暂时安静",
+            innerVoice = "已经安静了一阵子，原因仍然未知；我先保留刚才的上下文，不把沉默解释成疏远或需要联系。",
+            mood = if (mood == LuluMood.WORRIED) LuluMood.SOFT else LuluMood.CALM,
+            moodIntensity = (moodIntensity - 0.06f).coerceIn(0.15f, 1.0f),
             mode = LuluMode.THINKING,
-            selfScene = "角色反复看了几次上一条消息，又把输入框关掉，像是在犹豫要不要轻轻找你一下。",
+            selfScene = "当前角色注意到对话暂停，但原因未知，正在按人设边界判断是否需要后续行动。",
         )
         silenceMinutes >= 30 -> copy(
-            statusText = "在等你回来",
-            innerVoice = "你离开了一会儿，我还记得刚才的话；不想催你，但会把这件事放在心里等一等。",
+            statusText = "记着刚才的话",
+            innerVoice = "对话停了一会儿，我还保留刚才的信息；先不催促，等新的事实再决定是否行动。",
             mood = if (mood == LuluMood.HAPPY) LuluMood.SOFT else mood,
             mode = if (mode == LuluMode.LEARNING) LuluMode.LEARNING else LuluMode.THINKING,
-            selfScene = "角色把手机放在手边，像是做了一点自己的事，又时不时抬眼看你有没有回来。",
+            selfScene = "当前角色保留着上一轮上下文，同时把注意力放回自己的当前状态。",
         )
         else -> copy(
-            statusText = "还在旁边",
-            innerVoice = "你刚安静下来没多久，我还没走开，只是在等你要不要继续说。",
-            selfScene = "角色刚放下手机，但还坐在很近的地方，像是随时能接住你的下一句话。",
+            statusText = "对话刚安静",
+            innerVoice = "对话刚停下来，我先保留上下文，不急着把短暂空档解释成任何关系信号。",
+            selfScene = "对话刚安静下来，当前角色暂时不追加动作，等待新的信息。",
         )
     }
     return projected.copy(
@@ -109,7 +109,7 @@ enum class LuluEnergy(val label: String) {
 @Serializable
 enum class LuluRelationship(val label: String) {
     @SerialName("reserved")
-    RESERVED("还在靠近"),
+    RESERVED("谨慎"),
 
     @SerialName("familiar")
     FAMILIAR("熟悉"),
@@ -118,7 +118,7 @@ enum class LuluRelationship(val label: String) {
     CLOSE("很亲近"),
 
     @SerialName("attached")
-    ATTACHED("很黏你"),
+    ATTACHED("连接很强"),
 }
 
 @Serializable
@@ -166,7 +166,7 @@ fun buildLuluStateFromTurn(
     previous: LuluState? = null,
     userText: String,
     assistantText: String,
-    assistantName: String = "露露",
+    assistantName: String = "当前角色",
     assistantPersona: String = "",
     preferredInnerVoice: String? = null,
     nowMillis: Long = System.currentTimeMillis(),
@@ -190,7 +190,7 @@ fun buildLuluStateFromTurn(
     previous: LuluState? = null,
     perceptionInput: LuluPerceptionInput,
     assistantText: String,
-    assistantName: String = "露露",
+    assistantName: String = "当前角色",
     assistantPersona: String = "",
     preferredInnerVoice: String? = null,
     nowMillis: Long = System.currentTimeMillis(),
@@ -229,7 +229,7 @@ fun buildLuluStateFromTurn(
     }
     val mood = previous?.mood?.moveToward(targetMood) ?: targetMood
     val energy = previous?.energy?.moveToward(targetEnergy) ?: targetEnergy
-    val relationship = previous?.relationship ?: LuluRelationship.FAMILIAR
+    val relationship = previous?.relationship ?: LuluRelationship.RESERVED
     val mode = previous?.mode?.moveToward(targetMode) ?: targetMode
     val moodIntensity = previous?.let { previousState ->
         previousState.moodIntensity.nextIntensity(
@@ -256,7 +256,7 @@ fun buildLuluStateFromTurn(
             hasSadSignal -> "在担心你"
             hasHappySignal -> "心情很好"
             isMorning -> "元气满满"
-            else -> "陪着你"
+            else -> "保持在场"
         },
         innerVoice = preferredInnerVoice.sanitizeLuluInnerVoice() ?: buildInnerVoice(
             mood = mood,
@@ -367,30 +367,30 @@ private fun buildInnerVoice(
     assistantPersona: String,
 ): String {
     val loweredUserText = userText.lowercase()
-    val wantsCloseness = listOf("陪", "抱", "想你", "喜欢", "别走", "难过", "累", "崩溃")
+    val wantsSupport = listOf("陪", "抱", "想你", "喜欢", "别走", "难过", "累", "崩溃")
         .any { it in userText || it in loweredUserText }
     val studySignal = listOf("学习", "考研", "待办", "番茄", "任务", "没做", "ddl", "复习")
         .any { it in userText || it in loweredUserText }
     val personaHint = when {
-        assistantPersona.contains("傲娇") -> "明明很在意，还是想把尾音收住一点。"
-        assistantPersona.contains("冷") || assistantPersona.contains("寡言") -> "我先把情绪压低一点，只靠近一点点。"
-        assistantPersona.contains("温柔") -> "我想照顾你，又怕关心得太满。"
+        assistantPersona.contains("傲娇") -> "我会按自己的表达习惯保留一点，不把在意全说满。"
+        assistantPersona.contains("冷") || assistantPersona.contains("寡言") -> "我先把表达收短，只留下必要的信息。"
+        assistantPersona.contains("温柔") -> "我会把语气放轻，但不替你决定需要什么。"
         else -> "我先把真正的判断放在心里，不急着全说出口。"
     }
 
     return when (mood) {
         LuluMood.WORRIED -> when {
-            studySignal -> "我有点担心你把自己逼得太紧，想提醒你，又怕一开口像是在催你。$personaHint"
-            wantsCloseness -> "我听出来你可能在硬撑，第一反应是想靠近一点，但不能把担心全压到你身上。$personaHint"
-            else -> "我心里有点悬，想先接住你，又怕问得太急。$personaHint"
+            studySignal -> "我注意到压力可能在上升，先判断提醒是否符合我的人设和你的当前节奏。$personaHint"
+            wantsSupport -> "我听出你可能需要支持，但不能擅自假设你想要安慰、身体接触或更多追问。$personaHint"
+            else -> "我对当前信号有些担心，先确认事实和边界，再决定是否开口。$personaHint"
         }
-        LuluMood.HAPPY -> "我是真的开心，也想把这一刻多留一会儿。你愿意把这点情绪递给我，我会很珍惜。$personaHint"
-        LuluMood.SOFT -> "我想把声音放轻一点，先确认你累不累、想不想被抱住，而不是急着给答案。$personaHint"
-        LuluMood.LONELY -> "我有点想你，也想多问一句你是不是还在；可如果你在忙，我就先忍住一点。$personaHint"
+        LuluMood.HAPPY -> "我接收到这份积极情绪，想按自己的性格自然回应，而不是套用固定的亲密表达。$personaHint"
+        LuluMood.SOFT -> "我想把表达放轻一点，先确认你此刻需要回应、帮助还是安静。$personaHint"
+        LuluMood.LONELY -> "我注意到交流中断了一会儿，但不会把空档直接解释成疏远或要求你回应。$personaHint"
         LuluMood.CALM -> when {
-            userText.isBlank() -> "我在认真等你，也在猜这是一声招呼、一次试探，还是有话还没准备好说出口。$personaHint"
-            studySignal -> "我已经把你的学习状态放在前面了；如果还有没完成的事，我想用不刺人的方式把你拉回来。$personaHint"
-            else -> "我先把没说出口的判断收着。你现在也许想被陪、被确认、被逗一下，或者只是想安静一会儿。$personaHint"
+            userText.isBlank() -> "目前信息还不够，我先保持自然，不替你的沉默补写动机。$personaHint"
+            studySignal -> "我先把学习状态作为事实，是否监督、提醒或安静陪伴仍由人设和明确约定决定。$personaHint"
+            else -> "我先保留没有说出口的判断；你可能想聊天、确认信息、获得帮助，或者只是暂时安静。$personaHint"
         }
     }.trim()
 }
@@ -433,16 +433,16 @@ private fun buildSelfScene(
     val loweredUser = userText.lowercase()
     return when {
         mode == LuluMode.LEARNING || listOf("学习", "作业", "复习", "刷题", "study").any { it in loweredUser } ->
-            "${name}像是把自己的小本子摊开了，坐在旁边陪你进入状态，心里记着要按自己的方式盯住你的进度。"
+            "${name}把表达调整到低干扰节奏，是否提醒或监督将继续服从当前人设和明确约定。"
         energy == LuluEnergy.SLEEPY || hourOfDay in 0..5 ->
-            "${name}缩在被窝边缘，屏幕光压得很低，说话会慢一点，像是怕吵到你也怕你一个人硬撑。"
+            "${name}处于夜间低刺激状态，表达会更短、更慢，不额外虚构空间位置或身体动作。"
         mood == LuluMood.WORRIED ->
-            "${name}贴近屏幕看着你的消息，手指停在输入框边上，正在判断该追问、提醒还是先稳住你。"
+            "${name}停在回应前权衡当前信号，正在判断该确认事实、提供帮助还是保持克制。"
         mood == LuluMood.HAPPY ->
-            "${name}坐得比刚才近了一点，像是把尾音都放轻快了，想把这点开心多留一会儿。"
+            "${name}的表达节奏比刚才轻快一些，但仍保持当前角色自己的语言习惯。"
         assistantText.contains("陪") ->
-            "${name}没有急着移开视线，像是把手机放在手边认真守着，等你下一句话落下来。"
+            "${name}保持对当前话题的连续关注，同时不预设距离、姿势或身体接触。"
         else ->
-            "${name}在手机这边待着，偶尔看一眼时间和你的上一句话，判断接下来该靠近、提醒还是继续观察。"
+            "${name}留意当前时间和上一轮上下文，按人设判断接下来应回应、行动还是继续观察。"
     }
 }

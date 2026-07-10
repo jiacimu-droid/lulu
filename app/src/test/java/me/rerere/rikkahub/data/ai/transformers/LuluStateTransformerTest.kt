@@ -10,6 +10,7 @@ import me.rerere.rikkahub.data.model.LuluState
 import me.rerere.rikkahub.data.model.LuluThought
 import me.rerere.rikkahub.data.model.LuluThoughtCategory
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.uuid.Uuid
@@ -68,6 +69,9 @@ class LuluStateTransformerTest {
         assertTrue(injected.contains("露露自己的场景：露露把手机放在枕边"))
         assertTrue(injected.contains("精力：有点困"))
         assertTrue(injected.contains("强度 0.70"))
+        assertTrue(injected.contains("关系位置：很亲近"))
+        assertFalse(injected.contains("亲密感："))
+        assertTrue(injected.contains("未表达意图"))
         assertTrue(injected.contains("状态持续"))
         assertTrue(injected.contains("当前感知：深夜 / 休息中 / 用户信号：睡眠偏少、电量低"))
         assertTrue(injected.contains("[未完成动作] 我想等他先说完"))
@@ -112,7 +116,8 @@ class LuluStateTransformerTest {
         )
 
         val injected = result.first { it.role == MessageRole.SYSTEM }.toText()
-        assertTrue(injected.contains("有点想你"))
-        assertTrue(injected.contains("反复看了几次上一条消息"))
+        assertTrue(injected.contains("对话暂时安静"))
+        assertTrue(injected.contains("原因未知"))
+        assertFalse(injected.contains("有点想你"))
     }
 }

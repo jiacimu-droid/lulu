@@ -260,7 +260,7 @@ class LuluPresenceTest {
     }
 
     @Test
-    fun `expression plan carries embodied cues when worried`() {
+    fun `expression plan keeps worried cues boundary safe`() {
         val plan = buildLuluExpressionPlan(
             state = LuluState(
                 assistantId = assistantId,
@@ -273,9 +273,11 @@ class LuluPresenceTest {
         )
 
         assertEquals(LuluExpressionLength.SHORT, plan.length)
-        assertTrue(plan.emojiHint in listOf("🥺", "🫂", "🤍"))
-        assertTrue(plan.bodyGestureHint.contains("靠近") || plan.bodyGestureHint.contains("抱"))
-        assertTrue(plan.avatarMoodHint.contains("担心") || plan.avatarMoodHint.contains("柔软"))
+        assertTrue(plan.emojiHint in listOf("😟", ""))
+        assertTrue(!plan.bodyGestureHint.contains("靠近"))
+        assertTrue(!plan.bodyGestureHint.contains("抱"))
+        assertTrue(plan.bodyGestureHint.contains("边界"))
+        assertTrue(plan.avatarMoodHint.contains("担心"))
         assertFalse(plan.allowAvatarShift)
     }
 
@@ -294,7 +296,8 @@ class LuluPresenceTest {
         assertEquals("✨", plan.emojiHint)
         assertTrue(plan.allowAvatarShift)
         assertTrue(plan.avatarMoodHint.contains("亮"))
-        assertTrue(plan.stickerHint.contains("贴近") || plan.stickerHint.contains("开心"))
+        assertTrue(plan.stickerHint.contains("开心"))
+        assertTrue(!plan.stickerHint.contains("贴近"))
     }
 
     @Test

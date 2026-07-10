@@ -411,8 +411,8 @@ fun buildLuluExpressionPlan(
         typingDelayMillis = ((reply.length * if (sleepy) 45L else 28L) + 500L).coerceIn(600L, 4_000L),
         bubbleCountHint = bubbleCount,
         guidance = when (length) {
-            LuluExpressionLength.SHORT -> "露露现在精力偏低，优先用短句、轻声、少解释，不要硬撑长回复。"
-            LuluExpressionLength.WARM -> "露露现在更柔软，回复可以慢一点、贴近一点，但不要直接复述状态。"
+            LuluExpressionLength.SHORT -> "当前角色精力偏低，优先用短句、较慢节奏和少量解释，不要硬撑长回复。"
+            LuluExpressionLength.WARM -> "当前角色的表达可以放缓、降低刺激，但不要擅自增加亲密动作或直接复述状态。"
             LuluExpressionLength.NORMAL -> "自然表达即可；必要时按语义拆成 $bubbleCount 个气泡。"
         } + when {
             state.mode == LuluMode.LEARNING -> " 用户在学习/专注时，动作要安静，表情少一点，不要抢注意力。"
@@ -441,56 +441,56 @@ private fun buildLuluEmbodiedExpression(
 ): LuluEmbodiedExpression {
     if (state.mode == LuluMode.LEARNING) {
         return LuluEmbodiedExpression(
-            emojiHint = "🤫",
-            stickerHint = "安静陪读、轻轻点头，不主动刷存在感",
-            bodyGestureHint = "坐在旁边安静等你，动作放轻",
+            emojiHint = "",
+            stickerHint = "低干扰、专注、减少无关动作",
+            bodyGestureHint = "保持安静节奏，是否提醒继续服从人设和明确约定",
             avatarMoodHint = "专注、安静、低亮度",
             allowAvatarShift = false,
         )
     }
     if (state.mode == LuluMode.RESTING || state.energy == LuluEnergy.SLEEPY) {
         return LuluEmbodiedExpression(
-            emojiHint = "🌙",
-            stickerHint = "困困缩被子、轻声陪睡",
-            bodyGestureHint = "把声音压低，靠近一点但不催",
-            avatarMoodHint = "困倦、柔和、夜间",
+            emojiHint = "",
+            stickerHint = "夜间低刺激、动作幅度小、不过度占用注意力",
+            bodyGestureHint = "缩短表达并放慢节奏，不虚构空间位置或身体接触",
+            avatarMoodHint = "困倦、克制、夜间",
             allowAvatarShift = false,
         )
     }
     return when (state.mood) {
         LuluMood.WORRIED -> LuluEmbodiedExpression(
-            emojiHint = if (state.relationship == LuluRelationship.ATTACHED) "🫂" else "🥺",
-            stickerHint = "担心地靠近、伸手抱一下、轻轻拍拍",
-            bodyGestureHint = "往你这边靠近，先接住情绪再说事",
-            avatarMoodHint = "担心、柔软、眼神贴近",
+            emojiHint = "😟",
+            stickerHint = "克制地表达担心，先确认事实和用户需要",
+            bodyGestureHint = "遵守当前角色边界，不预设任何身体接触",
+            avatarMoodHint = "担心、专注、克制",
             allowAvatarShift = false,
         )
         LuluMood.SOFT -> LuluEmbodiedExpression(
-            emojiHint = "🤍",
-            stickerHint = "软软靠近、轻轻贴贴",
-            bodyGestureHint = "靠近一点，语气放软，留一点停顿",
-            avatarMoodHint = "柔软、温暖、安静发光",
+            emojiHint = "",
+            stickerHint = "语气放轻、留出停顿、不过度解释",
+            bodyGestureHint = "保持符合人设的距离和动作，不自动增加亲密接触",
+            avatarMoodHint = "温和、低刺激、平稳",
             allowAvatarShift = false,
         )
         LuluMood.HAPPY -> LuluEmbodiedExpression(
             emojiHint = "✨",
-            stickerHint = "开心贴近、眼睛亮起来、小幅度挥手",
-            bodyGestureHint = "坐近一点，尾音轻快，但不过分吵",
+            stickerHint = "开心、眼神有光、动作可以更有活力",
+            bodyGestureHint = "表达节奏轻快一些，但不改变当前关系边界",
             avatarMoodHint = "亮一点、开心、眼神有光",
             allowAvatarShift = state.energy == LuluEnergy.HIGH && !quietMode,
         )
         LuluMood.LONELY -> LuluEmbodiedExpression(
-            emojiHint = "💭",
-            stickerHint = "抱着手机等你、轻轻探头",
-            bodyGestureHint = "先试探着靠近，不要像质问",
-            avatarMoodHint = "想念、低饱和、安静",
+            emojiHint = "",
+            stickerHint = "安静、低饱和、保留观察",
+            bodyGestureHint = "不把交流空档解释成疏远，也不要求用户回应",
+            avatarMoodHint = "安静、低饱和、克制",
             allowAvatarShift = false,
         )
         LuluMood.CALM -> LuluEmbodiedExpression(
-            emojiHint = if (state.relationship == LuluRelationship.CLOSE) "☺️" else "",
-            stickerHint = "自然待在旁边，必要时轻轻点头",
-            bodyGestureHint = "保持在旁边的距离，等用户把话说完",
-            avatarMoodHint = "平静、自然、陪伴感",
+            emojiHint = "",
+            stickerHint = "自然、稳定、动作不过量",
+            bodyGestureHint = "保持当前角色的自然状态，等待信息完整后再行动",
+            avatarMoodHint = "平静、自然、稳定",
             allowAvatarShift = false,
         )
     }
