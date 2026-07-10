@@ -76,6 +76,10 @@ class LivingPresenceStore(
         }
     }
 
+    suspend fun clearAssistant(assistantId: String) {
+        update { state -> state.withoutAssistant(assistantId) }
+    }
+
     suspend fun updateIntent(intent: LivingIntent) {
         update { current ->
             current.copy(
@@ -222,4 +226,12 @@ class LivingPresenceStore(
         const val ARCHIVED_LIMIT = 120
         const val WAKE_REPLY_RECHECK_DELAY_MILLIS = 20 * 60_000L
     }
+}
+
+internal fun LivingPresenceState.withoutAssistant(assistantId: String): LivingPresenceState {
+    if (assistantId.isBlank()) return this
+    return copy(
+        activeIntents = activeIntents.filterNot { it.assistantId == assistantId },
+        archivedIntents = archivedIntents.filterNot { it.assistantId == assistantId },
+    )
 }

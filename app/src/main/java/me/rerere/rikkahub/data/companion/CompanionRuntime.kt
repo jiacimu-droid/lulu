@@ -181,6 +181,12 @@ class CompanionRuntime(
         nowMillis = nowMillis,
     )
 
+    suspend fun clearAssistant(assistantId: String) {
+        if (assistantId.isBlank()) return
+        recentSnapshots.remove(assistantId)
+        store.clearAssistant(assistantId)
+    }
+
     private fun remember(snapshot: CompanionSnapshot) {
         recentSnapshots.compute(snapshot.assistantId) { _, current ->
             if (current == null || snapshot.updatedAt >= current.updatedAt) snapshot else current

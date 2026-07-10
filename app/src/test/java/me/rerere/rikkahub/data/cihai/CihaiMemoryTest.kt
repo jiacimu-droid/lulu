@@ -77,6 +77,30 @@ class CihaiMemoryTest {
     }
 
     @Test
+    fun `clearing assistant records keeps books and other assistants`() {
+        val targetEntry = memoryEntry(id = "target", assistantId = "assistant-a")
+        val otherEntry = memoryEntry(id = "other", assistantId = "assistant-b")
+        val state = CihaiState(
+            selectedAssistantId = "assistant-a",
+            entries = listOf(targetEntry, otherEntry),
+            books = listOf(
+                CihaiBook(assistantId = "assistant-a", title = "保留的书", content = "用户添加的内容"),
+            ),
+            memoryQueue = listOf(
+                queueItem(entryId = "target", assistantId = "assistant-a", enqueuedAt = 100),
+                queueItem(entryId = "other", assistantId = "assistant-b", enqueuedAt = 100),
+            ),
+        )
+
+        val cleared = state.withoutAssistantRecords("assistant-a")
+
+        assertEquals(listOf("other"), cleared.entries.map { it.id })
+        assertEquals(listOf("other"), cleared.memoryQueue.map { it.entryId })
+        assertEquals(listOf("保留的书"), cleared.books.map { it.title })
+        assertEquals("assistant-a", cleared.selectedAssistantId)
+    }
+
+    @Test
     fun `normalization removes queue items whose entries are invalid or no longer pending`() {
         val invalidEntry = memoryEntry(id = "invalid").copy(content = "")
         val savedEntry = memoryEntry(id = "saved").copy(

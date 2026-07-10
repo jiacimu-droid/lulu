@@ -63,6 +63,10 @@ class CompanionStore(
         state.value.snapshots.firstOrNull { it.assistantId == assistantId }
             ?: CompanionSnapshot.empty(assistantId)
 
+    suspend fun clearAssistant(assistantId: String) {
+        update { state -> state.withoutAssistant(assistantId) }
+    }
+
     private fun decodeState(raw: String?): CompanionPersistedState {
         if (raw.isNullOrBlank()) return CompanionPersistedState()
         return runCatching { json.decodeFromString<CompanionPersistedState>(raw) }
@@ -74,6 +78,11 @@ class CompanionStore(
     private companion object {
         const val TAG = "CompanionStore"
     }
+}
+
+internal fun CompanionPersistedState.withoutAssistant(assistantId: String): CompanionPersistedState {
+    if (assistantId.isBlank()) return this
+    return copy(snapshots = snapshots.filterNot { it.assistantId == assistantId })
 }
 
 internal fun CompanionPersistedState.normalizedCompanionState(): CompanionPersistedState {

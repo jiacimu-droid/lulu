@@ -121,6 +121,7 @@ internal fun AssistantBasicContent(
     vm: AssistantDetailVM
 ) {
     val context = LocalContext.current
+    val historyClearState by vm.historyClearState.collectAsStateWithLifecycle()
     var showClearHistoryDialog by remember { mutableStateOf(false) }
     val faceReferencePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let { vm.setFaceReferenceImage(assistant, it) }
@@ -137,7 +138,7 @@ internal fun AssistantBasicContent(
         },
         onDismiss = { showClearHistoryDialog = false },
         text = {
-            Text("会清除这个角色的聊天记录、上下文、角色记忆、记忆库内容和电话记录，但不会修改人设、头像、提示词等基本信息。")
+            Text("会不可撤销地清除这个角色的聊天与电话、收藏、长期记忆、辞海记录、关系、挂心、承诺和旧状态。人设、头像、模型设置、世界书及考研计划会保留。")
         },
     )
 
@@ -764,14 +765,24 @@ internal fun AssistantBasicContent(
             FormItem(
                 modifier = Modifier.padding(8.dp),
                 label = {
-                    Text("清除聊天记录")
+                    Text("清除角色记录")
                 },
                 description = {
-                    Text("只清除这个角色过去产生的聊天、上下文、记忆和电话记录，保留角色人设与基本设置。")
+                    Text(
+                        when (val state = historyClearState) {
+                            HistoryClearState.Idle -> "清除这个角色产生的全部交互记录，保留人设、世界书与考研计划。"
+                            HistoryClearState.Running -> "正在清除角色记录…"
+                            HistoryClearState.Success -> "角色记录已清除，人设、世界书与考研计划均已保留。"
+                            is HistoryClearState.Failed -> state.message
+                        }
+                    )
                 },
                 tail = {
-                    TextButton(onClick = { showClearHistoryDialog = true }) {
-                        Text("清除")
+                    TextButton(
+                        enabled = historyClearState !is HistoryClearState.Running,
+                        onClick = { showClearHistoryDialog = true },
+                    ) {
+                        Text(if (historyClearState is HistoryClearState.Running) "清除中" else "清除")
                     }
                 },
             )

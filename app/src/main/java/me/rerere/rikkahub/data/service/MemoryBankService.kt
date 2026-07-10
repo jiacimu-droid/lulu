@@ -146,6 +146,11 @@ class MemoryBankService(
         memoryBankDAO.deleteMemoriesByAssistant(assistantId)
     }
 
+    suspend fun deleteAllMemories() = withContext(Dispatchers.IO) {
+        memoryBankDAO.deleteAllMemoryGraphEdges()
+        memoryBankDAO.deleteAllMemories()
+    }
+
     suspend fun updateMemory(memory: MemoryBankEntity) = withContext(Dispatchers.IO) {
         memoryBankDAO.updateMemory(memory)
     }

@@ -2,6 +2,7 @@ package me.rerere.rikkahub.ui.pages.memory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,6 +58,10 @@ class MemoryBankVM(
             try {
                 // Load assistant IDs for filter
                 _assistantIds.value = memoryBankService.getAssistantIds()
+                val selectedAssistantId = _selectedAssistantId.value
+                if (selectedAssistantId != null && selectedAssistantId !in _assistantIds.value) {
+                    _selectedAssistantId.value = null
+                }
 
                 // Update stats using COUNT queries (fast, no full load)
                 _stats.value = memoryBankService.getStats(_selectedAssistantId.value)
@@ -96,6 +101,29 @@ class MemoryBankVM(
         viewModelScope.launch {
             memoryBankService.deleteMemory(id)
             loadMemories()
+        }
+    }
+
+    fun clearLongTermMemories() {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val assistantId = _selectedAssistantId.value
+                if (assistantId == null) {
+                    memoryBankService.deleteAllMemories()
+                    _maintenanceMessage.value = "已清除全部长期记忆"
+                } else {
+                    memoryBankService.deleteMemoriesByAssistant(assistantId)
+                    _maintenanceMessage.value = "已清除当前角色的长期记忆"
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                _maintenanceMessage.value = error.message?.let { "清除失败：$it" } ?: "清除失败，请重试"
+            } finally {
+                _loading.value = false
+                loadMemories()
+            }
         }
     }
 

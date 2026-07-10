@@ -47,9 +47,7 @@ val viewModelModule = module {
         AssistantDetailVM(
             id = it.get(),
             settingsStore = get(),
-            conversationRepository = get(),
-            memoryBankService = get(),
-            voiceCallRepository = get(),
+            interactionResetService = get(),
             filesManager = get(),
             skillManager = get(),
         )

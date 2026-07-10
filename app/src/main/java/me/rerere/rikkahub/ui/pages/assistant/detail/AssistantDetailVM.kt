@@ -21,9 +21,7 @@ import me.rerere.rikkahub.data.files.SkillMetadata
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Avatar
 import me.rerere.rikkahub.data.model.Tag
-import me.rerere.rikkahub.data.repository.ConversationRepository
-import me.rerere.rikkahub.data.service.MemoryBankService
-import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
+import me.rerere.rikkahub.data.service.AssistantInteractionResetService
 import kotlin.uuid.Uuid
 
 private const val TAG = "AssistantDetailVM"
@@ -31,9 +29,7 @@ private const val TAG = "AssistantDetailVM"
 class AssistantDetailVM(
     private val id: String,
     private val settingsStore: SettingsStore,
-    private val conversationRepository: ConversationRepository,
-    private val memoryBankService: MemoryBankService,
-    private val voiceCallRepository: VoiceCallRepository,
+    private val interactionResetService: AssistantInteractionResetService,
     private val filesManager: FilesManager,
     private val skillManager: SkillManager,
 ) : ViewModel() {
@@ -41,6 +37,9 @@ class AssistantDetailVM(
 
     private val _skills = MutableStateFlow<List<SkillMetadata>>(emptyList())
     val skills = _skills.asStateFlow()
+
+    private val _historyClearState = MutableStateFlow<HistoryClearState>(HistoryClearState.Idle)
+    val historyClearState = _historyClearState.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -161,10 +160,14 @@ class AssistantDetailVM(
 
     fun clearAssistantHistory() {
         viewModelScope.launch(Dispatchers.IO) {
-            val assistantIdString = assistantId.toString()
-            conversationRepository.deleteConversationOfAssistant(assistantId)
-            memoryBankService.deleteMemoriesByAssistant(assistantIdString)
-            voiceCallRepository.deleteSessionsByAssistant(assistantIdString)
+            if (_historyClearState.value is HistoryClearState.Running) return@launch
+            _historyClearState.value = HistoryClearState.Running
+            _historyClearState.value = runCatching {
+                interactionResetService.clearAssistantRecords(assistantId)
+            }.fold(
+                onSuccess = { HistoryClearState.Success },
+                onFailure = { error -> HistoryClearState.Failed(error.message ?: "清除失败，请重试") },
+            )
         }
     }
 
@@ -210,4 +213,11 @@ class AssistantDetailVM(
             }
         }
     }
+}
+
+sealed interface HistoryClearState {
+    data object Idle : HistoryClearState
+    data object Running : HistoryClearState
+    data object Success : HistoryClearState
+    data class Failed(val message: String) : HistoryClearState
 }

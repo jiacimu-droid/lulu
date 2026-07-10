@@ -10,6 +10,20 @@ import org.junit.Test
 
 class MemoryBankServiceExtractionTest {
     @Test
+    fun `delete all memories removes graph edges before memory rows`() = runBlocking {
+        val dao = RecordingMemoryBankDAO()
+        val service = MemoryBankService(
+            memoryBankDAO = dao,
+            okHttpClient = null,
+            context = null,
+        )
+
+        service.deleteAllMemories()
+
+        assertEquals(listOf("edges", "memories"), dao.deleteAllCalls)
+    }
+
+    @Test
     fun `save extracted memories inserts normalized candidates and returns generated ids`() = runBlocking {
         val dao = RecordingMemoryBankDAO()
         val service = MemoryBankService(
@@ -319,6 +333,7 @@ private class RecordingMemoryBankDAO(
     val insertedGraphEdges = mutableListOf<MemoryGraphEdgeEntity>()
     val reinforcedGraphEdges = mutableListOf<ReinforcedGraphEdge>()
     val deprecatedUpdates = mutableListOf<DeprecatedMemoryUpdate>()
+    val deleteAllCalls = mutableListOf<String>()
     var lastAssistantKeywordTypeSearch: AssistantKeywordTypeSearch? = null
     var recalledAt: Long = 0L
 
@@ -338,6 +353,13 @@ private class RecordingMemoryBankDAO(
     override suspend fun deleteMemoryGraphEdgesForMemory(id: Int) = unsupported()
     override suspend fun deleteMemoryGraphEdgesForAssistant(assistantId: String) = unsupported()
     override suspend fun deleteMemoriesByAssistant(assistantId: String) = unsupported()
+    override suspend fun deleteAllMemoryGraphEdges() {
+        deleteAllCalls += "edges"
+    }
+
+    override suspend fun deleteAllMemories() {
+        deleteAllCalls += "memories"
+    }
     override suspend fun getMemoryById(id: Int): MemoryBankEntity? = unsupported()
     override suspend fun getAllMemories(): List<MemoryBankEntity> = unsupported()
     override suspend fun getMemoriesByType(type: String): List<MemoryBankEntity> = unsupported()

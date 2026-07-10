@@ -87,6 +87,7 @@ fun MemoryBankPage(
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showDeleteDialog by remember { mutableStateOf<MemoryBankEntity?>(null) }
+    var showClearAllDialog by remember { mutableStateOf(false) }
     var editMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
     var correctionMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
 
@@ -118,6 +119,9 @@ fun MemoryBankPage(
                     }
                     IconButton(onClick = { vm.runLightMaintenance() }) {
                         Icon(HugeIcons.Tools, contentDescription = "轻量维护")
+                    }
+                    IconButton(onClick = { showClearAllDialog = true }) {
+                        Icon(HugeIcons.Delete02, contentDescription = "清除长期记忆")
                     }
                     IconButton(onClick = { vm.loadMemories() }) {
                         Icon(HugeIcons.Refresh01, contentDescription = "刷新")
@@ -250,6 +254,37 @@ fun MemoryBankPage(
                     Text("取消")
                 }
             }
+        )
+    }
+
+    if (showClearAllDialog) {
+        val clearingAll = selectedAssistantId == null
+        val selectedName = selectedAssistantId?.let { assistantLabels[it] } ?: "当前角色"
+        AlertDialog(
+            onDismissRequest = { showClearAllDialog = false },
+            title = { Text(if (clearingAll) "清除全部长期记忆" else "清除角色长期记忆") },
+            text = {
+                Text(
+                    if (clearingAll) {
+                        "将不可撤销地删除记忆库中的全部长期记忆。角色人设、世界书、聊天记录和考研计划不会受影响。"
+                    } else {
+                        "将不可撤销地删除“$selectedName”的全部长期记忆。角色人设、世界书、聊天记录和考研计划不会受影响。"
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.clearLongTermMemories()
+                    showClearAllDialog = false
+                }) {
+                    Text("清除", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearAllDialog = false }) {
+                    Text("取消")
+                }
+            },
         )
     }
 
@@ -528,6 +563,7 @@ private fun StatsRow(stats: MemoryBankService.MemoryStats) {
         StatCard("待处理", stats.pendingCount, Modifier.weight(1f), MaterialTheme.colorScheme.tertiaryContainer)
         StatCard("失败", stats.failedCount, Modifier.weight(1f), MaterialTheme.colorScheme.errorContainer)
     }
+
 }
 
 @Composable

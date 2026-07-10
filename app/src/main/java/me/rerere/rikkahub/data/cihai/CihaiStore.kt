@@ -87,6 +87,10 @@ class CihaiStore(
         update { state -> state.removeCihaiEntry(entryId) }
     }
 
+    suspend fun clearAssistantRecords(assistantId: String) {
+        update { state -> state.withoutAssistantRecords(assistantId) }
+    }
+
     suspend fun addBook(book: CihaiBook) {
         update { state ->
             state.copy(books = (listOf(book) + state.books).take(CIHAI_BOOK_LIMIT))
@@ -213,6 +217,14 @@ internal fun CihaiState.removeCihaiEntry(entryId: String): CihaiState = copy(
     entries = entries.filterNot { it.id == entryId },
     memoryQueue = memoryQueue.filterNot { it.entryId == entryId },
 )
+
+internal fun CihaiState.withoutAssistantRecords(assistantId: String): CihaiState {
+    if (assistantId.isBlank()) return this
+    return copy(
+        entries = entries.filterNot { it.assistantId == assistantId },
+        memoryQueue = memoryQueue.filterNot { it.assistantId == assistantId },
+    )
+}
 
 private const val CIHAI_RETRY_BASE_DELAY_MILLIS = 15L * 60 * 1_000
 private const val CIHAI_RETRY_MAX_DELAY_MILLIS = 6L * 60 * 60 * 1_000

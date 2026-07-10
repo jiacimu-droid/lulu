@@ -82,4 +82,20 @@ class CompanionStateNormalizationTest {
         assertTrue("event-2100" in normalized.appliedRelationshipEventIds)
         assertTrue("event-1" !in normalized.appliedRelationshipEventIds)
     }
+
+    @Test
+    fun `clearing an assistant removes only its runtime snapshot`() {
+        val state = CompanionPersistedState(
+            snapshots = listOf(
+                CompanionSnapshot.empty("assistant-a"),
+                CompanionSnapshot.empty("assistant-b"),
+            ),
+            appliedRelationshipEventIds = listOf("event-a", "event-b"),
+        )
+
+        val cleared = state.withoutAssistant("assistant-a")
+
+        assertEquals(listOf("assistant-b"), cleared.snapshots.map { it.assistantId })
+        assertEquals(listOf("event-a", "event-b"), cleared.appliedRelationshipEventIds)
+    }
 }

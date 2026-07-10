@@ -14,6 +14,7 @@ import me.rerere.rikkahub.data.cihai.CihaiService
 import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.event.AppEventBus
 import me.rerere.rikkahub.data.service.MemoryBankService
+import me.rerere.rikkahub.data.service.AssistantInteractionResetService
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.utils.EmojiData
 import me.rerere.rikkahub.utils.EmojiUtils
@@ -95,6 +96,19 @@ val appModule = module {
             settingsStore = get(),
             generationHandler = get(),
             scope = get(),
+        )
+    }
+
+    single {
+        AssistantInteractionResetService(
+            conversationRepository = get(),
+            memoryRepository = get(),
+            memoryBankService = get(),
+            voiceCallRepository = get(),
+            cihaiStore = get(),
+            companionRuntime = get(),
+            livingPresenceStore = get(),
+            settingsStore = get(),
         )
     }
 
