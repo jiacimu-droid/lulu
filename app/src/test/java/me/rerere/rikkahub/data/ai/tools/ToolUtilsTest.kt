@@ -6,6 +6,7 @@ import me.rerere.ai.core.Tool
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -30,6 +31,25 @@ class ToolUtilsTest {
 
         assertTrue(selected.any { it.name == "today_study_plan" })
         assertFalse(selected.any { it.name == "calendar_tool" })
+    }
+
+    @Test
+    fun `passive perception tools are not exposed as model tools`() {
+        val tools = listOf(
+            fakeTool("get_time_info", "Long time description"),
+            fakeTool("get_battery_info", "Long battery description"),
+            fakeTool("get_app_usage", "Long usage description"),
+            fakeTool("get_gadgetbridge_data", "Long health description"),
+            fakeTool("set_alarm", "Very long alarm description that should be replaced"),
+            fakeTool("write_lulu_journal", "Very long diary description that should be replaced"),
+        )
+
+        val passive = tools.passivePerceptionTools()
+        val active = tools.activeModelTools().withConciseToolDescriptions()
+
+        assertTrue(passive.map { it.name }.containsAll(listOf("get_time_info", "get_battery_info", "get_app_usage", "get_gadgetbridge_data")))
+        assertEquals(listOf("set_alarm", "write_lulu_journal"), active.map { it.name })
+        assertTrue(active.all { it.description.length < 180 })
     }
 
     private fun fakeTool(name: String, description: String): Tool = Tool(

@@ -72,8 +72,11 @@ import me.rerere.rikkahub.data.ai.tools.SystemTools
 import me.rerere.rikkahub.data.ai.tools.createSearchTools
 import me.rerere.rikkahub.data.ai.tools.createSkillTools
 import me.rerere.rikkahub.data.ai.tools.createTodayStudyPlanTool
+import me.rerere.rikkahub.data.ai.tools.activeModelTools
 import me.rerere.rikkahub.data.ai.tools.deduplicateByToolName
+import me.rerere.rikkahub.data.ai.tools.passivePerceptionTools
 import me.rerere.rikkahub.data.ai.tools.selectRelevantToolsForPrompt
+import me.rerere.rikkahub.data.ai.tools.withConciseToolDescriptions
 import me.rerere.rikkahub.data.ai.tools.withHumanLikeToolPrompts
 import me.rerere.rikkahub.data.files.SkillManager
 import me.rerere.rikkahub.plugin.loader.PluginLoader
@@ -144,6 +147,16 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.uuid.Uuid
 
 private const val TAG = "ChatService"
+private const val PASSIVE_PERCEPTION_TIMEOUT_MILLIS = 3_000L
+private val ALWAYS_COLLECTED_PERCEPTION_TOOLS = setOf(
+    "get_time_info",
+    "get_battery_info",
+    "get_app_usage",
+    "get_gadgetbridge_data",
+    "get_notifications",
+)
+private val WEATHER_QUERY_MARKERS = listOf("天气", "温度", "下雨", "带伞", "冷不冷", "热不热", "weather")
+private val LOCATION_QUERY_MARKERS = listOf("位置", "在哪", "到哪", "附近", "路线", "location")
 
 data class ChatError(
     val id: Uuid = Uuid.random(),
@@ -645,9 +658,12 @@ class ChatService(
             role = MessageRole.USER,
             parts = processedContent,
         )
-        val availableTools = buildAvailableTools(settings, assistant)
+        val allTools = buildAvailableTools(settings, assistant)
             .deduplicateByToolName()
             .selectRelevantToolsForPrompt(hiddenMessages)
+        val availableTools = allTools
+            .activeModelTools()
+            .withConciseToolDescriptions()
             .withHumanLikeToolPrompts()
         val latestUserText = hiddenMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty()
         val memoryContext = memoryBankService.buildRecallContext(
@@ -657,7 +673,7 @@ class ChatService(
         val proactiveContext = collectProactiveToolContext(
             conversationId = conversationId,
             messages = hiddenMessages,
-            tools = availableTools,
+            tools = allTools,
             settings = settings,
             assistant = assistant,
             memoryContext = memoryContext,
@@ -885,9 +901,12 @@ class ChatService(
             // check invalid messages
             checkInvalidMessages(conversationId)
             val conversation = getConversationFlow(conversationId).value
-            val availableTools = buildAvailableTools(settings, assistant)
+            val allTools = buildAvailableTools(settings, assistant)
                 .deduplicateByToolName()
                 .selectRelevantToolsForPrompt(conversation.currentMessages)
+            val availableTools = allTools
+                .activeModelTools()
+                .withConciseToolDescriptions()
                 .withHumanLikeToolPrompts()
             val latestUserText = conversation.currentMessages.lastOrNull { it.role == MessageRole.USER }
                 ?.toText()
@@ -899,7 +918,7 @@ class ChatService(
             val proactiveContext = collectProactiveToolContext(
                 conversationId = conversationId,
                 messages = conversation.currentMessages,
-                tools = availableTools,
+                tools = allTools,
                 settings = settings,
                 assistant = assistant,
                 memoryContext = memoryContext,
@@ -1208,7 +1227,10 @@ class ChatService(
         assistant: Assistant,
         finalConversation: Conversation,
     ): CompanionIntentDecision {
-        val availableToolNames = buildAvailableTools(settings, assistant).map { it.name }.toSet()
+        val availableToolNames = buildAvailableTools(settings, assistant)
+            .activeModelTools()
+            .map { it.name }
+            .toSet()
         val nowMillis = System.currentTimeMillis()
         val minutesSinceLastChat = finalConversation.currentMessages
             .dropLast(1)
@@ -1478,6 +1500,11 @@ class ChatService(
             ?.createdAt
             ?.toInstant(TimeZone.currentSystemDefault())
             ?.toEpochMilliseconds()
+        val passiveFacts = collectPassivePerceptionFacts(
+            tools = tools,
+            latestUserText = latestUserText,
+            observedAt = nowMillis,
+        )
         val companionPerception = companionRuntime.perception(
             CompanionPerceptionInput(
                 assistantId = assistant.id.toString(),
@@ -1502,8 +1529,8 @@ class ChatService(
                             observedAt = nowMillis,
                         )
                     },
-                ),
-                availableToolNames = tools.map { it.name }.toSet(),
+                ) + passiveFacts,
+                availableToolNames = tools.activeModelTools().map { it.name }.toSet(),
                 memoryContext = memoryContext,
                 nowMillis = nowMillis,
             ),
@@ -1515,44 +1542,7 @@ class ChatService(
             perception = companionPerception,
         )
         val plan = planResult.plan
-        val toolRequests = plan.toolRequests
-        val fallbackRequests = if (!planResult.fromModel) {
-            ProactiveToolPlanner.plan(
-                userText = latestUserText,
-                availableToolNames = tools.map { it.name }.toSet(),
-                recentlyUsedToolNames = emptySet(),
-            )
-        } else {
-            emptyList()
-        }
-        val requests = (toolRequests + fallbackRequests).distinctBy { it.toolName }.take(5)
         if (
-            requests.isEmpty() &&
-            plan.expressionGuidance.isNullOrBlank() &&
-            plan.expressionAffordances.isEmpty() &&
-            plan.innerThought.isNullOrBlank()
-        ) return unifiedContext
-
-        val toolsByName = tools.associateBy { it.name }
-        val results = requests.mapNotNull { request ->
-            val tool = toolsByName[request.toolName] ?: return@mapNotNull null
-            val output = runCatching {
-                val args = JsonInstant.parseToJsonElement(request.argumentsJson)
-                val parts = tool.execute(args)
-                parts.filterIsInstance<UIMessagePart.Text>().joinToString("\n") { it.text }
-            }.getOrElse { error ->
-                val message = (error.message ?: error::class.simpleName.orEmpty()).replace("\"", "'")
-                """{"success":false,"error":"$message"}"""
-            }
-            """
-            - tool: ${request.toolName}
-              reason: ${request.reason}
-              result: $output
-            """.trimIndent()
-        }
-
-        if (
-            results.isEmpty() &&
             plan.expressionGuidance.isNullOrBlank() &&
             plan.expressionAffordances.isEmpty() &&
             plan.innerThought.isNullOrBlank()
@@ -1575,13 +1565,57 @@ class ChatService(
                 appendLine("表达池只是表达层 affordance，不决定是否行动，也不要逐字复述这些标签。")
                 appendLine()
             }
-            if (results.isNotEmpty()) {
-                appendLine("以下是程序在本轮回复前主动感知到的工具结果。")
-                appendLine("它们不是用户命令你查看的，而是你像真人一样主动留意到的上下文。")
-                appendLine("请自然使用这些信息，不要说“我调用了工具”。")
-                appendLine(results.joinToString("\n"))
+        }
+    }
+
+    private suspend fun collectPassivePerceptionFacts(
+        tools: List<Tool>,
+        latestUserText: String,
+        observedAt: Long,
+    ): List<CompanionContextFact> = coroutineScope {
+        val relevantNames = buildSet {
+            addAll(ALWAYS_COLLECTED_PERCEPTION_TOOLS)
+            if (WEATHER_QUERY_MARKERS.any { latestUserText.contains(it, ignoreCase = true) }) {
+                add("get_weather")
+                add("get_location")
+            }
+            if (LOCATION_QUERY_MARKERS.any { latestUserText.contains(it, ignoreCase = true) }) {
+                add("get_location")
             }
         }
+        tools.passivePerceptionTools()
+            .filter { it.name in relevantNames }
+            .map { tool ->
+                async(Dispatchers.IO) {
+                    val output = withTimeoutOrNull(PASSIVE_PERCEPTION_TIMEOUT_MILLIS) {
+                        runCatching {
+                            val args = JsonInstant.parseToJsonElement(passivePerceptionArguments(tool.name))
+                            tool.execute(args)
+                                .filterIsInstance<UIMessagePart.Text>()
+                                .joinToString("\n") { it.text }
+                                .trim()
+                        }.getOrNull()
+                    } ?: return@async null
+                    output.takeIf(String::isNotBlank)?.let { value ->
+                        CompanionContextFact(
+                            key = "perception.${tool.name}",
+                            value = value,
+                            observedAt = observedAt,
+                        )
+                    }
+                }
+            }
+            .awaitAll()
+            .filterNotNull()
+    }
+
+    private fun passivePerceptionArguments(toolName: String): String = when (toolName) {
+        "get_notifications" -> """{"limit":5}"""
+        "get_app_usage" -> """{"limit":8}"""
+        "get_gadgetbridge_data" -> """{"data_type":"daily_summary"}"""
+        "get_location" -> """{"include_address":false,"force_refresh":false}"""
+        "get_weather" -> """{"force_refresh_location":false}"""
+        else -> "{}"
     }
 
     private fun MessageRole.toCompanionTurnRole(): CompanionTurnRole = when (this) {
@@ -1610,9 +1644,9 @@ class ChatService(
                 }.getOrNull()
             }
         return if (modelPlan != null) {
-            ChatTurnPlanResult(plan = modelPlan, fromModel = true)
+            ChatTurnPlanResult(plan = modelPlan)
         } else {
-            ChatTurnPlanResult(plan = LuluChatTurnPlan(), fromModel = false)
+            ChatTurnPlanResult(plan = LuluChatTurnPlan())
         }
     }
 
@@ -1663,22 +1697,15 @@ class ChatService(
 
     private data class ChatTurnPlanResult(
         val plan: LuluChatTurnPlan,
-        val fromModel: Boolean,
     )
 
     private fun List<UIMessage>.withProactiveToolInstruction(assistant: Assistant, proactiveContext: String): List<UIMessage> {
         val instruction = buildString {
             appendLine("你正在扮演${assistant.name.ifBlank { "当前角色" }}。")
-            appendLine("工具是你的感知方式之一，不是用户下命令后才允许使用的功能。")
-            appendLine("当用户问现在、今天、温度、天气、位置、学习进度、待办、番茄钟、睡眠、身体、电量、通知、闹钟或附近环境时，如果有对应工具，就优先主动查看，再用角色自己的口吻回答。")
-            appendLine("当用户问考研计划、今日计划、今日待办、完成/划掉的学习任务、番茄钟或夸夸值时，必须优先使用 today_study_plan；calendar_tool 只用于手机系统日历，不代表学习 App 计划。")
-            appendLine("如果用户没有明说但上下文明显需要关心，例如备考拖延、久坐、太晚没睡、出门前犹豫、任务没完成，也可以主动查看最相关的一两个工具。")
-            appendLine("不要为了展示工具而调用工具；一次只查最有帮助的少数工具。")
-            appendLine("涉及短信正文、摄像头、闹钟、日历写入、日志写入、音乐播放控制等动作时，按人设、上下文和用户信任关系主动判断；如果意图已经很明确，可以直接使用工具。")
-            appendLine("工具调用要服务角色当下目的；如果同一个工具确实能帮助判断，可以再次主动使用。")
-            appendLine("工具结果只作为你的感知和上下文，不要机械地说“我调用了工具”或“根据工具结果”。")
-            appendLine("如果你决定稍后主动回来提醒用户，比如催睡、上课、吃饭或继续学习，请在回复里自然说出你会什么时候来找他；系统会尝试根据这轮对话安排主动消息。")
-            appendLine("最终回复只能写角色真正会说出口的话，保持自然、贴合人设，并尽量分成几句短句。")
+            appendLine("<companion_runtime> 中的 perception_facts 是程序已自动提供的当前感知；自然使用，不提工具或数据采集。")
+            appendLine("当前可见工具都属于会产生查询、写入或设备动作的主动能力，只在角色形成明确意图时使用。")
+            appendLine("today_study_plan 管理本 App 的考研计划；calendar_tool 只处理手机系统日历。")
+            appendLine("需要稍后主动回来时自然说清时间和目的；最终只输出角色真正会说出口的话。")
             if (proactiveContext.isNotBlank()) {
                 appendLine()
                 append(proactiveContext)

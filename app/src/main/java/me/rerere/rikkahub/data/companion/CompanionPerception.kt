@@ -194,6 +194,12 @@ fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
             )
         }
     }
+    if (contextFacts.isNotEmpty()) {
+        appendLine("perception_facts:")
+        contextFacts.take(16).forEach { fact ->
+            appendLine("- ${fact.key} observed_at=${fact.observedAt} value=${fact.value.take(500)}")
+        }
+    }
     appendLine("</companion_runtime>")
     append("Treat this runtime snapshot as current business truth. Ordinary chat never cancels unrelated commitments.")
 }.trim()

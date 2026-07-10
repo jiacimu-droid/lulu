@@ -136,6 +136,25 @@ class CompanionPerceptionAssemblerTest {
         assertTrue(prompt.contains("overdue=true"))
     }
 
+    @Test
+    fun `prompt context includes structured passive perception facts`() {
+        val packet = CompanionPerceptionAssembler.assemble(
+            input = input().copy(
+                contextFacts = listOf(
+                    CompanionContextFact("battery", "{\"level\":42}", 123L),
+                    CompanionContextFact("app_usage", "{\"minutes\":90}", 124L),
+                ),
+            ),
+            snapshot = CompanionSnapshot.empty("assistant-a"),
+        )
+
+        val prompt = packet.toPromptContext()
+
+        assertTrue(prompt.contains("perception_facts:"))
+        assertTrue(prompt.contains("battery"))
+        assertTrue(prompt.contains("app_usage"))
+    }
+
     private fun input(assistantId: String = "assistant-a") = CompanionPerceptionInput(
         assistantId = assistantId,
         assistantName = "角色 A",

@@ -55,7 +55,9 @@ import me.rerere.rikkahub.data.ai.tools.createSearchTools
 import me.rerere.rikkahub.data.ai.tools.createSkillTools
 import me.rerere.rikkahub.data.ai.tools.createTodayStudyPlanTool
 import me.rerere.rikkahub.data.ai.tools.deduplicateByToolName
+import me.rerere.rikkahub.data.ai.tools.activeModelTools
 import me.rerere.rikkahub.data.ai.tools.selectRelevantToolsForPrompt
+import me.rerere.rikkahub.data.ai.tools.withConciseToolDescriptions
 import me.rerere.rikkahub.data.ai.tools.withHumanLikeToolPrompts
 import me.rerere.rikkahub.data.ai.mcp.McpManager
 import me.rerere.rikkahub.data.files.SkillManager
@@ -1869,6 +1871,8 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
         buildAllTools(settings, assistant)
             .deduplicateByToolName()
             .selectRelevantToolsForPrompt(messages)
+            .activeModelTools()
+            .withConciseToolDescriptions()
             .withHumanLikeToolPrompts()
 
     private fun buildAllTools(
@@ -1924,7 +1928,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             addAll(pluginToolProvider.getTools())
         }
             .deduplicateByToolName()
-            .withHumanLikeToolPrompts()
     }
 
     private fun buildLivingPresenceObservationTools(

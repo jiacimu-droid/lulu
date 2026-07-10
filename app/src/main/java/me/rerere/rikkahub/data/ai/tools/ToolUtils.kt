@@ -5,8 +5,19 @@ import me.rerere.ai.ui.UIMessage
 
 fun List<Tool>.deduplicateByToolName(): List<Tool> = distinctBy { it.name }
 
-@Suppress("UNUSED_PARAMETER")
-fun List<Tool>.selectRelevantToolsForPrompt(messages: List<UIMessage>): List<Tool> = this
+fun List<Tool>.selectRelevantToolsForPrompt(messages: List<UIMessage>): List<Tool> {
+    val latestUserText = messages.lastOrNull()?.toText().orEmpty()
+    val asksForStudyPlan = STUDY_PLAN_MARKERS.any { latestUserText.contains(it, ignoreCase = true) }
+    return if (asksForStudyPlan) filterNot { it.name == "calendar_tool" } else this
+}
+
+fun List<Tool>.passivePerceptionTools(): List<Tool> = filter { it.name in PASSIVE_PERCEPTION_TOOL_NAMES }
+
+fun List<Tool>.activeModelTools(): List<Tool> = filterNot { it.name in PASSIVE_PERCEPTION_TOOL_NAMES }
+
+fun List<Tool>.withConciseToolDescriptions(): List<Tool> = map { tool ->
+    tool.copy(description = conciseToolDescription(tool).take(MAX_ACTIVE_TOOL_DESCRIPTION_LENGTH))
+}
 
 fun Tool.withHumanLikeToolPrompt(): Tool {
     val guidance = humanLikeToolGuidance(name)
@@ -62,3 +73,47 @@ internal fun humanLikeToolGuidance(toolName: String): String {
         else -> ""
     }
 }
+
+private fun conciseToolDescription(tool: Tool): String = when (tool.name.removePrefix("mcp__")) {
+    "ask_user" -> "Ask the user for missing information or confirmation."
+    "calendar_tool" -> "Read, create, or delete device calendar events."
+    "camera_capture" -> "Capture a camera image after the character decides visual confirmation is needed."
+    "clipboard_tool" -> "Read or write plain text in the device clipboard."
+    "control_music" -> "Control device music playback."
+    "eval_javascript" -> "Run a small JavaScript calculation."
+    "explore_nearby" -> "Search nearby places when local surroundings matter."
+    "memory_tool" -> "Read or update explicit assistant memory records."
+    "read_sms" -> "Read device SMS when message content is explicitly relevant."
+    "scrape_web" -> "Read the content of a web page."
+    "search_web" -> "Search the web for current external information."
+    "set_alarm" -> "Set a device alarm for a specific hour and minute."
+    "set_lulu_expression_state" -> "Update the character's visible state and private first-person thought for this turn."
+    "text_to_speech" -> "Create replayable speech audio for supplied text."
+    "today_study_plan" -> "Read or update the app-local study plan, tasks, focus sessions, and progress."
+    "use_skill" -> "Use an enabled skill for a specialized task."
+    "write_files" -> "Write requested content to local files."
+    "write_lulu_journal" -> "Write a genuine first-person character diary entry when the character chooses to keep one."
+    else -> tool.description.lineSequence().map(String::trim).filter(String::isNotBlank).joinToString(" ")
+}
+
+private val PASSIVE_PERCEPTION_TOOL_NAMES = setOf(
+    "get_time_info",
+    "get_battery_info",
+    "get_app_usage",
+    "get_gadgetbridge_data",
+    "get_location",
+    "get_weather",
+    "get_notifications",
+)
+
+private val STUDY_PLAN_MARKERS = listOf(
+    "考研",
+    "学习计划",
+    "今日计划",
+    "今日待办",
+    "学习待办",
+    "番茄钟",
+    "夸夸值",
+)
+
+private const val MAX_ACTIVE_TOOL_DESCRIPTION_LENGTH = 180
