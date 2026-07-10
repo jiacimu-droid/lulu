@@ -1394,7 +1394,7 @@ class ChatService(
         if (settings.enableWebSearch) {
             addAll(createSearchTools(settings))
         }
-        addAll(localTools.getTools(assistant.localTools))
+        addAll(localTools.getTools(assistant.localTools, assistant.id.toString()))
 
         val systemToolsOptions = settings.systemToolsSetting.getEnabledOptions() + SystemToolOption.Battery
         if (systemToolsOptions.isNotEmpty()) {

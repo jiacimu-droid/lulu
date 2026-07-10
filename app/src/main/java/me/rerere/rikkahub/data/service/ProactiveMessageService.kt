@@ -16,8 +16,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import androidx.core.app.NotificationCompat
 import android.os.Build
 import me.rerere.ai.core.MessageRole
@@ -119,8 +117,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 class ProactiveMessageService : KoinComponent {
-    private val settingsStore: SettingsStore by inject()
-    private val conversationRepository: ConversationRepository by inject()
     private val studyStore: StudyStore by inject()
     private val cihaiStore: CihaiStore by inject()
 
@@ -468,12 +464,14 @@ class ProactiveMessageService : KoinComponent {
     suspend fun buildProactiveContext(
         context: Context,
         settings: Settings,
+        assistant: Assistant,
+        minutesSinceLastChat: Long?,
         targetedReason: String? = null,
         targetedUserText: String? = null,
         targetedKind: String? = null,
     ): String {
         val sb = StringBuilder()
-        val assistantName = settings.getCurrentAssistant().name.ifBlank { "当前角色" }
+        val assistantName = assistant.name.ifBlank { "当前角色" }
         sb.appendLine("[主动消息上下文]")
         if (!targetedReason.isNullOrBlank()) {
             sb.appendLine("这次不是随机主动消息，而是${assistantName}刚才自己决定稍后回来确认的一次目标消息。")
@@ -487,26 +485,15 @@ class ProactiveMessageService : KoinComponent {
             }
         }
 
-        // Time since last chat
-        try {
-            val lastMessageTime = getLastMessageTime()
-            if (lastMessageTime != null) {
-                val nowMs = java.lang.System.currentTimeMillis()
-                val lastMs = lastMessageTime.toEpochMilliseconds()
-                val diffMs = nowMs - lastMs
-                val duration = diffMs.milliseconds
-                val minutesAgo = duration.inWholeMinutes
-                val hoursAgo = duration.inWholeHours
-                when {
-                    hoursAgo > 24 -> sb.appendLine("距离上次聊天: ${hoursAgo / 24}天${hoursAgo % 24}小时")
-                    hoursAgo > 0 -> sb.appendLine("距离上次聊天: ${hoursAgo}小时${minutesAgo % 60}分钟")
-                    else -> sb.appendLine("距离上次聊天: ${minutesAgo}分钟")
-                }
-            } else {
-                sb.appendLine("距离上次聊天: 很久没有聊天了")
+        if (minutesSinceLastChat != null) {
+            val hoursAgo = minutesSinceLastChat / 60
+            when {
+                hoursAgo > 24 -> sb.appendLine("距离上次聊天: ${hoursAgo / 24}天${hoursAgo % 24}小时")
+                hoursAgo > 0 -> sb.appendLine("距离上次聊天: ${hoursAgo}小时${minutesSinceLastChat % 60}分钟")
+                else -> sb.appendLine("距离上次聊天: ${minutesSinceLastChat}分钟")
             }
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to get last message time", e)
+        } else {
+            sb.appendLine("距离上次聊天: 很久没有聊天了")
         }
 
         // Current time
@@ -517,7 +504,7 @@ class ProactiveMessageService : KoinComponent {
         try {
             val studyState = studyStore.state.first()
             val selectedStudyAssistant = studyState.selectedAssistantId
-            if (selectedStudyAssistant == settings.assistantId.toString()) {
+            if (selectedStudyAssistant == assistant.id.toString()) {
                 val planTasks = studyState.tasks.filter { it.source == StudyTaskSource.Plan }
                 val manualTasks = studyState.tasks.filter { it.source == StudyTaskSource.Manual }
                 val undoneTasks = studyState.tasks.filterNot { it.done }
@@ -544,7 +531,7 @@ class ProactiveMessageService : KoinComponent {
         }
 
         try {
-            val assistantId = settings.assistantId.toString()
+            val assistantId = assistant.id.toString()
             val cihaiState = cihaiStore.state.first()
             val recentEntries = recentFormalDiaryEntries(
                 entries = cihaiState.entries,
@@ -683,22 +670,6 @@ class ProactiveMessageService : KoinComponent {
         return sb.toString()
     }
 
-    private suspend fun getLastMessageTime(): kotlinx.datetime.Instant? {
-        return try {
-            val settings = settingsStore.settingsFlow.first()
-            val assistantId = settings.assistantId
-            val recentConversations = conversationRepository.getRecentConversations(assistantId, limit = 1)
-            if (recentConversations.isNotEmpty()) {
-                val conv = recentConversations.first()
-                val fullConv = conversationRepository.getConversationById(conv.id)
-                val localDateTime: LocalDateTime? = fullConv?.messageNodes?.lastOrNull()?.messages?.lastOrNull()?.createdAt
-                localDateTime?.toInstant(TimeZone.currentSystemDefault())
-            } else null
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to get last message time", e)
-            null
-        }
-    }
 }
 
 class ProactiveMessageReceiver : BroadcastReceiver() {
@@ -1104,6 +1075,8 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                         proactiveMessageService.buildProactiveContext(
                             context = this@ProactiveMessageTriggerService,
                             settings = settings,
+                            assistant = assistant,
+                            minutesSinceLastChat = minutesSinceLastChat,
                             targetedReason = effectiveTargetedReason,
                             targetedUserText = targetedUserText ?: executingCommitment?.actionPlan?.contextText,
                             targetedKind = effectiveTargetedKind,
@@ -1574,7 +1547,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             }
             
             // 本地工具
-            addAll(localTools.getTools(assistant.localTools))
+            addAll(localTools.getTools(assistant.localTools, assistant.id.toString()))
             
             // 系统工具（位置、通知、日历、闹钟、相机）
             val systemToolsOptions = settings.systemToolsSetting.getEnabledOptions()

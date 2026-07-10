@@ -92,10 +92,6 @@ val appModule = module {
     single {
         CihaiService(
             store = get(),
-            memoryBankService = get(),
-            settingsStore = get(),
-            generationHandler = get(),
-            scope = get(),
         )
     }
 

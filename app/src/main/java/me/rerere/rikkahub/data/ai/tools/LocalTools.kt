@@ -20,8 +20,6 @@ import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.cihai.CihaiEntry
 import me.rerere.rikkahub.data.cihai.CihaiEntryKind
 import me.rerere.rikkahub.data.cihai.CihaiService
-import me.rerere.rikkahub.data.datastore.SettingsStore
-import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.service.LocalTimeContextFormatter
 import me.rerere.rikkahub.utils.readClipboardText
 import me.rerere.rikkahub.utils.writeClipboardText
@@ -338,14 +336,15 @@ class LocalTools(private val context: Context) {
         )
     }
 
-    val luluJournalTool by lazy {
-        Tool(
+    private fun createJournalTool(assistantId: String): Tool {
+        require(assistantId.isNotBlank()) { "Journal tool requires an assistant ID" }
+        return Tool(
             name = "write_lulu_journal",
             description = """
-                Write a visible Cihai diary entry for the character.
+                Write a visible Cihai diary entry for the current character.
                 Use when the character wants to record a first-person diary about real feelings, private thoughts, and what was not said aloud.
-                This is the only path that saves a formal Lulu diary entry; background perception PASS/WAIT should not use it just to record silence.
-                Before calling, compare with the recent diary/inner-journal context available in the prompt, especially the latest 3 entries, and only write if this turn adds new perception, a new change, or a new judgment.
+                This is the only path that saves a formal character diary entry; background perception PASS/WAIT should not use it just to record silence.
+                Before calling, compare with the recent formal diary context, especially the latest 3 entries, and only write if this turn adds new perception, a new change, or a new judgment.
                 Write in character and first person. Let the length follow the real thought: do not pad, summarize mechanically, or force a fixed word count.
                 Do not write detached third-person notes, field labels, or internal trace dumps.
             """.trimIndent().replace("\n", " "),
@@ -376,13 +375,11 @@ class LocalTools(private val context: Context) {
                 val now = ZonedDateTime.now()
                 val cihaiSaved = runCatching {
                     val koin = GlobalContext.get()
-                    val settings = koin.get<SettingsStore>().settingsFlow.value
-                    val assistant = settings.getCurrentAssistant()
                     koin.get<CihaiService>().addEntry(
                         CihaiEntry(
-                            assistantId = assistant.id.toString(),
+                            assistantId = assistantId,
                             kind = CihaiEntryKind.DIARY,
-                            title = params["title"]?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "辞海日记" },
+                            title = params["title"]?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "角色日记" },
                             content = content,
                             emotion = params["mood"]?.jsonPrimitive?.contentOrNull.orEmpty(),
                             createdAt = now.toInstant().toEpochMilli(),
@@ -479,7 +476,7 @@ class LocalTools(private val context: Context) {
         )
     }
 
-    fun getTools(options: List<LocalToolOption>): List<Tool> {
+    fun getTools(options: List<LocalToolOption>, assistantId: String): List<Tool> {
         val tools = mutableListOf<Tool>()
         if (options.contains(LocalToolOption.JavascriptEngine)) {
             tools.add(javascriptTool)
@@ -503,7 +500,7 @@ class LocalTools(private val context: Context) {
             tools.add(createCalendarTool(context))
         }
         if (options.contains(LocalToolOption.LuluJournal)) {
-            tools.add(luluJournalTool)
+            tools.add(createJournalTool(assistantId))
         }
         if (options.contains(LocalToolOption.LuluExpression) || options.contains(LocalToolOption.TimeInfo)) {
             tools.add(luluExpressionTool)
