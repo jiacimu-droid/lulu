@@ -21,6 +21,7 @@ import me.rerere.rikkahub.data.api.RikkaHubAPI
 import me.rerere.rikkahub.data.api.SponsorAPI
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.cihai.CihaiStore
+import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.desktop.DesktopStore
 import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.data.db.AppDatabase
@@ -75,6 +76,10 @@ val dataSourceModule = module {
 
     single {
         LivingPresenceStore(context = get(), scope = get(), json = get())
+    }
+
+    single {
+        CompanionStore(context = get(), scope = get(), json = get())
     }
 
     single {
