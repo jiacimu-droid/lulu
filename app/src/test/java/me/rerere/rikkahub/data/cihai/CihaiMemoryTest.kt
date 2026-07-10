@@ -21,6 +21,19 @@ class CihaiMemoryTest {
     }
 
     @Test
+    fun `non diary entries are rejected before entering memory queue`() {
+        val reflection = memoryEntry(id = "reflection", kind = CihaiEntryKind.REFLECTION)
+        val innerJournal = memoryEntry(id = "inner", kind = CihaiEntryKind.INNER_JOURNAL)
+
+        val updated = CihaiState()
+            .addEntryToMemoryQueue(reflection)
+            .addEntryToMemoryQueue(innerJournal)
+
+        assertTrue(updated.entries.isEmpty())
+        assertTrue(updated.memoryQueue.isEmpty())
+    }
+
+    @Test
     fun `completing a settlement marks evidence saved and other reviewed entries cihai only`() {
         val initial = CihaiState()
             .addEntryToMemoryQueue(memoryEntry(id = "saved", createdAt = 100))
@@ -77,15 +90,12 @@ class CihaiMemoryTest {
     }
 
     @Test
-    fun `clearing assistant records keeps books and other assistants`() {
+    fun `clearing assistant records keeps other assistants`() {
         val targetEntry = memoryEntry(id = "target", assistantId = "assistant-a")
         val otherEntry = memoryEntry(id = "other", assistantId = "assistant-b")
         val state = CihaiState(
             selectedAssistantId = "assistant-a",
             entries = listOf(targetEntry, otherEntry),
-            books = listOf(
-                CihaiBook(assistantId = "assistant-a", title = "保留的书", content = "用户添加的内容"),
-            ),
             memoryQueue = listOf(
                 queueItem(entryId = "target", assistantId = "assistant-a", enqueuedAt = 100),
                 queueItem(entryId = "other", assistantId = "assistant-b", enqueuedAt = 100),
@@ -96,7 +106,6 @@ class CihaiMemoryTest {
 
         assertEquals(listOf("other"), cleared.entries.map { it.id })
         assertEquals(listOf("other"), cleared.memoryQueue.map { it.entryId })
-        assertEquals(listOf("保留的书"), cleared.books.map { it.title })
         assertEquals("assistant-a", cleared.selectedAssistantId)
     }
 
@@ -104,6 +113,7 @@ class CihaiMemoryTest {
     fun `normalization removes queue items whose entries are invalid or no longer pending`() {
         val invalidEntry = memoryEntry(id = "invalid").copy(content = "")
         val savedEntry = memoryEntry(id = "saved").copy(
+            kind = CihaiEntryKind.DIARY,
             memoryDisposition = CihaiMemoryDisposition.SAVED,
             memorySaved = true,
         )
@@ -123,17 +133,22 @@ class CihaiMemoryTest {
     }
 
     @Test
-    fun `normalization removes legacy reflection entries and their queue items`() {
+    fun `normalization removes legacy reflection and background journal entries`() {
         val reflection = memoryEntry(id = "legacy-reflection").copy(
             kind = CihaiEntryKind.REFLECTION,
             title = "露露的下一轮判断沉淀",
             content = "本轮感知世界包、意义评估、动态判断和状态生成的结果。",
         )
+        val innerJournal = memoryEntry(
+            id = "legacy-inner-journal",
+            kind = CihaiEntryKind.INNER_JOURNAL,
+        )
         val diary = memoryEntry(id = "diary").copy(kind = CihaiEntryKind.DIARY)
         val state = CihaiState(
-            entries = listOf(reflection, diary),
+            entries = listOf(reflection, innerJournal, diary),
             memoryQueue = listOf(
                 queueItem(entryId = reflection.id),
+                queueItem(entryId = innerJournal.id),
                 queueItem(entryId = diary.id),
             ),
         )
@@ -485,146 +500,10 @@ class CihaiMemoryTest {
         assertTrue(context.shouldSummarize)
     }
 
-    @Test
-    fun `silent judgement creates cihai inner entry without writing diary content`() {
-        val entry = CihaiEntry.fromSilentJudgment(
-            assistantId = "lulu",
-            assistantName = "露露",
-            reason = "感知层：用户说自己明天早上考试，最近上下文里压力偏高。意义评估层：考试对学生很重要，错过会有严重后果。判断层：今晚先确认她有没有睡下，明早再重新感知是否醒来。",
-            userText = "我明天早上10点要起床考试",
-            createdAt = 1_700_000_000_000L,
-        )
-
-        assertEquals(CihaiEntryKind.INNER_JOURNAL, entry.kind)
-        assertTrue(entry.title.contains("露露"))
-        assertTrue(entry.content.length in 100..500)
-        assertTrue(entry.content.startsWith("我"))
-        assertFalse(entry.content.contains("用户刚才说过："))
-        assertTrue(entry.content.contains("感知"))
-        assertTrue(entry.content.contains("评估"))
-        assertTrue(entry.content.contains("判断"))
-        assertTrue(entry.content.contains("考试"))
-        assertTrue(entry.content.contains("明早"))
-    }
-
-    @Test
-    fun `book creates reading reflection entry and advances progress`() {
-        val book = CihaiBook(
-            assistantId = "lulu",
-            title = "亲密关系",
-            content = "第一段。".repeat(80),
-            progressPercent = 0,
-        )
-
-        val result = book.readNextReflection(nowMillis = 1_700_000_000_000L)
-
-        assertTrue(result.entry.title.contains("亲密关系"))
-        assertEquals(CihaiEntryKind.READING_NOTE, result.entry.kind)
-        assertTrue(result.entry.content.contains("我读到"))
-        assertTrue(result.updatedBook.progressPercent > book.progressPercent)
-        assertEquals(1_700_000_000_000L, result.updatedBook.lastReadAt)
-    }
-
-    @Test
-    fun `silent presence planner can read a user book without creating formal diary`() {
-        val book = CihaiBook(
-            assistantId = "lulu",
-            title = "陪伴方法",
-            content = "人在忙的时候，陪伴者要降低打扰强度，保留观察和温柔的后续判断。".repeat(40),
-            progressPercent = 0,
-        )
-
-        val result = planCihaiSilentPresence(
-            CihaiSilentPresenceInput(
-                assistantId = "lulu",
-                assistantName = "露露",
-                reason = "用户已经 25 分钟没有回复，当前没有危险信号，先不打扰。",
-                userText = "我先忙一下",
-                actionHintNames = listOf("WRITE_DIARY", "READ_BOOK"),
-                books = listOf(book),
-                createdAt = 1_700_000_000_000L,
-            )
-        )
-
-        assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL, CihaiEntryKind.READING_NOTE),
-            result.entries.map { it.kind },
-        )
-        assertTrue(result.entries.none { it.kind == CihaiEntryKind.DIARY })
-        assertTrue(result.entries[1].sourceTitle!!.contains("陪伴方法"))
-        assertTrue(result.updatedBook!!.progressPercent > book.progressPercent)
-        assertTrue(result.entries.all { it.assistantId == "lulu" })
-    }
-
-    @Test
-    fun `silent presence journal hints never create formal diary entries`() {
-        val result = planCihaiSilentPresence(
-            CihaiSilentPresenceInput(
-                assistantId = "lulu",
-                assistantName = "露露",
-                reason = "后台感知选择 PASS/WAIT，只更新内部心迹，不写正式日记。",
-                userText = "我先忙一会儿",
-                actionHintNames = listOf("WRITE_DIARY", "WRITE_JOURNAL", "MEMORY_REFLECT"),
-                books = emptyList(),
-                createdAt = 1_700_000_000_000L,
-            )
-        )
-
-        assertFalse(result.entries.any { it.kind == CihaiEntryKind.DIARY })
-        assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL),
-            result.entries.map { it.kind },
-        )
-        assertTrue(result.entries.first().content.contains("不写正式日记"))
-    }
-
-    @Test
-    fun `silent presence records inner journal instead of formal diary when no book is available`() {
-        val result = planCihaiSilentPresence(
-            CihaiSilentPresenceInput(
-                assistantId = "lulu",
-                assistantName = "露露",
-                reason = "主动判断后决定不打扰。",
-                userText = "",
-                actionHintNames = listOf("WRITE_DIARY", "READ_BOOK"),
-                books = emptyList(),
-                createdAt = 1_700_000_000_000L,
-            )
-        )
-
-        assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL),
-            result.entries.map { it.kind },
-        )
-        assertTrue(result.entries.none { it.kind == CihaiEntryKind.DIARY })
-        assertEquals(null, result.updatedBook)
-    }
-
-    @Test
-    fun `silent presence memory reflection hint does not create meta memory`() {
-        val result = planCihaiSilentPresence(
-            CihaiSilentPresenceInput(
-                assistantId = "lulu",
-                assistantName = "露露",
-                reason = "事件进入多次判断系统，本轮选择等待和整理记忆。",
-                userText = "我先忙三个小时",
-                actionHintNames = listOf("WRITE_DIARY", "MEMORY_REFLECT"),
-                books = emptyList(),
-                createdAt = 1_700_000_000_000L,
-            )
-        )
-
-        assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL),
-            result.entries.map { it.kind },
-        )
-        assertTrue(result.entries.none { it.kind == CihaiEntryKind.REFLECTION })
-    }
-
     private fun memoryEntry(
         id: String,
         assistantId: String = "lulu",
-        kind: CihaiEntryKind = CihaiEntryKind.INNER_JOURNAL,
+        kind: CihaiEntryKind = CihaiEntryKind.DIARY,
         content: String = "她明确说晚上十点后不要打电话。",
         memorySaved: Boolean = false,
     ): CihaiEntry = CihaiEntry(

@@ -74,7 +74,6 @@ import me.rerere.rikkahub.CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID
 import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.SettingsStore
-import me.rerere.rikkahub.data.cihai.CihaiService
 import me.rerere.rikkahub.data.companion.CompanionActionResult
 import me.rerere.rikkahub.data.companion.CompanionCommitment
 import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
@@ -121,7 +120,6 @@ import me.rerere.rikkahub.service.CompanionIntentDecision
 import me.rerere.rikkahub.service.CompanionIntentFallbackPlanner
 import me.rerere.rikkahub.service.CompanionIntentInput
 import me.rerere.rikkahub.service.CompanionIntentModelPlanner
-import me.rerere.rikkahub.service.LivingPresenceConsolidationHint
 import me.rerere.rikkahub.service.RollingJudgmentDecision
 import me.rerere.rikkahub.service.RollingJudgmentLoop
 import me.rerere.rikkahub.service.ProactiveReminderPlan
@@ -563,28 +561,20 @@ class ProactiveMessageService : KoinComponent {
         try {
             val assistantId = settings.assistantId.toString()
             val cihaiState = cihaiStore.state.first()
-            val recentEntries = recentFormalDiaryOrInnerJournalEntries(
+            val recentEntries = recentFormalDiaryEntries(
                 entries = cihaiState.entries,
                 assistantId = assistantId,
             )
-            val readingBooks = cihaiState.books.filter { it.assistantId == assistantId }.take(3)
-            if (recentEntries.isNotEmpty() || readingBooks.isNotEmpty()) {
+            if (recentEntries.isNotEmpty()) {
                 sb.appendLine("辞海上下文:")
                 if (recentEntries.isNotEmpty()) {
-                    sb.appendLine("  - 最近心迹/行动/阅读/沉淀:")
+                    sb.appendLine("  - 最近正式日记:")
                     recentEntries.forEach { entry ->
                         sb.appendLine("    · ${entry.kind.label}｜${entry.title}: ${entry.content.take(80)}")
                     }
                 }
                 if (recentEntries.isNotEmpty()) {
-                    sb.appendLine("  - 调用 write_lulu_journal 前必须对比以上最近 3 篇正式日记/后台心迹；只能写本轮新增感知、新变化或新判断，没有新东西就不要写正式日记。")
-                }
-                if (readingBooks.isNotEmpty()) {
-                    sb.appendLine("  - 可阅读材料:")
-                    readingBooks.forEach { book ->
-                        sb.appendLine("    · 《${book.title}》进度 ${book.progressPercent}%: ${book.content.take(100)}")
-                    }
-                    sb.appendLine("  - 如果当前不适合打扰用户，角色可以先阅读这些材料，之后把感悟写入辞海并沉淀进记忆。")
+                    sb.appendLine("  - 调用 write_lulu_journal 前必须对比以上最近 3 篇正式日记；只能写本轮新增的真实感受或变化，没有新内容就不要写。")
                 }
             }
         } catch (e: Exception) {
@@ -696,7 +686,7 @@ class ProactiveMessageService : KoinComponent {
         sb.appendLine("- 不要说\"根据xxx\"、\"我注意到xxx数据\"之类暴露信息来源的话")
         sb.appendLine("- 直接以朋友聊天的语气开口，就像你突然想到了什么想跟对方说")
         sb.appendLine("- 不要使用任何XML标签、思考标记或特殊格式，最终消息只输出纯文本")
-        sb.appendLine("- 可以为了判断用户状态主动调用工具，例如时间、位置、应用使用、电量、健康、通知、短信、当前音乐、闹钟、日历或辞海心迹。")
+        sb.appendLine("- 可以为了判断用户状态主动调用工具，例如时间、位置、应用使用、电量、健康、通知、短信、当前音乐、闹钟或日历。正式日记只在确有新内容时调用 write_lulu_journal。")
         sb.appendLine("- 工具调用要符合角色当下目的：比如催睡就优先看时间、电量、应用使用；确认上课就优先看时间、位置、应用使用。")
         sb.appendLine("- 涉及时间时必须以“当前本地时间”的 24 小时制为准，00:00-04:59 是凌晨，不能说成下午或中午。")
         sb.appendLine("- 如果工具能帮你更像真人一样判断用户状态，就大胆用；最终说出口的话仍然要自然，不要暴露工具细节。")
@@ -795,7 +785,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
     private val pluginToolProvider: PluginToolProvider by inject()
     private val json: Json by inject()
     private val chatService: ChatService by inject()
-    private val cihaiService: CihaiService by inject()
     private val livingPresenceStore: LivingPresenceStore by inject()
     private val companionRuntime: CompanionRuntime by inject()
     private val studyStore: StudyStore by inject()
@@ -1088,17 +1077,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     }.onFailure { error ->
                         Log.w(TAG, "Failed to persist silent companion state", error)
                     }
-                    runCatching {
-                        cihaiService.recordSilentPresenceAction(
-                            assistantId = assistantUuid.toString(),
-                            assistantName = assistant.name,
-                            reason = livingPresenceDecision.toTargetedReason(assistant.name),
-                            userText = historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
-                            actionHintNames = livingPresenceDecision.toCihaiActionHints(),
-                        )
-                    }.onFailure { error ->
-                        Log.w(ProactiveMessageService.TAG, "Failed to record LivingPresence silent judgment", error)
-                    }
                     val hasQueuedTargeted = if (isTargetedTrigger) {
                         ProactiveMessageService.popCurrentTargetedAndScheduleNext(
                             context = this@ProactiveMessageTriggerService,
@@ -1146,17 +1124,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                         )
                     }.onFailure { error ->
                         Log.w(TAG, "Failed to persist waiting companion state", error)
-                    }
-                    runCatching {
-                        cihaiService.recordSilentPresenceAction(
-                            assistantId = assistantUuid.toString(),
-                            assistantName = assistant.name,
-                            reason = "自主脉冲判断后决定不打扰：${autonomousPlan.reason}",
-                            userText = historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
-                            actionHintNames = defaultSilentPresenceActionHints(),
-                        )
-                    }.onFailure { error ->
-                        Log.w(ProactiveMessageService.TAG, "Failed to record silent Cihai judgment", error)
                     }
                     ProactiveMessageService.scheduleNext(
                         context = this@ProactiveMessageTriggerService,
@@ -1347,18 +1314,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 if (replyText.isBlank() || replyText.contains("[PASS]")) {
                     // AI 选择跳过，移除本次生成的 aiMessage node（基于 id 匹配，不误删历史）
                     Log.d(ProactiveMessageService.TAG, "AI chose to skip proactive message")
-                    runCatching {
-                        cihaiService.recordSilentPresenceAction(
-                            assistantId = assistantUuid.toString(),
-                            assistantName = assistant.name,
-                            reason = effectiveTargetedReason ?: "主动触发后，角色判断现在没有必要开口。",
-                            userText = targetedUserText
-                                ?: historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
-                            actionHintNames = defaultSilentPresenceActionHints(),
-                        )
-                    }.onFailure { error ->
-                        Log.w(ProactiveMessageService.TAG, "Failed to record skipped Cihai judgment", error)
-                    }
                     val aiId = aiMessage.id
                     chatService.updateConversationState(conversationId) { conv ->
                         conv.copy(
@@ -1718,18 +1673,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
         appendLine("情绪底色：${updatedIntent.emotion.label}，克制程度 ${updatedIntent.restraint}/10。")
         appendLine("下一次触发时必须重新看上下文、重新判断。可以自然开口，也可以 [PASS]，不要复述这段内部记录。")
     }.trim()
-
-    private fun RollingJudgmentDecision.toCihaiActionHints(): List<String> = buildList {
-        if (LivingAction.WRITE_DIARY in actions) {
-            add("WRITE_DIARY")
-        }
-        if (LivingAction.PASS in actions || LivingAction.WAIT in actions || LivingAction.INNER_THOUGHT in actions) {
-            add(LivingPresenceConsolidationHint.MEMORY_REFLECT.name)
-        }
-        if (LivingAction.READ in actions) {
-            add(LivingPresenceConsolidationHint.READ_BOOK.name)
-        }
-    }.ifEmpty { defaultSilentPresenceActionHints() }
 
     private fun LivingIntentKind.toTargetedKind(): String = when (this) {
         LivingIntentKind.STUDY_FOCUS -> "study"
@@ -2354,19 +2297,13 @@ private fun RollingJudgmentDecision.toFallbackSilentInnerVoice(): String = when 
         "我先保留上一轮上下文，不把沉默解释成关系信号；等下一轮新信息再判断。"
 }
 
-internal fun defaultSilentPresenceActionHints(): List<String> = listOf(
-    LivingPresenceConsolidationHint.READ_BOOK.name,
-    LivingPresenceConsolidationHint.MEMORY_REFLECT.name,
-)
-
-internal fun recentFormalDiaryOrInnerJournalEntries(
+internal fun recentFormalDiaryEntries(
     entries: List<CihaiEntry>,
     assistantId: String,
     limit: Int = 3,
 ): List<CihaiEntry> = entries
     .filter { entry ->
-        entry.assistantId == assistantId &&
-            (entry.kind == CihaiEntryKind.DIARY || entry.kind == CihaiEntryKind.INNER_JOURNAL)
+        entry.assistantId == assistantId && entry.kind == CihaiEntryKind.DIARY
     }
     .sortedBy { it.createdAt }
     .takeLast(limit.coerceAtLeast(0))
@@ -2394,14 +2331,14 @@ internal fun buildTargetedProactiveSensingInstruction(
             appendLine("表达重点放在轻轻确认状态，不要打断太重。")
         }
         "general" -> {
-            appendLine("本次目标的感知重点：先看当前时间、应用使用和电量；如果原因里提到记录，可以主动写入辞海心迹，不计入正式日记。")
+            appendLine("本次目标的感知重点：先看当前时间、应用使用和电量；没有明确行动价值时保持安静，不要为了记录判断过程而写辞海。")
         }
         "living_presence" -> {
             appendLine("本次目标的感知重点：这是 Living Presence OS 的下一轮滚动判断，不是随机主动消息。")
             appendLine("按感知世界包-意义评估-动态判断-行动实现-状态生成-辞海记忆架构重新判断：先整理当前时间、上下文、工具结果、工具状态、考研计划、召回记忆和历史挂心记录；再评估重要性、威胁、机会、身心安全、时间压力、成本、收益、不行动后果和可用资源。")
             appendLine("动态判断根据完整感知包、人设和意义评估决定意图、可做什么、要不要查工具、要不要开口、要不要写辞海，以及下一轮从什么时候重新感知。")
             appendLine("状态生成只保留心情、身体状况、精神状况、亲密关系和第一人称没说出口；不要把 belief、traitMotive、situationalMotive 或 intention 塞回状态栏。")
-            appendLine("如果已经开过口或用户明显在忙，可以 [PASS]，但要把第一人称内心想法写入辞海心迹；辞海心迹或行动不计入正式日记，记忆由辞海和聊天阈值自动沉淀。")
+            appendLine("如果已经开过口或用户明显在忙，可以 [PASS]；第一人称内心想法只更新统一状态，不自动写辞海。正式日记只能由 write_lulu_journal 工具主动保存。")
         }
         else -> when {
             reason.contains("睡") -> appendLine("本次目标的感知重点：先看当前时间、睡眠/健康、应用使用和电量。")

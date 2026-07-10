@@ -48,7 +48,8 @@ class RollingJudgmentLoopTest {
 
         assertEquals(LivingIntentKind.STUDY_FOCUS, intent.kind)
         assertEquals(listOf(1L), intent.evaluationCadence.delaysMinutes)
-        assertTrue(intent.candidateActions.contains(LivingAction.WRITE_DIARY))
+        assertTrue(LivingAction.WRITE_DIARY !in intent.candidateActions)
+        assertTrue(LivingAction.READ !in intent.candidateActions)
         assertTrue(LivingAction.MEMORY_UPDATE !in intent.candidateActions)
     }
 
@@ -140,7 +141,8 @@ class RollingJudgmentLoopTest {
 
         assertTrue(intent.candidateActions.contains(LivingAction.SET_ALARM))
         assertTrue(decision.actions.contains(LivingAction.SET_ALARM))
-        assertTrue(decision.actions.contains(LivingAction.WRITE_DIARY))
+        assertTrue(decision.actions.contains(LivingAction.WAIT))
+        assertTrue(LivingAction.WRITE_DIARY !in decision.actions)
     }
 
     @Test
@@ -160,7 +162,7 @@ class RollingJudgmentLoopTest {
 
         assertEquals(LivingIntentStatus.RESTRAINED, decision.updatedIntent.status)
         assertTrue(decision.actions.contains(LivingAction.WAIT))
-        assertTrue(decision.actions.contains(LivingAction.WRITE_DIARY))
+        assertTrue(LivingAction.WRITE_DIARY !in decision.actions)
         assertTrue(decision.actions.contains(LivingAction.SCHEDULE_NEXT_PERCEPTION))
         assertTrue(decision.updatedIntent.restraint > intent.restraint)
         assertEquals(1, decision.updatedIntent.silentEvaluationCount)
@@ -327,7 +329,7 @@ class RollingJudgmentLoopTest {
         )
 
         assertEquals(
-            listOf(LivingAction.TOOL_USE, LivingAction.WRITE_DIARY, LivingAction.SCHEDULE_NEXT_PERCEPTION),
+            listOf(LivingAction.TOOL_USE, LivingAction.WAIT, LivingAction.SCHEDULE_NEXT_PERCEPTION),
             decision.actions,
         )
         assertTrue(LivingAction.MESSAGE !in decision.actions)
@@ -394,7 +396,8 @@ class RollingJudgmentLoopTest {
         )
 
         assertTrue(decision.actions.contains(LivingAction.PASS))
-        assertTrue(decision.actions.contains(LivingAction.WRITE_DIARY))
+        assertTrue(decision.actions.contains(LivingAction.WAIT))
+        assertTrue(LivingAction.WRITE_DIARY !in decision.actions)
         assertTrue(LivingAction.MESSAGE !in decision.actions)
     }
 

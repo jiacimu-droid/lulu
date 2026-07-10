@@ -91,44 +91,16 @@ class CihaiStore(
         update { state -> state.withoutAssistantRecords(assistantId) }
     }
 
-    suspend fun addBook(book: CihaiBook) {
-        update { state ->
-            state.copy(books = (listOf(book) + state.books).take(CIHAI_BOOK_LIMIT))
-        }
-    }
-
-    suspend fun updateBook(book: CihaiBook) {
-        update { state ->
-            state.copy(books = state.books.map { current ->
-                if (current.id == book.id) book else current
-            })
-        }
-    }
-
-    suspend fun deleteBook(bookId: String) {
-        update { state ->
-            state.copy(books = state.books.filterNot { it.id == bookId })
-        }
-    }
-
 }
 
 internal fun CihaiState.normalizedCihaiState(): CihaiState {
     val normalizedEntries = entries
-        .filter {
-            it.assistantId.isNotBlank() &&
-                it.content.isNotBlank() &&
-                it.kind != CihaiEntryKind.REFLECTION
-        }
+        .filter { it.assistantId.isNotBlank() && it.content.isNotBlank() && it.kind == CihaiEntryKind.DIARY }
         .distinctBy { it.id }
         .take(CIHAI_ENTRY_LIMIT)
     val normalizedEntriesById = normalizedEntries.associateBy { it.id }
     return copy(
         entries = normalizedEntries,
-        books = books
-            .filter { it.assistantId.isNotBlank() && it.title.isNotBlank() && it.content.isNotBlank() }
-            .distinctBy { it.id }
-            .take(CIHAI_BOOK_LIMIT),
         memoryQueue = memoryQueue
             .asSequence()
             .filter { item ->
@@ -147,7 +119,13 @@ internal fun CihaiState.normalizedCihaiState(): CihaiState {
 }
 
 internal fun CihaiState.addEntryToMemoryQueue(entry: CihaiEntry): CihaiState {
-    if (entry.id.isBlank() || entry.assistantId.isBlank() || entry.content.isBlank()) return this
+    if (entry.kind != CihaiEntryKind.DIARY ||
+        entry.id.isBlank() ||
+        entry.assistantId.isBlank() ||
+        entry.content.isBlank()
+    ) {
+        return this
+    }
     val pendingEntry = entry.copy(
         memoryDisposition = CihaiMemoryDisposition.PENDING,
         memorySaved = false,
@@ -233,5 +211,4 @@ internal fun CihaiState.withoutAssistantRecords(assistantId: String): CihaiState
 private const val CIHAI_RETRY_BASE_DELAY_MILLIS = 15L * 60 * 1_000
 private const val CIHAI_RETRY_MAX_DELAY_MILLIS = 6L * 60 * 60 * 1_000
 private const val CIHAI_ENTRY_LIMIT = 300
-private const val CIHAI_BOOK_LIMIT = 60
 private const val CIHAI_MEMORY_QUEUE_LIMIT = 300

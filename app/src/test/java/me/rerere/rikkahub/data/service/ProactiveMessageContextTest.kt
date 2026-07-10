@@ -7,7 +7,6 @@ import me.rerere.rikkahub.service.LivingAction
 import me.rerere.rikkahub.service.LivingIntentKind
 import me.rerere.rikkahub.service.LivingJudgmentSource
 import me.rerere.rikkahub.service.LivingJudgmentTrace
-import me.rerere.rikkahub.service.LivingPresenceConsolidationHint
 import me.rerere.rikkahub.service.CompanionIntent
 import me.rerere.rikkahub.service.CompanionIntentDecision
 import me.rerere.rikkahub.service.RollingJudgmentLoop
@@ -111,16 +110,7 @@ class ProactiveMessageContextTest {
     }
 
     @Test
-    fun `default silent presence hints do not request formal journal writing`() {
-        val hints = defaultSilentPresenceActionHints()
-
-        assertFalse(hints.contains(LivingPresenceConsolidationHint.WRITE_JOURNAL.name))
-        assertTrue(hints.contains(LivingPresenceConsolidationHint.READ_BOOK.name))
-        assertTrue(hints.contains(LivingPresenceConsolidationHint.MEMORY_REFLECT.name))
-    }
-
-    @Test
-    fun `recent diary context keeps latest three formal diary or inner journal entries`() {
+    fun `recent diary context keeps only formal diary entries`() {
         val entries = listOf(
             cihaiEntry("old-diary", CihaiEntryKind.DIARY, createdAt = 1),
             cihaiEntry("reading", CihaiEntryKind.READING_NOTE, createdAt = 2),
@@ -130,13 +120,13 @@ class ProactiveMessageContextTest {
             cihaiEntry("new-diary", CihaiEntryKind.DIARY, createdAt = 6),
         )
 
-        val recent = recentFormalDiaryOrInnerJournalEntries(entries, assistantId = "lulu")
+        val recent = recentFormalDiaryEntries(entries, assistantId = "lulu")
 
         assertEquals(
-            listOf("inner-1", "inner-2", "new-diary"),
+            listOf("old-diary", "new-diary"),
             recent.map { it.title },
         )
-        assertTrue(recent.all { it.kind == CihaiEntryKind.DIARY || it.kind == CihaiEntryKind.INNER_JOURNAL })
+        assertTrue(recent.all { it.kind == CihaiEntryKind.DIARY })
     }
 
     @Test

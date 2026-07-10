@@ -24,7 +24,7 @@ class LivingPresencePlannerTest {
     }
 
     @Test
-    fun `health concern creates dense checks with sensing tools and journal option`() {
+    fun `health concern creates dense checks without memory side effects`() {
         val now = 1_700_000_000_000L
 
         val plans = LivingPresencePlanner.planRollingJudgments(
@@ -44,44 +44,9 @@ class LivingPresencePlannerTest {
         assertTrue(plans.first().reason.contains("Appraisal="))
         assertTrue(plans.first().reason.contains("感知层必须先装入角色人设"))
         assertTrue(plans.first().reason.contains("下次什么时候感知"))
-        assertFalse(plans.first().actionHints.any { it.toolName == LivingPresenceConsolidationHint.WRITE_JOURNAL.name })
-        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceConsolidationHint.MEMORY_REFLECT.name })
-        assertTrue(plans.first().actionHints.any { it.toolName == LivingPresenceAction.TOOL_USE.name })
-    }
-
-    @Test
-    fun `action pool stays separate from expression affordance pool`() {
-        val actionNames = LivingPresenceAction.entries.map { it.name }.toSet()
-        val expressionNames = LivingPresenceExpressionAffordance.entries.map { it.name }.toSet()
-
-        assertEquals(
-            setOf(
-                "MESSAGE",
-                "WAIT",
-                "TOOL_USE",
-                "SET_ALARM",
-                "WRITE_DIARY",
-                "SCHEDULE_NEXT_PERCEPTION",
-                "READ",
-                "ASK_USER",
-                "PASS",
-            ),
-            actionNames,
-        )
-        assertEquals(
-            setOf(
-                "TEXT",
-                "KAOMOJI",
-                "STICKER",
-                "VOICE",
-                "STATUS_BAR",
-                "LIGHT_REMINDER",
-                "LONG_EXPLANATION",
-                "SILENT_RECORD",
-            ),
-            expressionNames,
-        )
-        assertFalse(actionNames.any { it in expressionNames })
+        assertEquals(listOf("TOOL_USE"), plans.first().actionHints.map { it.toolName })
+        assertFalse(plans.first().reason.contains("后台心迹"))
+        assertFalse(plans.first().reason.contains("MEMORY_REFLECT"))
     }
 
     @Test

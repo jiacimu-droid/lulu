@@ -9,35 +9,6 @@ data class LivingPresenceInput(
     val preferredToolNames: List<String> = emptyList(),
 )
 
-enum class LivingPresenceAction {
-    MESSAGE,
-    WAIT,
-    TOOL_USE,
-    SET_ALARM,
-    WRITE_DIARY,
-    SCHEDULE_NEXT_PERCEPTION,
-    READ,
-    ASK_USER,
-    PASS,
-}
-
-enum class LivingPresenceConsolidationHint {
-    WRITE_JOURNAL,
-    READ_BOOK,
-    MEMORY_REFLECT,
-}
-
-enum class LivingPresenceExpressionAffordance {
-    TEXT,
-    KAOMOJI,
-    STICKER,
-    VOICE,
-    STATUS_BAR,
-    LIGHT_REMINDER,
-    LONG_EXPLANATION,
-    SILENT_RECORD,
-}
-
 object LivingPresencePlanner {
     fun planRollingJudgments(
         input: LivingPresenceInput,
@@ -70,8 +41,8 @@ object LivingPresencePlanner {
         append("事件=${intent.concernEvent}。目标=${intent.concernGoal}。")
         append("感知层必须先装入角色人设、上下文、未总结聊天、辞海、挂心任务、工具状态、工具结果、向量记忆和上一轮状态栏。")
         append("意义评估 Appraisal=${intent.appraisal.meaning}；风险=${intent.appraisal.risk}；价值=${intent.appraisal.value}；成本=${intent.appraisal.cost}；资源=${intent.appraisal.resources}.")
-        append("判断层 intention=${intent.intention}；是否开口、是否查工具、是否等待、是否记录后台心迹、下一次什么时候感知，都必须根据本轮感知和人设重新决定。")
-        append("行动池 includes MESSAGE, WAIT, TOOL_USE, SET_ALARM, WRITE_DIARY, SCHEDULE_NEXT_PERCEPTION, READ, ASK_USER, PASS；WRITE_DIARY 只代表后台心迹，不是正式日记；正式日记只通过 write_lulu_journal 工具保存。记忆沉淀由辞海/聊天阈值自动触发，不作为模型动作。")
+        append("判断层 intention=${intent.intention}；是否开口、是否查工具、是否等待、下一次什么时候感知，都必须根据本轮感知和人设重新决定。")
+        append("行动池 includes MESSAGE, WAIT, TOOL_USE, SET_ALARM, SCHEDULE_NEXT_PERCEPTION, ASK_USER, PASS；正式日记只通过 write_lulu_journal 工具保存，静默本身不生成辞海记录。")
         append("状态栏只生成心情、身体、精神、亲密和第一人称没说出口；不要把 belief/motive/intention 当成状态栏展示。")
         append("Consolidation=${intent.consolidation.episodicTrace} / ${intent.consolidation.policyLearning}.")
         append("Hypotheses: ${intent.hypotheses.joinToString(" / ")}.")
@@ -79,22 +50,10 @@ object LivingPresencePlanner {
     }
 
     private fun buildActionHints(kind: LivingIntentKind): List<ProactiveActionHint> = buildList {
-        add(
-            ProactiveActionHint(
-                toolName = LivingPresenceConsolidationHint.READ_BOOK.name,
-                reason = "如果用户持续沉默且没有紧急风险，可以阅读辞海里用户交给角色的材料，留下阅读感悟并进入记忆。",
-            )
-        )
-        add(
-            ProactiveActionHint(
-                toolName = LivingPresenceConsolidationHint.MEMORY_REFLECT.name,
-                reason = "把本轮感知、意义评估、审议判断、后台心迹、向量记忆和图谱记忆整理成沉淀，供下一轮判断复用；不要写正式日记。",
-            )
-        )
         if (kind == LivingIntentKind.HEALTH_SAFETY) {
             add(
                 ProactiveActionHint(
-                toolName = LivingPresenceAction.TOOL_USE.name,
+                    toolName = "TOOL_USE",
                     reason = "身体不适场景优先查看健康、电量、应用或位置线索，再决定是否发消息。",
                 )
             )

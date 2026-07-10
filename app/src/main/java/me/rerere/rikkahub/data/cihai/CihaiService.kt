@@ -30,6 +30,7 @@ class CihaiService(
     private val settlementMutex = Mutex()
 
     suspend fun addEntry(entry: CihaiEntry) {
+        if (entry.kind != CihaiEntryKind.DIARY) return
         store.addEntry(entry)
         scope.launch {
             runCatching {
@@ -39,57 +40,6 @@ class CihaiService(
                 Log.w(TAG, "Cihai settlement launch failed for assistant=${entry.assistantId}", error)
             }
         }
-    }
-
-    suspend fun addBook(book: CihaiBook) {
-        store.addBook(book)
-    }
-
-    suspend fun recordSilentJudgment(
-        assistantId: String,
-        assistantName: String,
-        reason: String,
-        userText: String,
-        createdAt: Long = System.currentTimeMillis(),
-    ) {
-        addEntry(
-            CihaiEntry.fromSilentJudgment(
-                assistantId = assistantId,
-                assistantName = assistantName,
-                reason = reason,
-                userText = userText,
-                createdAt = createdAt,
-            )
-        )
-    }
-
-    suspend fun recordSilentPresenceAction(
-        assistantId: String,
-        assistantName: String,
-        reason: String,
-        userText: String,
-        actionHintNames: List<String> = emptyList(),
-        createdAt: Long = System.currentTimeMillis(),
-    ) {
-        val result = planCihaiSilentPresence(
-            CihaiSilentPresenceInput(
-                assistantId = assistantId,
-                assistantName = assistantName,
-                reason = reason,
-                userText = userText,
-                actionHintNames = actionHintNames,
-                books = store.state.value.books,
-                createdAt = createdAt,
-            )
-        )
-        result.updatedBook?.let { store.updateBook(it) }
-        result.entries.forEach { entry -> addEntry(entry) }
-    }
-
-    suspend fun readBook(book: CihaiBook) {
-        val result = book.readNextReflection()
-        store.updateBook(result.updatedBook)
-        addEntry(result.entry)
     }
 
     suspend fun settleDueMemories(
