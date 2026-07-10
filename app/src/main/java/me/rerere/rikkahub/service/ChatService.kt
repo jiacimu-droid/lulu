@@ -110,6 +110,8 @@ import me.rerere.rikkahub.data.companion.CompanionPerceptionInput
 import me.rerere.rikkahub.data.companion.CompanionPerceptionPacket
 import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.companion.CompanionTurnMutation
+import me.rerere.rikkahub.data.companion.CompanionToolExecution
+import me.rerere.rikkahub.data.companion.buildScheduledToolFollowUp
 import me.rerere.rikkahub.data.companion.CompanionTurnRole
 import me.rerere.rikkahub.data.companion.buildCompanionStateFromTurn
 import me.rerere.rikkahub.data.companion.toLegacyLuluState
@@ -987,6 +989,13 @@ class ChatService(
                 userText = lastUserText,
                 assistantText = lastAssistantText,
             )
+            val scheduledToolDrafts = buildScheduledToolFollowUpsFromTurn(
+                finalConversation = finalConversation,
+                assistantId = assistant.id.toString(),
+                conversationId = conversationId.toString(),
+                sourceMessageId = lastUserMessage?.id?.toString(),
+                nowMillis = nowMillis,
+            )
             livingPresenceStore.completeReturnedIntents(
                 assistantId = assistant.id.toString(),
                 userText = lastUserText,
@@ -1007,7 +1016,12 @@ class ChatService(
                 presence = finalConversation.currentMessages.takeLast(8).companionModelPresence(),
                 nowMillis = nowMillis,
             )
-            val followUpDrafts = scheduledPlans.map { plan ->
+            val effectiveScheduledPlans = if (scheduledToolDrafts.isEmpty()) {
+                scheduledPlans
+            } else {
+                scheduledPlans.filterNot { it.kind == ProactiveReminderKind.SCHEDULE }
+            }
+            val followUpDrafts = effectiveScheduledPlans.map { plan ->
                 CompanionFollowUpDraft(
                     assistantId = assistant.id.toString(),
                     category = plan.kind.name.lowercase(Locale.ROOT),
@@ -1024,7 +1038,7 @@ class ChatService(
                         CompanionActionType.CHECK_IN
                     },
                 )
-            }
+            } + scheduledToolDrafts
             val persistedState = runCatching {
                 companionRuntime.applyTurn(
                     CompanionTurnMutation(
@@ -1093,6 +1107,43 @@ class ChatService(
             setting = settings.getProactiveMessageSetting(assistantId),
             commitment = nextCommitment,
         )
+    }
+
+    private fun buildScheduledToolFollowUpsFromTurn(
+        finalConversation: Conversation,
+        assistantId: String,
+        conversationId: String,
+        sourceMessageId: String?,
+        nowMillis: Long,
+    ): List<CompanionFollowUpDraft> {
+        val messages = finalConversation.currentMessages
+        val lastUserIndex = messages.indexOfLast { it.role == MessageRole.USER }
+        if (lastUserIndex < 0) return emptyList()
+        return messages
+            .drop(lastUserIndex + 1)
+            .flatMap { message -> message.getTools() }
+            .asSequence()
+            .filter { tool -> tool.isExecuted }
+            .mapNotNull { tool ->
+                val outputText = tool.output
+                    .filterIsInstance<UIMessagePart.Text>()
+                    .joinToString("\n") { it.text }
+                    .trim()
+                buildScheduledToolFollowUp(
+                    execution = CompanionToolExecution(
+                        toolCallId = tool.toolCallId,
+                        toolName = tool.toolName,
+                        inputJson = tool.input,
+                        outputText = outputText,
+                    ),
+                    assistantId = assistantId,
+                    conversationId = conversationId,
+                    sourceMessageId = sourceMessageId,
+                    nowMillis = nowMillis,
+                )
+            }
+            .distinctBy { draft -> draft.reason to draft.dueAt }
+            .toList()
     }
 
     private fun buildProactiveReminderPlansFromTurn(

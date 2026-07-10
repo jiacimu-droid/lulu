@@ -1,5 +1,10 @@
 package me.rerere.rikkahub.data.companion
 
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
 data class CompanionPerceptionInput(
     val assistantId: String,
     val assistantName: String,
@@ -149,6 +154,11 @@ object CompanionPerceptionAssembler {
 
 fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
     appendLine("<companion_runtime assistant_id=\"$assistantId\">")
+    val zoneId = ZoneId.systemDefault()
+    val absoluteTime = Instant.ofEpochMilli(nowMillis)
+        .atZone(zoneId)
+        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss XXX", Locale.ROOT))
+    appendLine("current_time=$absoluteTime timezone=${zoneId.id} epoch_ms=$nowMillis")
     appendLine(
         "relationship familiarity=${snapshot.relationship.familiarity} " +
             "trust=${snapshot.relationship.trust} closeness=${snapshot.relationship.closeness} " +
@@ -169,7 +179,9 @@ fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
         activeConcerns.take(8).forEach { concern ->
             appendLine(
                 "- subject=${concern.subjectKey} importance=${concern.importance} " +
-                    "next=${concern.nextPerceptionAt ?: "none"} goal=${concern.goal.take(180)}",
+                    "next=${concern.nextPerceptionAt ?: "none"} " +
+                    "overdue=${concern.nextPerceptionAt?.let { it <= nowMillis } == true} " +
+                    "goal=${concern.goal.take(180)}",
             )
         }
     }
@@ -178,7 +190,7 @@ fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
         actionableCommitments.take(8).forEach { commitment ->
             appendLine(
                 "- id=${commitment.id} due=${commitment.dueAt} status=${commitment.status.name} " +
-                    "promise=${commitment.promise.take(180)}",
+                    "overdue=${commitment.dueAt <= nowMillis} promise=${commitment.promise.take(180)}",
             )
         }
     }

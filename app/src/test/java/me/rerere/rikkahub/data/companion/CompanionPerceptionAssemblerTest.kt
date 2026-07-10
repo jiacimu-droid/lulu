@@ -118,6 +118,24 @@ class CompanionPerceptionAssemblerTest {
         assertEquals(false, prompt.contains("promise done"))
     }
 
+    @Test
+    fun `prompt context exposes absolute time and overdue state`() {
+        val packet = CompanionPerceptionAssembler.assemble(
+            input = input().copy(nowMillis = 1_783_616_400_000L),
+            snapshot = CompanionSnapshot(
+                assistantId = "assistant-a",
+                concerns = listOf(concern(id = "overdue", nextPerceptionAt = 100L)),
+                commitments = listOf(commitment(id = "overdue", dueAt = 100L)),
+            ),
+        )
+
+        val prompt = packet.toPromptContext()
+
+        assertTrue(prompt.contains("current_time="))
+        assertTrue(prompt.contains("timezone="))
+        assertTrue(prompt.contains("overdue=true"))
+    }
+
     private fun input(assistantId: String = "assistant-a") = CompanionPerceptionInput(
         assistantId = assistantId,
         assistantName = "角色 A",
