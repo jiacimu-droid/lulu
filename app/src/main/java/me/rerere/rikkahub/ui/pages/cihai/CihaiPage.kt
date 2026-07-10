@@ -43,8 +43,9 @@ import me.rerere.rikkahub.data.cihai.CihaiEntry
 import me.rerere.rikkahub.data.cihai.CihaiEntryKind
 import me.rerere.rikkahub.data.cihai.CihaiMemoryDisposition
 import me.rerere.rikkahub.data.cihai.CihaiStore
+import me.rerere.rikkahub.data.companion.CompanionSnapshot
+import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
-import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
@@ -59,9 +60,9 @@ import java.util.Locale
 fun CihaiPage(onBack: () -> Unit) {
     val settings = LocalSettings.current
     val store = koinInject<CihaiStore>()
-    val livingPresenceStore = koinInject<LivingPresenceStore>()
+    val companionStore = koinInject<CompanionStore>()
     val state by store.state.collectAsState()
-    val livingState by livingPresenceStore.state.collectAsState()
+    val companionState by companionStore.state.collectAsState()
     val scope = rememberCoroutineScope()
     val fallbackAssistant = settings.getCurrentAssistant()
     val selectedAssistantId = state.selectedAssistantId
@@ -71,9 +72,10 @@ fun CihaiPage(onBack: () -> Unit) {
         ?: fallbackAssistant
     var selectedTab by remember { mutableIntStateOf(0) }
     val sections = visibleCihaiSections()
-    val concernCards = buildLivingIntentCards(
-        intents = livingState.activeIntents,
-        selectedAssistantId = selectedAssistantId,
+    val concernCards = buildCompanionConcernCards(
+        snapshot = companionState.snapshots
+            .firstOrNull { it.assistantId == selectedAssistantId }
+            ?: CompanionSnapshot.empty(selectedAssistantId),
     )
 
     LaunchedEffect(selectedAssistantId) {
@@ -248,7 +250,7 @@ internal fun entriesForCihaiSection(
 }
 
 @Composable
-private fun ConcernCard(card: LivingIntentCardModel) {
+private fun ConcernCard(card: CompanionConcernCardModel) {
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
@@ -280,17 +282,26 @@ private fun ConcernCard(card: LivingIntentCardModel) {
             Text(
                 text = card.nextPerceptionText,
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
+                color = if (card.overdue) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = listOf(card.eventLine, card.goalLine).joinToString("\n"),
+                text = card.eventText,
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Text(
-                text = card.perceptionLine,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            card.goalText.takeIf(String::isNotBlank)?.let { goal ->
+                Text(
+                    text = goal,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            card.commitmentText?.let { commitment ->
+                Text(
+                    text = "答应你的事：$commitment",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }
