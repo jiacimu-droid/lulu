@@ -9,8 +9,8 @@ import me.rerere.rikkahub.service.LivingIntentKind
 import me.rerere.rikkahub.service.LivingJudgmentSource
 import me.rerere.rikkahub.service.LivingJudgmentTrace
 import me.rerere.rikkahub.service.LivingPresenceConsolidationHint
-import me.rerere.rikkahub.service.LuluIntent
-import me.rerere.rikkahub.service.LuluIntentPlan
+import me.rerere.rikkahub.service.CompanionIntent
+import me.rerere.rikkahub.service.CompanionIntentDecision
 import me.rerere.rikkahub.service.RollingJudgmentLoop
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
@@ -174,8 +174,8 @@ class ProactiveMessageContextTest {
     @Test
     fun `autonomous api plan updates status bar with model inner thought when not speaking`() {
         val assistantId = Uuid.parse("33333333-3333-3333-3333-333333333333")
-        val plan = LuluIntentPlan(
-            intent = LuluIntent.DO_NOT_DISTURB,
+        val plan = CompanionIntentDecision(
+            intent = CompanionIntent.WAIT,
             shouldMessageNow = false,
             delayMinutes = null,
             toolNames = emptyList(),

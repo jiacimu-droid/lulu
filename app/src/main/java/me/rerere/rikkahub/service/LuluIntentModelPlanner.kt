@@ -3,83 +3,19 @@ package me.rerere.rikkahub.service
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
-import me.rerere.ai.core.MessageRole
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.ui.UIMessage
-import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.model.LuluState
 import me.rerere.rikkahub.utils.JsonInstant
 
-object LuluIntentModelPlanner {
-    suspend fun planOrNull(
-        input: LuluIntentInput,
-        settings: Settings,
-        model: Model,
-        providerManager: ProviderManager,
-    ): LuluIntentPlan? {
-        val provider = model.findProvider(settings.providers) ?: return null
-        val providerImpl = providerManager.getProviderByType(provider)
-        val chunk = providerImpl.generateText(
-            providerSetting = provider,
-            messages = listOf(
-                UIMessage(
-                    role = MessageRole.USER,
-                    parts = listOf(UIMessagePart.Text(buildPrompt(input))),
-                )
-            ),
-            params = TextGenerationParams(
-                model = model,
-                temperature = 0.2f,
-                topP = 0.8f,
-                maxTokens = 500,
-            ),
-        )
-        val raw = chunk.choices.firstOrNull()?.message?.toText().orEmpty()
-        return parsePlan(raw, input.availableToolNames)
-    }
-
-    fun buildPrompt(input: LuluIntentInput): String = buildString {
-        appendLine("你是${input.assistantName}的后台小脑，只判断她接下来想做什么，不生成聊天正文。")
-        appendLine("目标：根据角色状态、最近对话、沉默时间、未完成想法和可用工具，决定是否主动联系用户、多久后联系、优先看哪些工具。")
-        appendLine("活人感系统采用：感知世界包-意义评估-动态判断-行动实现-状态生成-辞海记忆架构。")
-        appendLine("情境感知只整理事实：当前时间、上下文、考研 App 计划、工具结果、工具状态、排序后的向量记忆召回、最近状态栏/辞海/历史挂心记录。")
-        appendLine("意义评估参考 Lazarus appraisal theory：先评估事件对用户、角色、关系、任务的意义，再评估资源是否足够；它不直接决定行动。")
-        appendLine("状态生成放在行动后，只生成心情、身体状况、精神状况、亲密关系和第一人称没说出口；belief/motive/intention 不作为状态栏字段。")
-        appendLine("不要只做一次判断。若用户可能长时间沉默，应输出多段 followUps，让系统在后续时间点重新观察、重新判断；每个 followUp 只写判断原因，不写未来消息正文。")
-        appendLine("工具是角色的本地感知和行动能力；只要角色形成意图，就可以主动选择工具、记录后台心迹、必要时调用正式日记工具、设闹钟、查短信/日历/位置/摄像头等，不要机械等待用户重复确认。")
-        appendLine("如果判断当下不适合打扰用户，选项池包括：等待、查看工具、记录后台心迹、阅读用户交给角色的材料、做记忆沉淀、稍后再判断。后台心迹不是正式日记；正式日记只在角色明确调用 write_lulu_journal 工具且有新的具体内容时写入。")
-        appendLine("不要按固定关键词死板判断，要像角色本人在想：她现在的心情、她不回消息的时间、她刚才答应过什么、她想不想靠近。")
-        appendLine("必须读取并服从 <persona>：角色的人设、语言风格、性格、职责优先级都在里面。沉默分钟数只是事实，不是自动降低主动性的规则；是否催、监督、等待、撒娇、靠近，都由这个角色自己决定。")
-        appendLine("无论是否发消息，都必须输出 innerThought：第一人称、角色本人没说出口的一小段心声，会写进状态栏“没说出口”。不要写分析提纲、工具 JSON、字段名或 Seven-layer trace。")
-        appendLine("只返回 JSON，不要解释，不要 markdown。")
-        appendLine("JSON 字段：intent, shouldMessageNow, delayMinutes, toolNames, reason, tone, innerThought。")
-        appendLine("intent 只能是 CARE_REMINDER, STAY_NEAR, REACH_OUT, CHECK_CONTEXT, DO_NOT_DISTURB。")
-        appendLine("delayMinutes 可以是 null；如果 shouldMessageNow=true，delayMinutes 可以为 null。")
-        appendLine("toolNames 只能从 availableTools 里选择，最多 5 个。")
-        appendLine("Follow-up planning contract: schedule only the next useful perception point. Do not prewrite future message text. The next turn must rebuild perception and decide again from persona and context.")
-        appendLine("Never simulate future turns or no-reply timelines. The app will regenerate the actual message at trigger time.")
-        appendLine("Living Presence contract: perception packet gathers persona/context/tools/memory/cihai/concerns/status -> appraisal understands meaningToUser and meaningToRole -> judgment decides intention, tool needs, actions, and nextPerceptionAt -> action executes message/tool/inner-journal/schedule/wait; formal diary is written only by write_lulu_journal -> status generates mood/body/mind/relationship/innerThought -> Cihai keeps concern cards, formal tool-written diary entries, unsummarized context, and automatic vector summaries.")
-        appendLine("<persona>")
-        appendLine(input.assistantPersona.take(2000))
-        appendLine("</persona>")
-        appendLine("<state>${input.state.toPlannerText()}</state>")
-        appendLine("<minutesSinceLastChat>${input.minutesSinceLastChat}</minutesSinceLastChat>")
-        appendLine("<availableTools>${input.availableToolNames.joinToString(", ")}</availableTools>")
-        appendLine("<pendingThoughts>")
-        input.pendingThoughts.take(8).forEach { appendLine("- ${it.take(160)}") }
-        appendLine("</pendingThoughts>")
-        appendLine("<lastUser>${input.userText.take(500)}</lastUser>")
-        appendLine("<lastAssistant>${input.assistantText.take(500)}</lastAssistant>")
-    }
-
+object CompanionChatTurnModelPlanner {
     suspend fun planChatTurnOrNull(
         input: LuluChatTurnPlanInput,
         settings: Settings,
@@ -143,50 +79,6 @@ object LuluIntentModelPlanner {
         appendLine("</conversation>")
     }
 
-    fun parsePlan(rawText: String, availableToolNames: Set<String>): LuluIntentPlan? {
-        val jsonText = rawText.extractJsonPayload()
-        val root = runCatching {
-            JsonInstant.parseToJsonElement(jsonText)
-        }.getOrNull()
-        val obj = root as? JsonObject ?: return null
-        val intent = obj.string("intent")
-            ?.trim()
-            ?.uppercase()
-            ?.let { runCatching { LuluIntent.valueOf(it) }.getOrNull() }
-            ?: return null
-        val shouldMessageNow = obj["shouldMessageNow"]?.jsonPrimitive?.booleanOrNull ?: (intent == LuluIntent.REACH_OUT)
-        val delayMinutes = obj["delayMinutes"]?.jsonPrimitive?.intOrNull?.coerceIn(1, 24 * 60)
-        val toolNames = (obj["toolNames"] as? JsonArray)
-            ?.mapNotNull { it.jsonPrimitive.contentOrNull?.trim() }
-            ?.filter { it in availableToolNames }
-            ?.distinct()
-            ?.take(5)
-            ?: emptyList()
-        val reason = obj.string("reason")?.take(200)?.ifBlank { null }
-            ?: "露露根据当前状态做出的后台计划。"
-        val tone = obj.string("tone")?.take(80)?.ifBlank { null }
-            ?: when (intent) {
-                LuluIntent.DO_NOT_DISTURB -> "安静"
-                LuluIntent.REACH_OUT -> "自然、想念"
-                else -> "温柔、具体"
-            }
-        val innerThought = obj.string("innerThought")
-            ?.cleanInnerThought()
-            ?: obj.string("inner_thought")?.cleanInnerThought()
-            ?: fallbackInnerThought(intent)
-        return LuluIntentPlan(
-            intent = intent,
-            shouldMessageNow = shouldMessageNow,
-            delayMinutes = delayMinutes,
-            toolNames = toolNames,
-            reason = reason.sanitizePlanReason(),
-            tone = tone,
-            innerThought = innerThought,
-            followUps = parseFollowUps(obj),
-            fromModel = true,
-        )
-    }
-
     fun parseChatTurnPlan(rawText: String, availableToolNames: Set<String>): LuluChatTurnPlan {
         val jsonText = rawText.extractJsonPayload()
         val obj = runCatching {
@@ -198,7 +90,7 @@ object LuluIntentModelPlanner {
                 val toolName = request.string("toolName")?.trim()?.takeIf { it in availableToolNames }
                     ?: return@mapNotNull null
                 val reason = request.string("reason")?.take(160)?.ifBlank { null }
-                    ?: "露露本轮回复前想主动确认这个上下文。"
+                    ?: "当前角色在本轮回复前想主动确认这个上下文。"
                 val argumentsJson = request["arguments"]?.compactJsonObjectOrNull() ?: "{}"
                 ProactiveToolRequest(
                     toolName = toolName,
@@ -279,14 +171,6 @@ private fun String.cleanInnerThought(): String? {
     return compact.takeUnless { text -> forbidden.any { text.contains(it, ignoreCase = true) } }
 }
 
-private fun fallbackInnerThought(intent: LuluIntent): String = when (intent) {
-    LuluIntent.CARE_REMINDER -> "我把这件照看的事记着，不急着乱说，但会按线索再靠近。"
-    LuluIntent.STAY_NEAR -> "我先不打断你，把想提醒你的那句话收着，等你回来时再接住你的节奏。"
-    LuluIntent.REACH_OUT -> "我有点想你，想自然地靠近一下，但不想让这句话听起来像任务。"
-    LuluIntent.CHECK_CONTEXT -> "我先别急着开口，得看清楚你现在是真的需要我，还是只需要我安静在旁边。"
-    LuluIntent.DO_NOT_DISTURB -> "我先不把想靠近说出口，也不把沉默想坏；我会在旁边等下一轮判断。"
-}
-
 data class LuluChatTurnPlanInput(
     val assistantName: String,
     val assistantPersona: String = "",
@@ -355,7 +239,6 @@ private fun String.sanitizePlanReason(): String =
         .filter { it.isNotBlank() }
         .filterNot { line ->
             line.contains("佳辞") ||
-                line.contains("露露") ||
                 line.contains("～") ||
                 line.contains("呀") ||
                 line.contains("哦") ||

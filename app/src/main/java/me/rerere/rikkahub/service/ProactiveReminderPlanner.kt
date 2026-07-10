@@ -14,37 +14,45 @@ data class ProactiveReminderPlan(
     val actionHints: List<ProactiveActionHint> = emptyList(),
 )
 
-fun LuluIntentPlan.toProactiveReminderPlan(
+fun CompanionIntentDecision.toProactiveReminderPlan(
     userText: String,
     nowMillis: Long = System.currentTimeMillis(),
 ): ProactiveReminderPlan? {
     val delay = delayMinutes ?: if (shouldMessageNow) 1 else return null
     if (delay <= 0) return null
     if (
-        intent == LuluIntent.CHECK_CONTEXT &&
+        intent == CompanionIntent.OBSERVE &&
         !shouldScheduleFollowUpForUserTurn(userText = userText, reason = reason, delayMinutes = delay)
     ) {
         return null
     }
     val kind = when (intent) {
-        LuluIntent.CARE_REMINDER -> when {
-            reason.contains("吃") -> ProactiveReminderKind.MEAL
-            reason.contains("学习") || reason.contains("写作业") -> ProactiveReminderKind.STUDY
-            reason.contains("睡") -> ProactiveReminderKind.SLEEP
-            else -> ProactiveReminderKind.GENERAL
-        }
-        LuluIntent.STAY_NEAR -> ProactiveReminderKind.STUDY
-        LuluIntent.CHECK_CONTEXT -> ProactiveReminderKind.GENERAL
-        LuluIntent.REACH_OUT -> ProactiveReminderKind.GENERAL
-        LuluIntent.DO_NOT_DISTURB -> return null
+        CompanionIntent.FOLLOW_UP -> category.toProactiveReminderKind(reason)
+        CompanionIntent.STAY_AVAILABLE,
+        CompanionIntent.OBSERVE,
+        CompanionIntent.REACH_OUT -> ProactiveReminderKind.GENERAL
+        CompanionIntent.WAIT -> return null
     }
     return ProactiveReminderPlan(
         triggerAtMillis = nowMillis + delay * 60_000L,
         kind = kind,
-        reason = "露露自主计划：$reason 语气：$tone",
+        reason = "$reason 语气：$tone",
         userText = userText.take(160),
         preferredToolNames = toolNames,
     )
+}
+
+private fun String?.toProactiveReminderKind(reason: String): ProactiveReminderKind = when (this?.lowercase()) {
+    "sleep" -> ProactiveReminderKind.SLEEP
+    "schedule", "deadline", "wake" -> ProactiveReminderKind.SCHEDULE
+    "meal" -> ProactiveReminderKind.MEAL
+    "study" -> ProactiveReminderKind.STUDY
+    else -> when {
+        reason.contains("吃") -> ProactiveReminderKind.MEAL
+        reason.contains("学习") || reason.contains("写作业") -> ProactiveReminderKind.STUDY
+        reason.contains("睡") -> ProactiveReminderKind.SLEEP
+        else -> ProactiveReminderKind.GENERAL
+    }
 }
 
 data class ProactiveActionHint(
@@ -100,11 +108,11 @@ object ProactiveReminderPlanner {
             triggerAtMillis = triggerAt,
             kind = kind,
             reason = when (kind) {
-                ProactiveReminderKind.SLEEP -> "刚才聊到了睡觉/休息，露露决定到点来催你睡觉。"
-                ProactiveReminderKind.SCHEDULE -> "刚才聊到了课程/日程，露露决定到点来确认你的状态。"
-                ProactiveReminderKind.MEAL -> "刚才聊到了吃饭，露露决定稍后来确认你有没有好好吃。"
-                ProactiveReminderKind.STUDY -> "刚才聊到了学习/写作业，露露决定晚点来轻轻确认你的状态。"
-                ProactiveReminderKind.GENERAL -> "刚才聊到了需要提醒的事情，露露决定到点主动找你。"
+                ProactiveReminderKind.SLEEP -> "刚才聊到了睡觉或休息，当前角色决定到点重新确认。"
+                ProactiveReminderKind.SCHEDULE -> "刚才聊到了课程或日程，当前角色决定到点重新确认。"
+                ProactiveReminderKind.MEAL -> "刚才聊到了吃饭，当前角色决定稍后重新确认。"
+                ProactiveReminderKind.STUDY -> "刚才聊到了学习或任务，当前角色决定稍后重新确认。"
+                ProactiveReminderKind.GENERAL -> "刚才明确提到了后续提醒，当前角色决定到点重新确认。"
             },
             userText = userText.take(160),
             preferredToolNames = buildPreferredToolNames(kind),

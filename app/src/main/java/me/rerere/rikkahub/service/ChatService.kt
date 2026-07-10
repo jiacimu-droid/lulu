@@ -1150,15 +1150,13 @@ class ChatService(
                 userText = lastUserText,
                 settings = settings,
             )
-            val luluIntentPlan = buildLuluIntentPlan(
+            val intentDecision = buildCompanionIntentDecision(
                 settings = settings,
                 assistant = assistant,
-                userText = lastUserText,
-                assistantText = lastAssistantText,
                 finalConversation = finalConversation,
             )
             val scheduledPlans = buildProactiveReminderPlansFromTurn(
-                plan = luluIntentPlan,
+                plan = intentDecision,
                 assistantName = assistant.name,
                 userText = lastUserText,
                 assistantText = lastAssistantText,
@@ -1277,7 +1275,7 @@ class ChatService(
     }
 
     private fun buildProactiveReminderPlansFromTurn(
-        plan: LuluIntentPlan,
+        plan: CompanionIntentDecision,
         assistantName: String,
         userText: String,
         assistantText: String,
@@ -1291,7 +1289,7 @@ class ChatService(
         }.map { followUp ->
             ProactiveReminderPlan(
                 triggerAtMillis = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(followUp.delayMinutes.toLong()),
-                kind = followUp.kind.toProactiveReminderKind(),
+                kind = followUp.category.toProactiveReminderKind(),
                 reason = followUp.reason,
                 userText = userText.take(160),
                 preferredToolNames = plan.toolNames,
@@ -1333,43 +1331,60 @@ class ChatService(
         else -> ProactiveReminderKind.GENERAL
     }
 
-    private suspend fun buildLuluIntentPlan(
+    private suspend fun buildCompanionIntentDecision(
         settings: Settings,
         assistant: Assistant,
-        userText: String,
-        assistantText: String,
         finalConversation: Conversation,
-    ): LuluIntentPlan {
+    ): CompanionIntentDecision {
         val availableToolNames = buildAvailableTools(settings, assistant).map { it.name }.toSet()
-        val currentState = settings.luluStates.currentProjectedLuluState(assistant.id)
-        val pendingThoughts = settings.luluThoughts
-            .thoughtHistory(assistant.id)
-            .map { it.content }
+        val nowMillis = System.currentTimeMillis()
         val minutesSinceLastChat = finalConversation.currentMessages
             .dropLast(1)
             .lastOrNull()
             ?.createdAt
             ?.let { createdAt ->
                 val last = createdAt.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
-                ((System.currentTimeMillis() - last) / 60_000L).coerceAtLeast(0)
+                ((nowMillis - last) / 60_000L).coerceAtLeast(0)
             }
             ?: 0L
-        val input = LuluIntentInput(
-            assistantName = assistant.name,
-            assistantPersona = assistant.toLuluPlannerPersona(),
-            state = currentState,
-            userText = userText,
-            assistantText = assistantText,
+        val perception = companionRuntime.perception(
+            CompanionPerceptionInput(
+                assistantId = assistant.id.toString(),
+                assistantName = assistant.name,
+                persona = assistant.toLuluPlannerPersona(),
+                conversationId = finalConversation.id.toString(),
+                recentTurns = finalConversation.currentMessages.takeLast(12).map { message ->
+                    CompanionConversationTurn(
+                        role = message.role.toCompanionTurnRole(),
+                        content = message.toText(),
+                        createdAt = message.createdAt
+                            .toInstant(TimeZone.currentSystemDefault())
+                            .toEpochMilliseconds(),
+                        sourceId = message.id.toString(),
+                    )
+                },
+                contextFacts = listOf(
+                    CompanionContextFact(
+                        key = "minutes_since_previous_interaction",
+                        value = minutesSinceLastChat.toString(),
+                        observedAt = nowMillis,
+                    ),
+                ),
+                availableToolNames = availableToolNames,
+                nowMillis = nowMillis,
+            ),
+        )
+        val input = CompanionIntentInput(
+            perception = perception,
+            mode = CompanionDecisionMode.FOREGROUND,
             minutesSinceLastChat = minutesSinceLastChat,
-            pendingThoughts = pendingThoughts,
-            availableToolNames = availableToolNames,
         )
         val modelPlan = settings.luluIntentModelId
             ?.let { settings.findModelById(it) }
             ?.takeIf { it.type == ModelType.CHAT }
             ?.let { model ->
                 runCatching {
-                    LuluIntentModelPlanner.planOrNull(
+                    CompanionIntentModelPlanner.planOrNull(
                         input = input,
                         settings = settings,
                         model = model,
@@ -1377,7 +1392,7 @@ class ChatService(
                     )
                 }.getOrNull()
             }
-        return modelPlan ?: LuluIntentPlanner.plan(input)
+        return modelPlan ?: CompanionIntentFallbackPlanner.plan(input)
     }
 
     private fun ProactiveReminderPlan.toTargetedReason(): String = buildString {
@@ -1731,7 +1746,7 @@ class ChatService(
             ?.takeIf { it.type == ModelType.CHAT }
             ?.let { model ->
                 runCatching {
-                    LuluIntentModelPlanner.planChatTurnOrNull(
+                    CompanionChatTurnModelPlanner.planChatTurnOrNull(
                         input = input,
                         settings = settings,
                         model = model,

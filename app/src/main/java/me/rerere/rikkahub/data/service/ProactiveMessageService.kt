@@ -118,11 +118,12 @@ import me.rerere.rikkahub.service.LivingJudgmentModelInput
 import me.rerere.rikkahub.service.LivingJudgmentModelPlanner
 import me.rerere.rikkahub.service.LivingObservation
 import me.rerere.rikkahub.service.LivingObservationToolRunner
-import me.rerere.rikkahub.service.LuluIntent
-import me.rerere.rikkahub.service.LuluIntentInput
-import me.rerere.rikkahub.service.LuluIntentModelPlanner
-import me.rerere.rikkahub.service.LuluIntentPlan
-import me.rerere.rikkahub.service.LuluIntentPlanner
+import me.rerere.rikkahub.service.CompanionDecisionMode
+import me.rerere.rikkahub.service.CompanionIntent
+import me.rerere.rikkahub.service.CompanionIntentDecision
+import me.rerere.rikkahub.service.CompanionIntentFallbackPlanner
+import me.rerere.rikkahub.service.CompanionIntentInput
+import me.rerere.rikkahub.service.CompanionIntentModelPlanner
 import me.rerere.rikkahub.service.LivingPresenceConsolidationHint
 import me.rerere.rikkahub.service.RollingJudgmentDecision
 import me.rerere.rikkahub.service.RollingJudgmentLoop
@@ -1136,8 +1137,8 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                         availableToolNames = tools.map { it.name }.toSet(),
                     )
                 }
-                if (!isTargetedTrigger && autonomousPlan?.intent == LuluIntent.DO_NOT_DISTURB) {
-                    Log.d(TAG, "Lulu intent planner chose not to disturb")
+                if (!isTargetedTrigger && autonomousPlan?.intent == CompanionIntent.WAIT) {
+                    Log.d(TAG, "Companion intent planner chose not to disturb")
                     settingsStore.update { currentSettings ->
                         val previous = currentSettings.luluStates.currentProjectedLuluState(assistantUuid, nowMillis)
                         currentSettings.copy(
@@ -1964,30 +1965,56 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
         assistant: Assistant,
         historyMessages: List<UIMessage>,
         availableToolNames: Set<String>,
-    ): LuluIntentPlan {
-        val input = LuluIntentInput(
-            assistantName = assistant.name,
-            assistantPersona = assistant.toLuluPlannerPersona(),
-            state = settings.luluStates.currentProjectedLuluState(assistant.id),
-            userText = historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
-            assistantText = historyMessages.lastOrNull { it.role == MessageRole.ASSISTANT }?.toText().orEmpty(),
-            minutesSinceLastChat = historyMessages.lastOrNull()
-                ?.createdAt
-                ?.toInstant(TimeZone.currentSystemDefault())
-                ?.toEpochMilliseconds()
-                ?.let { ((System.currentTimeMillis() - it) / 60_000L).coerceAtLeast(0) }
-                ?: Long.MAX_VALUE,
-            pendingThoughts = settings.luluThoughts
-                .thoughtHistory(assistant.id)
-                .map { it.content },
-            availableToolNames = availableToolNames,
+    ): CompanionIntentDecision {
+        val nowMillis = System.currentTimeMillis()
+        val minutesSinceLastChat = historyMessages.lastOrNull()
+            ?.createdAt
+            ?.toInstant(TimeZone.currentSystemDefault())
+            ?.toEpochMilliseconds()
+            ?.let { ((nowMillis - it) / 60_000L).coerceAtLeast(0) }
+            ?: Long.MAX_VALUE
+        val perception = companionRuntime.perception(
+            CompanionPerceptionInput(
+                assistantId = assistant.id.toString(),
+                assistantName = assistant.name,
+                persona = assistant.toLuluPlannerPersona(),
+                recentTurns = historyMessages.takeLast(12).map { message ->
+                    CompanionConversationTurn(
+                        role = when (message.role) {
+                            MessageRole.USER -> CompanionTurnRole.USER
+                            MessageRole.ASSISTANT -> CompanionTurnRole.ASSISTANT
+                            MessageRole.SYSTEM -> CompanionTurnRole.SYSTEM
+                            MessageRole.TOOL -> CompanionTurnRole.TOOL
+                        },
+                        content = message.toText(),
+                        createdAt = message.createdAt
+                            .toInstant(TimeZone.currentSystemDefault())
+                            .toEpochMilliseconds(),
+                        sourceId = message.id.toString(),
+                    )
+                },
+                contextFacts = listOf(
+                    CompanionContextFact(
+                        key = "minutes_since_previous_interaction",
+                        value = minutesSinceLastChat.toString(),
+                        observedAt = nowMillis,
+                    ),
+                ),
+                availableToolNames = availableToolNames,
+                nowMillis = nowMillis,
+            ),
+        )
+        val input = CompanionIntentInput(
+            perception = perception,
+            mode = CompanionDecisionMode.BACKGROUND,
+            minutesSinceLastChat = minutesSinceLastChat,
         )
         val modelPlan = settings.luluIntentModelId
             ?.let { settings.findModelById(it) }
             ?.takeIf { it.type == ModelType.CHAT }
             ?.let { plannerModel ->
                 runCatching {
-                    LuluIntentModelPlanner.planOrNull(
+                    CompanionIntentModelPlanner.planOrNull(
                         input = input,
                         settings = settings,
                         model = plannerModel,
@@ -1995,7 +2022,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     )
                 }.getOrNull()
             }
-        return modelPlan ?: LuluIntentPlanner.plan(input)
+        return modelPlan ?: CompanionIntentFallbackPlanner.plan(input)
     }
 
     private fun Assistant.toLuluPlannerPersona(): String = buildString {
@@ -2014,7 +2041,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
         }
     }.trim()
 
-    private fun LuluIntentPlan.toImmediateReason(assistantName: String): String = buildString {
+    private fun CompanionIntentDecision.toImmediateReason(assistantName: String): String = buildString {
         appendLine("${assistantName.ifBlank { "当前角色" }}刚刚自主判断现在适合主动找用户。")
         appendLine("主动意图: ${intent.name}")
         appendLine("触发原因: $reason")
@@ -2298,7 +2325,7 @@ internal fun buildSilentLivingPresenceState(
         ?: decision.updatedIntent.lastJudgmentTrace?.decision?.takeIf { it.isNotBlank() }
         ?: "这一轮选择暂时不发消息。"
     val observation = decision.observation?.summary.orEmpty()
-    val name = assistantName.ifBlank { "露露" }
+    val name = assistantName.ifBlank { "当前角色" }
     return previous.copy(
         statusText = "克制着没开口",
         innerVoice = innerVoice,
@@ -2321,24 +2348,24 @@ internal fun buildAutonomousPlanPresenceState(
     assistantId: Uuid,
     previous: LuluState,
     assistantName: String,
-    plan: LuluIntentPlan,
+    plan: CompanionIntentDecision,
     nowMillis: Long = System.currentTimeMillis(),
 ): LuluState {
     val innerVoice = plan.innerThought.cleanSilentInnerVoice()
         ?: when (plan.intent) {
-            LuluIntent.CARE_REMINDER -> "我把这件照看的事记着，不急着乱说，但会按线索再靠近。"
-            LuluIntent.STAY_NEAR -> "我先不打断你，把想提醒你的那句话收着，等你回来时再接住你的节奏。"
-            LuluIntent.REACH_OUT -> "我有点想你，想自然地靠近一下，但不想让这句话听起来像任务。"
-            LuluIntent.CHECK_CONTEXT -> "我先别急着开口，得看清楚你现在是真的需要我，还是只需要我安静在旁边。"
-            LuluIntent.DO_NOT_DISTURB -> "我先不把想靠近说出口，也不把沉默想坏；我会在旁边等下一轮判断。"
+            CompanionIntent.FOLLOW_UP -> "我把这件明确的后续记着，到点会重新看真实情况。"
+            CompanionIntent.STAY_AVAILABLE -> "我先不打断，把注意留在这里，等下一次有意义的变化。"
+            CompanionIntent.REACH_OUT -> "安静了一阵，我想按自己的人设确认现在是否适合开口。"
+            CompanionIntent.OBSERVE -> "我先重新看清上下文，再决定行动和表达。"
+            CompanionIntent.WAIT -> "现在没有足够理由打扰，我先保持安静。"
         }
-    val name = assistantName.ifBlank { "露露" }
+    val name = assistantName.ifBlank { "当前角色" }
     return previous.copy(
         statusText = when (plan.intent) {
-            LuluIntent.DO_NOT_DISTURB -> "安静判断中"
-            LuluIntent.STAY_NEAR, LuluIntent.CHECK_CONTEXT -> "在心里记着"
-            LuluIntent.CARE_REMINDER -> "惦记着提醒"
-            LuluIntent.REACH_OUT -> "想靠近一点"
+            CompanionIntent.WAIT -> "安静判断中"
+            CompanionIntent.STAY_AVAILABLE, CompanionIntent.OBSERVE -> "在心里记着"
+            CompanionIntent.FOLLOW_UP -> "记着后续"
+            CompanionIntent.REACH_OUT -> "想主动联系"
         },
         innerVoice = innerVoice,
         mode = LuluMode.THINKING,
@@ -2426,14 +2453,14 @@ internal fun buildTargetedProactiveSensingInstruction(
             appendLine("表达重点放在轻轻确认状态，不要打断太重。")
         }
         "general" -> {
-            appendLine("本次目标的感知重点：先看当前时间、应用使用和电量；如果原因里提到记录，可以主动写入辞海心迹，不计入露露日记。")
+            appendLine("本次目标的感知重点：先看当前时间、应用使用和电量；如果原因里提到记录，可以主动写入辞海心迹，不计入正式日记。")
         }
         "living_presence" -> {
             appendLine("本次目标的感知重点：这是 Living Presence OS 的下一轮滚动判断，不是随机主动消息。")
             appendLine("按感知世界包-意义评估-动态判断-行动实现-状态生成-辞海记忆架构重新判断：先整理当前时间、上下文、工具结果、工具状态、考研计划、召回记忆和历史挂心记录；再评估重要性、威胁、机会、身心安全、时间压力、成本、收益、不行动后果和可用资源。")
             appendLine("动态判断根据完整感知包、人设和意义评估决定意图、可做什么、要不要查工具、要不要开口、要不要写辞海，以及下一轮从什么时候重新感知。")
             appendLine("状态生成只保留心情、身体状况、精神状况、亲密关系和第一人称没说出口；不要把 belief、traitMotive、situationalMotive 或 intention 塞回状态栏。")
-            appendLine("如果已经开过口或用户明显在忙，可以 [PASS]，但要把第一人称内心想法写入辞海心迹；辞海心迹/行动不计入露露日记，记忆由辞海和聊天阈值自动沉淀。")
+            appendLine("如果已经开过口或用户明显在忙，可以 [PASS]，但要把第一人称内心想法写入辞海心迹；辞海心迹或行动不计入正式日记，记忆由辞海和聊天阈值自动沉淀。")
         }
         else -> when {
             reason.contains("睡") -> appendLine("本次目标的感知重点：先看当前时间、睡眠/健康、应用使用和电量。")
