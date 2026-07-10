@@ -64,7 +64,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -73,7 +72,17 @@ import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.cihai.CihaiService
+import me.rerere.rikkahub.data.companion.CompanionActionResult
 import me.rerere.rikkahub.data.companion.CompanionCommitment
+import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
+import me.rerere.rikkahub.data.companion.CompanionContextFact
+import me.rerere.rikkahub.data.companion.CompanionConversationTurn
+import me.rerere.rikkahub.data.companion.CompanionPerceptionInput
+import me.rerere.rikkahub.data.companion.CompanionRuntime
+import me.rerere.rikkahub.data.companion.CompanionTurnMutation
+import me.rerere.rikkahub.data.companion.CompanionTurnRole
+import me.rerere.rikkahub.data.companion.toCompanionState
+import me.rerere.rikkahub.data.companion.toPromptContext
 import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
@@ -92,6 +101,7 @@ import me.rerere.rikkahub.data.model.LuluState
 import me.rerere.rikkahub.data.model.LuluThoughtCategory
 import me.rerere.rikkahub.data.model.appendLuluState
 import me.rerere.rikkahub.data.model.currentProjectedLuluState
+import me.rerere.rikkahub.data.model.luluStateHistory
 import me.rerere.rikkahub.data.model.thoughtHistory
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
@@ -117,6 +127,7 @@ import me.rerere.rikkahub.service.LivingPresenceConsolidationHint
 import me.rerere.rikkahub.service.RollingJudgmentDecision
 import me.rerere.rikkahub.service.RollingJudgmentLoop
 import me.rerere.rikkahub.service.ProactiveReminderPlan
+import me.rerere.rikkahub.service.recordLuluPresenceTurn
 import me.rerere.rikkahub.service.toProactiveReminderPlan
 import me.rerere.rikkahub.utils.sendNotification
 import java.time.Instant
@@ -359,7 +370,7 @@ class ProactiveMessageService : KoinComponent {
             scheduleTargeted(
                 context = context,
                 setting = setting,
-                triggerAtMillis = commitment.dueAt,
+                triggerAtMillis = maxOf(commitment.dueAt, System.currentTimeMillis() + 1_000L),
                 reason = commitment.promise,
                 userText = commitment.actionPlan.contextText,
                 kind = commitment.actionPlan.category.ifBlank { "commitment" },
@@ -367,54 +378,6 @@ class ProactiveMessageService : KoinComponent {
                 commitmentId = commitment.id,
             )
         }
-
-        fun replaceTargetedQueue(
-            context: Context,
-            setting: ProactiveMessageSetting,
-            plans: List<ProactiveReminderPlan>,
-        ) {
-            clearTargetedQueue(context)
-            val upcoming = plans
-                .filter { it.triggerAtMillis > java.lang.System.currentTimeMillis() }
-                .sortedBy { it.triggerAtMillis }
-                .take(5)
-            if (!setting.enabled || upcoming.isEmpty()) return
-
-            val queue = JsonArray(upcoming.map { plan ->
-                buildJsonObject {
-                    put("triggerAtMillis", JsonPrimitive(plan.triggerAtMillis))
-                    put("reason", JsonPrimitive(plan.toQueuedTargetedReason()))
-                    put("userText", JsonPrimitive(plan.userText))
-                    put("kind", JsonPrimitive(plan.kind.name.lowercase(java.util.Locale.ROOT)))
-                }
-            })
-            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .edit()
-                .putString(KEY_TARGETED_QUEUE, queue.toString())
-                .apply()
-            scheduleTargeted(
-                context = context,
-                setting = setting,
-                triggerAtMillis = upcoming.first().triggerAtMillis,
-                reason = upcoming.first().toQueuedTargetedReason(),
-                userText = upcoming.first().userText,
-                kind = upcoming.first().kind.name.lowercase(java.util.Locale.ROOT),
-            )
-        }
-
-        private fun ProactiveReminderPlan.toQueuedTargetedReason(): String = buildString {
-            appendLine(reason)
-            if (preferredToolNames.isNotEmpty()) {
-                appendLine("At trigger time, check these sensing tools first if available: ${preferredToolNames.joinToString(", ")}.")
-            }
-            if (actionHints.isNotEmpty()) {
-                appendLine("Available living-presence actions at trigger time:")
-                actionHints.forEach { hint ->
-                    appendLine("- ${hint.toolName}: ${hint.reason}")
-                }
-            }
-            appendLine("This is only a proactive-plan reason. Do not treat it as prewritten message text; generate the actual user-facing message fresh.")
-        }.trim()
 
         fun clearTargetedQueue(context: Context) {
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -791,6 +754,10 @@ class ProactiveMessageReceiver : BroadcastReceiver() {
                         ProactiveMessageService.EXTRA_TARGETED_KIND,
                         intent.getStringExtra(ProactiveMessageService.EXTRA_TARGETED_KIND)
                     )
+                    putExtra(
+                        ProactiveMessageService.EXTRA_COMMITMENT_ID,
+                        intent.getStringExtra(ProactiveMessageService.EXTRA_COMMITMENT_ID)
+                    )
                 }
                 context.startForegroundService(serviceIntent)
             }
@@ -799,7 +766,15 @@ class ProactiveMessageReceiver : BroadcastReceiver() {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         val settingsStore = org.koin.core.context.GlobalContext.get().get<SettingsStore>()
+                        val companionRuntime = org.koin.core.context.GlobalContext.get().get<CompanionRuntime>()
                         val settings = settingsStore.settingsFlow.first()
+                        companionRuntime.nextCommitment()?.let { commitment ->
+                            val assistantId = runCatching { Uuid.parse(commitment.assistantId) }.getOrNull()
+                            val setting = assistantId?.let { settings.getProactiveMessageSetting(it) }
+                            if (setting?.enabled == true) {
+                                ProactiveMessageService.scheduleCommitment(context, setting, commitment)
+                            }
+                        }
                         val proactiveSetting = settings.getProactiveMessageSetting()
                         if (proactiveSetting.enabled) {
                             ProactiveMessageService.scheduleNext(context, settings)
@@ -827,12 +802,16 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
     private val chatService: ChatService by inject()
     private val cihaiService: CihaiService by inject()
     private val livingPresenceStore: LivingPresenceStore by inject()
+    private val companionRuntime: CompanionRuntime by inject()
     private val studyStore: StudyStore by inject()
     private val proactiveMessageService = ProactiveMessageService()
 
     companion object {
         private const val TAG = "ProactiveMessageTrigger"
         private const val MAX_TOOL_STEPS = 5 // 主动消息最大工具调用步数
+        private const val MAX_COMMITMENT_ATTEMPTS = 3
+        private const val COMMITMENT_RETRY_MINUTES = 15L
+        private const val MAX_SCHEDULER_CANDIDATES = 50
     }
 
     // 输入转换器（与 ChatService 保持一致）
@@ -867,6 +846,8 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
 
         CoroutineScope(Dispatchers.IO).launch {
             var conversationId: kotlin.uuid.Uuid? = null
+            var executingCommitment: CompanionCommitment? = null
+            var completedCommitmentResult: CompanionActionResult? = null
             try {
                 val settings = settingsStore.settingsFlow.first()
                 val prefs = getSharedPreferences(ProactiveMessageService.PREFS_NAME, Context.MODE_PRIVATE)
@@ -896,9 +877,23 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     } else {
                         null
                     }
-                val isTargetedTrigger = !targetedReason.isNullOrBlank()
+                val targetedCommitmentId = intent?.getStringExtra(ProactiveMessageService.EXTRA_COMMITMENT_ID)
+                    ?: if (canRestoreTargeted) {
+                        prefs.getString(ProactiveMessageService.KEY_TARGETED_COMMITMENT_ID, null)
+                    } else {
+                        null
+                    }
+                val isDurableCommitmentTrigger = !targetedCommitmentId.isNullOrBlank()
+                val isTargetedTrigger = isDurableCommitmentTrigger || !targetedReason.isNullOrBlank()
 
                 if (!proactiveSetting.enabled) {
+                    if (isDurableCommitmentTrigger && !triggerAssistantId.isNullOrBlank()) {
+                        companionRuntime.snapshot(triggerAssistantId).commitments
+                            .firstOrNull { it.id == targetedCommitmentId }
+                            ?.let { commitment ->
+                                discardUnschedulableCommitment(commitment, "Proactive messaging disabled")
+                            }
+                    }
                     stopSelf()
                     return@launch
                 }
@@ -920,18 +915,60 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 prefs.edit().putLong("last_triggered_time", System.currentTimeMillis()).apply()
 
                 // 获取助手
-                val assistant = settings.assistants.find { it.id.toString() == proactiveSetting.assistantId }
-                    ?: settings.getCurrentAssistant()
+                val assistant = if (isDurableCommitmentTrigger) {
+                    settings.assistants.find { it.id.toString() == triggerAssistantId }
+                } else {
+                    settings.assistants.find { it.id.toString() == proactiveSetting.assistantId }
+                        ?: settings.getCurrentAssistant()
+                }
+                if (assistant == null) {
+                    Log.w(TAG, "Ignoring commitment for missing assistant id=$triggerAssistantId")
+                    if (!triggerAssistantId.isNullOrBlank()) {
+                        companionRuntime.snapshot(triggerAssistantId).commitments
+                            .firstOrNull { it.id == targetedCommitmentId }
+                            ?.let { commitment ->
+                                discardUnschedulableCommitment(
+                                    commitment,
+                                    "Assistant configuration no longer exists",
+                                )
+                            }
+                    }
+                    stopSelf()
+                    return@launch
+                }
                 val assistantUuid = assistant.id
+                if (isDurableCommitmentTrigger) {
+                    val started = companionRuntime.beginCommitment(
+                        assistantId = assistantUuid.toString(),
+                        commitmentId = targetedCommitmentId.orEmpty(),
+                        nowMillis = System.currentTimeMillis(),
+                    )
+                    if (started == null) {
+                        Log.d(TAG, "Commitment is missing, already handled, or not due: $targetedCommitmentId")
+                        scheduleNextDurableCommitment()
+                        stopSelf()
+                        return@launch
+                    }
+                    executingCommitment = started
+                }
                 val model = settings.findModelById(assistant.chatModelId ?: settings.chatModelId)
 
                 if (model == null) {
                     Log.e(ProactiveMessageService.TAG, "No model found for proactive message")
-                    ProactiveMessageService.scheduleNext(
-                        context = this@ProactiveMessageTriggerService,
-                        settings = settings,
-                        assistantId = assistantUuid,
-                    )
+                    val activeCommitment = executingCommitment
+                    if (activeCommitment != null) {
+                        failDurableCommitment(
+                            commitment = activeCommitment,
+                            summary = "No chat model configured for proactive execution",
+                        )
+                        executingCommitment = null
+                    } else {
+                        ProactiveMessageService.scheduleNext(
+                            context = this@ProactiveMessageTriggerService,
+                            settings = settings,
+                            assistantId = assistantUuid,
+                        )
+                    }
                     stopSelf()
                     return@launch
                 }
@@ -961,10 +998,48 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 val tools = buildTools(settings, assistant, model, historyMessages)
                 val observationTools = buildAllTools(settings, assistant)
                 val nowMillis = System.currentTimeMillis()
-                val dueLivingIntent = livingPresenceStore.nextDueIntent(
-                    assistantId = assistantUuid.toString(),
-                    nowMillis = nowMillis,
-                )
+                val companionContext = companionRuntime.perception(
+                    CompanionPerceptionInput(
+                        assistantId = assistantUuid.toString(),
+                        assistantName = assistant.name,
+                        persona = assistant.toLuluPlannerPersona(),
+                        conversationId = conversationId.toString(),
+                        recentTurns = historyMessages.takeLast(12).map { message ->
+                            CompanionConversationTurn(
+                                role = when (message.role) {
+                                    MessageRole.USER -> CompanionTurnRole.USER
+                                    MessageRole.ASSISTANT -> CompanionTurnRole.ASSISTANT
+                                    MessageRole.SYSTEM -> CompanionTurnRole.SYSTEM
+                                    MessageRole.TOOL -> CompanionTurnRole.TOOL
+                                },
+                                content = message.toText(),
+                                createdAt = message.createdAt
+                                    .toInstant(TimeZone.currentSystemDefault())
+                                    .toEpochMilliseconds(),
+                                sourceId = message.id.toString(),
+                            )
+                        },
+                        contextFacts = listOfNotNull(
+                            minutesSinceLastChat?.let { minutes ->
+                                CompanionContextFact(
+                                    key = "minutes_since_previous_interaction",
+                                    value = minutes.toString(),
+                                    observedAt = nowMillis,
+                                )
+                            },
+                        ),
+                        availableToolNames = tools.map { it.name }.toSet(),
+                        nowMillis = nowMillis,
+                    ),
+                ).toPromptContext()
+                val dueLivingIntent = if (executingCommitment == null) {
+                    livingPresenceStore.nextDueIntent(
+                        assistantId = assistantUuid.toString(),
+                        nowMillis = nowMillis,
+                    )
+                } else {
+                    null
+                }
                 val livingPresenceObservation = dueLivingIntent?.let { intent ->
                     buildLivingPresenceRuntimeObservation(
                         intent = intent,
@@ -1133,9 +1208,11 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 }
 
                 val effectiveTargetedReason = targetedReason
+                    ?: executingCommitment?.promise
                     ?: livingPresenceDecision?.toTargetedReason(assistant.name)
                     ?: autonomousPlan?.toImmediateReason(assistant.name)
                 val effectiveTargetedKind = targetedKind
+                    ?: executingCommitment?.actionPlan?.category?.takeIf { it.isNotBlank() }
                     ?: livingPresenceDecision?.updatedIntent?.kind?.toTargetedKind()
                     ?: autonomousPlan
                     ?.takeIf { it.shouldMessageNow }
@@ -1144,13 +1221,19 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     ?.lowercase(java.util.Locale.ROOT)
 
                 // 构建上下文
-                val contextStr = proactiveMessageService.buildProactiveContext(
-                    context = this@ProactiveMessageTriggerService,
-                    settings = settings,
-                    targetedReason = effectiveTargetedReason,
-                    targetedUserText = targetedUserText,
-                    targetedKind = effectiveTargetedKind,
-                )
+                val contextStr = buildString {
+                    appendLine(companionContext)
+                    appendLine()
+                    append(
+                        proactiveMessageService.buildProactiveContext(
+                            context = this@ProactiveMessageTriggerService,
+                            settings = settings,
+                            targetedReason = effectiveTargetedReason,
+                            targetedUserText = targetedUserText ?: executingCommitment?.actionPlan?.contextText,
+                            targetedKind = effectiveTargetedKind,
+                        ),
+                    )
+                }
 
                 // 构建系统提示词（包含记忆）
                 val systemPrompt = buildSystemPrompt(assistant, settings)
@@ -1195,12 +1278,21 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 val providerSetting = model.findProvider(settings.providers)
                 if (providerSetting == null) {
                     Log.e(ProactiveMessageService.TAG, "No provider found for proactive message")
-                    ProactiveMessageService.scheduleNext(
-                        context = this@ProactiveMessageTriggerService,
-                        settings = settings,
-                        minutesSinceLastChat = minutesSinceLastChat,
-                        assistantId = assistantUuid,
-                    )
+                    val activeCommitment = executingCommitment
+                    if (activeCommitment != null) {
+                        failDurableCommitment(
+                            commitment = activeCommitment,
+                            summary = "No provider configured for proactive execution",
+                        )
+                        executingCommitment = null
+                    } else {
+                        ProactiveMessageService.scheduleNext(
+                            context = this@ProactiveMessageTriggerService,
+                            settings = settings,
+                            minutesSinceLastChat = minutesSinceLastChat,
+                            assistantId = assistantUuid,
+                        )
+                    }
                     stopSelf()
                     return@launch
                 }
@@ -1285,6 +1377,18 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     saveProactiveMessage(
                         settings, assistant, conversationId, conversation
                     )
+                    runCatching {
+                        persistProactiveCompanionState(
+                            assistant = assistant,
+                            userText = targetedUserText
+                                ?: executingCommitment?.actionPlan?.contextText
+                                ?: historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
+                            assistantText = replyText,
+                            nowMillis = System.currentTimeMillis(),
+                        )
+                    }.onFailure { error ->
+                        Log.w(TAG, "Failed to persist proactive companion state projection", error)
+                    }
                     livingPresenceDecision?.let { decision ->
                         livingPresenceStore.markIntentSpoken(
                             intentId = decision.updatedIntent.id,
@@ -1302,7 +1406,30 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     showProactiveNotification(conversationId, assistant.name.ifBlank { "AI" }, replyText)
                 }
 
-                val hasNextTargeted = if (isTargetedTrigger) {
+                executingCommitment?.let { commitment ->
+                    val actionResult = CompanionActionResult(
+                        success = true,
+                        summary = if (replyText.isBlank() || replyText.contains("[PASS]")) {
+                            "Reappraised at the promised time; no message was needed"
+                        } else {
+                            "Proactive message delivered"
+                        },
+                        completedAt = System.currentTimeMillis(),
+                        outputReference = conversationId.toString(),
+                    )
+                    completedCommitmentResult = actionResult
+                    companionRuntime.finishCommitment(
+                        assistantId = commitment.assistantId,
+                        commitmentId = commitment.id,
+                        result = actionResult,
+                    )
+                    executingCommitment = null
+                    completedCommitmentResult = null
+                }
+
+                val hasNextTargeted = if (isDurableCommitmentTrigger) {
+                    scheduleNextDurableCommitment()
+                } else if (isTargetedTrigger) {
                     ProactiveMessageService.popCurrentTargetedAndScheduleNext(
                         context = this@ProactiveMessageTriggerService,
                         setting = proactiveSetting,
@@ -1333,12 +1460,153 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 }
             } catch (e: Exception) {
                 Log.e(ProactiveMessageService.TAG, "Failed to trigger proactive message", e)
+                val activeCommitment = executingCommitment
+                if (activeCommitment != null) {
+                    runCatching {
+                        val completedResult = completedCommitmentResult
+                        if (completedResult != null) {
+                            companionRuntime.finishCommitment(
+                                assistantId = activeCommitment.assistantId,
+                                commitmentId = activeCommitment.id,
+                                result = completedResult,
+                            )
+                            scheduleNextDurableCommitment()
+                        } else {
+                            failDurableCommitment(
+                                commitment = activeCommitment,
+                                summary = (e.message ?: e::class.simpleName ?: "Proactive execution failed").take(500),
+                            )
+                        }
+                    }.onFailure { persistenceError ->
+                        Log.e(TAG, "Failed to persist proactive commitment failure", persistenceError)
+                    }
+                    executingCommitment = null
+                }
             } finally {
                 conversationId?.let { chatService.removeConversationReference(it) }
                 stopSelf()
             }
         }
         return START_NOT_STICKY
+    }
+
+    private suspend fun failDurableCommitment(
+        commitment: CompanionCommitment,
+        summary: String,
+    ) {
+        val completedAt = System.currentTimeMillis()
+        val retryAt = if (commitment.attemptCount < MAX_COMMITMENT_ATTEMPTS) {
+            completedAt + TimeUnit.MINUTES.toMillis(
+                (COMMITMENT_RETRY_MINUTES * commitment.attemptCount.coerceAtLeast(1)).coerceAtMost(60L),
+            )
+        } else {
+            null
+        }
+        companionRuntime.finishCommitment(
+            assistantId = commitment.assistantId,
+            commitmentId = commitment.id,
+            result = CompanionActionResult(
+                success = false,
+                summary = summary,
+                completedAt = completedAt,
+            ),
+            retryAt = retryAt,
+        )
+        scheduleNextDurableCommitment()
+    }
+
+    private suspend fun persistProactiveCompanionState(
+        assistant: Assistant,
+        userText: String,
+        assistantText: String,
+        nowMillis: Long,
+    ) {
+        var unifiedState = companionRuntime.snapshot(assistant.id.toString()).state
+        settingsStore.update { currentSettings ->
+            currentSettings.recordLuluPresenceTurn(
+                assistantId = assistant.id,
+                userText = userText,
+                assistantText = assistantText,
+                nowMillis = nowMillis,
+            ).also { updatedSettings ->
+                unifiedState = updatedSettings.luluStates
+                    .luluStateHistory(assistant.id)
+                    .firstOrNull()
+                    ?.toCompanionState()
+                    ?: unifiedState
+            }
+        }
+        companionRuntime.applyTurn(
+            CompanionTurnMutation(
+                assistantId = assistant.id.toString(),
+                state = unifiedState,
+                nowMillis = nowMillis,
+            ),
+        )
+    }
+
+    private suspend fun scheduleNextDurableCommitment(): Boolean {
+        val settings = settingsStore.settingsFlow.first()
+        repeat(MAX_SCHEDULER_CANDIDATES) {
+            val next = companionRuntime.nextCommitment() ?: run {
+                clearDurableCommitmentProjection()
+                return false
+            }
+            val assistantUuid = runCatching { Uuid.parse(next.assistantId) }.getOrNull()
+            if (assistantUuid == null) {
+                discardUnschedulableCommitment(next, "Commitment has an invalid assistant ID")
+                return@repeat
+            }
+            val setting = settings.getProactiveMessageSetting(assistantUuid)
+            if (!setting.enabled) {
+                discardUnschedulableCommitment(next, "Proactive messaging disabled")
+                return@repeat
+            }
+            ProactiveMessageService.scheduleCommitment(
+                context = this,
+                setting = setting,
+                commitment = next,
+            )
+            return true
+        }
+        clearDurableCommitmentProjection()
+        return false
+    }
+
+    private suspend fun discardUnschedulableCommitment(
+        commitment: CompanionCommitment,
+        reason: String,
+    ) {
+        val nowMillis = System.currentTimeMillis()
+        if (commitment.status == CompanionCommitmentStatus.EXECUTING) {
+            companionRuntime.finishCommitment(
+                assistantId = commitment.assistantId,
+                commitmentId = commitment.id,
+                result = CompanionActionResult(
+                    success = false,
+                    summary = reason,
+                    completedAt = nowMillis,
+                ),
+            )
+        } else {
+            companionRuntime.cancelCommitment(
+                assistantId = commitment.assistantId,
+                commitmentId = commitment.id,
+                reason = reason,
+                nowMillis = nowMillis,
+            )
+        }
+    }
+
+    private fun clearDurableCommitmentProjection() {
+            getSharedPreferences(ProactiveMessageService.PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .remove(ProactiveMessageService.KEY_TARGETED_TRIGGER_TIME)
+                .remove(ProactiveMessageService.KEY_TARGETED_REASON)
+                .remove(ProactiveMessageService.KEY_TARGETED_USER_TEXT)
+                .remove(ProactiveMessageService.KEY_TARGETED_KIND)
+                .remove(ProactiveMessageService.KEY_TARGETED_COMMITMENT_ID)
+                .apply()
     }
 
     private suspend fun buildLivingPresenceRuntimeObservation(

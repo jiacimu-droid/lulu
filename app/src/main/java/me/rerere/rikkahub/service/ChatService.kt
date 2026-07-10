@@ -103,17 +103,15 @@ import me.rerere.rikkahub.data.datastore.getCurrentChatModel
 import me.rerere.rikkahub.data.datastore.getProactiveMessageSetting
 import me.rerere.rikkahub.data.companion.CompanionActionType
 import me.rerere.rikkahub.data.companion.CompanionConcernChange
-import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
 import me.rerere.rikkahub.data.companion.CompanionContextFact
 import me.rerere.rikkahub.data.companion.CompanionConversationTurn
 import me.rerere.rikkahub.data.companion.CompanionFollowUpDraft
 import me.rerere.rikkahub.data.companion.CompanionPerceptionInput
-import me.rerere.rikkahub.data.companion.CompanionPerceptionPacket
 import me.rerere.rikkahub.data.companion.CompanionRuntime
-import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import me.rerere.rikkahub.data.companion.CompanionTurnMutation
 import me.rerere.rikkahub.data.companion.CompanionTurnRole
 import me.rerere.rikkahub.data.companion.toCompanionState
+import me.rerere.rikkahub.data.companion.toPromptContext
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.data.model.Conversation
@@ -1217,7 +1215,7 @@ class ChatService(
                     },
                 )
             }
-            val companionSnapshot = runCatching {
+            runCatching {
                 companionRuntime.applyTurn(
                     CompanionTurnMutation(
                         assistantId = assistant.id.toString(),
@@ -1231,13 +1229,9 @@ class ChatService(
                 )
             }.onFailure { error ->
                 Log.w(TAG, "Failed to persist unified companion turn", error)
-            }.getOrElse {
-                companionRuntime.snapshot(assistant.id.toString())
             }
             scheduleProactiveReminderFromTurn(
                 settings = settings,
-                assistant = assistant,
-                snapshot = companionSnapshot,
             )
             launchAffectiveMemoryExtraction(
                 conversationId = conversationId,
@@ -1272,23 +1266,12 @@ class ChatService(
 
     private fun scheduleProactiveReminderFromTurn(
         settings: Settings,
-        assistant: Assistant,
-        snapshot: CompanionSnapshot,
     ) {
-        val nextCommitment = snapshot.commitments
-            .asSequence()
-            .filter { commitment ->
-                commitment.assistantId == assistant.id.toString() && commitment.status in setOf(
-                    CompanionCommitmentStatus.ACTIVE,
-                    CompanionCommitmentStatus.DUE,
-                    CompanionCommitmentStatus.RETRY_SCHEDULED,
-                )
-            }
-            .minByOrNull { it.dueAt }
-            ?: return
+        val nextCommitment = companionRuntime.nextCommitment() ?: return
+        val assistantId = runCatching { Uuid.parse(nextCommitment.assistantId) }.getOrNull() ?: return
         ProactiveMessageService.scheduleCommitment(
             context = context,
-            setting = settings.getProactiveMessageSetting(assistant.id),
+            setting = settings.getProactiveMessageSetting(assistantId),
             commitment = nextCommitment,
         )
     }
@@ -1722,45 +1705,6 @@ class ChatService(
         MessageRole.SYSTEM -> CompanionTurnRole.SYSTEM
         MessageRole.TOOL -> CompanionTurnRole.TOOL
     }
-
-    private fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
-        appendLine("<companion_runtime assistant_id=\"$assistantId\">")
-        appendLine(
-            "relationship familiarity=${snapshot.relationship.familiarity} " +
-                "trust=${snapshot.relationship.trust} closeness=${snapshot.relationship.closeness} " +
-                "reliability=${snapshot.relationship.reliability} tension=${snapshot.relationship.unresolvedTension}",
-        )
-        if (snapshot.state.statusText.isNotBlank() || snapshot.state.innerThought.isNotBlank()) {
-            appendLine(
-                "state status=${snapshot.state.statusText.take(120)} " +
-                    "mood=${snapshot.state.mood.take(80)} body=${snapshot.state.bodyState.take(80)} " +
-                    "mind=${snapshot.state.mindState.take(80)}",
-            )
-            snapshot.state.innerThought.takeIf { it.isNotBlank() }?.let { thought ->
-                appendLine("unspoken=${thought.take(300)}")
-            }
-        }
-        if (activeConcerns.isNotEmpty()) {
-            appendLine("active_concerns:")
-            activeConcerns.take(8).forEach { concern ->
-                appendLine(
-                    "- subject=${concern.subjectKey} importance=${concern.importance} " +
-                        "next=${concern.nextPerceptionAt ?: "none"} goal=${concern.goal.take(180)}",
-                )
-            }
-        }
-        if (actionableCommitments.isNotEmpty()) {
-            appendLine("active_commitments:")
-            actionableCommitments.take(8).forEach { commitment ->
-                appendLine(
-                    "- id=${commitment.id} due=${commitment.dueAt} status=${commitment.status.name} " +
-                        "promise=${commitment.promise.take(180)}",
-                )
-            }
-        }
-        appendLine("</companion_runtime>")
-        append("Treat this runtime snapshot as current business truth. Ordinary chat never cancels unrelated commitments.")
-    }.trim()
 
     private suspend fun buildChatTurnPlan(
         messages: List<UIMessage>,

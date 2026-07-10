@@ -117,8 +117,50 @@ class CompanionRuntimeReducerTest {
     }
 
     @Test
+    fun `begin execution recovers an interrupted stale commitment`() {
+        val stale = commitment(
+            status = CompanionCommitmentStatus.EXECUTING,
+            attemptCount = 1,
+        ).copy(updatedAt = 100L)
+
+        val reduced = beginCompanionCommitment(
+            current = persisted(snapshot(commitments = listOf(stale))),
+            assistantId = ASSISTANT_A,
+            commitmentId = stale.id,
+            nowMillis = 400_000L,
+        )
+
+        val recovered = reduced.snapshot.commitments.single()
+        assertEquals(CompanionCommitmentStatus.EXECUTING, recovered.status)
+        assertEquals(2, recovered.attemptCount)
+        assertNotNull(reduced.affectedCommitment)
+    }
+
+    @Test
+    fun `begin execution does not duplicate a fresh executing commitment`() {
+        val executing = commitment(status = CompanionCommitmentStatus.EXECUTING).copy(updatedAt = 100L)
+
+        val reduced = beginCompanionCommitment(
+            current = persisted(snapshot(commitments = listOf(executing))),
+            assistantId = ASSISTANT_A,
+            commitmentId = executing.id,
+            nowMillis = 200L,
+        )
+
+        assertNull(reduced.affectedCommitment)
+        assertEquals(CompanionCommitmentStatus.EXECUTING, reduced.snapshot.commitments.single().status)
+    }
+
+    @Test
     fun `successful execution stores result and fulfills commitment`() {
         val executing = commitment(status = CompanionCommitmentStatus.EXECUTING, attemptCount = 1)
+        val concern = CompanionConcern(
+            id = "concern-1",
+            assistantId = ASSISTANT_A,
+            subjectKey = executing.subjectKey,
+            event = "follow up",
+            goal = "follow up",
+        )
         val result = CompanionActionResult(
             success = true,
             summary = "message delivered",
@@ -126,7 +168,7 @@ class CompanionRuntimeReducerTest {
         )
 
         val reduced = finishCompanionCommitment(
-            current = persisted(snapshot(commitments = listOf(executing))),
+            current = persisted(snapshot(commitments = listOf(executing)).copy(concerns = listOf(concern))),
             assistantId = ASSISTANT_A,
             commitmentId = executing.id,
             result = result,
@@ -136,6 +178,10 @@ class CompanionRuntimeReducerTest {
         assertEquals(CompanionCommitmentStatus.FULFILLED, fulfilled.status)
         assertEquals(result, fulfilled.lastActionResult)
         assertEquals(300L, fulfilled.resolvedAt)
+        assertEquals(0.53f, reduced.snapshot.relationship.reliability)
+        assertEquals(0.51f, reduced.snapshot.relationship.trust)
+        assertEquals(1, reduced.persistedState.appliedRelationshipEventIds.size)
+        assertEquals(CompanionConcernStatus.COMPLETED, reduced.snapshot.concerns.single().status)
     }
 
     @Test
@@ -160,6 +206,27 @@ class CompanionRuntimeReducerTest {
         assertEquals(900L, retry.dueAt)
         assertEquals(result, retry.lastActionResult)
         assertNull(retry.resolvedAt)
+        assertEquals(0.47f, reduced.snapshot.relationship.reliability)
+        assertEquals(0.49f, reduced.snapshot.relationship.trust)
+        assertEquals(0.02f, reduced.snapshot.relationship.unresolvedTension)
+    }
+
+    @Test
+    fun `cancelling an active commitment records an explicit reason`() {
+        val active = commitment()
+
+        val reduced = cancelCompanionCommitment(
+            current = persisted(snapshot(commitments = listOf(active))),
+            assistantId = ASSISTANT_A,
+            commitmentId = active.id,
+            reason = "proactive messaging disabled",
+            nowMillis = 250L,
+        )
+
+        val cancelled = reduced.snapshot.commitments.single()
+        assertEquals(CompanionCommitmentStatus.CANCELLED, cancelled.status)
+        assertEquals("proactive messaging disabled", cancelled.statusReason)
+        assertEquals(250L, cancelled.resolvedAt)
     }
 
     @Test
@@ -202,6 +269,53 @@ class CompanionRuntimeReducerTest {
         assertEquals(emptyList<CompanionCommitment>(), reduced.snapshot.commitments)
         assertEquals(0.5f, reduced.snapshot.relationship.trust)
         assertNotNull(reduced.persistedState.snapshots.singleOrNull { it.assistantId == ASSISTANT_A })
+    }
+
+    @Test
+    fun `global next commitment selects earliest work across assistants`() {
+        val assistantA = snapshot(
+            assistantId = ASSISTANT_A,
+            commitments = listOf(commitment(assistantId = ASSISTANT_A).copy(dueAt = 500L)),
+        )
+        val assistantB = snapshot(
+            assistantId = ASSISTANT_B,
+            commitments = listOf(commitment(id = "b", assistantId = ASSISTANT_B).copy(dueAt = 300L)),
+        )
+
+        val next = selectNextCompanionCommitment(
+            snapshots = listOf(assistantA, assistantB),
+            nowMillis = 200L,
+        )
+
+        assertEquals("b", next?.id)
+        assertEquals(ASSISTANT_B, next?.assistantId)
+    }
+
+    @Test
+    fun `global next commitment includes stale interrupted execution`() {
+        val stale = commitment(status = CompanionCommitmentStatus.EXECUTING)
+            .copy(dueAt = 100L, updatedAt = 100L)
+
+        val next = selectNextCompanionCommitment(
+            snapshots = listOf(snapshot(commitments = listOf(stale))),
+            nowMillis = 400_000L,
+        )
+
+        assertEquals(stale.id, next?.id)
+    }
+
+    @Test
+    fun `global next commitment schedules fresh execution at recovery boundary`() {
+        val executing = commitment(status = CompanionCommitmentStatus.EXECUTING)
+            .copy(dueAt = 100L, updatedAt = 100L)
+
+        val next = selectNextCompanionCommitment(
+            snapshots = listOf(snapshot(commitments = listOf(executing))),
+            nowMillis = 200L,
+        )
+
+        assertEquals(executing.id, next?.id)
+        assertEquals(300_100L, next?.dueAt)
     }
 
     private fun commitment(

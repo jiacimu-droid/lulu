@@ -93,6 +93,31 @@ class CompanionPerceptionAssemblerTest {
         assertTrue(packet.contextFacts.all { it.key.length <= 80 && it.value.length <= 500 })
     }
 
+    @Test
+    fun `prompt context includes active work but excludes completed work`() {
+        val packet = CompanionPerceptionAssembler.assemble(
+            input = input(),
+            snapshot = CompanionSnapshot(
+                assistantId = "assistant-a",
+                concerns = listOf(
+                    concern(id = "active"),
+                    concern(id = "done", status = CompanionConcernStatus.COMPLETED),
+                ),
+                commitments = listOf(
+                    commitment(id = "active"),
+                    commitment(id = "done", status = CompanionCommitmentStatus.FULFILLED),
+                ),
+            ),
+        )
+
+        val prompt = packet.toPromptContext()
+
+        assertTrue(prompt.contains("subject:active"))
+        assertTrue(prompt.contains("promise active"))
+        assertEquals(false, prompt.contains("subject:done"))
+        assertEquals(false, prompt.contains("promise done"))
+    }
+
     private fun input(assistantId: String = "assistant-a") = CompanionPerceptionInput(
         assistantId = assistantId,
         assistantName = "角色 A",

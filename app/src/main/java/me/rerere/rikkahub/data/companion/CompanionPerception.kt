@@ -146,3 +146,42 @@ object CompanionPerceptionAssembler {
     private const val MAX_ACTIONABLE_COMMITMENTS = 50
     private const val MAX_TOOL_NAMES = 64
 }
+
+fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
+    appendLine("<companion_runtime assistant_id=\"$assistantId\">")
+    appendLine(
+        "relationship familiarity=${snapshot.relationship.familiarity} " +
+            "trust=${snapshot.relationship.trust} closeness=${snapshot.relationship.closeness} " +
+            "reliability=${snapshot.relationship.reliability} tension=${snapshot.relationship.unresolvedTension}",
+    )
+    if (snapshot.state.statusText.isNotBlank() || snapshot.state.innerThought.isNotBlank()) {
+        appendLine(
+            "state status=${snapshot.state.statusText.take(120)} " +
+                "mood=${snapshot.state.mood.take(80)} body=${snapshot.state.bodyState.take(80)} " +
+                "mind=${snapshot.state.mindState.take(80)}",
+        )
+        snapshot.state.innerThought.takeIf { it.isNotBlank() }?.let { thought ->
+            appendLine("unspoken=${thought.take(300)}")
+        }
+    }
+    if (activeConcerns.isNotEmpty()) {
+        appendLine("active_concerns:")
+        activeConcerns.take(8).forEach { concern ->
+            appendLine(
+                "- subject=${concern.subjectKey} importance=${concern.importance} " +
+                    "next=${concern.nextPerceptionAt ?: "none"} goal=${concern.goal.take(180)}",
+            )
+        }
+    }
+    if (actionableCommitments.isNotEmpty()) {
+        appendLine("active_commitments:")
+        actionableCommitments.take(8).forEach { commitment ->
+            appendLine(
+                "- id=${commitment.id} due=${commitment.dueAt} status=${commitment.status.name} " +
+                    "promise=${commitment.promise.take(180)}",
+            )
+        }
+    }
+    appendLine("</companion_runtime>")
+    append("Treat this runtime snapshot as current business truth. Ordinary chat never cancels unrelated commitments.")
+}.trim()
