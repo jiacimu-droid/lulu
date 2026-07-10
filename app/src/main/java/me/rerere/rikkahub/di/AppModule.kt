@@ -11,6 +11,7 @@ import me.rerere.rikkahub.data.ai.AILoggingManager
 import me.rerere.rikkahub.data.ai.ApiUsageStore
 import me.rerere.rikkahub.data.ai.tools.LocalTools
 import me.rerere.rikkahub.data.cihai.CihaiService
+import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.event.AppEventBus
 import me.rerere.rikkahub.data.service.LuluPerceptionCollector
 import me.rerere.rikkahub.data.service.MemoryBankService
@@ -79,6 +80,10 @@ val appModule = module {
     }
 
     single {
+        CompanionRuntime(store = get())
+    }
+
+    single {
         MemoryBankService(
             memoryBankDAO = get(),
             okHttpClient = get(),
@@ -115,6 +120,7 @@ val appModule = module {
             pluginLoader = get(),
             luluPerceptionCollector = get(),
             livingPresenceStore = get(),
+            companionRuntime = get(),
         )
     }
 

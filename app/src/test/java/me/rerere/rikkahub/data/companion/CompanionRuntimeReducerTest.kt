@@ -7,6 +7,47 @@ import org.junit.Test
 
 class CompanionRuntimeReducerTest {
     @Test
+    fun `same follow up draft produces stable concern and commitment identity`() {
+        val draft = CompanionFollowUpDraft(
+            assistantId = ASSISTANT_A,
+            category = "schedule",
+            reason = "check the user's schedule",
+            sourceText = "class starts at eight",
+            dueAt = 500L,
+            sourceConversationId = "conversation-1",
+            sourceMessageId = "message-1",
+            preferredToolNames = listOf("calendar_tool"),
+        )
+
+        val firstConcern = draft.toConcern(nowMillis = 100L)
+        val secondConcern = draft.toConcern(nowMillis = 200L)
+        val commitment = draft.toCommitment(nowMillis = 100L)
+        val rescheduled = draft.copy(dueAt = 900L).toCommitment(nowMillis = 200L)
+
+        assertEquals(firstConcern.id, secondConcern.id)
+        assertEquals(firstConcern.subjectKey, commitment.subjectKey)
+        assertEquals(commitment.id, rescheduled.id)
+        assertEquals(commitment.subjectKey, rescheduled.subjectKey)
+        assertEquals(CompanionActionType.CHECK_IN, commitment.actionPlan.type)
+        assertEquals(listOf("calendar_tool"), commitment.actionPlan.preferredToolNames)
+    }
+
+    @Test
+    fun `follow ups at different times keep separate identities`() {
+        val first = CompanionFollowUpDraft(
+            assistantId = ASSISTANT_A,
+            category = "deadline",
+            reason = "check first deadline",
+            sourceText = "two assignments",
+            dueAt = 500L,
+        )
+        val second = first.copy(dueAt = 900L, reason = "check second deadline")
+
+        assertEquals(false, first.toCommitment(100L).id == second.toCommitment(100L).id)
+        assertEquals(false, first.toConcern(100L).subjectKey == second.toConcern(100L).subjectKey)
+    }
+
+    @Test
     fun `unrelated chat leaves existing commitments untouched`() {
         val existing = commitment(id = "existing", subjectKey = "deadline:first")
         val current = persisted(snapshot(commitments = listOf(existing)))

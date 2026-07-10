@@ -1,5 +1,68 @@
 package me.rerere.rikkahub.data.companion
 
+import java.nio.charset.StandardCharsets
+import java.util.UUID
+
+data class CompanionFollowUpDraft(
+    val assistantId: String,
+    val category: String,
+    val reason: String,
+    val sourceText: String,
+    val dueAt: Long,
+    val sourceConversationId: String? = null,
+    val sourceMessageId: String? = null,
+    val preferredToolNames: List<String> = emptyList(),
+    val importance: Int = 3,
+    val actionType: CompanionActionType = CompanionActionType.CHECK_IN,
+) {
+    fun toConcern(nowMillis: Long): CompanionConcern {
+        val subjectKey = stableSubjectKey()
+        return CompanionConcern(
+            id = stableId("concern", subjectKey),
+            assistantId = assistantId,
+            subjectKey = subjectKey,
+            event = reason.trim(),
+            goal = reason.trim(),
+            importance = importance.coerceIn(1, 5),
+            nextPerceptionAt = dueAt,
+            sourceMessageIds = listOfNotNull(sourceMessageId?.trim()?.takeIf(String::isNotBlank)),
+            createdAt = nowMillis,
+            lastUpdatedAt = nowMillis,
+        )
+    }
+
+    fun toCommitment(nowMillis: Long): CompanionCommitment {
+        val subjectKey = stableSubjectKey()
+        return CompanionCommitment(
+            id = stableId("commitment", subjectKey),
+            assistantId = assistantId,
+            subjectKey = subjectKey,
+            promise = reason.trim(),
+            dueAt = dueAt,
+            actionPlan = CompanionActionPlan(
+                type = actionType,
+                userFacingSummary = reason.trim(),
+                contextText = sourceText.trim(),
+                category = category.trim(),
+                preferredToolNames = preferredToolNames,
+            ),
+            sourceConversationId = sourceConversationId?.trim()?.takeIf(String::isNotBlank),
+            sourceMessageId = sourceMessageId?.trim()?.takeIf(String::isNotBlank),
+            createdAt = nowMillis,
+            updatedAt = nowMillis,
+        )
+    }
+
+    private fun stableSubjectKey(): String = normalizeCompanionSubjectKey(
+        "${category.trim().ifBlank { "follow-up" }}:${reason.trim().take(120)}:${sourceText.trim().take(120)}",
+    )
+
+    private fun stableId(prefix: String, subjectKey: String): String {
+        val evidence = "$assistantId|$subjectKey|${sourceMessageId.orEmpty()}"
+        return "$prefix:${UUID.nameUUIDFromBytes(evidence.toByteArray(StandardCharsets.UTF_8))}"
+    }
+}
+
 data class CompanionTurnMutation(
     val assistantId: String,
     val state: CompanionState? = null,

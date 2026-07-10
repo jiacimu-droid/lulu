@@ -73,6 +73,7 @@ import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.cihai.CihaiService
+import me.rerere.rikkahub.data.companion.CompanionCommitment
 import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
@@ -144,10 +145,12 @@ class ProactiveMessageService : KoinComponent {
         internal const val KEY_TARGETED_REASON = "targeted_reason"
         internal const val KEY_TARGETED_USER_TEXT = "targeted_user_text"
         internal const val KEY_TARGETED_KIND = "targeted_kind"
+        internal const val KEY_TARGETED_COMMITMENT_ID = "targeted_commitment_id"
         internal const val KEY_TARGETED_QUEUE = "targeted_queue"
         internal const val EXTRA_TARGETED_REASON = "targeted_reason"
         internal const val EXTRA_TARGETED_USER_TEXT = "targeted_user_text"
         internal const val EXTRA_TARGETED_KIND = "targeted_kind"
+        internal const val EXTRA_COMMITMENT_ID = "commitment_id"
         internal const val EXTRA_ASSISTANT_ID = "assistant_id"
 
         fun scheduleNext(context: Context, setting: ProactiveMessageSetting) {
@@ -299,26 +302,34 @@ class ProactiveMessageService : KoinComponent {
             reason: String,
             userText: String,
             kind: String,
+            assistantId: String = setting.assistantId,
+            commitmentId: String? = null,
         ) {
             if (!setting.enabled || triggerAtMillis <= java.lang.System.currentTimeMillis()) return
 
-            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val preferencesEditor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit()
                 .putLong(KEY_NEXT_TRIGGER_TIME, triggerAtMillis)
                 .putLong(KEY_TARGETED_TRIGGER_TIME, triggerAtMillis)
                 .putString(KEY_TARGETED_REASON, reason)
                 .putString(KEY_TARGETED_USER_TEXT, userText)
                 .putString(KEY_TARGETED_KIND, kind)
-                .putString(EXTRA_ASSISTANT_ID, setting.assistantId)
-                .apply()
+                .putString(EXTRA_ASSISTANT_ID, assistantId)
+            if (commitmentId.isNullOrBlank()) {
+                preferencesEditor.remove(KEY_TARGETED_COMMITMENT_ID)
+            } else {
+                preferencesEditor.putString(KEY_TARGETED_COMMITMENT_ID, commitmentId)
+            }
+            preferencesEditor.apply()
 
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val intent = Intent(context, ProactiveMessageReceiver::class.java).apply {
                 action = ACTION_PROACTIVE_MESSAGE
-                putExtra(EXTRA_ASSISTANT_ID, setting.assistantId)
+                putExtra(EXTRA_ASSISTANT_ID, assistantId)
                 putExtra(EXTRA_TARGETED_REASON, reason)
                 putExtra(EXTRA_TARGETED_USER_TEXT, userText)
                 putExtra(EXTRA_TARGETED_KIND, kind)
+                commitmentId?.takeIf { it.isNotBlank() }?.let { putExtra(EXTRA_COMMITMENT_ID, it) }
             }
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -338,6 +349,23 @@ class ProactiveMessageService : KoinComponent {
             }
 
             Log.d(TAG, "Scheduled targeted proactive message kind=$kind at ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(triggerAtMillis))}")
+        }
+
+        fun scheduleCommitment(
+            context: Context,
+            setting: ProactiveMessageSetting,
+            commitment: CompanionCommitment,
+        ) {
+            scheduleTargeted(
+                context = context,
+                setting = setting,
+                triggerAtMillis = commitment.dueAt,
+                reason = commitment.promise,
+                userText = commitment.actionPlan.contextText,
+                kind = commitment.actionPlan.category.ifBlank { "commitment" },
+                assistantId = commitment.assistantId,
+                commitmentId = commitment.id,
+            )
         }
 
         fun replaceTargetedQueue(
@@ -395,6 +423,7 @@ class ProactiveMessageService : KoinComponent {
                 .remove(KEY_TARGETED_REASON)
                 .remove(KEY_TARGETED_USER_TEXT)
                 .remove(KEY_TARGETED_KIND)
+                .remove(KEY_TARGETED_COMMITMENT_ID)
                 .remove(KEY_TARGETED_QUEUE)
                 .apply()
 

@@ -101,6 +101,19 @@ import me.rerere.rikkahub.data.datastore.getAssistantById
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.datastore.getCurrentChatModel
 import me.rerere.rikkahub.data.datastore.getProactiveMessageSetting
+import me.rerere.rikkahub.data.companion.CompanionActionType
+import me.rerere.rikkahub.data.companion.CompanionConcernChange
+import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
+import me.rerere.rikkahub.data.companion.CompanionContextFact
+import me.rerere.rikkahub.data.companion.CompanionConversationTurn
+import me.rerere.rikkahub.data.companion.CompanionFollowUpDraft
+import me.rerere.rikkahub.data.companion.CompanionPerceptionInput
+import me.rerere.rikkahub.data.companion.CompanionPerceptionPacket
+import me.rerere.rikkahub.data.companion.CompanionRuntime
+import me.rerere.rikkahub.data.companion.CompanionSnapshot
+import me.rerere.rikkahub.data.companion.CompanionTurnMutation
+import me.rerere.rikkahub.data.companion.CompanionTurnRole
+import me.rerere.rikkahub.data.companion.toCompanionState
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.data.model.Conversation
@@ -374,6 +387,7 @@ class ChatService(
     private val pluginLoader: PluginLoader,
     private val luluPerceptionCollector: LuluPerceptionCollector,
     private val livingPresenceStore: LivingPresenceStore,
+    private val companionRuntime: CompanionRuntime,
 ) {
     // 统一会话管理
     private val sessions = ConcurrentHashMap<Uuid, ConversationSession>()
@@ -570,7 +584,6 @@ class ChatService(
             val currentAssistantId = getOrCreateSession(conversationId).state.value.assistantId
             val proactiveSetting = settings.getProactiveMessageSetting(currentAssistantId)
             if (proactiveSetting.enabled) {
-                me.rerere.rikkahub.data.service.ProactiveMessageService.clearTargetedQueue(context)
                 me.rerere.rikkahub.data.service.ProactiveMessageService.scheduleNext(
                     context = context,
                     settings = settings,
@@ -710,6 +723,8 @@ class ChatService(
             userText = visibleUserText.orEmpty(),
             settings = settings,
         )
+        val nowMillis = System.currentTimeMillis()
+        var unifiedState = companionRuntime.snapshot(assistant.id.toString()).state
         settingsStore.update { currentSettings ->
             currentSettings.recordLuluPresenceTurn(
                 assistantId = assistant.id,
@@ -717,7 +732,26 @@ class ChatService(
                 assistantText = reply,
                 perceptionInput = perceptionInput,
                 modelPresence = listOf(replyMessage).extractLuluModelPresence(),
+                nowMillis = nowMillis,
             )
+                .also { updatedSettings ->
+                    unifiedState = updatedSettings.luluStates
+                        .luluStateHistory(assistant.id)
+                        .firstOrNull()
+                        ?.toCompanionState()
+                        ?: unifiedState
+                }
+        }
+        runCatching {
+            companionRuntime.applyTurn(
+                CompanionTurnMutation(
+                    assistantId = assistant.id.toString(),
+                    state = unifiedState,
+                    nowMillis = nowMillis,
+                ),
+            )
+        }.onFailure { error ->
+            Log.w(TAG, "Failed to persist companion voice turn", error)
         }
 
         return reply
@@ -742,15 +776,17 @@ class ChatService(
             .selectRelevantToolsForPrompt(hiddenMessages)
             .withHumanLikeToolPrompts()
         val latestUserText = hiddenMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty()
+        val memoryContext = memoryBankService.buildRecallContext(
+            assistantId = assistant.id.toString(),
+            query = latestUserText,
+        )
         val proactiveContext = collectProactiveToolContext(
+            conversationId = conversationId,
             messages = hiddenMessages,
             tools = availableTools,
             settings = settings,
             assistant = assistant,
-        )
-        val memoryContext = memoryBankService.buildRecallContext(
-            assistantId = assistant.id.toString(),
-            query = latestUserText,
+            memoryContext = memoryContext,
         )
         var generatedMessages = hiddenMessages
 
@@ -1026,15 +1062,17 @@ class ChatService(
             val latestUserText = conversation.currentMessages.lastOrNull { it.role == MessageRole.USER }
                 ?.toText()
                 .orEmpty()
+            val memoryContext = memoryBankService.buildRecallContext(
+                assistantId = assistant.id.toString(),
+                query = latestUserText,
+            )
             val proactiveContext = collectProactiveToolContext(
+                conversationId = conversationId,
                 messages = conversation.currentMessages,
                 tools = availableTools,
                 settings = settings,
                 assistant = assistant,
-            )
-            val memoryContext = memoryBankService.buildRecallContext(
-                assistantId = assistant.id.toString(),
-                query = latestUserText,
+                memoryContext = memoryContext,
             )
 
             // start generating
@@ -1104,12 +1142,12 @@ class ChatService(
         }.onSuccess {
             val finalConversation = getConversationFlow(conversationId).value
             saveConversation(conversationId, finalConversation)
-            val lastUserText = finalConversation.currentMessages.lastOrNull { it.role == MessageRole.USER }
-                ?.toText()
-                .orEmpty()
+            val lastUserMessage = finalConversation.currentMessages.lastOrNull { it.role == MessageRole.USER }
+            val lastUserText = lastUserMessage?.toText().orEmpty()
             val lastAssistantText = finalConversation.currentMessages.lastOrNull { it.role == MessageRole.ASSISTANT }
                 ?.toText()
                 .orEmpty()
+            val nowMillis = System.currentTimeMillis()
             val perceptionInput = luluPerceptionCollector.collectSafely(
                 userText = lastUserText,
                 settings = settings,
@@ -1130,7 +1168,7 @@ class ChatService(
             livingPresenceStore.completeReturnedIntents(
                 assistantId = assistant.id.toString(),
                 userText = lastUserText,
-                nowMillis = System.currentTimeMillis(),
+                nowMillis = nowMillis,
             )
             livingPresenceStore.mergeEvent(
                 LivingPresenceEventExtractor.extract(
@@ -1138,10 +1176,11 @@ class ChatService(
                     assistantName = assistant.name,
                     userText = lastUserText,
                     assistantText = lastAssistantText,
-                    nowMillis = System.currentTimeMillis(),
+                    nowMillis = nowMillis,
                 )
             )
             val scheduledPlan = scheduledPlans.firstOrNull()
+            var unifiedState = companionRuntime.snapshot(assistant.id.toString()).state
             settingsStore.update { currentSettings ->
                 currentSettings.recordLuluPresenceTurn(
                     assistantId = assistant.id,
@@ -1150,12 +1189,55 @@ class ChatService(
                     perceptionInput = perceptionInput,
                     proactiveReminderPlan = scheduledPlan,
                     modelPresence = finalConversation.currentMessages.takeLast(8).extractLuluModelPresence(),
+                    nowMillis = nowMillis,
                 )
+                    .also { updatedSettings ->
+                        unifiedState = updatedSettings.luluStates
+                            .luluStateHistory(assistant.id)
+                            .firstOrNull()
+                            ?.toCompanionState()
+                            ?: unifiedState
+                    }
+            }
+            val followUpDrafts = scheduledPlans.map { plan ->
+                CompanionFollowUpDraft(
+                    assistantId = assistant.id.toString(),
+                    category = plan.kind.name.lowercase(Locale.ROOT),
+                    reason = plan.toTargetedReason(),
+                    sourceText = plan.userText,
+                    dueAt = plan.triggerAtMillis,
+                    sourceConversationId = conversationId.toString(),
+                    sourceMessageId = lastUserMessage?.id?.toString(),
+                    preferredToolNames = plan.preferredToolNames,
+                    importance = if (plan.kind == ProactiveReminderKind.SCHEDULE) 4 else 3,
+                    actionType = if (plan.kind == ProactiveReminderKind.SCHEDULE) {
+                        CompanionActionType.REMINDER
+                    } else {
+                        CompanionActionType.CHECK_IN
+                    },
+                )
+            }
+            val companionSnapshot = runCatching {
+                companionRuntime.applyTurn(
+                    CompanionTurnMutation(
+                        assistantId = assistant.id.toString(),
+                        state = unifiedState,
+                        concernChanges = followUpDrafts.map { draft ->
+                            CompanionConcernChange.Upsert(draft.toConcern(nowMillis))
+                        },
+                        acceptedCommitments = followUpDrafts.map { draft -> draft.toCommitment(nowMillis) },
+                        nowMillis = nowMillis,
+                    ),
+                )
+            }.onFailure { error ->
+                Log.w(TAG, "Failed to persist unified companion turn", error)
+            }.getOrElse {
+                companionRuntime.snapshot(assistant.id.toString())
             }
             scheduleProactiveReminderFromTurn(
                 settings = settings,
                 assistant = assistant,
-                plans = scheduledPlans,
+                snapshot = companionSnapshot,
             )
             launchAffectiveMemoryExtraction(
                 conversationId = conversationId,
@@ -1191,12 +1273,23 @@ class ChatService(
     private fun scheduleProactiveReminderFromTurn(
         settings: Settings,
         assistant: Assistant,
-        plans: List<ProactiveReminderPlan>,
+        snapshot: CompanionSnapshot,
     ) {
-        ProactiveMessageService.replaceTargetedQueue(
+        val nextCommitment = snapshot.commitments
+            .asSequence()
+            .filter { commitment ->
+                commitment.assistantId == assistant.id.toString() && commitment.status in setOf(
+                    CompanionCommitmentStatus.ACTIVE,
+                    CompanionCommitmentStatus.DUE,
+                    CompanionCommitmentStatus.RETRY_SCHEDULED,
+                )
+            }
+            .minByOrNull { it.dueAt }
+            ?: return
+        ProactiveMessageService.scheduleCommitment(
             context = context,
             setting = settings.getProactiveMessageSetting(assistant.id),
-            plans = plans,
+            commitment = nextCommitment,
         )
     }
 
@@ -1499,13 +1592,53 @@ class ChatService(
     }
 
     private suspend fun collectProactiveToolContext(
+        conversationId: Uuid,
         messages: List<UIMessage>,
         tools: List<Tool>,
         settings: Settings,
         assistant: Assistant,
+        memoryContext: String,
     ): String {
         val latestUserText = messages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty()
         if (latestUserText.isBlank()) return ""
+        val nowMillis = System.currentTimeMillis()
+        val previousInteractionAt = messages
+            .dropLast(1)
+            .lastOrNull { it.role == MessageRole.USER || it.role == MessageRole.ASSISTANT }
+            ?.createdAt
+            ?.toInstant(TimeZone.currentSystemDefault())
+            ?.toEpochMilliseconds()
+        val companionPerception = companionRuntime.perception(
+            CompanionPerceptionInput(
+                assistantId = assistant.id.toString(),
+                assistantName = assistant.name,
+                persona = assistant.toLuluPlannerPersona(),
+                conversationId = conversationId.toString(),
+                recentTurns = messages.takeLast(12).map { message ->
+                    CompanionConversationTurn(
+                        role = message.role.toCompanionTurnRole(),
+                        content = message.toText(),
+                        createdAt = message.createdAt
+                            .toInstant(TimeZone.currentSystemDefault())
+                            .toEpochMilliseconds(),
+                        sourceId = message.id.toString(),
+                    )
+                },
+                contextFacts = listOfNotNull(
+                    previousInteractionAt?.let { previousAt ->
+                        CompanionContextFact(
+                            key = "minutes_since_previous_interaction",
+                            value = ((nowMillis - previousAt) / 60_000L).coerceAtLeast(0L).toString(),
+                            observedAt = nowMillis,
+                        )
+                    },
+                ),
+                availableToolNames = tools.map { it.name }.toSet(),
+                memoryContext = memoryContext,
+                nowMillis = nowMillis,
+            ),
+        )
+        val unifiedContext = companionPerception.toPromptContext()
         val planResult = buildChatTurnPlan(
             messages = messages,
             settings = settings,
@@ -1530,7 +1663,7 @@ class ChatService(
             plan.expressionGuidance.isNullOrBlank() &&
             plan.expressionAffordances.isEmpty() &&
             plan.innerThought.isNullOrBlank()
-        ) return ""
+        ) return unifiedContext
 
         val toolsByName = tools.associateBy { it.name }
         val results = requests.mapNotNull { request ->
@@ -1555,8 +1688,10 @@ class ChatService(
             plan.expressionGuidance.isNullOrBlank() &&
             plan.expressionAffordances.isEmpty() &&
             plan.innerThought.isNullOrBlank()
-        ) return ""
+        ) return unifiedContext
         return buildString {
+            appendLine(unifiedContext)
+            appendLine()
             plan.innerThought?.takeIf { it.isNotBlank() }?.let { thought ->
                 appendLine("本轮露露没说出口的心里话：$thought")
                 appendLine("这只是后台第一人称心声，不要把它当成工具结果，也不要原样复述。")
@@ -1580,6 +1715,52 @@ class ChatService(
             }
         }
     }
+
+    private fun MessageRole.toCompanionTurnRole(): CompanionTurnRole = when (this) {
+        MessageRole.USER -> CompanionTurnRole.USER
+        MessageRole.ASSISTANT -> CompanionTurnRole.ASSISTANT
+        MessageRole.SYSTEM -> CompanionTurnRole.SYSTEM
+        MessageRole.TOOL -> CompanionTurnRole.TOOL
+    }
+
+    private fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
+        appendLine("<companion_runtime assistant_id=\"$assistantId\">")
+        appendLine(
+            "relationship familiarity=${snapshot.relationship.familiarity} " +
+                "trust=${snapshot.relationship.trust} closeness=${snapshot.relationship.closeness} " +
+                "reliability=${snapshot.relationship.reliability} tension=${snapshot.relationship.unresolvedTension}",
+        )
+        if (snapshot.state.statusText.isNotBlank() || snapshot.state.innerThought.isNotBlank()) {
+            appendLine(
+                "state status=${snapshot.state.statusText.take(120)} " +
+                    "mood=${snapshot.state.mood.take(80)} body=${snapshot.state.bodyState.take(80)} " +
+                    "mind=${snapshot.state.mindState.take(80)}",
+            )
+            snapshot.state.innerThought.takeIf { it.isNotBlank() }?.let { thought ->
+                appendLine("unspoken=${thought.take(300)}")
+            }
+        }
+        if (activeConcerns.isNotEmpty()) {
+            appendLine("active_concerns:")
+            activeConcerns.take(8).forEach { concern ->
+                appendLine(
+                    "- subject=${concern.subjectKey} importance=${concern.importance} " +
+                        "next=${concern.nextPerceptionAt ?: "none"} goal=${concern.goal.take(180)}",
+                )
+            }
+        }
+        if (actionableCommitments.isNotEmpty()) {
+            appendLine("active_commitments:")
+            actionableCommitments.take(8).forEach { commitment ->
+                appendLine(
+                    "- id=${commitment.id} due=${commitment.dueAt} status=${commitment.status.name} " +
+                        "promise=${commitment.promise.take(180)}",
+                )
+            }
+        }
+        appendLine("</companion_runtime>")
+        append("Treat this runtime snapshot as current business truth. Ordinary chat never cancels unrelated commitments.")
+    }.trim()
 
     private suspend fun buildChatTurnPlan(
         messages: List<UIMessage>,
