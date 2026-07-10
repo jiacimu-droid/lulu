@@ -187,6 +187,7 @@ class CompanionRuntimeReducerTest {
     @Test
     fun `failed execution stores error and schedules retry`() {
         val executing = commitment(status = CompanionCommitmentStatus.EXECUTING, attemptCount = 1)
+        val concern = concernFor(executing)
         val result = CompanionActionResult(
             success = false,
             summary = "provider unavailable",
@@ -194,7 +195,7 @@ class CompanionRuntimeReducerTest {
         )
 
         val reduced = finishCompanionCommitment(
-            current = persisted(snapshot(commitments = listOf(executing))),
+            current = persisted(snapshot(commitments = listOf(executing)).copy(concerns = listOf(concern))),
             assistantId = ASSISTANT_A,
             commitmentId = executing.id,
             result = result,
@@ -209,14 +210,39 @@ class CompanionRuntimeReducerTest {
         assertEquals(0.47f, reduced.snapshot.relationship.reliability)
         assertEquals(0.49f, reduced.snapshot.relationship.trust)
         assertEquals(0.02f, reduced.snapshot.relationship.unresolvedTension)
+        assertEquals(CompanionConcernStatus.ACTIVE, reduced.snapshot.concerns.single().status)
+        assertEquals(900L, reduced.snapshot.concerns.single().nextPerceptionAt)
+    }
+
+    @Test
+    fun `final execution failure cancels the matching concern`() {
+        val executing = commitment(status = CompanionCommitmentStatus.EXECUTING, attemptCount = 3)
+        val concern = concernFor(executing)
+        val result = CompanionActionResult(
+            success = false,
+            summary = "retry limit reached",
+            completedAt = 300L,
+        )
+
+        val reduced = finishCompanionCommitment(
+            current = persisted(snapshot(commitments = listOf(executing)).copy(concerns = listOf(concern))),
+            assistantId = ASSISTANT_A,
+            commitmentId = executing.id,
+            result = result,
+        )
+
+        assertEquals(CompanionCommitmentStatus.FAILED, reduced.snapshot.commitments.single().status)
+        assertEquals(CompanionConcernStatus.CANCELLED, reduced.snapshot.concerns.single().status)
+        assertEquals("retry limit reached", reduced.snapshot.concerns.single().completedReason)
     }
 
     @Test
     fun `cancelling an active commitment records an explicit reason`() {
         val active = commitment()
+        val concern = concernFor(active)
 
         val reduced = cancelCompanionCommitment(
-            current = persisted(snapshot(commitments = listOf(active))),
+            current = persisted(snapshot(commitments = listOf(active)).copy(concerns = listOf(concern))),
             assistantId = ASSISTANT_A,
             commitmentId = active.id,
             reason = "proactive messaging disabled",
@@ -227,6 +253,8 @@ class CompanionRuntimeReducerTest {
         assertEquals(CompanionCommitmentStatus.CANCELLED, cancelled.status)
         assertEquals("proactive messaging disabled", cancelled.statusReason)
         assertEquals(250L, cancelled.resolvedAt)
+        assertEquals(CompanionConcernStatus.CANCELLED, reduced.snapshot.concerns.single().status)
+        assertEquals("proactive messaging disabled", reduced.snapshot.concerns.single().completedReason)
     }
 
     @Test
@@ -334,6 +362,15 @@ class CompanionRuntimeReducerTest {
         attemptCount = attemptCount,
         createdAt = 10L,
         updatedAt = 10L,
+    )
+
+    private fun concernFor(commitment: CompanionCommitment) = CompanionConcern(
+        id = "concern-${commitment.id}",
+        assistantId = commitment.assistantId,
+        subjectKey = commitment.subjectKey,
+        event = "follow up",
+        goal = "follow up",
+        nextPerceptionAt = commitment.dueAt,
     )
 
     private fun snapshot(

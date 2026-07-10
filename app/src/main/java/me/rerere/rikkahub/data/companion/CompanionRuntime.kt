@@ -440,37 +440,32 @@ fun finishCompanionCommitment(
         lastActionResult = cleanResult,
         updatedAt = cleanResult.completedAt,
     )
-    val concernChanges = if (cleanResult.success) {
-        snapshot.concerns
-            .filter { concern ->
-                concern.assistantId == assistantId &&
-                    concern.subjectKey == existing.subjectKey &&
-                    concern.status == CompanionConcernStatus.ACTIVE
-            }
-            .map { concern ->
-                CompanionConcernChange.Complete(
-                    assistantId = assistantId,
-                    concernId = concern.id,
-                    reason = cleanResult.summary,
-                )
-            }
-    } else {
-        retryAt
-            ?.takeIf { it > cleanResult.completedAt }
-            ?.let { nextPerceptionAt ->
-                snapshot.concerns
-                    .filter { concern ->
-                        concern.assistantId == assistantId &&
-                            concern.subjectKey == existing.subjectKey &&
-                            concern.status == CompanionConcernStatus.ACTIVE
-                    }
-                    .map { concern ->
-                        CompanionConcernChange.Upsert(
-                            concern.copy(nextPerceptionAt = nextPerceptionAt),
-                        )
-                    }
-            }
-            .orEmpty()
+    val matchingConcerns = snapshot.concerns.filter { concern ->
+        concern.assistantId == assistantId &&
+            concern.subjectKey == existing.subjectKey &&
+            concern.status == CompanionConcernStatus.ACTIVE
+    }
+    val validRetryAt = retryAt?.takeIf { it > cleanResult.completedAt }
+    val concernChanges = when {
+        cleanResult.success -> matchingConcerns.map { concern ->
+            CompanionConcernChange.Complete(
+                assistantId = assistantId,
+                concernId = concern.id,
+                reason = cleanResult.summary,
+            )
+        }
+        validRetryAt != null -> matchingConcerns.map { concern ->
+            CompanionConcernChange.Upsert(
+                concern.copy(nextPerceptionAt = validRetryAt),
+            )
+        }
+        else -> matchingConcerns.map { concern ->
+            CompanionConcernChange.Cancel(
+                assistantId = assistantId,
+                concernId = concern.id,
+                reason = cleanResult.summary,
+            )
+        }
     }
     val updatedSnapshot = snapshot.copy(
         concerns = CompanionConcernReducer.apply(
@@ -538,8 +533,26 @@ fun cancelCompanionCommitment(
     val cancelled = transitioned.firstOrNull { it.id == commitmentId }
         ?.takeIf { it.status == CompanionCommitmentStatus.CANCELLED }
         ?: return current.unchangedReduction(snapshot)
+    val concernChanges = snapshot.concerns
+        .filter { concern ->
+            concern.assistantId == assistantId &&
+                concern.subjectKey == existing.subjectKey &&
+                concern.status == CompanionConcernStatus.ACTIVE
+        }
+        .map { concern ->
+            CompanionConcernChange.Cancel(
+                assistantId = assistantId,
+                concernId = concern.id,
+                reason = reason,
+            )
+        }
     return current.withUpdatedSnapshot(
         snapshot = snapshot.copy(
+            concerns = CompanionConcernReducer.apply(
+                current = snapshot.concerns,
+                changes = concernChanges,
+                nowMillis = nowMillis,
+            ),
             commitments = transitioned,
             updatedAt = maxOf(snapshot.updatedAt, nowMillis),
         ),
