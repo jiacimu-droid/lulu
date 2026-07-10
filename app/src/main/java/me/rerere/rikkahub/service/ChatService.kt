@@ -117,15 +117,12 @@ import me.rerere.rikkahub.data.companion.CompanionToolExecution
 import me.rerere.rikkahub.data.companion.buildScheduledToolFollowUp
 import me.rerere.rikkahub.data.companion.CompanionTurnRole
 import me.rerere.rikkahub.data.companion.buildCompanionStateFromTurn
-import me.rerere.rikkahub.data.companion.toLegacyLuluState
 import me.rerere.rikkahub.data.companion.toPromptContext
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.AssistantAffectScope
-import me.rerere.rikkahub.data.model.appendLuluState
-import me.rerere.rikkahub.data.model.luluStateHistory
 import me.rerere.rikkahub.data.model.replaceRegexes
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
@@ -221,17 +218,6 @@ internal fun Conversation.withoutVoiceCallInstructionLeaks(): Conversation {
     } else {
         copy(messageNodes = cleanedNodes, updateAt = Instant.now())
     }
-}
-
-internal fun Settings.projectCompanionStateForLegacyUi(
-    assistantId: Uuid,
-    state: me.rerere.rikkahub.data.companion.CompanionState,
-): Settings {
-    if (assistants.none { it.id == assistantId }) return this
-    val previousState = luluStates.luluStateHistory(assistantId).firstOrNull()
-    return copy(
-        luluStates = luluStates.appendLuluState(state.toLegacyLuluState(assistantId, previousState)),
-    )
 }
 
 private fun String.isVoiceCallInternalInstruction(): Boolean {
@@ -624,24 +610,16 @@ class ChatService(
             presence = listOf(replyMessage).companionModelPresence(),
             nowMillis = nowMillis,
         )
-        val persistedState = runCatching {
+        runCatching {
             companionRuntime.applyTurn(
                 CompanionTurnMutation(
                     assistantId = assistant.id.toString(),
                     state = unifiedState,
                     nowMillis = nowMillis,
                 ),
-            ).state
+            )
         }.onFailure { error ->
             Log.w(TAG, "Failed to persist companion voice turn", error)
-        }.getOrNull()
-        persistedState?.let { state ->
-            settingsStore.update { currentSettings ->
-                currentSettings.projectCompanionStateForLegacyUi(
-                    assistantId = assistant.id,
-                    state = state,
-                )
-            }
         }
 
         return reply
@@ -1061,7 +1039,7 @@ class ChatService(
                     },
                 )
             } + scheduledToolDrafts
-            val persistedState = runCatching {
+            runCatching {
                 companionRuntime.applyTurn(
                     CompanionTurnMutation(
                         assistantId = assistant.id.toString(),
@@ -1072,18 +1050,9 @@ class ChatService(
                         acceptedCommitments = followUpDrafts.map { draft -> draft.toCommitment(nowMillis) },
                         nowMillis = nowMillis,
                     ),
-                ).state
+                )
             }.onFailure { error ->
                 Log.w(TAG, "Failed to persist unified companion turn", error)
-            }.getOrNull()
-            persistedState?.let { state ->
-                // Legacy settings are a one-way UI projection; CompanionRuntime remains business truth.
-                settingsStore.update { currentSettings ->
-                    currentSettings.projectCompanionStateForLegacyUi(
-                        assistantId = assistant.id,
-                        state = state,
-                    )
-                }
             }
             scheduleProactiveReminderFromTurn(
                 settings = settings,

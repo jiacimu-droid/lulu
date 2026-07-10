@@ -49,15 +49,17 @@ import me.rerere.hugeicons.stroke.LeftToRightListBullet
 import me.rerere.hugeicons.stroke.TransactionHistory
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.Screen
+import me.rerere.rikkahub.data.companion.CompanionPersistedState
+import me.rerere.rikkahub.data.companion.CompanionSnapshot
+import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.getAssistantById
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.datastore.getCurrentChatModel
 import me.rerere.rikkahub.data.files.FilesManager
+import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Conversation
-import me.rerere.rikkahub.data.model.currentProjectedLuluState
-import me.rerere.rikkahub.data.model.luluStateHistory
 import me.rerere.rikkahub.service.ChatError
 import me.rerere.rikkahub.ui.components.ai.ChatInput
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
@@ -81,6 +83,7 @@ fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, au
         }
     )
     val filesManager: FilesManager = koinInject()
+    val companionStore: CompanionStore = koinInject()
     val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
 
@@ -91,6 +94,7 @@ fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, au
     val currentChatModel by vm.currentChatModel.collectAsStateWithLifecycle()
     val enableWebSearch by vm.enableWebSearch.collectAsStateWithLifecycle()
     val errors by vm.errors.collectAsStateWithLifecycle()
+    val companionState by companionStore.state.collectAsStateWithLifecycle()
 
     val inputState = vm.inputState
 
@@ -142,6 +146,7 @@ fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, au
         loadingJob = loadingJob,
         processingStatus = processingStatus,
         setting = setting,
+        companionState = companionState,
         conversation = conversation,
         navController = navController,
         vm = vm,
@@ -161,6 +166,7 @@ private fun ChatPageContent(
     loadingJob: Job?,
     processingStatus: String? = null,
     setting: Settings,
+    companionState: CompanionPersistedState,
     conversation: Conversation,
     navController: Navigator,
     vm: ChatVM,
@@ -186,8 +192,14 @@ private fun ChatPageContent(
         AssistantBackground(setting = setting)
         Scaffold(
             topBar = {
+                val assistant = setting.getAssistantById(conversation.assistantId)
+                    ?: setting.getCurrentAssistant()
                 TopBar(
                     settings = setting,
+                    assistant = assistant,
+                    companionSnapshot = companionState.snapshots
+                        .firstOrNull { it.assistantId == assistant.id.toString() }
+                        ?: CompanionSnapshot.empty(assistant.id.toString()),
                     conversation = conversation,
                     navController = navController,
                     previewMode = previewMode,
@@ -196,9 +208,6 @@ private fun ChatPageContent(
                     },
                     onUpdateTitle = {
                         vm.updateTitle(it)
-                    },
-                    onUpdateSettings = {
-                        vm.updateSettings(it)
                     },
                     onStartVoiceCall = {
                         navController.navigate(
@@ -404,12 +413,13 @@ private fun ChatPageContent(
 @Composable
 private fun TopBar(
     settings: Settings,
+    assistant: Assistant,
+    companionSnapshot: CompanionSnapshot,
     conversation: Conversation,
     navController: Navigator,
     previewMode: Boolean,
     onClickMenu: () -> Unit,
     onUpdateTitle: (String) -> Unit,
-    onUpdateSettings: (Settings) -> Unit,
     onStartVoiceCall: () -> Unit,
     onOpenVoiceCallHistory: () -> Unit,
 ) {
@@ -418,9 +428,6 @@ private fun TopBar(
         onUpdateTitle(it)
     }
     var showLuluStatus by rememberSaveable { mutableStateOf(false) }
-    val assistant = settings.getAssistantById(conversation.assistantId) ?: settings.getCurrentAssistant()
-    val currentLuluState = settings.luluStates.currentProjectedLuluState(assistant.id)
-    val luluStateHistory = settings.luluStates.luluStateHistory(assistant.id)
     val assistantDefaultName = stringResource(R.string.assistant_page_default_assistant)
 
     TopAppBar(
@@ -493,26 +500,7 @@ private fun TopBar(
     if (showLuluStatus) {
         LuluStatusDialog(
             assistant = assistant,
-            currentState = currentLuluState,
-            history = luluStateHistory,
-            onDeleteHistory = { selected ->
-                onUpdateSettings(
-                    settings.copy(
-                        luluStates = settings.luluStates.filterNot {
-                            it.assistantId == assistant.id && it.updatedAt in selected
-                        }
-                    )
-                )
-            },
-            onClearHistory = {
-                onUpdateSettings(
-                    settings.copy(
-                        luluStates = settings.luluStates.filterNot {
-                            it.assistantId == assistant.id
-                        }
-                    )
-                )
-            },
+            snapshot = companionSnapshot,
             onDismissRequest = { showLuluStatus = false },
         )
     }

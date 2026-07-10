@@ -1,12 +1,7 @@
 package me.rerere.rikkahub.data.companion
 
-import me.rerere.rikkahub.data.model.LuluMode
-import me.rerere.rikkahub.data.model.LuluMood
-import me.rerere.rikkahub.data.model.LuluRelationship
-import me.rerere.rikkahub.data.model.LuluState
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import kotlin.uuid.Uuid
 
 class CompanionPresenceStateTest {
     @Test
@@ -76,32 +71,5 @@ class CompanionPresenceStateTest {
         assertEquals("planning", next.activityMode)
         assertEquals("正在核对安排。", next.selfScene)
         assertEquals(50L, next.sinceAt)
-    }
-
-    @Test
-    fun `legacy ui projection preserves legacy enum fields`() {
-        val assistantId = Uuid.parse("11111111-1111-1111-1111-111111111111")
-        val previous = LuluState(
-            assistantId = assistantId,
-            mood = LuluMood.CALM,
-            mode = LuluMode.RESTING,
-            relationship = LuluRelationship.FAMILIAR,
-        )
-        val state = CompanionState(
-            statusText = "刚刚聊完",
-            innerThought = "这件事要继续记着。",
-            selfScene = "把刚才的重点整理好了。",
-            updatedAt = 2_000L,
-            sinceAt = 1_500L,
-        )
-
-        val projected = state.toLegacyLuluState(assistantId, previous)
-
-        assertEquals("刚刚聊完", projected.statusText)
-        assertEquals("这件事要继续记着。", projected.innerVoice)
-        assertEquals("把刚才的重点整理好了。", projected.selfScene)
-        assertEquals(LuluMood.CALM, projected.mood)
-        assertEquals(LuluMode.RESTING, projected.mode)
-        assertEquals(LuluRelationship.FAMILIAR, projected.relationship)
     }
 }

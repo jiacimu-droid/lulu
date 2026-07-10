@@ -125,7 +125,6 @@ import me.rerere.rikkahub.service.LivingPresenceConsolidationHint
 import me.rerere.rikkahub.service.RollingJudgmentDecision
 import me.rerere.rikkahub.service.RollingJudgmentLoop
 import me.rerere.rikkahub.service.ProactiveReminderPlan
-import me.rerere.rikkahub.service.projectCompanionStateForLegacyUi
 import me.rerere.rikkahub.service.toProactiveReminderPlan
 import me.rerere.rikkahub.utils.sendNotification
 import java.time.Instant
@@ -1076,7 +1075,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 if (livingPresenceDecision?.shouldResolveSilently() == true) {
                     Log.d(TAG, "LivingPresence decision resolved silently: ${livingPresenceDecision.thought}")
                     runCatching {
-                        persistCompanionStateProjection(
+                        persistCompanionState(
                             assistant = assistant,
                             state = buildSilentLivingPresenceState(
                                 previous = companionRuntime.snapshot(assistant.id.toString()).state,
@@ -1135,7 +1134,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 if (!isTargetedTrigger && autonomousPlan?.intent == CompanionIntent.WAIT) {
                     Log.d(TAG, "Companion intent planner chose not to disturb")
                     runCatching {
-                        persistCompanionStateProjection(
+                        persistCompanionState(
                             assistant = assistant,
                             state = buildAutonomousPlanPresenceState(
                                 previous = companionRuntime.snapshot(assistant.id.toString()).state,
@@ -1177,7 +1176,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     Log.d(TAG, "Lulu intent planner deferred proactive message: ${deferredPlan.reason}")
                     autonomousPlan?.let { plan ->
                         runCatching {
-                            persistCompanionStateProjection(
+                            persistCompanionState(
                                 assistant = assistant,
                                 state = buildAutonomousPlanPresenceState(
                                     previous = companionRuntime.snapshot(assistant.id.toString()).state,
@@ -1513,27 +1512,21 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             presence = presence,
             nowMillis = nowMillis,
         )
-        persistCompanionStateProjection(assistant, unifiedState, nowMillis)
+        persistCompanionState(assistant, unifiedState, nowMillis)
     }
 
-    private suspend fun persistCompanionStateProjection(
+    private suspend fun persistCompanionState(
         assistant: Assistant,
         state: CompanionState,
         nowMillis: Long,
     ) {
-        val persistedState = companionRuntime.applyTurn(
+        companionRuntime.applyTurn(
             CompanionTurnMutation(
                 assistantId = assistant.id.toString(),
                 state = state,
                 nowMillis = nowMillis,
             ),
-        ).state
-        settingsStore.update { currentSettings ->
-            currentSettings.projectCompanionStateForLegacyUi(
-                assistantId = assistant.id,
-                state = persistedState,
-            )
-        }
+        )
     }
 
     private suspend fun scheduleNextDurableCommitment(): Boolean {
