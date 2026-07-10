@@ -19,7 +19,7 @@ object CompanionCommitmentReducer {
         nowMillis: Long,
     ): List<CompanionCommitment> {
         val commitments = current
-            .map(CompanionCommitment::normalized)
+            .map { commitment -> commitment.normalized() }
             .distinctBy { it.id }
             .toMutableList()
 

@@ -13,7 +13,9 @@ object CompanionRelationshipReducer {
         events: List<CompanionRelationshipEvent>,
         nowMillis: Long,
     ): CompanionRelationshipReduction {
-        val appliedKeys = LinkedHashSet(appliedEventIds.takeLast(MAX_APPLIED_EVENT_IDS))
+        val appliedKeys = LinkedHashSet<String>(
+            appliedEventIds.toList().takeLast(MAX_APPLIED_EVENT_IDS),
+        )
         var relationship = current
 
         events.asSequence()

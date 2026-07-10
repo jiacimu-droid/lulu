@@ -25,7 +25,7 @@ object CompanionConcernReducer {
         nowMillis: Long,
     ): List<CompanionConcern> {
         val concerns = current
-            .map(CompanionConcern::normalized)
+            .map { concern -> concern.normalized() }
             .distinctBy { it.id }
             .toMutableList()
 
