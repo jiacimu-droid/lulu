@@ -39,6 +39,7 @@ data class LivingIntent(
     val appraisal: MeaningAppraisal = MeaningAppraisal(),
     val consolidation: ConsolidationPlan = ConsolidationPlan(),
     val wakeReplyRecheckAt: Long? = null,
+    val subjectKey: String = "",
 ) {
     val nextPerceptionAt: Long
         get() = nextEvaluateAt
@@ -242,6 +243,7 @@ object RollingJudgmentLoop {
         nowMillis: Long = System.currentTimeMillis(),
         targetAtMillis: Long? = null,
         deadlineAtMillis: Long? = null,
+        subjectKey: String? = null,
     ): LivingIntent {
         val kind = classify(userText = userText, assistantText = assistantText, targetAtMillis, deadlineAtMillis)
         val cadence = cadenceFor(kind)
@@ -272,6 +274,13 @@ object RollingJudgmentLoop {
             situationalMotive = situationalMotiveFor(kind, assistantName),
             appraisal = appraisalFor(kind),
             consolidation = consolidationFor(kind),
+            subjectKey = subjectKey?.takeIf { it.isNotBlank() }
+                ?: buildLivingPresenceSubjectKey(
+                    kind = kind.toEventKind(),
+                    userText = userText,
+                    targetAtMillis = targetAtMillis,
+                    deadlineAtMillis = deadlineAtMillis,
+                ),
         )
     }
 
@@ -914,6 +923,14 @@ object RollingJudgmentLoop {
     }
 
     private fun String.containsAny(words: Set<String>): Boolean = words.any { contains(it) }
+
+    private fun LivingIntentKind.toEventKind(): LivingPresenceEventKind = when (this) {
+        LivingIntentKind.HEALTH_SAFETY -> LivingPresenceEventKind.HEALTH_SAFETY
+        LivingIntentKind.ORDINARY_SILENCE -> LivingPresenceEventKind.ORDINARY_SILENCE
+        LivingIntentKind.STUDY_FOCUS -> LivingPresenceEventKind.STUDY_FOCUS
+        LivingIntentKind.DEADLINE -> LivingPresenceEventKind.DEADLINE
+        LivingIntentKind.WAKE_UP -> LivingPresenceEventKind.WAKE_UP
+    }
 
     private const val MINUTE_MILLIS = 60_000L
     private val HEALTH_WORDS = setOf("肚子疼", "肚子痛", "胃疼", "胃痛", "难受", "不舒服", "头疼", "头痛", "疼", "痛")

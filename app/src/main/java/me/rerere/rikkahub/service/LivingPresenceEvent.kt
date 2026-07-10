@@ -19,6 +19,7 @@ data class LivingPresenceEvent(
     val createdAt: Long = System.currentTimeMillis(),
     val targetAtMillis: Long? = null,
     val deadlineAtMillis: Long? = null,
+    val subjectKey: String = "",
 )
 
 @Serializable
@@ -95,6 +96,12 @@ object LivingPresenceEventExtractor {
             createdAt = nowMillis,
             targetAtMillis = effectiveTargetAt,
             deadlineAtMillis = effectiveDeadlineAt,
+            subjectKey = buildLivingPresenceSubjectKey(
+                kind = kind,
+                userText = userText,
+                targetAtMillis = effectiveTargetAt,
+                deadlineAtMillis = effectiveDeadlineAt,
+            ),
         )
     }
 
@@ -275,7 +282,10 @@ object LivingBeliefStore {
     ): List<LivingIntent> {
         val eventKind = event.kind.toIntentKind()
         val match = existingIntents.firstOrNull { intent ->
-            intent.kind == eventKind && intent.status != LivingIntentStatus.COMPLETED
+            intent.kind == eventKind &&
+                intent.assistantId == event.assistantId &&
+                intent.subjectKey == event.subjectKey &&
+                intent.status != LivingIntentStatus.COMPLETED
         }
         if (match == null) {
             return existingIntents + RollingJudgmentLoop.createIntent(
@@ -286,6 +296,7 @@ object LivingBeliefStore {
                 nowMillis = nowMillis,
                 targetAtMillis = event.targetAtMillis,
                 deadlineAtMillis = event.deadlineAtMillis,
+                subjectKey = event.subjectKey,
             )
         }
         val updated = match.copy(
@@ -296,6 +307,7 @@ object LivingBeliefStore {
             lastEvaluatedAt = nowMillis,
             targetAtMillis = event.targetAtMillis ?: match.targetAtMillis,
             deadlineAtMillis = event.deadlineAtMillis ?: match.deadlineAtMillis,
+            subjectKey = event.subjectKey,
         )
         return existingIntents.map { if (it.id == match.id) updated else it }
     }
@@ -306,5 +318,25 @@ object LivingBeliefStore {
         LivingPresenceEventKind.STUDY_FOCUS -> LivingIntentKind.STUDY_FOCUS
         LivingPresenceEventKind.DEADLINE -> LivingIntentKind.DEADLINE
         LivingPresenceEventKind.WAKE_UP -> LivingIntentKind.WAKE_UP
+    }
+}
+
+internal fun buildLivingPresenceSubjectKey(
+    kind: LivingPresenceEventKind,
+    userText: String,
+    targetAtMillis: Long?,
+    deadlineAtMillis: Long?,
+): String = when {
+    kind == LivingPresenceEventKind.WAKE_UP && targetAtMillis != null -> "wake:$targetAtMillis"
+    kind == LivingPresenceEventKind.DEADLINE && deadlineAtMillis != null -> "deadline:$deadlineAtMillis"
+    kind == LivingPresenceEventKind.ORDINARY_SILENCE -> "ordinary-silence"
+    else -> {
+        val subject = userText
+            .trim()
+            .lowercase()
+            .replace(Regex("\\s+"), " ")
+            .take(96)
+            .ifBlank { "general" }
+        "${kind.name.lowercase()}:$subject"
     }
 }

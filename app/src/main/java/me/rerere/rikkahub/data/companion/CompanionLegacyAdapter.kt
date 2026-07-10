@@ -92,6 +92,7 @@ fun importLegacyCompanionSnapshot(
 }
 
 private fun LivingIntent.legacyCompanionSubjectKey(): String = when {
+    subjectKey.isNotBlank() -> subjectKey
     kind == LivingIntentKind.WAKE_UP && targetAtMillis != null -> "wake:$targetAtMillis"
     kind == LivingIntentKind.DEADLINE && deadlineAtMillis != null -> "deadline:$deadlineAtMillis"
     else -> "legacy:${kind.name.lowercase()}:$id"

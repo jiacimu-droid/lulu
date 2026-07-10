@@ -198,6 +198,56 @@ class LivingPresenceEventTest {
         assertTrue(merged.any { it.kind == LivingIntentKind.ORDINARY_SILENCE })
     }
 
+    @Test
+    fun `belief store never merges same kind across assistants`() {
+        val first = LivingPresenceEventExtractor.extract(
+            assistantId = "assistant-a",
+            assistantName = "角色 A",
+            userText = "我先忙一下",
+            assistantText = "好。",
+            nowMillis = NOW,
+        )
+        val second = LivingPresenceEventExtractor.extract(
+            assistantId = "assistant-b",
+            assistantName = "角色 B",
+            userText = "我先忙一下",
+            assistantText = "好。",
+            nowMillis = NOW,
+        )
+
+        val afterFirst = LivingBeliefStore.mergeEvent(emptyList(), first, NOW)
+        val merged = LivingBeliefStore.mergeEvent(afterFirst, second, NOW)
+
+        assertEquals(2, merged.size)
+        assertEquals(setOf("assistant-a", "assistant-b"), merged.map { it.assistantId }.toSet())
+    }
+
+    @Test
+    fun `belief store keeps separate deadlines for one assistant`() {
+        val first = LivingPresenceEventExtractor.extract(
+            assistantId = "assistant-a",
+            assistantName = "角色 A",
+            userText = "第一份作业要提交",
+            assistantText = "我记着。",
+            nowMillis = NOW,
+            deadlineAtMillis = NOW + 60 * MINUTE,
+        )
+        val second = LivingPresenceEventExtractor.extract(
+            assistantId = "assistant-a",
+            assistantName = "角色 A",
+            userText = "第二份作业也要提交",
+            assistantText = "这份也记着。",
+            nowMillis = NOW,
+            deadlineAtMillis = NOW + 120 * MINUTE,
+        )
+
+        val afterFirst = LivingBeliefStore.mergeEvent(emptyList(), first, NOW)
+        val merged = LivingBeliefStore.mergeEvent(afterFirst, second, NOW)
+
+        assertEquals(2, merged.size)
+        assertEquals(2, merged.map { it.subjectKey }.distinct().size)
+    }
+
     private companion object {
         const val NOW = 1_700_000_000_000L
         const val MINUTE = 60_000L
