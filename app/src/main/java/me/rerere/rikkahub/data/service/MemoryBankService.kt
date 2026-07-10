@@ -290,10 +290,19 @@ class MemoryBankService(
         conversationId: String?,
         createdAt: Long = System.currentTimeMillis(),
     ): List<MemoryBankEntity> = withContext(Dispatchers.IO) {
+        val existingIdentities = assistantId
+            ?.let { memoryBankDAO.getMemoriesByAssistant(it) }
+            .orEmpty()
+            .asSequence()
+            .map { it.content.normalizedMemoryIdentity() }
+            .filter { it.isNotBlank() }
+            .toMutableSet()
         val saved = candidates
             .map { it.normalized() }
             .filter { it.content.isNotBlank() }
             .filterNot { it.shouldSkipMemoryBankWrite() }
+            .filter { it.isDurableMemoryCandidate() }
+            .filter { candidate -> existingIdentities.add(candidate.content.normalizedMemoryIdentity()) }
             .map { candidate ->
                 val entity = candidate.toEntity(
                     assistantId = assistantId,

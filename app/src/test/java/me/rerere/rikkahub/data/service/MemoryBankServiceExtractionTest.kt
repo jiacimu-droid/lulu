@@ -18,10 +18,11 @@ class MemoryBankServiceExtractionTest {
             context = null,
         )
         val candidate = AffectiveMemoryCandidate(
-            type = "role_emotion",
-            content = "Lulu felt seen after the user praised her memory design.",
+            type = "relationship",
+            content = "I remember the user praised my memory design, and I felt trusted.",
             roleFeeling = "happy, shy, wants to move closer",
             bodySense = "warm chest, lighter voice",
+            userSignal = "The user explicitly praised the memory design.",
             relationshipEffect = "trust increased",
             importance = 5,
             confidence = 0.91,
@@ -43,7 +44,7 @@ class MemoryBankServiceExtractionTest {
         assertEquals(1, dao.inserted.size)
         val inserted = dao.inserted.single()
         assertEquals("message", inserted.type)
-        assertEquals("role_emotion", inserted.memoryKind)
+        assertEquals("relationship", inserted.memoryKind)
         assertEquals("assistant-1", inserted.assistantId)
         assertEquals("conversation-1", inserted.conversationId)
         assertEquals(1234L, inserted.createdAt)
@@ -90,16 +91,22 @@ class MemoryBankServiceExtractionTest {
         val saved = service.saveExtractedMemories(
             candidates = listOf(
                 AffectiveMemoryCandidate(
-                    type = "cihai_inner",
-                    content = "Lulu decided not to disturb and kept her concern in Cihai.",
+                    type = "user_preference",
+                    content = "I remember the user prefers quiet company while concentrating.",
                     importance = 3,
                     embeddingText = "silent judgement concern",
+                    userSignal = "The user asked not to be interrupted while working.",
+                    sourceMessageNodeIds = listOf("user-node-1"),
+                    evidenceMessageNodeIds = listOf("user-node-1"),
                 ),
                 AffectiveMemoryCandidate(
-                    type = "cihai_action",
-                    content = "Lulu waited, read context, and prepared the next judgement.",
+                    type = "promise",
+                    content = "I promised to check in after the user's study session.",
                     importance = 3,
                     embeddingText = "silent action next judgement",
+                    userSignal = "The user accepted a later check-in.",
+                    sourceMessageNodeIds = listOf("assistant-node-2"),
+                    evidenceMessageNodeIds = listOf("user-node-1"),
                 ),
             ),
             assistantId = "assistant-1",
@@ -114,7 +121,7 @@ class MemoryBankServiceExtractionTest {
     }
 
     @Test
-    fun `save extracted memories summarizes raw tool observation before display`() = runBlocking {
+    fun `save extracted memories rejects raw meta reflection`() = runBlocking {
         val dao = RecordingMemoryBankDAO()
         val service = MemoryBankService(
             memoryBankDAO = dao,
@@ -147,14 +154,36 @@ class MemoryBankServiceExtractionTest {
             createdAt = 1234L,
         )
 
-        val inserted = dao.inserted.single()
-        assertEquals(saved.single().content, inserted.content)
-        assertTrue(inserted.content.startsWith("我记得"))
-        assertTrue(inserted.content.contains("我先不去吵你"))
-        assertFalse(inserted.content.contains("tool_result"))
-        assertFalse(inserted.content.contains("requested_tools"))
-        assertFalse(inserted.content.contains("{\"success\""))
-        assertTrue(inserted.embeddingText!!.contains("起床和学习安排"))
+        assertEquals(emptyList<MemoryBankEntity>(), saved)
+        assertEquals(0, dao.inserted.size)
+    }
+
+    @Test
+    fun `save extracted memories deduplicates normalized content before insert`() = runBlocking {
+        val dao = RecordingMemoryBankDAO()
+        val service = MemoryBankService(
+            memoryBankDAO = dao,
+            okHttpClient = null,
+            context = null,
+        )
+        val first = AffectiveMemoryCandidate(
+            type = "user_boundary",
+            content = "我记得她晚上十点后不希望我打电话。",
+            userSignal = "用户明确说明边界",
+            sourceMessageNodeIds = listOf("user-node-1"),
+            evidenceMessageNodeIds = listOf("user-node-1"),
+        )
+        val duplicate = first.copy(content = " 我记得她晚上十点后，不希望我打电话。 ")
+
+        val saved = service.saveExtractedMemories(
+            candidates = listOf(first, duplicate),
+            assistantId = "assistant-1",
+            conversationId = "conversation-1",
+            createdAt = 1234L,
+        )
+
+        assertEquals(1, saved.size)
+        assertEquals(1, dao.inserted.size)
     }
 
     @Test
@@ -308,6 +337,7 @@ private class RecordingMemoryBankDAO(
     override suspend fun deleteMemoryById(id: Int) = unsupported()
     override suspend fun deleteMemoryGraphEdgesForMemory(id: Int) = unsupported()
     override suspend fun deleteMemoryGraphEdgesForAssistant(assistantId: String) = unsupported()
+    override suspend fun deleteMemoriesByAssistant(assistantId: String) = unsupported()
     override suspend fun getMemoryById(id: Int): MemoryBankEntity? = unsupported()
     override suspend fun getAllMemories(): List<MemoryBankEntity> = unsupported()
     override suspend fun getMemoriesByType(type: String): List<MemoryBankEntity> = unsupported()

@@ -111,6 +111,31 @@ internal fun AffectiveMemoryCandidate.shouldSkipMemoryBankWrite(): Boolean {
     return normalized.content.looksLikeRawToolOrTraceDump() && !normalized.hasAffectiveSummary()
 }
 
+internal fun AffectiveMemoryCandidate.isDurableMemoryCandidate(): Boolean {
+    val normalized = normalized()
+    if (normalized.type.lowercase() !in DURABLE_MEMORY_TYPES) return false
+    if (normalized.sourceMessageNodeIds.isEmpty() && normalized.evidenceMessageNodeIds.isEmpty()) return false
+    if (!normalized.content.hasFirstPersonVoice()) return false
+
+    val inspectedText = listOfNotNull(
+        normalized.content,
+        normalized.title,
+        normalized.roleFeeling,
+        normalized.bodySense,
+        normalized.unspokenThought,
+        normalized.userSignal,
+        normalized.relationshipEffect,
+        normalized.embeddingText,
+    ).joinToString("\n")
+    if (inspectedText.looksLikeRawToolOrTraceDump()) return false
+    if (GENERIC_META_MEMORY_MARKERS.any { inspectedText.contains(it, ignoreCase = true) }) return false
+    if (normalized.userSignal.isNullOrBlank()) return false
+    return true
+}
+
+internal fun String.normalizedMemoryIdentity(): String = lowercase()
+    .replace(Regex("[\\p{P}\\p{S}\\s]+"), "")
+
 private fun AffectiveMemoryCandidate.hasAffectiveSummary(): Boolean =
     !roleFeeling.isNullOrBlank() ||
         !bodySense.isNullOrBlank() ||
@@ -120,15 +145,6 @@ private fun AffectiveMemoryCandidate.hasAffectiveSummary(): Boolean =
 
 private fun AffectiveMemoryCandidate.toDisplayMemoryContent(): String {
     val normalized = normalized()
-    val lines = buildList {
-        normalized.unspokenThought?.let { add("没说出口：$it") }
-        normalized.roleFeeling?.let { add("当时感觉：$it") }
-        normalized.userSignal?.let { add("用户信号：$it") }
-        normalized.relationshipEffect?.let { add("关系影响：$it") }
-    }
-    if (lines.isNotEmpty()) {
-        return ("我记得这件事。" + lines.joinToString("；")).take(260)
-    }
     if (normalized.content.looksLikeRawToolOrTraceDump()) {
         return "我记得当时做过一次工具观察和内部判断，但原始结果只适合作为证据回查，不直接当作记忆内容。"
     }
@@ -153,8 +169,13 @@ private fun firstPersonSummary(content: String): String {
         .filter { it.isNotBlank() }
         .joinToString(" ")
         .replace(Regex("\\s+"), " ")
-    if (compact.startsWith("我")) return compact
+    if (compact.hasFirstPersonVoice()) return compact
     return "我记得：$compact"
+}
+
+private fun String.hasFirstPersonVoice(): Boolean {
+    val compact = trimStart()
+    return FIRST_PERSON_PREFIXES.any { prefix -> compact.startsWith(prefix, ignoreCase = true) }
 }
 
 private fun String.looksLikeRawToolOrTraceDump(): Boolean {
@@ -191,15 +212,16 @@ object AffectiveMemoryExtractor {
         if (assistantPersona.isNotBlank()) {
             appendLine("角色设定摘要：${assistantPersona.take(1200)}")
         }
-        appendLine("重点写$name 自己的情绪、身体感受、未说出口的想法、关系判断，而不是只记录用户流水账。")
-        appendLine("content 必须是$name 第一人称的压缩记忆摘要，不要粘贴工具 JSON、学习计划原文、单词表、长列表或完整 observation。")
+        appendLine("只保存以后召回仍有价值的新事实：稳定用户事实、用户偏好、用户边界、明确承诺及结果、有用户证据的关系变化、高情绪共同事件、用户纠正。")
+        appendLine("content 必须是$name 第一人称的自然完整记忆，不要拼接字段标签，也不要粘贴工具 JSON、学习计划原文、单词表、长列表或完整 observation。")
         appendLine("所有 content、roleFeeling、bodySense、unspokenThought、relationshipEffect、embeddingText 都必须代入$name，用第一人称“我”来总结；不要写成“${name}觉得”“角色认为”“助手记录”这类旁白或第三人称。")
         appendLine("如果原文只是英文单词、工具结果、日程 JSON 或流水账，除非能提炼出用户偏好/承诺/关系变化/角色心声，否则不要写入 memories。")
         appendLine("unspokenThought 必须贴合$name 的人设、语言习惯和关系位置；不要写成旁白腔、客服腔或通用模板。")
         appendLine("unspokenThought 要尽量具体：写$name 当时的猜测、顾虑、符合人设但没有说出口的意图、想做但暂时压住的动作、对用户真实状态的判断。不要默认亲密动作，也不要只写“很担心”这类空泛短句。")
         appendLine("返回 JSON，格式为 {\"memories\":[...]}。不要输出解释。")
         appendLine("每条字段：type, content, roleFeeling, bodySense, unspokenThought, userSignal, relationshipEffect, importance, confidence, tags, embeddingText, sourceMessageNodeIds, evidenceMessageNodeIds, relatedMemoryIds, people, topics, supersededByMemoryId, correctedAt。")
-        appendLine("type 只能优先使用 role_emotion, body_sense, promise, relationship, user_preference, event。")
+        appendLine("type 只能使用 user_fact, user_preference, user_boundary, promise, relationship, shared_event, correction。")
+        appendLine("每条必须提供 sourceMessageNodeIds 或 evidenceMessageNodeIds，并用 userSignal 简述用户原话或真实工具结果证据；无新事实时返回空 memories。")
         appendLine("<conversation_turns>")
         turns.forEach { turn ->
             appendLine("[${turn.nodeId}] ${turn.role}: ${turn.text.trim()}")
@@ -222,6 +244,51 @@ object AffectiveMemoryExtractor {
         )
     }
 }
+
+private val DURABLE_MEMORY_TYPES = setOf(
+    "user_fact",
+    "user_preference",
+    "user_boundary",
+    "promise",
+    "relationship",
+    "shared_event",
+    "correction",
+)
+
+private val FIRST_PERSON_PREFIXES = listOf(
+    "我",
+    "咱",
+    "本人",
+    "本小姐",
+    "本少爷",
+    "本官",
+    "本王",
+    "本宫",
+    "在下",
+    "余",
+    "吾",
+    "I ",
+    "I'm ",
+    "I’m ",
+)
+
+private val GENERIC_META_MEMORY_MARKERS = listOf(
+    "cihai_reflection",
+    "我记得这件事。当时感觉",
+    "复盘、收束、准备下一轮",
+    "后续可复用的长期记忆",
+    "感知世界包",
+    "意义评估",
+    "动态判断",
+    "状态生成",
+    "辞海记忆架构",
+    "七层架构",
+    "下一轮判断",
+    "我完成了沉淀",
+    "我整理了记忆",
+    "以后可以参考",
+    "等待下一次",
+)
 
 private fun String.extractJsonPayload(): String {
     val trimmed = trim()

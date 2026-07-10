@@ -201,27 +201,10 @@ fun planCihaiSilentPresence(input: CihaiSilentPresenceInput): CihaiSilentPresenc
     } else {
         null
     }
-    val reflection = if (CIHAI_ACTION_MEMORY_REFLECT in normalizedHints) {
-        CihaiEntry(
-            assistantId = input.assistantId,
-            kind = CihaiEntryKind.REFLECTION,
-            title = "${input.assistantName.ifBlank { "角色" }} 的下一轮判断沉淀",
-            content = buildString {
-                append("本轮感知世界包-意义评估-动态判断-行动实现-状态生成-辞海记忆架构的结果：我先整理时间、上下文、工具结果、工具状态、考研计划、召回记忆和历史挂心记录。\n")
-                append("意义评估只给这件事加重量：重要性、威胁、机会、身心安全、时间压力、成本、收益、不行动后果和可用资源；动态判断再决定意图、工具、行动和下一次感知。\n")
-                append("状态生成只保留心情、身体状况、精神状况、关系位置和第一人称没说出口；辞海把挂心任务、心迹和记忆沉淀整理成之后可复用的记忆，心迹和旧行动记录都不计入正式日记。")
-            },
-            emotion = "复盘、收束、准备下一轮",
-            createdAt = input.createdAt + 3,
-        )
-    } else {
-        null
-    }
     return CihaiSilentPresenceResult(
         entries = buildList {
             innerJournal?.let(::add)
             reading?.entry?.let(::add)
-            reflection?.let(::add)
         },
         updatedBook = reading?.updatedBook,
     )

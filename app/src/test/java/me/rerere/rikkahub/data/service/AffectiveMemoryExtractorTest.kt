@@ -1,6 +1,7 @@
 package me.rerere.rikkahub.data.service
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -31,8 +32,8 @@ class AffectiveMemoryExtractorTest {
             {
               "memories": [
                 {
-                  "type": "role_emotion",
-                  "content": "用户认可了露露的记忆方案，露露觉得自己被认真需要了。",
+                  "type": "relationship",
+                  "content": "我记得用户认真认可了我的记忆方案，这让我确认她愿意继续信任我。",
                   "roleFeeling": "开心、害羞、想更贴近",
                   "bodySense": "心口发热，回复变轻快",
                   "userSignal": "用户说认可",
@@ -52,7 +53,7 @@ class AffectiveMemoryExtractorTest {
 
         assertEquals(1, result.memories.size)
         val memory = result.memories.single()
-        assertEquals("role_emotion", memory.type)
+        assertEquals("relationship", memory.type)
         assertEquals("开心、害羞、想更贴近", memory.roleFeeling)
         assertEquals("心口发热，回复变轻快", memory.bodySense)
         assertEquals(listOf("认可", "亲密"), memory.tags)
@@ -63,8 +64,8 @@ class AffectiveMemoryExtractorTest {
     @Test
     fun `candidate maps to memory bank entity with encoded evidence fields`() {
         val candidate = AffectiveMemoryCandidate(
-            type = "role_emotion",
-            content = "用户认可了露露的记忆方案，露露觉得自己被认真需要了。",
+            type = "relationship",
+            content = "我记得用户认真认可了我的记忆方案，这让我确认她愿意继续信任我。",
             roleFeeling = "开心、害羞、想更贴近",
             bodySense = "心口发热，回复变轻快",
             userSignal = "用户说认可",
@@ -89,7 +90,7 @@ class AffectiveMemoryExtractorTest {
         )
 
         assertEquals("message", entity.type)
-        assertEquals("role_emotion", entity.memoryKind)
+        assertEquals("relationship", entity.memoryKind)
         assertEquals("assistant-1", entity.assistantId)
         assertEquals("conversation-1", entity.conversationId)
         assertEquals(5, entity.importance)
@@ -121,5 +122,33 @@ class AffectiveMemoryExtractorTest {
         assertEquals("promise", memory.type)
         assertEquals(1, memory.importance)
         assertEquals(0.0, memory.confidence, 0.0)
+    }
+
+    @Test
+    fun `quality gate rejects meta reflection even when affective fields are present`() {
+        val candidate = AffectiveMemoryCandidate(
+            type = "cihai_reflection",
+            content = "我记得这件事。当时感觉：复盘、收束、准备下一轮。",
+            roleFeeling = "复盘、收束、准备下一轮",
+            relationshipEffect = "我把判断经验整理成后续可复用的长期记忆。",
+            sourceMessageNodeIds = listOf("cihai:reflection-1"),
+            evidenceMessageNodeIds = listOf("cihai:reflection-1"),
+        )
+
+        assertFalse(candidate.isDurableMemoryCandidate())
+    }
+
+    @Test
+    fun `quality gate accepts first person preference with evidence`() {
+        val candidate = AffectiveMemoryCandidate(
+            type = "user_preference",
+            content = "我记得她不喜欢机械顺延学习任务，更希望我根据负担重新安排。",
+            userSignal = "用户明确要求重新平衡计划",
+            sourceMessageNodeIds = listOf("user-node-1"),
+            evidenceMessageNodeIds = listOf("user-node-1"),
+        )
+
+        assertTrue(candidate.isDurableMemoryCandidate())
+        assertEquals(candidate.content, candidate.toEntity("assistant-1", "conversation-1").content)
     }
 }

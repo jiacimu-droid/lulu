@@ -526,7 +526,7 @@ class CihaiMemoryTest {
 
         assertFalse(result.entries.any { it.kind == CihaiEntryKind.DIARY })
         assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL, CihaiEntryKind.REFLECTION),
+            listOf(CihaiEntryKind.INNER_JOURNAL),
             result.entries.map { it.kind },
         )
         assertTrue(result.entries.first().content.contains("不写正式日记"))
@@ -555,7 +555,7 @@ class CihaiMemoryTest {
     }
 
     @Test
-    fun `silent presence action can create reflection for next rolling judgement`() {
+    fun `silent presence memory reflection hint does not create meta memory`() {
         val result = planCihaiSilentPresence(
             CihaiSilentPresenceInput(
                 assistantId = "lulu",
@@ -569,11 +569,10 @@ class CihaiMemoryTest {
         )
 
         assertEquals(
-            listOf(CihaiEntryKind.INNER_JOURNAL, CihaiEntryKind.REFLECTION),
+            listOf(CihaiEntryKind.INNER_JOURNAL),
             result.entries.map { it.kind },
         )
-        assertTrue(result.entries.last().content.contains("下一轮判断"))
-        assertEquals(CihaiEntryKind.REFLECTION, result.entries.last().kind)
+        assertTrue(result.entries.none { it.kind == CihaiEntryKind.REFLECTION })
     }
 
     private fun memoryEntry(
