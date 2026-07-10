@@ -3,18 +3,12 @@ package me.rerere.rikkahub.data.service
 import me.rerere.rikkahub.data.cihai.CihaiEntry
 import me.rerere.rikkahub.data.cihai.CihaiEntryKind
 import me.rerere.rikkahub.data.companion.CompanionState
-import me.rerere.rikkahub.service.LivingAction
-import me.rerere.rikkahub.service.LivingIntentKind
-import me.rerere.rikkahub.service.LivingJudgmentSource
-import me.rerere.rikkahub.service.LivingJudgmentTrace
 import me.rerere.rikkahub.service.CompanionIntent
 import me.rerere.rikkahub.service.CompanionIntentDecision
-import me.rerere.rikkahub.service.RollingJudgmentLoop
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.uuid.Uuid
 
 class ProactiveMessageContextTest {
     @Test
@@ -69,47 +63,6 @@ class ProactiveMessageContextTest {
     }
 
     @Test
-    fun `silent living judgment updates unspoken status bar voice`() {
-        val assistantId = Uuid.parse("11111111-1111-1111-1111-111111111111")
-        val intent = RollingJudgmentLoop.createIntent(
-            assistantId = assistantId.toString(),
-            assistantName = "露露",
-            userText = "我先去学习，晚点回来",
-            assistantText = "好，我不吵你。",
-            nowMillis = NOW,
-        )
-        val trace = LivingJudgmentTrace(
-            source = LivingJudgmentSource.MAIN_API_READY_CONTRACT,
-            belief = "用户可能正在学习，不该被我打断。",
-            desire = "安静陪着，但继续守住这件事。",
-            intention = "不发消息，先记住这个判断。",
-            thought = "我先不去吵你，但我会把这件事放在心里，等你回来时接住你。",
-            action = "PASS, WRITE_DIARY, SCHEDULE_NEXT_PERCEPTION",
-            observation = "用户说要学习。",
-            decision = "静默记录并等待下一轮。",
-            createdAt = NOW,
-        )
-        val decision = RollingJudgmentLoop.evaluate(
-            intent = intent,
-            nowMillis = NOW + 10 * MINUTE,
-            externalJudgmentTrace = trace,
-        )
-
-        val state = buildSilentLivingPresenceState(
-            previous = CompanionState(innerThought = "旧心声"),
-            assistantName = "露露",
-            decision = decision,
-            nowMillis = NOW + 10 * MINUTE,
-        )
-
-        assertEquals("克制着没开口", state.statusText)
-        assertEquals("我先不去吵你，但我会把这件事放在心里，等你回来时接住你。", state.innerThought)
-        assertEquals("waiting", state.activityMode)
-        assertTrue(state.selfScene.contains("没有发消息"))
-        assertTrue(state.mindState.contains("静默判断"))
-    }
-
-    @Test
     fun `recent diary context keeps only formal diary entries`() {
         val entries = listOf(
             cihaiEntry("old-diary", CihaiEntryKind.DIARY, createdAt = 1),
@@ -130,36 +83,7 @@ class ProactiveMessageContextTest {
     }
 
     @Test
-    fun `technical fallback trace is not shown as status bar inner voice`() {
-        val assistantId = Uuid.parse("22222222-2222-2222-2222-222222222222")
-        val intent = RollingJudgmentLoop.createIntent(
-            assistantId = assistantId.toString(),
-            assistantName = "露露",
-            userText = "我先去学习，晚点回来",
-            assistantText = "好，我不吵你。",
-            nowMillis = NOW,
-        )
-        val decision = RollingJudgmentLoop.evaluate(
-            intent = intent,
-            nowMillis = NOW + 10 * MINUTE,
-        )
-
-        val state = buildSilentLivingPresenceState(
-            previous = CompanionState(),
-            assistantName = "露露",
-            decision = decision,
-            nowMillis = NOW + 10 * MINUTE,
-        )
-
-        assertTrue(state.innerThought.startsWith("我"))
-        assertFalse(state.innerThought.contains("Seven-layer trace"))
-        assertFalse(state.innerThought.contains("Perception="))
-        assertFalse(state.innerThought.contains("requested_tools="))
-    }
-
-    @Test
     fun `autonomous api plan updates status bar with model inner thought when not speaking`() {
-        val assistantId = Uuid.parse("33333333-3333-3333-3333-333333333333")
         val plan = CompanionIntentDecision(
             intent = CompanionIntent.WAIT,
             shouldMessageNow = false,
@@ -186,7 +110,6 @@ class ProactiveMessageContextTest {
 
     private companion object {
         const val NOW = 1_700_000_000_000L
-        const val MINUTE = 60_000L
 
         fun cihaiEntry(
             title: String,

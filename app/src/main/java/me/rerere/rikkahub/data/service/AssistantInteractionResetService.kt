@@ -3,7 +3,6 @@ package me.rerere.rikkahub.data.service
 import kotlinx.coroutines.CancellationException
 import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.companion.CompanionRuntime
-import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.repository.MemoryRepository
 import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
@@ -16,7 +15,6 @@ class AssistantInteractionResetService(
     private val voiceCallRepository: VoiceCallRepository,
     private val cihaiStore: CihaiStore,
     private val companionRuntime: CompanionRuntime,
-    private val livingPresenceStore: LivingPresenceStore,
 ) {
     suspend fun clearAssistantRecords(assistantId: Uuid) {
         val id = assistantId.toString()
@@ -26,7 +24,6 @@ class AssistantInteractionResetService(
         runStep("电话记录") { voiceCallRepository.deleteSessionsByAssistant(id) }
         runStep("辞海记录") { cihaiStore.clearAssistantRecords(id) }
         runStep("统一陪伴状态") { companionRuntime.clearAssistant(id) }
-        runStep("旧挂心意图") { livingPresenceStore.clearAssistant(id) }
     }
 
     private suspend fun runStep(name: String, block: suspend () -> Unit) {

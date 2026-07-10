@@ -119,7 +119,6 @@ import me.rerere.rikkahub.data.companion.CompanionTurnRole
 import me.rerere.rikkahub.data.companion.buildCompanionStateFromTurn
 import me.rerere.rikkahub.data.companion.toPromptContext
 import me.rerere.rikkahub.data.files.FilesManager
-import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.AssistantAffectScope
@@ -270,7 +269,6 @@ class ChatService(
     private val skillManager: SkillManager,
     private val pluginToolProvider: PluginToolProvider,
     private val pluginLoader: PluginLoader,
-    private val livingPresenceStore: LivingPresenceStore,
     private val companionRuntime: CompanionRuntime,
 ) {
     // 统一会话管理
@@ -993,11 +991,6 @@ class ChatService(
                 assistantId = assistant.id.toString(),
                 conversationId = conversationId.toString(),
                 sourceMessageId = lastUserMessage?.id?.toString(),
-                nowMillis = nowMillis,
-            )
-            livingPresenceStore.completeReturnedIntents(
-                assistantId = assistant.id.toString(),
-                userText = lastUserText,
                 nowMillis = nowMillis,
             )
             val unifiedState = buildCompanionStateFromTurn(

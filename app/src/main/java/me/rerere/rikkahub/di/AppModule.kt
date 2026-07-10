@@ -107,7 +107,6 @@ val appModule = module {
             voiceCallRepository = get(),
             cihaiStore = get(),
             companionRuntime = get(),
-            livingPresenceStore = get(),
         )
     }
 
@@ -128,7 +127,6 @@ val appModule = module {
             skillManager = get(),
             pluginToolProvider = get(),
             pluginLoader = get(),
-            livingPresenceStore = get(),
             companionRuntime = get(),
         )
     }

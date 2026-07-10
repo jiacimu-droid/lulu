@@ -50,7 +50,6 @@ import me.rerere.rikkahub.data.ai.transformers.transforms
 import me.rerere.rikkahub.data.ai.transformers.onGenerationFinish
 import me.rerere.rikkahub.data.ai.tools.LocalTools
 import me.rerere.rikkahub.data.ai.tools.SystemTools
-import me.rerere.rikkahub.data.ai.tools.SystemToolOption
 import me.rerere.rikkahub.data.ai.tools.createSearchTools
 import me.rerere.rikkahub.data.ai.tools.createSkillTools
 import me.rerere.rikkahub.data.ai.tools.createTodayStudyPlanTool
@@ -95,38 +94,24 @@ import me.rerere.rikkahub.data.datastore.getProactiveMessageSetting
 import me.rerere.rikkahub.data.cihai.CihaiEntry
 import me.rerere.rikkahub.data.cihai.CihaiEntryKind
 import me.rerere.rikkahub.data.gadgetbridge.GadgetbridgeReader
-import me.rerere.rikkahub.data.living.LivingPresenceStore
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.RouteActivity
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
-import me.rerere.rikkahub.data.study.ExamStudyPlan
-import me.rerere.rikkahub.data.study.StudyScheduleBlock
 import me.rerere.rikkahub.data.study.StudyStore
-import me.rerere.rikkahub.data.study.StudyTask
 import me.rerere.rikkahub.data.study.StudyTaskSource
 import me.rerere.rikkahub.service.ChatService
-import me.rerere.rikkahub.service.LivingAction
-import me.rerere.rikkahub.service.LivingIntent
-import me.rerere.rikkahub.service.LivingIntentKind
-import me.rerere.rikkahub.service.LivingJudgmentModelInput
-import me.rerere.rikkahub.service.LivingJudgmentModelPlanner
-import me.rerere.rikkahub.service.LivingObservation
-import me.rerere.rikkahub.service.LivingObservationToolRunner
 import me.rerere.rikkahub.service.CompanionDecisionMode
 import me.rerere.rikkahub.service.CompanionIntent
 import me.rerere.rikkahub.service.CompanionIntentDecision
 import me.rerere.rikkahub.service.CompanionIntentFallbackPlanner
 import me.rerere.rikkahub.service.CompanionIntentInput
 import me.rerere.rikkahub.service.CompanionIntentModelPlanner
-import me.rerere.rikkahub.service.RollingJudgmentDecision
-import me.rerere.rikkahub.service.RollingJudgmentLoop
 import me.rerere.rikkahub.service.ProactiveReminderPlan
 import me.rerere.rikkahub.service.toProactiveReminderPlan
 import me.rerere.rikkahub.utils.sendNotification
 import java.time.Instant
-import java.time.LocalDate
 import kotlin.uuid.Uuid
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -785,9 +770,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
     private val pluginToolProvider: PluginToolProvider by inject()
     private val json: Json by inject()
     private val chatService: ChatService by inject()
-    private val livingPresenceStore: LivingPresenceStore by inject()
     private val companionRuntime: CompanionRuntime by inject()
-    private val studyStore: StudyStore by inject()
     private val proactiveMessageService = ProactiveMessageService()
 
     companion object {
@@ -877,6 +860,23 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                             ?.let { commitment ->
                                 discardUnschedulableCommitment(commitment, "Proactive messaging disabled")
                             }
+                    }
+                    stopSelf()
+                    return@launch
+                }
+
+                if (targetedKind == "living_presence") {
+                    Log.d(TAG, "Discarding legacy Living Presence trigger")
+                    val hasNextTargeted = ProactiveMessageService.popCurrentTargetedAndScheduleNext(
+                        context = this@ProactiveMessageTriggerService,
+                        setting = proactiveSetting,
+                    )
+                    if (!hasNextTargeted) {
+                        ProactiveMessageService.scheduleNext(
+                            context = this@ProactiveMessageTriggerService,
+                            settings = settings,
+                            assistantId = triggerAssistantUuid,
+                        )
                     }
                     stopSelf()
                     return@launch
@@ -980,7 +980,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
 
                 // 构建工具列表（与 ChatService 保持一致）
                 val tools = buildTools(settings, assistant, model, historyMessages)
-                val observationTools = buildAllTools(settings, assistant)
                 val nowMillis = System.currentTimeMillis()
                 val companionContext = companionRuntime.perception(
                     CompanionPerceptionInput(
@@ -1016,90 +1015,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                         nowMillis = nowMillis,
                     ),
                 ).toPromptContext()
-                val dueLivingIntent = if (executingCommitment == null) {
-                    livingPresenceStore.nextDueIntent(
-                        assistantId = assistantUuid.toString(),
-                        nowMillis = nowMillis,
-                    )
-                } else {
-                    null
-                }
-                val livingPresenceObservation = dueLivingIntent?.let { intent ->
-                    buildLivingPresenceRuntimeObservation(
-                        intent = intent,
-                        tools = observationTools,
-                        historyMessages = historyMessages,
-                        minutesSinceLastChat = minutesSinceLastChat,
-                        nowMillis = nowMillis,
-                    )
-                }
-                val livingPresenceJudgmentTrace = if (dueLivingIntent != null && livingPresenceObservation != null) {
-                    runCatching {
-                        LivingJudgmentModelPlanner.planOrNull(
-                            input = LivingJudgmentModelInput(
-                                assistantName = assistant.name,
-                                persona = assistant.toLuluPlannerPersona(),
-                                intent = dueLivingIntent,
-                                observation = livingPresenceObservation,
-                                recentConversation = historyMessages.takeLast(8).map { message ->
-                                    "${message.role.name}: ${message.toText().take(500)}"
-                                },
-                            ),
-                            settings = settings,
-                            model = model,
-                            providerManager = providerManager,
-                        )
-                    }.onFailure { error ->
-                        Log.w(ProactiveMessageService.TAG, "LivingPresence main API judgment failed; using rule fallback", error)
-                    }.getOrNull()
-                } else {
-                    null
-                }
-                val livingPresenceDecision = livingPresenceStore.evaluateDueIntent(
-                    assistantId = assistantUuid.toString(),
-                    nowMillis = nowMillis,
-                    externalObservation = livingPresenceObservation,
-                    externalJudgmentTrace = livingPresenceJudgmentTrace,
-                )
-                if (livingPresenceDecision?.shouldResolveSilently() == true) {
-                    Log.d(TAG, "LivingPresence decision resolved silently: ${livingPresenceDecision.thought}")
-                    runCatching {
-                        persistCompanionState(
-                            assistant = assistant,
-                            state = buildSilentLivingPresenceState(
-                                previous = companionRuntime.snapshot(assistant.id.toString()).state,
-                                assistantName = assistant.name,
-                                decision = livingPresenceDecision,
-                                nowMillis = nowMillis,
-                            ),
-                            nowMillis = nowMillis,
-                        )
-                    }.onFailure { error ->
-                        Log.w(TAG, "Failed to persist silent companion state", error)
-                    }
-                    val hasQueuedTargeted = if (isTargetedTrigger) {
-                        ProactiveMessageService.popCurrentTargetedAndScheduleNext(
-                            context = this@ProactiveMessageTriggerService,
-                            setting = proactiveSetting,
-                        )
-                    } else {
-                        false
-                    }
-                    val scheduledLivingPresence = !hasQueuedTargeted &&
-                        scheduleNextLivingPresenceTick(proactiveSetting, assistant.name, livingPresenceDecision)
-                    if (!hasQueuedTargeted && !scheduledLivingPresence) {
-                        ProactiveMessageService.scheduleNext(
-                            context = this@ProactiveMessageTriggerService,
-                            settings = settings,
-                            minutesSinceLastChat = minutesSinceLastChat,
-                            assistantId = assistantUuid,
-                        )
-                    }
-                    stopSelf()
-                    return@launch
-                }
-
-                val autonomousPlan = if (isTargetedTrigger || livingPresenceDecision != null) {
+                val autonomousPlan = if (isTargetedTrigger) {
                     null
                 } else {
                     buildAutonomousIntentPlan(
@@ -1171,11 +1087,9 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
 
                 val effectiveTargetedReason = targetedReason
                     ?: executingCommitment?.promise
-                    ?: livingPresenceDecision?.toTargetedReason(assistant.name)
                     ?: autonomousPlan?.toImmediateReason(assistant.name)
                 val effectiveTargetedKind = targetedKind
                     ?: executingCommitment?.actionPlan?.category?.takeIf { it.isNotBlank() }
-                    ?: livingPresenceDecision?.updatedIntent?.kind?.toTargetedKind()
                     ?: autonomousPlan
                     ?.takeIf { it.shouldMessageNow }
                     ?.intent
@@ -1337,12 +1251,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     }.onFailure { error ->
                         Log.w(TAG, "Failed to persist proactive companion state projection", error)
                     }
-                    livingPresenceDecision?.let { decision ->
-                        livingPresenceStore.markIntentSpoken(
-                            intentId = decision.updatedIntent.id,
-                            nowMillis = System.currentTimeMillis(),
-                        )
-                    }
                     showProactiveNotification(conversationId, assistant.name.ifBlank { "AI" }, replyText)
                 }
 
@@ -1377,12 +1285,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 } else {
                     false
                 }
-                val scheduledLivingPresence = if (!hasNextTargeted) {
-                    livingPresenceDecision?.let { scheduleNextLivingPresenceTick(proactiveSetting, assistant.name, it) } == true
-                } else {
-                    false
-                }
-                if (isTargetedTrigger && !hasNextTargeted && !scheduledLivingPresence) {
+                if (isTargetedTrigger && !hasNextTargeted) {
                     ProactiveMessageService.scheduleNext(
                         context = this@ProactiveMessageTriggerService,
                         settings = settings,
@@ -1390,7 +1293,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                         assistantId = assistantUuid,
                     )
                 }
-                if (!isTargetedTrigger && !scheduledLivingPresence) {
+                if (!isTargetedTrigger) {
                     ProactiveMessageService.scheduleNext(
                         context = this@ProactiveMessageTriggerService,
                         settings = settings,
@@ -1548,159 +1451,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 .apply()
     }
 
-    private suspend fun buildLivingPresenceRuntimeObservation(
-        intent: LivingIntent,
-        tools: List<Tool>,
-        historyMessages: List<UIMessage>,
-        minutesSinceLastChat: Long?,
-        nowMillis: Long,
-    ): LivingObservation {
-        val request = RollingJudgmentLoop.buildObservationRequest(intent, nowMillis)
-        val availableToolNames = tools.map { it.name }.toSet()
-        val availableRequestedTools = request.requestedTools.filter { requested ->
-            val resolved = LivingObservationToolRunner.resolveToolName(requested)
-            availableToolNames.any { available ->
-                available == requested || available == resolved || available.removePrefix("mcp__") == resolved
-            }
-        }
-        val missingRequestedTools = request.requestedTools - availableRequestedTools.toSet()
-        val toolObservationResults = observeRequestedToolsForLivingPresence(
-            intent = intent,
-            tools = tools,
-            requestedToolNames = request.requestedTools,
-        )
-        val studyState = studyStore.state.value
-        val openTasks: List<StudyTask> = studyState.tasks.filter { task -> !task.done }
-        val doneTaskCount: Int = studyState.tasks.count { task -> task.done }
-        val todaySchedule: List<StudyScheduleBlock> = runCatching {
-            ExamStudyPlan.todaySchedule(LocalDate.now()).take(3)
-        }.getOrDefault(emptyList<StudyScheduleBlock>())
-        val lastUserText = historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty()
-        val signals = buildList {
-            addAll(request.signals)
-            add("observation_pipeline=runtime_before_judgment")
-            add("available_tool_count=${availableToolNames.size}")
-            addAll(availableRequestedTools.map { "available_tool=$it" })
-            addAll(missingRequestedTools.map { "missing_tool=$it" })
-            addAll(toolObservationResults)
-            minutesSinceLastChat?.let { add("minutes_since_last_chat=$it") }
-            add("study_tasks_open=${openTasks.size}")
-            add("study_tasks_done=$doneTaskCount")
-            add("recent_user_text_present=${lastUserText.isNotBlank()}")
-            batterySignal()?.let(::add)
-            if (todaySchedule.isNotEmpty()) {
-                add("today_schedule_blocks=${todaySchedule.size}")
-            }
-        }.distinct()
-        val summary = buildString {
-            append("Perception layer before seven-layer deliberation: ")
-            append("requested_tools=${request.requestedTools.joinToString(", ").ifBlank { "none" }}; ")
-            append("available_requested_tools=${availableRequestedTools.joinToString(", ").ifBlank { "none" }}; ")
-            append("missing_requested_tools=${missingRequestedTools.joinToString(", ").ifBlank { "none" }}; ")
-            append("tool_observations=${toolObservationResults.joinToString(" | ").ifBlank { "none" }}; ")
-            append("minutes_since_last_chat=${minutesSinceLastChat ?: "unknown"}; ")
-            append("study_tasks_open=${openTasks.size}; study_tasks_done=$doneTaskCount")
-            if (openTasks.isNotEmpty()) {
-                append("; open_tasks=")
-                append(openTasks.take(3).joinToString(" / ") { it.title.take(48) })
-            }
-            if (todaySchedule.isNotEmpty()) {
-                append("; today_schedule=")
-                append(todaySchedule.joinToString(" / ") { "${it.time} ${it.title}".take(64) })
-            }
-            batterySignal()?.let { append("; $it") }
-            append(". Use this perception before appraisal, state update, deliberation, action planning, expression, and consolidation.")
-        }
-        return LivingObservation(
-            summary = summary,
-            requestedTools = request.requestedTools,
-            signals = signals,
-            createdAt = nowMillis,
-        )
-    }
-
-    private suspend fun observeRequestedToolsForLivingPresence(
-        intent: LivingIntent,
-        tools: List<Tool>,
-        requestedToolNames: List<String>,
-    ): List<String> {
-        val toolsByName = tools.associateBy { it.name.removePrefix("mcp__") }
-        return requestedToolNames
-            .distinct()
-            .filter { LivingObservationToolRunner.canAutoObserve(it, intent) }
-            .map { requested ->
-                val resolvedToolName = LivingObservationToolRunner.resolveToolName(requested)
-                val tool = toolsByName[resolvedToolName] ?: return@map "tool_result[$requested]=unavailable"
-                runCatching {
-                    val args = LivingObservationToolRunner.argumentsFor(requested, intent)
-                    val outputs = tool.execute(args).filterIsInstance<UIMessagePart.Text>().map { it.text }
-                    LivingObservationToolRunner.formatResult(requested, outputs)
-                }.getOrElse { error ->
-                    LivingObservationToolRunner.formatFailure(requested, error)
-                }
-            }
-    }
-
-    private fun batterySignal(): String? {
-        val batteryStatus = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED)) ?: return null
-        val level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-        val scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-        if (level < 0 || scale <= 0) return null
-        val percent = (level * 100 / scale).coerceIn(0, 100)
-        val plugged = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0
-        return "battery_percent=$percent,charging=$plugged"
-    }
-
-    private fun RollingJudgmentDecision.shouldResolveSilently(): Boolean =
-        LivingAction.PASS in actions || (LivingAction.MESSAGE !in actions && updatedIntent.spokenCount > 0)
-
-    private fun RollingJudgmentDecision.toTargetedReason(assistantName: String): String = buildString {
-        appendLine("${assistantName.ifBlank { "当前角色" }}正在重新判断一件挂念的事。")
-        appendLine("当前信念：${updatedIntent.belief}")
-        appendLine("当前动机：${updatedIntent.motive}")
-        appendLine("当前打算：${updatedIntent.intention}")
-        appendLine("意义评估：${updatedIntent.appraisal.meaning} 风险：${updatedIntent.appraisal.risk} 成本/资源：${updatedIntent.appraisal.cost} / ${updatedIntent.appraisal.resources}")
-        judgmentTrace?.thought?.takeIf { it.isNotBlank() }?.let {
-            appendLine("没说出口的想法：$it")
-        } ?: appendLine("没说出口的想法：$thought")
-        judgmentTrace?.decision?.takeIf { it.isNotBlank() }?.let {
-            appendLine("这轮决定：$it")
-        }
-        judgmentTrace?.historyNote?.takeIf { it.isNotBlank() }?.let {
-            appendLine("判断痕迹：$it")
-        }
-        appendLine("沉淀方向：${updatedIntent.consolidation.episodicTrace}；${updatedIntent.consolidation.policyLearning}")
-        appendLine("情绪底色：${updatedIntent.emotion.label}，克制程度 ${updatedIntent.restraint}/10。")
-        appendLine("下一次触发时必须重新看上下文、重新判断。可以自然开口，也可以 [PASS]，不要复述这段内部记录。")
-    }.trim()
-
-    private fun LivingIntentKind.toTargetedKind(): String = when (this) {
-        LivingIntentKind.STUDY_FOCUS -> "study"
-        LivingIntentKind.DEADLINE, LivingIntentKind.WAKE_UP -> "schedule"
-        LivingIntentKind.HEALTH_SAFETY, LivingIntentKind.ORDINARY_SILENCE -> "living_presence"
-    }
-
-    private fun scheduleNextLivingPresenceTick(
-        setting: ProactiveMessageSetting,
-        assistantName: String,
-        decision: RollingJudgmentDecision,
-    ): Boolean {
-        val nextPerceptionAt = decision.updatedIntent.nextPerceptionAt
-        val triggerAtMillis = resolveLivingPresenceTriggerAt(
-            nextPerceptionAt = nextPerceptionAt,
-            nowMillis = System.currentTimeMillis(),
-        )
-        ProactiveMessageService.scheduleTargeted(
-            context = this@ProactiveMessageTriggerService,
-            setting = setting,
-            triggerAtMillis = triggerAtMillis,
-            reason = decision.toTargetedReason(assistantName),
-            userText = decision.updatedIntent.belief.take(160),
-            kind = decision.updatedIntent.kind.toTargetedKind(),
-        )
-        return true
-    }
-
     /**
      * 构建系统提示词，包含记忆等内容
      */
@@ -1832,7 +1582,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 val systemTools = SystemTools(this@ProactiveMessageTriggerService, settings)
                 addAll(systemTools.getTools(systemToolsOptions))
             }
-            addAll(buildLivingPresenceObservationTools(settings, systemToolsOptions))
             
             // Skill 工具
             if (assistant.enabledSkills.isNotEmpty()) {
@@ -1864,27 +1613,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             addAll(pluginToolProvider.getTools())
         }
             .deduplicateByToolName()
-    }
-
-    private fun buildLivingPresenceObservationTools(
-        settings: Settings,
-        enabledSystemTools: Set<SystemToolOption>,
-    ): List<Tool> {
-        val needed = mutableSetOf(
-            SystemToolOption.AppUsage,
-            SystemToolOption.Battery,
-            SystemToolOption.Alarm,
-        )
-        if (settings.systemToolsSetting.gadgetbridgeEnabled) {
-            needed += SystemToolOption.Gadgetbridge
-        }
-        if (settings.systemToolsSetting.locationAccess) {
-            needed += SystemToolOption.Location
-            needed += SystemToolOption.Weather
-        }
-        val extras = needed - enabledSystemTools
-        if (extras.isEmpty()) return emptyList()
-        return SystemTools(this@ProactiveMessageTriggerService, settings).getTools(extras)
     }
 
     private suspend fun buildAutonomousIntentPlan(
@@ -2202,38 +1930,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
     override fun onBind(intent: Intent?): android.os.IBinder? = null
 }
 
-internal fun resolveLivingPresenceTriggerAt(
-    nextPerceptionAt: Long,
-    nowMillis: Long = System.currentTimeMillis(),
-): Long = maxOf(nextPerceptionAt, nowMillis + TimeUnit.SECONDS.toMillis(10))
-
-internal fun buildSilentLivingPresenceState(
-    previous: CompanionState,
-    assistantName: String,
-    decision: RollingJudgmentDecision,
-    nowMillis: Long = System.currentTimeMillis(),
-): CompanionState {
-    val innerVoice = decision.judgmentTrace
-        ?.thought
-        ?.cleanSilentInnerVoice()
-        ?: decision.thought.cleanSilentInnerVoice()
-        ?: decision.toFallbackSilentInnerVoice()
-    val decisionText = decision.judgmentTrace?.decision?.takeIf { it.isNotBlank() }
-        ?: decision.updatedIntent.lastJudgmentTrace?.decision?.takeIf { it.isNotBlank() }
-        ?: "这一轮选择暂时不发消息。"
-    val name = assistantName.ifBlank { "当前角色" }
-    return previous.copy(
-        statusText = "克制着没开口",
-        innerThought = innerVoice,
-        mood = if (decision.updatedIntent.kind == LivingIntentKind.HEALTH_SAFETY) "担心" else previous.mood,
-        mindState = "静默判断：$decisionText",
-        activityMode = "waiting",
-        updatedAt = nowMillis,
-        sinceAt = nowMillis,
-        selfScene = "$name 刚刚重新判断了一次，没有发消息，只把那句没说出口的话放进状态栏里。",
-    )
-}
-
 internal fun buildAutonomousPlanPresenceState(
     previous: CompanionState,
     assistantName: String,
@@ -2284,19 +1980,6 @@ private fun String.cleanSilentInnerVoice(): String? {
     return compact.take(180)
 }
 
-private fun RollingJudgmentDecision.toFallbackSilentInnerVoice(): String = when (updatedIntent.kind) {
-    LivingIntentKind.HEALTH_SAFETY ->
-        "我先不把担心直接压给你，但会继续确认是否出现需要行动的安全信号。"
-    LivingIntentKind.STUDY_FOCUS ->
-        "我先不打断你的专注；只有存在明确约定或新信号时，我才重新判断是否提醒。"
-    LivingIntentKind.DEADLINE ->
-        "我先忍住不催太紧，但这个时间点我记着，会在下一轮再确认你有没有被任务压住。"
-    LivingIntentKind.WAKE_UP ->
-        "我先记住明确的唤醒目标，不在时间没有校准时行动；到节点后再重新确认。"
-    LivingIntentKind.ORDINARY_SILENCE ->
-        "我先保留上一轮上下文，不把沉默解释成关系信号；等下一轮新信息再判断。"
-}
-
 internal fun recentFormalDiaryEntries(
     entries: List<CihaiEntry>,
     assistantId: String,
@@ -2332,13 +2015,6 @@ internal fun buildTargetedProactiveSensingInstruction(
         }
         "general" -> {
             appendLine("本次目标的感知重点：先看当前时间、应用使用和电量；没有明确行动价值时保持安静，不要为了记录判断过程而写辞海。")
-        }
-        "living_presence" -> {
-            appendLine("本次目标的感知重点：这是 Living Presence OS 的下一轮滚动判断，不是随机主动消息。")
-            appendLine("按感知世界包-意义评估-动态判断-行动实现-状态生成-辞海记忆架构重新判断：先整理当前时间、上下文、工具结果、工具状态、考研计划、召回记忆和历史挂心记录；再评估重要性、威胁、机会、身心安全、时间压力、成本、收益、不行动后果和可用资源。")
-            appendLine("动态判断根据完整感知包、人设和意义评估决定意图、可做什么、要不要查工具、要不要开口、要不要写辞海，以及下一轮从什么时候重新感知。")
-            appendLine("状态生成只保留心情、身体状况、精神状况、亲密关系和第一人称没说出口；不要把 belief、traitMotive、situationalMotive 或 intention 塞回状态栏。")
-            appendLine("如果已经开过口或用户明显在忙，可以 [PASS]；第一人称内心想法只更新统一状态，不自动写辞海。正式日记只能由 write_lulu_journal 工具主动保存。")
         }
         else -> when {
             reason.contains("睡") -> appendLine("本次目标的感知重点：先看当前时间、睡眠/健康、应用使用和电量。")
