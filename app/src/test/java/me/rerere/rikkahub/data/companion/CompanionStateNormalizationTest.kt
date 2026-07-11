@@ -82,6 +82,39 @@ class CompanionStateNormalizationTest {
     }
 
     @Test
+    fun `normalization keeps the latest relationship timeline events for each assistant`() {
+        val snapshot = CompanionSnapshot(
+            assistantId = "assistant-a",
+            relationshipHistory = (1..180).map { index ->
+                CompanionRelationshipEvent(
+                    id = "event-$index",
+                    assistantId = "assistant-a",
+                    sourceId = "source-$index",
+                    kind = CompanionRelationshipEventKind.MEANINGFUL_DISCLOSURE,
+                    evidence = "event $index",
+                    createdAt = index.toLong(),
+                )
+            } + CompanionRelationshipEvent(
+                id = "foreign",
+                assistantId = "assistant-b",
+                sourceId = "foreign",
+                kind = CompanionRelationshipEventKind.MANUAL,
+                evidence = "foreign",
+                createdAt = 999L,
+            ),
+        )
+
+        val history = CompanionPersistedState(snapshots = listOf(snapshot))
+            .normalizedCompanionState()
+            .snapshots.single()
+            .relationshipHistory
+
+        assertEquals(160, history.size)
+        assertEquals("event-21", history.first().id)
+        assertEquals("event-180", history.last().id)
+    }
+
+    @Test
     fun `clearing an assistant removes only its runtime snapshot`() {
         val state = CompanionPersistedState(
             snapshots = listOf(

@@ -3,7 +3,7 @@ package me.rerere.rikkahub.data.companion
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
-const val CURRENT_COMPANION_SCHEMA_VERSION = 2
+const val CURRENT_COMPANION_SCHEMA_VERSION = 3
 
 @Serializable
 data class CompanionPersistedState(
@@ -18,6 +18,7 @@ data class CompanionSnapshot(
     val state: CompanionState = CompanionState(),
     val stateHistory: List<CompanionStateHistoryEntry> = emptyList(),
     val relationship: CompanionRelationshipState = CompanionRelationshipState(),
+    val relationshipHistory: List<CompanionRelationshipEvent> = emptyList(),
     val concerns: List<CompanionConcern> = emptyList(),
     val commitments: List<CompanionCommitment> = emptyList(),
     val updatedAt: Long = 0L,

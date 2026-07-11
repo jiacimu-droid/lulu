@@ -3,6 +3,7 @@ package me.rerere.rikkahub.data.companion
 data class CompanionRelationshipReduction(
     val relationship: CompanionRelationshipState,
     val appliedEventIds: Set<String>,
+    val appliedEvents: List<CompanionRelationshipEvent>,
 )
 
 object CompanionRelationshipReducer {
@@ -17,6 +18,7 @@ object CompanionRelationshipReducer {
             appliedEventIds.toList().takeLast(MAX_APPLIED_EVENT_IDS),
         )
         var relationship = current
+        val appliedEvents = mutableListOf<CompanionRelationshipEvent>()
 
         events.asSequence()
             .filter { event ->
@@ -42,6 +44,7 @@ object CompanionRelationshipReducer {
                     updatedAt = maxOf(relationship.updatedAt, event.createdAt, nowMillis),
                 )
                 appliedKeys += key
+                appliedEvents += event
                 while (appliedKeys.size > MAX_APPLIED_EVENT_IDS) {
                     appliedKeys.remove(appliedKeys.first())
                 }
@@ -50,6 +53,7 @@ object CompanionRelationshipReducer {
         return CompanionRelationshipReduction(
             relationship = relationship,
             appliedEventIds = appliedKeys,
+            appliedEvents = appliedEvents,
         )
     }
 

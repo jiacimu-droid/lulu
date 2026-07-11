@@ -44,6 +44,7 @@ import me.rerere.rikkahub.data.cihai.CihaiEntry
 import me.rerere.rikkahub.data.cihai.CihaiEntryKind
 import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
+import me.rerere.rikkahub.data.companion.CompanionRelationshipEvent
 import me.rerere.rikkahub.data.companion.CompanionRelationshipState
 import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
@@ -180,7 +181,10 @@ fun CihaiPage(onBack: () -> Unit) {
                     }
                     CihaiSection.RELATIONSHIP -> {
                         item(key = "relationship-overview") {
-                            RelationshipOverview(selectedSnapshot.relationship)
+                            RelationshipOverview(
+                                relationship = selectedSnapshot.relationship,
+                                history = selectedSnapshot.relationshipHistory,
+                            )
                         }
                     }
                     else -> {
@@ -312,7 +316,11 @@ private fun ConcernCard(card: CompanionConcernCardModel) {
 }
 
 @Composable
-private fun RelationshipOverview(relationship: CompanionRelationshipState) {
+private fun RelationshipOverview(
+    relationship: CompanionRelationshipState,
+    history: List<CompanionRelationshipEvent>,
+) {
+    val timeline = buildCompanionRelationshipTimeline(history)
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
             Column(
@@ -347,6 +355,63 @@ private fun RelationshipOverview(relationship: CompanionRelationshipState) {
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+        Text(
+            text = "最近变化",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        if (timeline.isEmpty()) {
+            Text(
+                text = "还没有形成可记录的关系变化。之后的重要袒露、边界、承诺和修复会留在这里。",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            timeline.forEach { item -> RelationshipTimelineEntry(item) }
+        }
+    }
+}
+
+@Composable
+private fun RelationshipTimelineEntry(item: CompanionRelationshipTimelineItem) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = item.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = formatTime(item.createdAt),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            item.detail?.let { detail ->
+                Text(
+                    text = detail,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            item.deltaText.takeIf(String::isNotBlank)?.let { delta ->
+                Text(
+                    text = delta,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }

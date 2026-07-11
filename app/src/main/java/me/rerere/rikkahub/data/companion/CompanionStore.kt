@@ -117,6 +117,8 @@ private fun CompanionSnapshot.merge(other: CompanionSnapshot): CompanionSnapshot
     } else {
         relationship
     },
+    relationshipHistory = (relationshipHistory + other.relationshipHistory)
+        .distinctBy { it.timelineKey() },
     concerns = (concerns + other.concerns).distinctBy { it.id },
     commitments = (commitments + other.commitments).distinctBy { it.id },
     updatedAt = maxOf(updatedAt, other.updatedAt),
@@ -139,6 +141,15 @@ private fun CompanionSnapshot.normalized(): CompanionSnapshot = copy(
         boundaryConfidence = relationship.boundaryConfidence.normalizedDimension(),
         unresolvedTension = relationship.unresolvedTension.normalizedDimension(),
     ),
+    relationshipHistory = relationshipHistory
+        .filter { event ->
+            event.assistantId == assistantId &&
+                event.id.isNotBlank() &&
+                event.sourceId.isNotBlank()
+        }
+        .distinctBy { it.timelineKey() }
+        .sortedWith(compareBy<CompanionRelationshipEvent> { it.createdAt }.thenBy { it.id })
+        .takeLast(MAX_RELATIONSHIP_HISTORY_PER_ASSISTANT),
     concerns = concerns
         .filter { it.assistantId == assistantId && it.id.isNotBlank() }
         .distinctBy { it.id }
@@ -181,6 +192,8 @@ private fun CompanionCommitmentStatus.isTerminal(): Boolean = this in setOf(
 
 private fun Float.normalizedDimension(): Float = coerceIn(0f, 1f)
 
+private fun CompanionRelationshipEvent.timelineKey(): String = "$assistantId:$sourceId:${kind.name}"
+
 private fun CompanionState.hasVisibleStateContent(): Boolean = listOf(
     statusText,
     innerThought,
@@ -195,6 +208,7 @@ private const val MAX_APPLIED_RELATIONSHIP_EVENTS = 2_000
 private const val MAX_CONCERNS_PER_ASSISTANT = 300
 private const val MAX_COMMITMENTS_PER_ASSISTANT = 300
 private const val MAX_STATE_HISTORY_PER_ASSISTANT = 160
+private const val MAX_RELATIONSHIP_HISTORY_PER_ASSISTANT = 160
 private const val MAX_STATE_TEXT_LENGTH = 120
 private const val MAX_INNER_THOUGHT_LENGTH = 600
 private const val MAX_SELF_SCENE_LENGTH = 800

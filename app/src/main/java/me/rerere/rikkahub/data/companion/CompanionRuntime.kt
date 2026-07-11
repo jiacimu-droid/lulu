@@ -394,6 +394,9 @@ fun reduceCompanionRuntimeState(
         state = nextState,
         stateHistory = nextStateHistory,
         relationship = relationshipReduction.relationship,
+        relationshipHistory = existing.relationshipHistory.appendRelationshipEvents(
+            relationshipReduction.appliedEvents,
+        ),
         concerns = CompanionConcernReducer.apply(
             current = existing.concerns,
             changes = concernChanges,
@@ -619,31 +622,42 @@ fun finishCompanionCommitment(
     } else {
         CompanionRelationshipEventKind.COMMITMENT_FAILED
     }
+    val relationshipEvent = CompanionRelationshipEvent(
+        id = "$commitmentId:${relationshipEventKind.name}",
+        assistantId = assistantId,
+        sourceId = commitmentId,
+        kind = relationshipEventKind,
+        trustDelta = if (cleanResult.success) 0.01f else -0.01f,
+        reliabilityDelta = if (cleanResult.success) 0.03f else -0.03f,
+        tensionDelta = if (cleanResult.success) -0.01f else 0.02f,
+        evidence = cleanResult.summary,
+        createdAt = cleanResult.completedAt,
+    )
     val relationshipReduction = CompanionRelationshipReducer.apply(
         assistantId = assistantId,
         current = updatedSnapshot.relationship,
         appliedEventIds = current.appliedRelationshipEventIds.toSet(),
-        events = listOf(
-            CompanionRelationshipEvent(
-                id = "$commitmentId:${relationshipEventKind.name}",
-                assistantId = assistantId,
-                sourceId = commitmentId,
-                kind = relationshipEventKind,
-                trustDelta = if (cleanResult.success) 0.01f else -0.01f,
-                reliabilityDelta = if (cleanResult.success) 0.03f else -0.03f,
-                tensionDelta = if (cleanResult.success) -0.01f else 0.02f,
-                evidence = cleanResult.summary,
-                createdAt = cleanResult.completedAt,
-            ),
-        ),
+        events = listOf(relationshipEvent),
         nowMillis = cleanResult.completedAt,
     )
     return current.withUpdatedSnapshot(
-        snapshot = updatedSnapshot.copy(relationship = relationshipReduction.relationship),
+        snapshot = updatedSnapshot.copy(
+            relationship = relationshipReduction.relationship,
+            relationshipHistory = updatedSnapshot.relationshipHistory.appendRelationshipEvents(
+                relationshipReduction.appliedEvents,
+            ),
+        ),
         appliedRelationshipEventIds = relationshipReduction.appliedEventIds,
         affectedCommitmentId = commitmentId,
     )
 }
+
+private fun List<CompanionRelationshipEvent>.appendRelationshipEvents(
+    events: List<CompanionRelationshipEvent>,
+): List<CompanionRelationshipEvent> = (this + events)
+    .distinctBy { event -> "${event.assistantId}:${event.sourceId}:${event.kind.name}" }
+    .sortedWith(compareBy<CompanionRelationshipEvent> { it.createdAt }.thenBy { it.id })
+    .takeLast(160)
 
 fun continueCompanionCommitment(
     current: CompanionPersistedState,

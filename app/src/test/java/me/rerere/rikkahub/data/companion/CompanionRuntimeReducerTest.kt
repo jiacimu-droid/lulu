@@ -224,6 +224,11 @@ class CompanionRuntimeReducerTest {
         assertEquals(0.53f, reduced.snapshot.relationship.reliability)
         assertEquals(0.51f, reduced.snapshot.relationship.trust)
         assertEquals(1, reduced.persistedState.appliedRelationshipEventIds.size)
+        assertEquals(1, reduced.snapshot.relationshipHistory.size)
+        assertEquals(
+            CompanionRelationshipEventKind.COMMITMENT_FULFILLED,
+            reduced.snapshot.relationshipHistory.single().kind,
+        )
         assertEquals(CompanionConcernStatus.COMPLETED, reduced.snapshot.concerns.single().status)
     }
 

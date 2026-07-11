@@ -31,6 +31,8 @@ class CompanionRelationshipReducerTest {
         assertEquals(0.2f, second.relationship.closeness)
         assertEquals(0.6f, second.relationship.trust)
         assertEquals(first.appliedEventIds, second.appliedEventIds)
+        assertEquals(listOf(event), first.appliedEvents)
+        assertEquals(emptyList<CompanionRelationshipEvent>(), second.appliedEvents)
     }
 
     @Test
