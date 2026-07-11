@@ -2,14 +2,57 @@ package me.rerere.rikkahub.data.ai.transformers
 
 import java.time.LocalDate
 import me.rerere.rikkahub.data.ai.tools.buildTodayStudyPlanPayload
+import me.rerere.rikkahub.data.ai.tools.updateTodayStudyTaskCompletion
 import me.rerere.rikkahub.data.study.StudyScheduleBlock
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyTask
 import me.rerere.rikkahub.data.study.StudyTaskSource
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class StudyStateTransformerTest {
+    @Test
+    fun `completion update can mark every task done except a fuzzy title match`() {
+        val state = StudyState(
+            today = "2026-07-11",
+            tasks = listOf(
+                StudyTask(id = "law", title = "背法理学第一章重点", done = false),
+                StudyTask(id = "english", title = "英语单词复习", done = false),
+                StudyTask(id = "politics", title = "政治选择题", done = false),
+            ),
+        )
+
+        val result = updateTodayStudyTaskCompletion(
+            state = state,
+            completeAllExceptTitles = setOf("背法理学第一章"),
+            nowMillis = 123L,
+        )
+
+        assertFalse(result.state.tasks.first { it.id == "law" }.done)
+        assertTrue(result.state.tasks.first { it.id == "english" }.done)
+        assertTrue(result.state.tasks.first { it.id == "politics" }.done)
+        assertTrue(result.changedTaskIds == setOf("english", "politics"))
+    }
+
+    @Test
+    fun `explicit unfinished task wins over a completion request`() {
+        val state = StudyState(
+            today = "2026-07-11",
+            tasks = listOf(StudyTask(id = "law", title = "Law chapter one", done = true)),
+        )
+
+        val result = updateTodayStudyTaskCompletion(
+            state = state,
+            completeTaskIds = setOf("law"),
+            unfinishedTaskIds = setOf("law"),
+            nowMillis = 456L,
+        )
+
+        assertFalse(result.state.tasks.single().done)
+        assertTrue(result.changedTaskIds == setOf("law"))
+    }
+
     @Test
     fun `study context includes completed tasks undone tasks and today schedule`() {
         val state = StudyState(

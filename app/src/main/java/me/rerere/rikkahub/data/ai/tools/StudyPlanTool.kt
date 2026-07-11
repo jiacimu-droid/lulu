@@ -3,10 +3,16 @@ package me.rerere.rikkahub.data.ai.tools
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonObject
 import me.rerere.ai.core.InputSchema
 import me.rerere.ai.core.Tool
 import me.rerere.ai.ui.UIMessagePart
@@ -22,19 +28,109 @@ import java.time.format.DateTimeParseException
 fun createTodayStudyPlanTool(): Tool = Tool(
     name = "today_study_plan",
     description = """
-        Read the app's local study plan state for today, including real study-app todos, completed/checked-off todos,
+        Read or update today's app-local study tasks. Use action=set_completion only after the user explicitly reports
         generated schedule, pomodoro stats, kudos and rewards. Use this for 考研计划, 今日计划, 待办, 番茄钟,
-        completed study tasks, and study progress. Do not use calendar_tool for these app-local study records.
+        completion status. Only existing tasks can change; this tool never creates or deletes tasks. Do not use calendar_tool.
     """.trimIndent().replace("\n", " "),
     parameters = {
-        InputSchema.Obj(properties = buildJsonObject { })
+        InputSchema.Obj(
+            properties = buildJsonObject {
+                putJsonObject("action") {
+                    put("type", JsonPrimitive("string"))
+                    put("enum", buildJsonArray {
+                        add(JsonPrimitive("read"))
+                        add(JsonPrimitive("set_completion"))
+                    })
+                    put("description", JsonPrimitive("Read state or update completion after an explicit user report."))
+                }
+                putJsonObject("complete_task_ids") {
+                    put("type", JsonPrimitive("array"))
+                    putJsonObject("items") { put("type", JsonPrimitive("string")) }
+                }
+                putJsonObject("unfinished_task_ids") {
+                    put("type", JsonPrimitive("array"))
+                    putJsonObject("items") { put("type", JsonPrimitive("string")) }
+                }
+                putJsonObject("complete_all_except_titles") {
+                    put("type", JsonPrimitive("array"))
+                    putJsonObject("items") { put("type", JsonPrimitive("string")) }
+                    put("description", JsonPrimitive("Complete all existing tasks except fuzzy title matches here."))
+                }
+            },
+        )
     },
-    execute = {
+    execute = { args ->
         val store = GlobalContext.get().get<StudyStore>()
-        val state = runBlocking { store.state.first() }
-        listOf(UIMessagePart.Text(buildTodayStudyPlanPayload(state).toString()))
+        val params = args.jsonObject
+        val action = params["action"]?.jsonPrimitive?.contentOrNull ?: "read"
+        if (action == "set_completion") {
+            var changedIds = emptySet<String>()
+            var updatedState: StudyState? = null
+            runBlocking {
+                store.update { current ->
+                    val result = updateTodayStudyTaskCompletion(
+                        state = current,
+                        completeTaskIds = params.stringSet("complete_task_ids"),
+                        unfinishedTaskIds = params.stringSet("unfinished_task_ids"),
+                        completeAllExceptTitles = params.stringSet("complete_all_except_titles"),
+                    )
+                    changedIds = result.changedTaskIds
+                    updatedState = result.state
+                    result.state
+                }
+            }
+            listOf(UIMessagePart.Text(buildJsonObject {
+                put("success", true)
+                put("changed_count", changedIds.size)
+                put("changed_task_ids", buildJsonArray { changedIds.forEach { add(it) } })
+                put("state", buildTodayStudyPlanPayload(updatedState ?: runBlocking { store.state.first() }))
+            }.toString()))
+        } else {
+            val state = runBlocking { store.state.first() }
+            listOf(UIMessagePart.Text(buildTodayStudyPlanPayload(state).toString()))
+        }
     },
 )
+
+internal data class StudyTaskCompletionUpdate(
+    val state: StudyState,
+    val changedTaskIds: Set<String>,
+)
+
+internal fun updateTodayStudyTaskCompletion(
+    state: StudyState,
+    completeTaskIds: Set<String> = emptySet(),
+    unfinishedTaskIds: Set<String> = emptySet(),
+    completeAllExceptTitles: Set<String> = emptySet(),
+    nowMillis: Long = System.currentTimeMillis(),
+): StudyTaskCompletionUpdate {
+    val exceptions = completeAllExceptTitles.map(String::normalizedTaskTitle).filter(String::isNotBlank)
+    val completeAllExcept = exceptions.isNotEmpty()
+    var next = state
+    val changed = linkedSetOf<String>()
+    state.tasks.forEach { task ->
+        val title = task.title.normalizedTaskTitle()
+        val keepUnfinished = completeAllExcept && exceptions.any { query -> query in title || title in query }
+        val requestedDone = when {
+            task.id in unfinishedTaskIds || keepUnfinished -> false
+            task.id in completeTaskIds || completeAllExcept -> true
+            else -> return@forEach
+        }
+        if (task.done == requestedDone) return@forEach
+        next = StudyRules.toggleTask(next, task.id, requestedDone, nowMillis).state
+        changed += task.id
+    }
+    return StudyTaskCompletionUpdate(next, changed)
+}
+
+private fun JsonObject.stringSet(key: String): Set<String> = this[key]
+    ?.jsonArray
+    ?.mapNotNull { it.jsonPrimitive.contentOrNull?.trim()?.takeIf(String::isNotBlank) }
+    ?.toSet()
+    .orEmpty()
+
+private fun String.normalizedTaskTitle(): String = lowercase()
+    .replace(Regex("[\\p{P}\\p{S}\\s]+"), "")
 
 fun buildTodayStudyPlanPayload(
     state: StudyState,
