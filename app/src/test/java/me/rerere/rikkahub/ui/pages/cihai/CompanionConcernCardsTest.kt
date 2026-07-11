@@ -81,13 +81,86 @@ class CompanionConcernCardsTest {
         assertEquals("日程安排", card.title)
     }
 
-    private fun concern(id: String, subject: String, nextAt: Long) = CompanionConcern(
+    @Test
+    fun `legacy records with the same subject collapse into one card`() {
+        val snapshot = CompanionSnapshot(
+            assistantId = "lulu",
+            concerns = listOf(
+                concern(id = "old-concern", subject = " wake : morning ", nextAt = NOW + 30_000L),
+                concern(id = "new-concern", subject = "wake:morning", nextAt = NOW + 60_000L),
+            ),
+            commitments = listOf(
+                commitment(id = "old-commitment", subject = "wake:morning", dueAt = NOW + 30_000L),
+                commitment(id = "new-commitment", subject = " wake : morning ", dueAt = NOW + 60_000L),
+            ),
+        )
+
+        val cards = buildCompanionConcernCards(snapshot, nowMillis = NOW)
+
+        assertEquals(1, cards.size)
+        assertEquals("起床提醒", cards.single().title)
+    }
+
+    @Test
+    fun `different planner keys link when they came from the same user message`() {
+        val snapshot = CompanionSnapshot(
+            assistantId = "lulu",
+            concerns = listOf(
+                concern(
+                    id = "concern",
+                    subject = "check-in:morning",
+                    nextAt = NOW + 60_000L,
+                    sourceMessageId = "message-1",
+                ),
+            ),
+            commitments = listOf(
+                commitment(
+                    id = "commitment",
+                    subject = "schedule:wake-up",
+                    dueAt = NOW + 60_000L,
+                    sourceMessageId = "message-1",
+                ),
+            ),
+        )
+
+        val cards = buildCompanionConcernCards(snapshot, nowMillis = NOW)
+
+        assertEquals(1, cards.size)
+        assertEquals("起床提醒", cards.single().title)
+    }
+
+    private fun concern(
+        id: String,
+        subject: String,
+        nextAt: Long,
+        sourceMessageId: String? = null,
+    ) = CompanionConcern(
         id = id,
         assistantId = "lulu",
         subjectKey = subject,
         event = "需要继续留意",
         goal = "确认事情得到处理",
         nextPerceptionAt = nextAt,
+        sourceMessageIds = listOfNotNull(sourceMessageId),
+    )
+
+    private fun commitment(
+        id: String,
+        subject: String,
+        dueAt: Long,
+        sourceMessageId: String? = null,
+    ) = CompanionCommitment(
+        id = id,
+        assistantId = "lulu",
+        subjectKey = subject,
+        promise = "确认你已经起床",
+        dueAt = dueAt,
+        status = CompanionCommitmentStatus.ACTIVE,
+        actionPlan = CompanionActionPlan(
+            type = CompanionActionType.CHECK_IN,
+            category = "wake",
+        ),
+        sourceMessageId = sourceMessageId,
     )
 
     private companion object {

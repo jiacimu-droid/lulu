@@ -6,6 +6,7 @@ import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
 import me.rerere.rikkahub.data.companion.CompanionConcern
 import me.rerere.rikkahub.data.companion.CompanionConcernStatus
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
+import me.rerere.rikkahub.data.companion.normalizeCompanionSubjectKey
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -28,15 +29,21 @@ fun buildCompanionConcernCards(
     val concerns = snapshot.concerns.filter { concern ->
         concern.assistantId == snapshot.assistantId &&
             concern.status in setOf(CompanionConcernStatus.ACTIVE, CompanionConcernStatus.PAUSED)
-    }
+    }.collapseLegacyConcerns()
     val commitments = snapshot.commitments.filter { commitment ->
         commitment.assistantId == snapshot.assistantId && commitment.status.isVisibleConcernCommitment()
-    }
-    val commitmentsBySubject = commitments.groupBy { it.subjectKey }
+    }.collapseLegacyCommitments()
     val representedCommitmentIds = mutableSetOf<String>()
     val concernCards = concerns.map { concern ->
-        val commitment = commitmentsBySubject[concern.subjectKey]
-            ?.minByOrNull { it.dueAt }
+        val commitment = commitments
+            .asSequence()
+            .filterNot { it.id in representedCommitmentIds }
+            .firstOrNull { it.normalizedSubjectKey() == concern.normalizedSubjectKey() }
+            ?: commitments
+                .asSequence()
+                .filterNot { it.id in representedCommitmentIds }
+                .firstOrNull { it.sharesSourceMessageWith(concern) }
+        commitment
             ?.also { representedCommitmentIds += it.id }
         concern.toCardModel(commitment, nowMillis)
     }
@@ -48,6 +55,57 @@ fun buildCompanionConcernCards(
         .sortedWith(compareBy<SortableConcernCard> { it.sortAt }.thenByDescending { it.importance })
         .take(12)
         .map { it.card }
+}
+
+private fun List<CompanionConcern>.collapseLegacyConcerns(): List<CompanionConcern> =
+    groupBy { it.normalizedSubjectKey() }
+        .map { (subjectKey, duplicates) ->
+            val selected = duplicates.maxWith(
+                compareBy<CompanionConcern> { it.status == CompanionConcernStatus.ACTIVE }
+                    .thenBy { it.lastUpdatedAt }
+                    .thenBy { it.createdAt },
+            )
+            selected.copy(
+                subjectKey = subjectKey,
+                status = if (duplicates.any { it.status == CompanionConcernStatus.ACTIVE }) {
+                    CompanionConcernStatus.ACTIVE
+                } else {
+                    CompanionConcernStatus.PAUSED
+                },
+                nextPerceptionAt = duplicates.mapNotNull { it.nextPerceptionAt }.minOrNull(),
+                sourceMessageIds = duplicates
+                    .flatMap { it.sourceMessageIds }
+                    .filter(String::isNotBlank)
+                    .distinct(),
+                createdAt = duplicates.minOf { it.createdAt },
+                lastUpdatedAt = duplicates.maxOf { it.lastUpdatedAt },
+            )
+        }
+
+private fun List<CompanionCommitment>.collapseLegacyCommitments(): List<CompanionCommitment> =
+    groupBy { it.normalizedSubjectKey() }
+        .map { (subjectKey, duplicates) ->
+            duplicates.minWith(
+                compareBy<CompanionCommitment> { it.status.visiblePriority() }
+                    .thenBy { it.dueAt }
+                    .thenByDescending { it.updatedAt },
+            ).copy(subjectKey = subjectKey)
+        }
+
+private fun CompanionConcern.normalizedSubjectKey(): String = normalizeCompanionSubjectKey(subjectKey)
+
+private fun CompanionCommitment.normalizedSubjectKey(): String = normalizeCompanionSubjectKey(subjectKey)
+
+private fun CompanionCommitment.sharesSourceMessageWith(concern: CompanionConcern): Boolean =
+    sourceMessageId?.takeIf(String::isNotBlank)?.let { it in concern.sourceMessageIds } == true
+
+private fun CompanionCommitmentStatus.visiblePriority(): Int = when (this) {
+    CompanionCommitmentStatus.EXECUTING -> 0
+    CompanionCommitmentStatus.DUE -> 1
+    CompanionCommitmentStatus.RETRY_SCHEDULED -> 2
+    CompanionCommitmentStatus.ACTIVE -> 3
+    CompanionCommitmentStatus.PROPOSED -> 4
+    else -> 5
 }
 
 private data class SortableConcernCard(
