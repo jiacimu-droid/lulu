@@ -32,7 +32,7 @@ fun createAppUsageTool(context: Context): Tool = Tool(
         val params = args.jsonObject
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         try {
-            val limit = params["limit"]?.jsonPrimitive?.intOrNull ?: 10
+            val limit = (params["limit"]?.jsonPrimitive?.intOrNull ?: 10).coerceIn(1, 50)
             val usm = context.getSystemService(Context.USAGE_STATS_SERVICE) as android.app.usage.UsageStatsManager
             val cal = java.util.Calendar.getInstance()
             cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
@@ -40,11 +40,13 @@ fun createAppUsageTool(context: Context): Tool = Tool(
             cal.set(java.util.Calendar.SECOND, 0)
             cal.set(java.util.Calendar.MILLISECOND, 0)
 
-            val stats = usm.queryUsageStats(
+            val allStats = usm.queryUsageStats(
                 android.app.usage.UsageStatsManager.INTERVAL_DAILY,
                 cal.timeInMillis,
                 System.currentTimeMillis()
             ).filter { it.totalTimeInForeground > 0 }
+            val latestForegroundActivityAt = allStats.maxOfOrNull { it.lastTimeUsed }
+            val stats = allStats
                 .sortedByDescending { it.totalTimeInForeground }
                 .take(limit)
 
@@ -80,6 +82,9 @@ fun createAppUsageTool(context: Context): Tool = Tool(
                 buildJsonObject {
                     put("success", true)
                     put("count", stats.size)
+                    latestForegroundActivityAt?.let {
+                        put("latest_foreground_activity_at_millis", it)
+                    }
                     put("apps", arr)
                 }.toString()
             ))

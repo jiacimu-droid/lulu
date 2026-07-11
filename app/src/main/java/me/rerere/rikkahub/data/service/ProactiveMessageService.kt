@@ -2141,13 +2141,14 @@ internal fun latestForegroundUsageAt(facts: List<CompanionContextFact>): Long? =
     .filter { it.key == "perception.get_app_usage" }
     .mapNotNull { fact ->
         runCatching {
-            Json.parseToJsonElement(fact.value)
-                .jsonObject["apps"]
-                ?.jsonArray
-                ?.mapNotNull { app ->
-                    app.jsonObject["last_used_at_millis"]?.jsonPrimitive?.longOrNull
-                }
-                ?.maxOrNull()
+            val root = Json.parseToJsonElement(fact.value).jsonObject
+            root["latest_foreground_activity_at_millis"]?.jsonPrimitive?.longOrNull
+                ?: root["apps"]
+                    ?.jsonArray
+                    ?.mapNotNull { app ->
+                        app.jsonObject["last_used_at_millis"]?.jsonPrimitive?.longOrNull
+                    }
+                    ?.maxOrNull()
         }.getOrNull()
     }
     .maxOrNull()

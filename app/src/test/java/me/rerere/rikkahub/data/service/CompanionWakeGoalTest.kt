@@ -88,6 +88,21 @@ class CompanionWakeGoalTest {
     }
 
     @Test
+    fun `latest foreground activity uses aggregate timestamp even when app list is trimmed`() {
+        val activityAt = latestForegroundUsageAt(
+            listOf(
+                CompanionContextFact(
+                    key = "perception.get_app_usage",
+                    value = """{"success":true,"latest_foreground_activity_at_millis":1800,"apps":[]}""",
+                    observedAt = 1_900L,
+                )
+            )
+        )
+
+        assertEquals(1_800L, activityAt)
+    }
+
+    @Test
     fun `sleep supervision stops quietly when screen is off and there is no new message`() {
         assertTrue(
             shouldCompleteSleepSupervision(
