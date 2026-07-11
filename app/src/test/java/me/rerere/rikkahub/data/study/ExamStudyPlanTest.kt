@@ -375,6 +375,35 @@ class ExamStudyPlanTest {
     }
 
     @Test
+    fun generatedDailyPlansFollowTheHardCourseCutoffs() {
+        val augustCivil = ExamStudyPlan.todayPlan(LocalDate.of(2026, 8, 10))!!
+            .tasks.joinToString("\n") { it.title }
+        val augustConstitution = ExamStudyPlan.todayPlan(LocalDate.of(2026, 8, 25))!!
+            .tasks.joinToString("\n") { it.title }
+        val septemberHistory = ExamStudyPlan.todayPlan(LocalDate.of(2026, 9, 10))!!
+            .tasks.joinToString("\n") { it.title }
+        val septemberRevision = ExamStudyPlan.todayPlan(LocalDate.of(2026, 9, 16))!!
+            .tasks.joinToString("\n") { it.title }
+
+        assertTrue(augustCivil.contains("听众合法硕民法课程 约 3-3.5 小时"))
+        assertFalse(augustCivil.contains("刑法课程"))
+        assertTrue(augustConstitution.contains("听众合法硕宪法课程 约 3-3.5 小时"))
+        assertTrue(septemberHistory.contains("听众合法硕法制史课程 约 3-3.5 小时"))
+        assertTrue(septemberRevision.contains("不再开常规新课"))
+        assertFalse(septemberRevision.contains("听众合法硕"))
+    }
+
+    @Test
+    fun finalPreExamWeekStillGeneratesAPlan() {
+        val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 12, 18))
+        val text = plan?.tasks.orEmpty().joinToString("\n") { it.title }
+
+        assertTrue(plan != null)
+        assertTrue(text.contains("不再开常规新课"))
+        assertTrue(text.contains("保温"))
+    }
+
+    @Test
     fun formalStudyDaysIncludeFixedVocabularyReview() {
         val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 2))
         val taskTitles = plan?.tasks.orEmpty().map { it.title }

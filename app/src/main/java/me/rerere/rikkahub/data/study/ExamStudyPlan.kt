@@ -240,10 +240,9 @@ object ExamStudyPlan {
         if (date < LocalDate.of(2026, 8, 1) || date > examDate) return null
         val week = weekForDate(date) ?: return null
         val activeBook = when {
-            date < LocalDate.of(2026, 8, 15) -> "刑法"
-            date < LocalDate.of(2026, 9, 16) -> "民法"
-            date < LocalDate.of(2026, 9, 23) -> "宪法"
-            date < LocalDate.of(2026, 10, 1) -> "法制史"
+            date <= LocalDate.of(2026, 8, 20) -> "民法"
+            date <= LocalDate.of(2026, 8, 31) -> "宪法"
+            date <= LocalDate.of(2026, 9, 14) -> "法制史"
             else -> "全科回炉"
         }
         val activeCourse = when (activeBook) {
@@ -263,10 +262,12 @@ object ExamStudyPlan {
             DayOfWeek.SUNDAY -> "周复盘/缓冲日：不新增硬章节"
         }
         val recitation = when {
-            date < LocalDate.of(2026, 9, 16) ->
-                "背诵：第一轮结构和关键词 40-60 分钟；7 月遗留和本周闭环章都要留下背诵痕迹"
+            date < LocalDate.of(2026, 9, 15) ->
+                "背诵：已学科目第一轮结构和关键词 45-60 分钟；本周闭环章必须留下闭卷输出痕迹"
+            date < LocalDate.of(2026, 10, 1) ->
+                "背诵：补齐五科第一轮 90-120 分钟；按闭卷结果回炉，不用翻书熟悉感代替会背"
             date < LocalDate.of(2026, 11, 1) ->
-                "背诵：第二轮规范表述 60-90 分钟；背不出的章节写进隔日回炉表"
+                "背诵：第二轮规范表述 90-120 分钟；背不出的章节写进隔日回炉表"
             else ->
                 "背诵：第三轮限时输出 90-120 分钟拆成多次；默写框架、口头答题、抽背高频点"
         }
@@ -295,26 +296,17 @@ object ExamStudyPlan {
                 "身体缓冲：散步 20-30 分钟，饭后不补硬任务；如果用户指定完整休息日，当天任务清零",
             )
         }
-        val mainTask = when (date.dayOfWeek) {
-            DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY ->
-                if (activeBook == "全科回炉") {
-                    "主线块：按高频点、错题点、真题点做 60-90 分钟回炉，不再开新课"
-                } else {
-                    "主线块：按本周${activeBook}章节$activeCourse 60-90 分钟，写切片编号、3-5 个关键词和 1 个不懂点；未完成这本书前不启动下一本新课"
-                }
-            DayOfWeek.THURSDAY ->
-                "主线块：只做已经整章闭环的章节题或错题回炉；未闭环章节只补听课切片和关键词"
-            DayOfWeek.FRIDAY ->
-                "主线块：按本周${activeBook}范围做真题高频点锚定或主观题短答 1-2 题，做完回到具体章节"
-            else ->
-                "主线块：补本周未闭环切片或最弱框架 60-90 分钟；不为追数字强开新章"
+        val mainTask = if (activeBook == "全科回炉") {
+            "主线块：按本周主题完成背诵、错题、真题或主观题闭卷输出，不再开常规新课；做完必须订正到具体章节和规范表述"
+        } else {
+            "新课冲刺块：按本周${activeBook}章节连续完成$activeCourse 约 3-3.5 小时，可拆 2-3 块；上一章结束即进入下一章，整章结束后集中完成题目、错因、框架和关键词"
         }
         return daily(
             date.toString(),
             title,
             "本周计划：${week.title}（${week.dateRange}）",
             mainTask,
-            "消化块：30-45 分钟整理关键词、不懂点、小框架或错题主错因，整章未闭环前不刷整章题",
+            "消化块：60-90 分钟完成关键词、不懂点、小框架、章节题或错题主错因；整章未闭环前不刷整章题",
             recitation,
             english,
             politics,
@@ -327,7 +319,11 @@ object ExamStudyPlan {
             val parts = week.dateRange.split(" 至 ")
             if (parts.size != 2) return@firstOrNull false
             val start = runCatching { LocalDate.parse(parts[0]) }.getOrNull() ?: return@firstOrNull false
-            val end = runCatching { LocalDate.parse(parts[1]) }.getOrNull() ?: return@firstOrNull false
+            val end = if (parts[1] == "考前") {
+                examDate
+            } else {
+                runCatching { LocalDate.parse(parts[1]) }.getOrNull() ?: return@firstOrNull false
+            }
             date >= start && date <= end
         }
 
