@@ -485,9 +485,12 @@ object StudyRules {
         val dateText = date.toString()
         if (state.shopDate == dateText && state.shopItems.size == 3) return state
         val pool = listOf(
-            StudyShopItemType.UniversalRareFragment to 12,
-            StudyShopItemType.UniversalEpicFragment to 3,
-            StudyShopItemType.SingleDrawTicket to 85,
+            StudyShopItemType.DouyinFragment to 7,
+            StudyShopItemType.TheaterFragment to 7,
+            StudyShopItemType.GameFragment to 3,
+            StudyShopItemType.VideoFragment to 3,
+            StudyShopItemType.AnimeFragment to 1,
+            StudyShopItemType.SingleDrawTicket to 79,
         )
         val items = (1..3).map { slot ->
             val type = weighted(pool, random)
@@ -853,8 +856,11 @@ private fun List<StudyEvent>.addEvent(type: StudyEventType, title: String, detai
 private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
     return when (this) {
         StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x1", 120)
-        StudyShopItemType.UniversalRareFragment -> StudyShopItem(id, this, "剧场碎片 x1", 160)
-        StudyShopItemType.UniversalEpicFragment -> StudyShopItem(id, this, "视频碎片 x1", 400)
+        StudyShopItemType.DouyinFragment -> StudyShopItem(id, this, "抖音碎片 x1", 160)
+        StudyShopItemType.TheaterFragment -> StudyShopItem(id, this, "剧场碎片 x1", 160)
+        StudyShopItemType.GameFragment -> StudyShopItem(id, this, "游戏碎片 x1", 400)
+        StudyShopItemType.VideoFragment -> StudyShopItem(id, this, "视频碎片 x1", 400)
+        StudyShopItemType.AnimeFragment -> StudyShopItem(id, this, "动漫碎片 x1", 800)
         StudyShopItemType.SingleDrawTicket -> StudyShopItem(id, this, "单抽券 x1", 80)
     }
 }
@@ -862,8 +868,11 @@ private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
 private fun StudyShopItem.toReward(): StudyReward {
     return when (type) {
         StudyShopItemType.UniversalNormalFragment -> StudyReward(universalNormalFragments = 1, title = title)
-        StudyShopItemType.UniversalRareFragment -> StudyReward(theaterFragments = 1, title = title)
-        StudyShopItemType.UniversalEpicFragment -> StudyReward(videoFragments = 1, title = title)
+        StudyShopItemType.DouyinFragment -> StudyReward(douyinFragments = 1, title = title)
+        StudyShopItemType.TheaterFragment -> StudyReward(theaterFragments = 1, title = title)
+        StudyShopItemType.GameFragment -> StudyReward(gameFragments = 1, title = title)
+        StudyShopItemType.VideoFragment -> StudyReward(videoFragments = 1, title = title)
+        StudyShopItemType.AnimeFragment -> StudyReward(animeFragments = 1, title = title)
         StudyShopItemType.SingleDrawTicket -> StudyReward(singleDrawTickets = 1, title = title)
     }
 }

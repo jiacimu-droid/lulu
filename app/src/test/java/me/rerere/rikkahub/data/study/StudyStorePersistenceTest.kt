@@ -53,4 +53,24 @@ class StudyStorePersistenceTest {
     fun `safe decoder does not turn corrupt study data into an empty state`() {
         assertNull(decodeStudyStateOrNull("{not-json"))
     }
+
+    @Test
+    fun `legacy universal purple and gold shop entries migrate to explicit fragments`() {
+        val raw = """
+            {
+              "today": "2026-07-11",
+              "shopDate": "2026-07-11",
+              "shopItems": [
+                {"id":"rare","type":"UniversalRareFragment","title":"旧紫色碎片","price":160},
+                {"id":"epic","type":"UniversalEpicFragment","title":"旧金色碎片","price":400}
+              ]
+            }
+        """.trimIndent()
+
+        val decoded = decodeStudyStateOrNull(raw)
+
+        requireNotNull(decoded)
+        assertEquals(StudyShopItemType.TheaterFragment, decoded.shopItems[0].type)
+        assertEquals(StudyShopItemType.VideoFragment, decoded.shopItems[1].type)
+    }
 }

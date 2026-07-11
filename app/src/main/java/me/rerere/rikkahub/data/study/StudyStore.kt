@@ -96,13 +96,17 @@ class StudyStore(
     }
 }
 
-internal fun decodeStudyStateOrNull(raw: String): StudyState? =
-    runCatching { studyJson.decodeFromString<StudyState>(raw) }
+internal fun decodeStudyStateOrNull(raw: String): StudyState? {
+    val migratedRaw = raw
+        .replace("\"UniversalRareFragment\"", "\"TheaterFragment\"")
+        .replace("\"UniversalEpicFragment\"", "\"VideoFragment\"")
+    return runCatching { studyJson.decodeFromString<StudyState>(migratedRaw) }
         .recoverCatching { error ->
             if (error !is SerializationException && error !is IllegalArgumentException) throw error
-            JsonInstant.decodeFromString(raw)
+            JsonInstant.decodeFromString(migratedRaw)
         }
         .getOrNull()
+}
 
 private val studyJson = Json(JsonInstant) {
     ignoreUnknownKeys = true

@@ -263,6 +263,26 @@ class StudyRulesTest {
     }
 
     @Test
+    fun `daily shop uses only explicit entertainment fragment types`() {
+        val allowed = setOf(
+            StudyShopItemType.DouyinFragment,
+            StudyShopItemType.TheaterFragment,
+            StudyShopItemType.GameFragment,
+            StudyShopItemType.VideoFragment,
+            StudyShopItemType.AnimeFragment,
+            StudyShopItemType.SingleDrawTicket,
+        )
+
+        val refreshed = StudyRules.refreshShopIfNeeded(
+            StudyState(),
+            LocalDate.of(2026, 7, 11),
+            Random(18),
+        )
+
+        assertTrue(refreshed.shopItems.all { it.type in allowed })
+    }
+
+    @Test
     fun `mystery boxes make universal normal fragments uncommon`() {
         val none = StudyRules.completePomodoro(
             state = StudyState(today = "2026-07-06"),
@@ -508,6 +528,37 @@ class StudyRulesTest {
         assertEquals(1, purple.inventory.douyinFragments)
         assertEquals(1, gold.inventory.videoFragments)
         assertEquals(1, rainbow.inventory.animeFragments)
+    }
+
+    @Test
+    fun `purple and gold draws split evenly between their explicit fragment types`() {
+        var state = StudyState(wallet = StudyWallet(singleDrawTickets = 4))
+
+        state = StudyRules.draw(
+            state,
+            count = 1,
+            random = FixedDrawRandom(doubles = mutableListOf(0.95), ints = mutableListOf(0)),
+        ).state
+        state = StudyRules.draw(
+            state,
+            count = 1,
+            random = FixedDrawRandom(doubles = mutableListOf(0.95), ints = mutableListOf(1)),
+        ).state
+        state = StudyRules.draw(
+            state,
+            count = 1,
+            random = FixedDrawRandom(doubles = mutableListOf(0.98), ints = mutableListOf(0)),
+        ).state
+        state = StudyRules.draw(
+            state,
+            count = 1,
+            random = FixedDrawRandom(doubles = mutableListOf(0.98), ints = mutableListOf(1)),
+        ).state
+
+        assertEquals(1, state.inventory.douyinFragments)
+        assertEquals(1, state.inventory.theaterFragments)
+        assertEquals(1, state.inventory.gameFragments)
+        assertEquals(1, state.inventory.videoFragments)
     }
 
     @Test

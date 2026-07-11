@@ -228,7 +228,10 @@ data class StudyShopItem(
 @Serializable
 enum class StudyShopItemType {
     UniversalNormalFragment,
-    UniversalRareFragment,
-    UniversalEpicFragment,
+    DouyinFragment,
+    TheaterFragment,
+    GameFragment,
+    VideoFragment,
+    AnimeFragment,
     SingleDrawTicket,
 }
