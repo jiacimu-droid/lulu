@@ -218,7 +218,16 @@ private fun CompanionCommitmentStatus.isTerminal(): Boolean = this in setOf(
 )
 
 private fun List<CompanionConcern>.mergeSemanticConcernDuplicates(): List<CompanionConcern> =
-    map { concern -> concern.copy(subjectKey = normalizeCompanionSubjectKey(concern.subjectKey)) }
+    map { concern ->
+        concern.copy(
+            subjectKey = normalizeCompanionSubjectKey(concern.subjectKey),
+            event = concern.event.cleanCompanionHumanText("正在继续留意这件事。"),
+            goal = concern.goal.cleanCompanionHumanText(""),
+            completedReason = concern.completedReason
+                ?.cleanCompanionHumanText("")
+                ?.takeIf(String::isNotBlank),
+        )
+    }
         .groupBy { concern -> concern.assistantId to concern.subjectKey }
         .values
         .map { duplicates ->
@@ -242,7 +251,11 @@ private fun List<CompanionConcern>.mergeSemanticConcernDuplicates(): List<Compan
         }
 
 private fun List<CompanionCommitment>.mergeSemanticCommitmentDuplicates(): List<CompanionCommitment> =
-    map { commitment -> commitment.copy(subjectKey = normalizeCompanionSubjectKey(commitment.subjectKey)) }
+    map { commitment ->
+        commitment
+            .copy(subjectKey = normalizeCompanionSubjectKey(commitment.subjectKey))
+            .sanitizedHumanFacingText()
+    }
         .groupBy { commitment -> commitment.assistantId to commitment.subjectKey }
         .values
         .map { duplicates ->

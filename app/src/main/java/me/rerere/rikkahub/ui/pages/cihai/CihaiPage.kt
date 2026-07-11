@@ -36,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ import me.rerere.rikkahub.data.companion.CompanionRelationshipEvent
 import me.rerere.rikkahub.data.companion.CompanionRelationshipState
 import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
+import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
@@ -60,6 +62,7 @@ import java.util.Locale
 
 @Composable
 fun CihaiPage(onBack: () -> Unit) {
+    val context = LocalContext.current
     val settings = LocalSettings.current
     val store = koinInject<CihaiStore>()
     val companionStore = koinInject<CompanionStore>()
@@ -183,6 +186,7 @@ fun CihaiPage(onBack: () -> Unit) {
                                                 assistantId = selectedAssistantId,
                                                 subjectKeys = card.subjectKeys,
                                             )
+                                            ProactiveMessageService.reconcileDurableCommitments(context, settings)
                                         }
                                     },
                                 )

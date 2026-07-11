@@ -6,6 +6,7 @@ import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
 import me.rerere.rikkahub.data.companion.CompanionConcern
 import me.rerere.rikkahub.data.companion.CompanionConcernStatus
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
+import me.rerere.rikkahub.data.companion.cleanCompanionHumanText
 import me.rerere.rikkahub.data.companion.normalizeCompanionSubjectKey
 import java.time.Instant
 import java.time.ZoneId
@@ -164,14 +165,16 @@ private fun CompanionConcern.toCardModel(
             statusText = when {
                 commitment?.status == CompanionCommitmentStatus.EXECUTING -> "正在处理"
                 commitment?.status == CompanionCommitmentStatus.RETRY_SCHEDULED -> "等待重试"
-                isOverdue -> "已经到点"
+                isOverdue -> targetAt.deliveryStatusText(nowMillis)
                 status == CompanionConcernStatus.PAUSED -> "暂缓留意"
                 else -> "挂心中"
             },
-            eventText = event.trim().ifBlank { commitment?.promise.orEmpty().trim() },
-            goalText = goal.trim(),
+            eventText = event.cleanCompanionHumanText(
+                commitment?.promise?.cleanCompanionHumanText("正在继续留意这件事。").orEmpty(),
+            ),
+            goalText = goal.cleanCompanionHumanText(""),
             commitmentText = commitment?.promise
-                ?.trim()
+                ?.cleanCompanionHumanText("")
                 ?.takeIf { it.isNotBlank() && it != event.trim() && it != goal.trim() },
             overdue = isOverdue,
         ),
@@ -191,10 +194,13 @@ private fun CompanionCommitment.toCardModel(nowMillis: Long): SortableConcernCar
             statusText = when (status) {
                 CompanionCommitmentStatus.EXECUTING -> "正在处理"
                 CompanionCommitmentStatus.RETRY_SCHEDULED -> "等待重试"
-                else -> if (isOverdue) "已经到点" else "挂心中"
+                else -> if (isOverdue) dueAt.deliveryStatusText(nowMillis) else "挂心中"
             },
-            eventText = promise.trim(),
-            goalText = actionPlan.userFacingSummary.trim().takeIf { it != promise.trim() }.orEmpty(),
+            eventText = promise.cleanCompanionHumanText("我会在合适的时候再确认这件事。"),
+            goalText = actionPlan.userFacingSummary
+                .cleanCompanionHumanText("")
+                .takeIf { it != promise.cleanCompanionHumanText("") }
+                .orEmpty(),
             commitmentText = null,
             overdue = isOverdue,
         ),
@@ -237,4 +243,10 @@ private fun Long?.toPerceptionText(nowMillis: Long): String {
     } else {
         "计划留意时间：$absoluteTime"
     }
+}
+
+private fun Long?.deliveryStatusText(nowMillis: Long): String = when {
+    this == null -> "挂心中"
+    nowMillis - this > 12L * 60L * 60L * 1_000L -> "未送达"
+    else -> "等待发送"
 }

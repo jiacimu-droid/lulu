@@ -28,6 +28,7 @@ import me.rerere.rikkahub.data.companion.CompanionCommitment
 import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
 import me.rerere.rikkahub.data.companion.CompanionConcern
 import me.rerere.rikkahub.data.companion.CompanionConcernStatus
+import me.rerere.rikkahub.data.companion.cleanCompanionHumanText
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import me.rerere.rikkahub.data.companion.CompanionStateHistoryEntry
 import me.rerere.rikkahub.data.model.Assistant
@@ -219,13 +220,13 @@ private fun SectionTitle(text: String) {
 private fun ConcernRow(concern: CompanionConcern) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            text = concern.event,
+            text = concern.event.cleanCompanionHumanText("正在继续留意这件事。"),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
         )
         concern.goal.takeIf(String::isNotBlank)?.let { goal ->
             Text(
-                text = goal,
+                text = goal.cleanCompanionHumanText(""),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -245,7 +246,7 @@ private fun ConcernRow(concern: CompanionConcern) {
 private fun CommitmentRow(commitment: CompanionCommitment) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            text = commitment.promise,
+            text = commitment.promise.cleanCompanionHumanText("我会在合适的时候再确认这件事。"),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
         )

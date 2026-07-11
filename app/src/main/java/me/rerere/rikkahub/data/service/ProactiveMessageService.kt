@@ -355,6 +355,42 @@ class ProactiveMessageService : KoinComponent {
             )
         }
 
+        suspend fun reconcileDurableCommitments(
+            context: Context,
+            settings: Settings,
+            nowMillis: Long = System.currentTimeMillis(),
+        ): Boolean {
+            clearTargetedQueue(context)
+            val runtime = org.koin.core.context.GlobalContext.get().get<CompanionRuntime>()
+            repeat(MAX_RECONCILE_COMMITMENTS) {
+                val commitment = runtime.nextCommitment(nowMillis) ?: return false
+                if (nowMillis - commitment.dueAt > STALE_UNDELIVERED_COMMITMENT_MILLIS) {
+                    runtime.cancelCommitment(
+                        assistantId = commitment.assistantId,
+                        commitmentId = commitment.id,
+                        reason = "提醒已经过期且未能送达",
+                        nowMillis = nowMillis,
+                    )
+                    return@repeat
+                }
+                val assistantId = runCatching { Uuid.parse(commitment.assistantId) }.getOrNull()
+                if (assistantId == null) {
+                    runtime.cancelCommitment(
+                        assistantId = commitment.assistantId,
+                        commitmentId = commitment.id,
+                        reason = "提醒对应的角色已经不存在",
+                        nowMillis = nowMillis,
+                    )
+                    return@repeat
+                }
+                val setting = settings.getProactiveMessageSetting(assistantId)
+                if (!setting.enabled) return false
+                scheduleCommitment(context, setting, commitment)
+                return true
+            }
+            return false
+        }
+
         fun clearTargetedQueue(context: Context) {
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit()
@@ -379,6 +415,9 @@ class ProactiveMessageService : KoinComponent {
             pendingIntent?.let { alarmManager.cancel(it) }
             ProactiveMessageWorker.cancelTargeted(context)
         }
+
+        private const val MAX_RECONCILE_COMMITMENTS = 50
+        private const val STALE_UNDELIVERED_COMMITMENT_MILLIS = 12L * 60L * 60L * 1_000L
 
         fun resetAssistantProjection(
             context: Context,
