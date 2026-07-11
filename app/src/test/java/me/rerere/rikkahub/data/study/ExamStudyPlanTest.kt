@@ -1,5 +1,6 @@
 package me.rerere.rikkahub.data.study
 
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import org.junit.Assert.assertEquals
@@ -8,6 +9,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ExamStudyPlanTest {
+    @Test
+    fun countdownUsesAConservativePlanningAnchorUntilTheOfficialDateIsPublished() {
+        assertEquals(LocalDate.of(2026, 12, 19), ExamStudyPlan.examDate)
+        assertEquals(DayOfWeek.SATURDAY, ExamStudyPlan.examDate.dayOfWeek)
+        assertFalse(ExamStudyPlan.examDateIsOfficial)
+        assertTrue(ExamStudyPlan.examDateNotice.contains("保守规划"))
+        assertTrue(ExamStudyPlan.examDateNotice.contains("以教育部公告为准"))
+        assertEquals(1, ExamStudyPlan.daysLeft(LocalDate.of(2026, 12, 18)))
+    }
+
     @Test
     fun sichuanUniversityTargetUsesASafetyMarginInsteadOfTheHistoricalMinimum() {
         assertEquals(385, ExamStudyPlan.scuSafeTargetScore)

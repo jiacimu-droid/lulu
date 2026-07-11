@@ -8,7 +8,10 @@ import java.time.temporal.ChronoUnit
 import kotlinx.serialization.Serializable
 
 object ExamStudyPlan {
-    val examDate: LocalDate = LocalDate.of(2026, 12, 21)
+    // 2027 研考正式日期尚未公布，先按更早的周末做保守冲刺锚点；公告发布后必须更新。
+    val examDate: LocalDate = LocalDate.of(2026, 12, 19)
+    const val examDateIsOfficial: Boolean = false
+    const val examDateNotice: String = "按 2026-12-19 保守规划，正式考试日期以教育部公告为准"
     const val vocabularyBacklog: Int = 1550
     const val dailyVocabularyTarget: Int = 120
     const val dailyVocabularyGroups: Int = 6

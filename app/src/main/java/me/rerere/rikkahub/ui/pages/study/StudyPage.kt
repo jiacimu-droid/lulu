@@ -699,10 +699,15 @@ private fun StudyHero(
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                    HeroMetric("倒计时", "${daysLeft}天", Modifier.weight(1f))
+                    HeroMetric("规划倒计时", "${daysLeft}天", Modifier.weight(1f))
                     HeroMetric("夸夸值", state.wallet.kudos.toString(), Modifier.weight(1f))
                     HeroMetric("Lv", StudyRules.currentLevel(state).level.toString(), Modifier.weight(1f), onOpenLevel)
                 }
+                Text(
+                    text = ExamStudyPlan.examDateNotice,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     HeroMetric(
                         "今日学习",
