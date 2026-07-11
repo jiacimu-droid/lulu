@@ -183,7 +183,7 @@ class ExamStudyPlanTest {
             .tasks.joinToString("\n") { it.title }
         val week = ExamStudyPlan.julyWeeks.single { it.id == "2026-07-w2" }.tasks.joinToString("\n")
 
-        assertTrue(julyFourteen.contains("合并题：仍不开始"))
+        assertTrue(julyFourteen.contains("合并题：今天仍不提前开始"))
         assertTrue(julySixteen.contains("确认刑法第 3-6 章课程全部完成"))
         assertTrue(julySixteen.contains("第 2-6 章合并题"))
         assertTrue(week.indexOf("第 3-6 章课程后") < week.indexOf("统一做第 2-6 章合并题"))
