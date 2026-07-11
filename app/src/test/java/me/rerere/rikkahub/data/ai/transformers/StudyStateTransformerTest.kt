@@ -54,6 +54,31 @@ class StudyStateTransformerTest {
     }
 
     @Test
+    fun `complete all except does nothing when exception title is missing or ambiguous`() {
+        val state = StudyState(
+            today = "2026-07-11",
+            tasks = listOf(
+                StudyTask(id = "law-1", title = "Law first chapter"),
+                StudyTask(id = "civ-1", title = "Civ first chapter"),
+            ),
+        )
+
+        val missing = updateTodayStudyTaskCompletion(
+            state = state,
+            completeAllExceptTitles = setOf("politics chapter"),
+        )
+        val ambiguous = updateTodayStudyTaskCompletion(
+            state = state,
+            completeAllExceptTitles = setOf("first chapter"),
+        )
+
+        assertTrue(missing.changedTaskIds.isEmpty())
+        assertTrue(ambiguous.changedTaskIds.isEmpty())
+        assertTrue(missing.state.tasks.none { it.done })
+        assertTrue(ambiguous.state.tasks.none { it.done })
+    }
+
+    @Test
     fun `study context includes completed tasks undone tasks and today schedule`() {
         val state = StudyState(
             today = "2026-07-03",

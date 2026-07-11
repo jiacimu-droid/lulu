@@ -213,8 +213,14 @@ object StudyRules {
         val index = state.tasks.indexOfFirst { it.id == taskId }
         if (index < 0 || state.tasks[index].done == done) return StudyActionResult(state)
         val nextTasks = state.tasks.toMutableList()
-        nextTasks[index] = nextTasks[index].copy(done = done, completedAt = if (done) nowMillis else null)
-        val reward = if (done) {
+        val currentTask = nextTasks[index]
+        val rewardEligible = done && !currentTask.completionRewardClaimed
+        nextTasks[index] = currentTask.copy(
+            done = done,
+            completedAt = if (done) nowMillis else null,
+            completionRewardClaimed = currentTask.completionRewardClaimed || currentTask.done || done,
+        )
+        val reward = if (rewardEligible) {
             StudyReward(kudos = TASK_COMPLETE_KUDOS, title = "完成待办 +$TASK_COMPLETE_KUDOS")
         } else {
             StudyReward()
@@ -226,7 +232,11 @@ object StudyRules {
             state = state.copy(
                 tasks = nextTasks,
                 wallet = state.wallet.add(reward),
-                stats = if (done) state.stats.copy(totalTasksCompleted = state.stats.totalTasksCompleted + 1) else state.stats,
+                stats = if (rewardEligible) {
+                    state.stats.copy(totalTasksCompleted = state.stats.totalTasksCompleted + 1)
+                } else {
+                    state.stats
+                },
                 inactiveStudyDays = if (done) 0 else state.inactiveStudyDays,
                 lastStudyDate = if (done) state.today else state.lastStudyDate,
                 superMomentAvailable = state.superMomentAvailable ||

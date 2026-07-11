@@ -50,6 +50,24 @@ class StudyRulesTest {
     }
 
     @Test
+    fun `task completion reward is granted only once after reopening`() {
+        val state = StudyState(
+            today = "2026-07-11",
+            tasks = listOf(StudyTask(id = "law", title = "Law chapter one")),
+        )
+
+        val first = StudyRules.toggleTask(state, "law", true, nowMillis = 100L)
+        val reopened = StudyRules.toggleTask(first.state, "law", false, nowMillis = 200L)
+        val completedAgain = StudyRules.toggleTask(reopened.state, "law", true, nowMillis = 300L)
+
+        assertEquals(50, first.reward.kudos)
+        assertEquals(0, completedAgain.reward.kudos)
+        assertEquals(50, completedAgain.state.wallet.kudos)
+        assertEquals(1, completedAgain.state.stats.totalTasksCompleted)
+        assertTrue(completedAgain.state.tasks.single().completionRewardClaimed)
+    }
+
+    @Test
     fun `pomodoro completion gives fixed kudos and stores an unopened mystery box`() {
         val result = StudyRules.completePomodoro(
             state = StudyState(today = "2026-06-30"),

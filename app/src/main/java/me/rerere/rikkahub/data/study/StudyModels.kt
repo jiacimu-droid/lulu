@@ -48,6 +48,7 @@ data class StudyTask(
     val done: Boolean = false,
     val createdAt: Long = 0L,
     val completedAt: Long? = null,
+    val completionRewardClaimed: Boolean = false,
     val source: StudyTaskSource = StudyTaskSource.Manual,
 )
 

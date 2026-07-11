@@ -104,13 +104,16 @@ internal fun updateTodayStudyTaskCompletion(
     completeAllExceptTitles: Set<String> = emptySet(),
     nowMillis: Long = System.currentTimeMillis(),
 ): StudyTaskCompletionUpdate {
-    val exceptions = completeAllExceptTitles.map(String::normalizedTaskTitle).filter(String::isNotBlank)
-    val completeAllExcept = exceptions.isNotEmpty()
+    val normalizedExceptions = completeAllExceptTitles
+        .map(String::normalizedTaskTitle)
+        .filter { it.length >= 2 }
+        .distinct()
+    val exceptionTaskIds = matchTaskTitleQueries(state, normalizedExceptions.toSet())
+    val completeAllExcept = normalizedExceptions.isNotEmpty() && exceptionTaskIds.size == normalizedExceptions.size
     var next = state
     val changed = linkedSetOf<String>()
     state.tasks.forEach { task ->
-        val title = task.title.normalizedTaskTitle()
-        val keepUnfinished = completeAllExcept && exceptions.any { query -> query in title || title in query }
+        val keepUnfinished = task.id in exceptionTaskIds
         val requestedDone = when {
             task.id in unfinishedTaskIds || keepUnfinished -> false
             task.id in completeTaskIds || completeAllExcept -> true
@@ -122,6 +125,26 @@ internal fun updateTodayStudyTaskCompletion(
     }
     return StudyTaskCompletionUpdate(next, changed)
 }
+
+private fun matchTaskTitleQueries(state: StudyState, queries: Set<String>): Set<String> = queries
+    .map(String::normalizedTaskTitle)
+    .filter { it.length >= 2 }
+    .mapNotNull { query ->
+        val exact = state.tasks.firstOrNull { it.title.normalizedTaskTitle() == query }
+        if (exact != null) return@mapNotNull exact.id
+        state.tasks
+            .mapNotNull { task ->
+                val title = task.title.normalizedTaskTitle()
+                if (query !in title && title !in query) return@mapNotNull null
+                task.id to kotlin.math.abs(title.length - query.length)
+            }
+            .sortedBy { it.second }
+            .let { matches ->
+                val best = matches.firstOrNull() ?: return@let null
+                best.first.takeIf { matches.count { it.second == best.second } == 1 }
+            }
+    }
+    .toSet()
 
 private fun JsonObject.stringSet(key: String): Set<String> = this[key]
     ?.jsonArray
