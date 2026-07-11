@@ -681,7 +681,7 @@ class ChatService(
             messages = hiddenMessages
                 .withUserProfileContext(settings)
                 .withMemoryRecallContext(memoryContext)
-                .withProactiveToolInstruction(assistant, proactiveContext),
+                .withProactiveToolInstruction(assistant, proactiveContext.promptContext),
             assistant = assistant,
             conversationSystemPrompt = conversation.customSystemPrompt,
             inputTransformers = buildList {
