@@ -162,7 +162,7 @@ class ExamStudyPlanTest {
         assertTrue(text.contains("规范表述"))
         assertTrue(ExamStudyPlan.studyHabitReference.contains("不能长期停留在“看错题、搞目录”"))
         assertTrue(ExamStudyPlan.studyHabitReference.contains("正式背诵 30-40 分钟"))
-        assertTrue(ExamStudyPlan.studyHabitReference.contains("每天约 3 小时总有效学习"))
+        assertTrue(ExamStudyPlan.studyHabitReference.contains("恢复、启动、稳定、加码四档"))
         assertTrue(ExamStudyPlan.studyHabitReference.contains("单纯看框架不算"))
     }
 
@@ -190,7 +190,7 @@ class ExamStudyPlanTest {
         assertTrue(habit.contains("法理背诵复线"))
         assertTrue(habit.contains("复线只能是背诵、错题、框架回炉"))
         assertTrue(habit.contains("刑法主线期间不把民法作为新开副线"))
-        assertTrue(habit.contains("每天约 3 小时总有效学习"))
+        assertTrue(habit.contains("某天完成 3 小时只代表当天状态好"))
         assertTrue(habit.contains("不能再开另一门新书"))
         assertTrue(habit.contains("不要拆成 4-5 个碎片"))
         assertTrue(subject.contains("不单独安排预习目录"))
@@ -204,7 +204,7 @@ class ExamStudyPlanTest {
         assertTrue(week.contains("第 5-7 章"))
         assertTrue(julySix?.title.orEmpty().contains("连续主块"))
         assertFalse(julySix?.tasks.orEmpty().any { it.title.contains("听众合法硕民法课程") })
-        assertTrue(julyThirteen?.title.orEmpty().contains("刑法2章闭环"))
+        assertTrue(julyThirteen?.title.orEmpty().contains("启动档"))
         assertTrue(julyThirteenTasks.contains("刑法第 2 章独立题组"))
         assertTrue(julyThirteenTasks.contains("法理第 1 章正式闭卷背诵"))
         assertTrue(julyThirteenTasks.contains("英语"))
@@ -320,6 +320,21 @@ class ExamStudyPlanTest {
     }
 
     @Test
+    fun dailyLoadProgressesWithoutTreatingThreeHoursAsARequirement() {
+        val startupDay = LocalDate.of(2026, 7, 13)
+        val recoveryDay = LocalDate.of(2026, 7, 15)
+        val stableDay = LocalDate.of(2026, 7, 20)
+        val restDay = LocalDate.of(2026, 7, 19)
+
+        assertEquals(120, ExamStudyPlan.plannedStudyMinutes(startupDay))
+        assertEquals(90, ExamStudyPlan.plannedStudyMinutes(recoveryDay))
+        assertEquals(150, ExamStudyPlan.plannedStudyMinutes(stableDay))
+        assertEquals(0, ExamStudyPlan.plannedStudyMinutes(restDay))
+        assertTrue(ExamStudyPlan.todaySchedule(startupDay).first().detail.contains("约 120 分钟"))
+        assertFalse(ExamStudyPlan.studyHabitReference.contains("每天约 3 小时总有效学习"))
+    }
+
+    @Test
     fun julyTenHeadacheBacklogIsRebalancedWithoutSkippingLegalTheoryChapters() {
         val july10 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 10))!!
         val july11 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 11))!!.tasks.joinToString("\n") { it.title }
@@ -339,18 +354,16 @@ class ExamStudyPlanTest {
         assertTrue(july13.contains("英语"))
         assertFalse(july13.contains("法理第 4 章"))
         assertFalse(july13.contains("法理第 8 章"))
-        assertTrue(july15.contains("法理第 1 章"))
+        assertFalse(july15.contains("法理第 1 章"))
+        assertTrue(july15.contains("今天不另加法理背诵"))
     }
 
     @Test
     fun julyLegalTheoryReviewAdvancesInChapterOrder() {
         val expectedChapters = mapOf(
             13 to "法理第 1 章",
-            14 to "法理第 1 章",
-            15 to "法理第 1 章",
             16 to "法理第 1 章",
             17 to "法理第 1 章",
-            18 to "法理第 1 章",
             20 to "法理第 2 章",
             21 to "法理第 2 章",
             22 to "法理第 2 章",
