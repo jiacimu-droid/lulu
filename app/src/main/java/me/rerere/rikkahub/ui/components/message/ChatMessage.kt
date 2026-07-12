@@ -215,7 +215,11 @@ fun ChatMessage(
                 model = model,
                 onToolApproval = onToolApproval,
                 onToolAnswer = onToolAnswer,
-                onUserMessageClick = if (message.role == MessageRole.USER) onEdit else null,
+                onUserMessageClick = if (message.role == MessageRole.USER) {
+                    { showActionsSheet = true }
+                } else {
+                    null
+                },
             )
 
             message.translation?.let { translation ->
@@ -235,7 +239,7 @@ fun ChatMessage(
             )
         }
 
-        val showActions = groupEnd && if (lastMessage) {
+        val showActions = message.role == MessageRole.ASSISTANT && groupEnd && if (lastMessage) {
             !loading
         } else {
             message.parts.isEmptyUIMessage().not()
@@ -277,6 +281,7 @@ fun ChatMessage(
             onDelete = onDelete,
             onShare = onShare,
             onFork = onFork,
+            onRegenerate = if (message.role == MessageRole.USER) onRegenerate else null,
             model = model,
             onSelectAndCopy = {
                 showSelectCopySheet = true

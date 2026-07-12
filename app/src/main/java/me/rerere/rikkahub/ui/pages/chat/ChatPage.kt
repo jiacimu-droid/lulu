@@ -43,6 +43,7 @@ import me.rerere.hugeicons.stroke.ArrowLeft02
 import me.rerere.hugeicons.stroke.Call02
 import me.rerere.hugeicons.stroke.Cancel01
 import me.rerere.hugeicons.stroke.LeftToRightListBullet
+import me.rerere.hugeicons.stroke.Setting07
 import me.rerere.hugeicons.stroke.TransactionHistory
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.Screen
@@ -198,6 +199,12 @@ private fun ChatPageContent(
                     companionSnapshot = companionSnapshot,
                     navController = navController,
                     previewMode = previewMode,
+                    customSystemPrompt = conversation.customSystemPrompt,
+                    allowConversationSystemPrompt = assistant.allowConversationSystemPrompt,
+                    onConversationSystemPromptChange = { newPrompt ->
+                        vm.updateConversation(conversation.copy(customSystemPrompt = newPrompt))
+                        vm.saveConversationAsync()
+                    },
                     onClickMenu = {
                         previewMode = !previewMode
                     },
@@ -394,10 +401,6 @@ private fun ChatPageContent(
                 onToggleFavorite = { node ->
                     vm.toggleMessageFavorite(node)
                 },
-                onConversationSystemPromptChange = { newPrompt ->
-                    vm.updateConversation(conversation.copy(customSystemPrompt = newPrompt))
-                    vm.saveConversationAsync()
-                },
             )
         }
     }
@@ -410,11 +413,15 @@ private fun TopBar(
     companionSnapshot: CompanionSnapshot,
     navController: Navigator,
     previewMode: Boolean,
+    customSystemPrompt: String?,
+    allowConversationSystemPrompt: Boolean,
+    onConversationSystemPromptChange: (String?) -> Unit,
     onClickMenu: () -> Unit,
     onStartVoiceCall: () -> Unit,
     onOpenVoiceCallHistory: () -> Unit,
 ) {
     var showLuluStatus by rememberSaveable { mutableStateOf(false) }
+    var showConversationSystemPrompt by rememberSaveable { mutableStateOf(false) }
     val assistantDefaultName = stringResource(R.string.assistant_page_default_assistant)
 
     TopAppBar(
@@ -457,6 +464,14 @@ private fun TopBar(
             }
         },
         actions = {
+            if (allowConversationSystemPrompt) {
+                IconButton(onClick = { showConversationSystemPrompt = true }) {
+                    Icon(
+                        HugeIcons.Setting07,
+                        contentDescription = stringResource(R.string.chat_page_conversation_system_prompt),
+                    )
+                }
+            }
             IconButton(onClick = onStartVoiceCall) {
                 Icon(HugeIcons.Call02, contentDescription = "电话")
             }
@@ -479,4 +494,10 @@ private fun TopBar(
             onDismissRequest = { showLuluStatus = false },
         )
     }
+    ConversationSystemPromptDialog(
+        visible = showConversationSystemPrompt,
+        customSystemPrompt = customSystemPrompt,
+        onSystemPromptChange = onConversationSystemPromptChange,
+        onDismissRequest = { showConversationSystemPrompt = false },
+    )
 }

@@ -237,6 +237,7 @@ fun ChatMessageActionsSheet(
     onEdit: () -> Unit,
     onShare: () -> Unit,
     onFork: () -> Unit,
+    onRegenerate: (() -> Unit)? = null,
     onSelectAndCopy: () -> Unit,
     isFavorite: Boolean = false,
     onToggleFavorite: (() -> Unit)? = null,
@@ -278,6 +279,34 @@ fun ChatMessageActionsSheet(
                         text = stringResource(R.string.select_and_copy),
                         style = MaterialTheme.typography.titleMedium,
                     )
+                }
+            }
+
+            if (onRegenerate != null) {
+                Card(
+                    onClick = {
+                        onDismissRequest()
+                        onRegenerate()
+                    },
+                    shape = MaterialTheme.shapes.medium,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                    ) {
+                        Icon(
+                            imageVector = HugeIcons.Refresh03,
+                            contentDescription = null,
+                            modifier = Modifier.padding(4.dp),
+                        )
+                        Text(
+                            text = stringResource(R.string.regenerate),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
                 }
             }
 
