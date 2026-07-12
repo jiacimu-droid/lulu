@@ -83,9 +83,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -283,6 +285,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             state = state,
                             onSingle = { vm.draw(1) },
                             onTen = { vm.draw(10) },
+                            onPurple = vm::drawPurpleTicket,
                         )
                     }
                 }
@@ -1282,6 +1285,8 @@ private fun DrawResultCelebration(
     var skipAllRequested by remember(results) { mutableStateOf(false) }
     val currentReveal = results.getOrNull(revealState.index)
     val current = currentReveal?.result
+    val haptic = LocalHapticFeedback.current
+    var cardRevealReady by remember(results) { mutableStateOf(true) }
     val hasOpeningVideo = remember(drawResults) {
         drawResults.any {
             it.rarity == StudyRarity.Rainbow || it.rarity == StudyRarity.Epic || it.rarity == StudyRarity.Rare
@@ -1316,6 +1321,37 @@ private fun DrawResultCelebration(
         ),
         label = "draw-pulse",
     )
+    LaunchedEffect(revealState.index, revealState.phase, current?.rarity) {
+        if (revealState.phase != DrawRevealPhase.Card || current == null) {
+            cardRevealReady = true
+            return@LaunchedEffect
+        }
+        cardRevealReady = false
+        when (current.rarity) {
+            StudyRarity.Normal -> {
+                haptic.performHapticFeedback(HapticFeedbackType.KeyboardTap)
+                delay(120)
+            }
+            StudyRarity.Rare -> {
+                haptic.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                delay(360)
+            }
+            StudyRarity.Epic -> {
+                haptic.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                delay(120)
+                haptic.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                delay(480)
+            }
+            StudyRarity.Rainbow -> {
+                repeat(3) {
+                    haptic.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                    delay(150)
+                }
+                delay(420)
+            }
+        }
+        cardRevealReady = true
+    }
     fun nextPendingRewardVideoIndex(): Int? {
         val startIndex = revealState.index.coerceAtLeast(0)
         return results
@@ -1495,7 +1531,7 @@ private fun DrawResultCelebration(
                     if (revealState.index < drawResults.lastIndex) {
                         Button(
                             onClick = { revealState = DrawRevealFlow.next(revealState, drawResults) },
-                            enabled = revealState.phase == DrawRevealPhase.Card && !rewardVideoPending,
+                            enabled = revealState.phase == DrawRevealPhase.Card && !rewardVideoPending && cardRevealReady,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text("下一个")
@@ -1515,7 +1551,7 @@ private fun DrawResultCelebration(
                                     revealState = DrawRevealFlow.summary(revealState)
                                 }
                             },
-                            enabled = revealState.phase == DrawRevealPhase.Card && !rewardVideoPending,
+                            enabled = revealState.phase == DrawRevealPhase.Card && !rewardVideoPending && cardRevealReady,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(if (isSingleDraw) "收下" else "查看结果")
@@ -1775,10 +1811,23 @@ private fun DrawResultSquare(
 
 @Composable
 private fun DrawRevealCard(result: StudyDrawResult, pulse: Float) {
+    val borderColor = when (result.rarity) {
+        StudyRarity.Normal -> Color.White.copy(alpha = 0.42f)
+        StudyRarity.Rare -> Color(0xFFE0C7FF)
+        StudyRarity.Epic -> Color(0xFFFFE4A3)
+        StudyRarity.Rainbow -> Color(0xFFE8FFFF)
+    }
+    val borderWidth = when (result.rarity) {
+        StudyRarity.Normal -> 1.dp
+        StudyRarity.Rare -> 2.dp
+        StudyRarity.Epic -> 3.dp
+        StudyRarity.Rainbow -> 4.dp
+    }
     Surface(
         color = Color.White.copy(alpha = 0.9f),
         shape = RoundedCornerShape(24.dp),
         tonalElevation = 8.dp,
+        border = BorderStroke(borderWidth, borderColor),
         modifier = Modifier.size(width = 236.dp, height = 316.dp),
     ) {
         Box(
@@ -1787,6 +1836,32 @@ private fun DrawRevealCard(result: StudyDrawResult, pulse: Float) {
                 .background(drawCardBrush(result.rarity))
                 .padding(18.dp),
         ) {
+            if (result.rarity != StudyRarity.Normal) {
+                Canvas(Modifier.fillMaxSize()) {
+                    val points = listOf(
+                        0.12f to 0.16f,
+                        0.78f to 0.12f,
+                        0.34f to 0.30f,
+                        0.86f to 0.44f,
+                        0.18f to 0.58f,
+                        0.70f to 0.70f,
+                        0.42f to 0.86f,
+                    )
+                    val visiblePoints = when (result.rarity) {
+                        StudyRarity.Rare -> points.take(3)
+                        StudyRarity.Epic -> points.take(5)
+                        StudyRarity.Rainbow -> points
+                        StudyRarity.Normal -> emptyList()
+                    }
+                    visiblePoints.forEachIndexed { index, (x, y) ->
+                        drawCircle(
+                            color = Color.White.copy(alpha = 0.38f + (index % 3) * 0.14f),
+                            radius = (2.5f + (index % 3) * 2f) * pulse,
+                            center = Offset(size.width * x, size.height * y),
+                        )
+                    }
+                }
+            }
             Surface(
                 shape = CircleShape,
                 color = Color.White.copy(alpha = 0.82f),
@@ -1911,6 +1986,7 @@ private fun GachaCard(
     state: StudyState,
     onSingle: () -> Unit,
     onTen: () -> Unit,
+    onPurple: () -> Unit,
 ) {
     val singleCost = if (StudyRules.hasSingleDrawDiscount(state)) StudyRules.DISCOUNT_SINGLE_DRAW_COST else StudyRules.SINGLE_DRAW_COST
     Card(
@@ -1973,9 +2049,9 @@ private fun GachaCard(
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StarryRarityPill("紫", "4%", Color(0xFFC5A5FF))
-                    StarryRarityPill("金", "2%", Color(0xFFF2D18A))
-                    StarryRarityPill("彩", "1%", Color(0xFF8DE0DC))
+                    StarryRarityPill("紫", "8%", Color(0xFFC5A5FF))
+                    StarryRarityPill("金", "1.5%", Color(0xFFF2D18A))
+                    StarryRarityPill("彩", "0.35%", Color(0xFF8DE0DC))
                 }
                 Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     StarryLetterSeal()
@@ -1984,19 +2060,31 @@ private fun GachaCard(
                     modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    FragmentWalletPill("抖音", state.inventory.douyinFragments, Color(0xFFC5A5FF))
+                    FragmentWalletPill("抖音20分", state.inventory.douyinFragments, Color(0xFFC5A5FF))
                     FragmentWalletPill("剧场", state.inventory.theaterFragments, Color(0xFFD9B7FF))
-                    FragmentWalletPill("游戏", state.inventory.gameFragments, Color(0xFFF2D18A))
-                    FragmentWalletPill("视频", state.inventory.videoFragments, Color(0xFFFFDFA3))
-                    FragmentWalletPill("动漫", state.inventory.animeFragments, Color(0xFF8DE0DC))
+                    FragmentWalletPill("游戏120分", state.inventory.gameFragments, Color(0xFFF2D18A))
+                    FragmentWalletPill("视频卡", state.inventory.videoFragments, Color(0xFFFFDFA3))
+                    FragmentWalletPill("番剧3小时", state.inventory.animeFragments, Color(0xFF8DE0DC))
                 }
                 Text(
-                    "紫色随机为抖音 / 剧场 · 金色随机为游戏 / 视频",
+                    "紫色：抖音20分钟 / 剧场 · 金色：游戏120分钟 / 视频",
                     color = Color.White.copy(alpha = 0.64f),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                 )
+                if (state.wallet.purpleDrawTickets > 0) {
+                    Button(
+                        onClick = onPurple,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF7D5BB3),
+                            contentColor = Color.White,
+                        ),
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                    ) {
+                        Text("今日零紫安全抽 · ${state.wallet.purpleDrawTickets}张", fontWeight = FontWeight.Bold)
+                    }
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(
                         onClick = onSingle,
@@ -2143,7 +2231,7 @@ private fun CollectionCard(
             }
         }
         EntertainmentRewardRow(
-            label = "抖音碎片",
+            label = "抖音时长券 · 20分钟",
             count = inventory.douyinFragments,
             color = StudyColors.purple,
             actions = listOf("刷抖音" to onRedeemDouyin),
@@ -2155,19 +2243,19 @@ private fun CollectionCard(
             actions = listOf("小剧场" to onOpenStarWish),
         )
         EntertainmentRewardRow(
-            label = "游戏碎片",
+            label = "游戏畅玩券 · 120分钟",
             count = inventory.gameFragments,
             color = StudyColors.goldText,
             actions = listOf("玩游戏" to onRedeemGame),
         )
         EntertainmentRewardRow(
-            label = "视频碎片",
+            label = "视频解锁卡",
             count = inventory.videoFragments,
             color = StudyColors.goldText,
             actions = listOf("视频馆" to onOpenStarWish),
         )
         EntertainmentRewardRow(
-            label = "动漫碎片",
+            label = "番剧兑换券 · 3小时",
             count = inventory.animeFragments,
             color = Color(0xFF23C8B8),
             actions = listOf("看动漫" to onRedeemAnime),
@@ -2560,19 +2648,10 @@ private fun StudyGuideCard() {
             title = "每日获取",
             lines = listOf(
                 "签到：每天固定 50 夸夸值。",
-                "完成 1 个番茄钟：50 夸夸值 + 1 个盲盒。",
+                "累计学习每满 ${StudyRules.STUDY_REWARD_INTERVAL_MINUTES} 分钟：${StudyRules.STUDY_REWARD_KUDOS} 夸夸值；不足部分跨番茄保留。",
                 "完成 1 项待办：50 夸夸值。",
                 "今日待办全清：触发超神时刻，固定给十连券 x1。",
-            ),
-        )
-        GuideBlock(
-            title = "盲盒概率",
-            lines = listOf(
-                "15 夸夸值：40% · 柔光蓝",
-                "25 夸夸值：30% · 流光蓝",
-                "50 夸夸值：15% · 幽雅紫",
-                "100 夸夸值：4% · 暖金",
-                "200 夸夸值：1% · 璨金",
+                "当天累计学习120分钟且普通卡池已抽30抽仍为零紫：发放1次今日零紫安全抽。",
             ),
         )
         GuideBlock(
@@ -2580,20 +2659,20 @@ private fun StudyGuideCard() {
             lines = listOf(
                 "单抽 ${StudyRules.SINGLE_DRAW_COST} 夸夸值。",
                 "十连 ${StudyRules.TEN_DRAW_COST} 夸夸值。",
-                "普通图片专属碎片 93%，紫色 4%（抖音/剧场各半），金色 2%（游戏/视频各半），彩色动漫碎片 1%。",
-                "卡池不产出通用碎片；通用普通碎片只可通过等级奖励或神秘商店购买获得。",
+                "蓝色画卷专属碎片 90.15%；紫色 8%（抖音20分钟 6.5% / 剧场碎片 1.5%）。",
+                "金色 1.5%（游戏120分钟 1.2% / 视频解锁卡 0.3%）；彩色番剧3小时 0.35%。",
+                "卡池、等级和神秘商店都不再产出通用碎片；旧存档中的通用碎片仍可使用。",
                 "每套画卷需要 10 个专属碎片；通用普通碎片可以补任意一套未满画卷。",
-                "抖音碎片只兑换抖音时间；剧场碎片只用于生成或续写小剧场。",
+                "娱乐券抽到即拥有；剧场碎片每枚可生成或续写小剧场 1 章。",
             ),
         )
         GuideBlock(
-            title = "每周 5 天全清模拟",
+            title = "每日抽数估算",
             lines = listOf(
-                "约 4155 夸夸值，可折算 41 次单抽；十连 800 会比单抽省 200。",
+                "学习2小时约得2400夸夸值，可抽3次十连；学习3小时约得3600夸夸值，可抽4次十连加4次单抽。",
                 "超神 5 天给 5 张十连券；等级、成就和商店会追加抽卡券。",
-                "按 100 抽估算：普通约 93，紫色约 4，金色约 2，彩色约 1。",
-                "普通图片专属碎片只来自抽卡；通用普通碎片只来自等级奖励和神秘商店。",
-                "盲盒、超神和成就不再产出通用碎片。",
+                "按100抽估算：蓝色约90，紫色约8，金色约1至2，彩色约0至1。",
+                "普通图片专属碎片只来自抽卡；新奖励不再产生通用普通碎片。",
             ),
         )
         GuideBlock(
@@ -2609,7 +2688,7 @@ private fun StudyGuideCard() {
             lines = listOf(
                 "番茄钟开始前可选择语音鼓励。",
                 "番茄钟里可以和角色轻声聊天。",
-                "番茄钟完成后会自动发放夸夸值和盲盒奖励。",
+                "番茄钟结束后按实际累计学习时长发放夸夸值。",
             ),
         )
         GuideBlock(
@@ -2617,8 +2696,8 @@ private fun StudyGuideCard() {
             lines = listOf(
                 "签到、待办、番茄钟、盲盒、惩罚、抽卡、超神、等级、成就、商店都已接入本地状态。",
                 "收藏已按 20 套画卷、每套 10 个专属碎片展示。",
-                "通用普通碎片仅由等级奖励或商店获得，可自动补最佳目标，也可在收藏里指定画卷。",
-                "娱乐碎片均按用途独立保存，卡池内不存在任何通用碎片。",
+                "旧存档通用普通碎片仍可自动补最佳目标，也可在收藏里指定画卷；新系统不再产出。",
+                "娱乐券与剧场碎片均按用途独立保存，卡池内不存在任何通用碎片。",
                 "Lv14 会自动补齐一套未完成画卷；已解锁画卷可以直接跳到生图页。",
                 "番茄钟已接入角色陪伴、语音鼓励和轻聊天。",
                 "更深的角色主动督学、画卷提示词自动带入、星愿馆视频收藏柜可以作为后续增强。",
@@ -2687,6 +2766,13 @@ private fun DurationCard(
             label = { Text("自定义分钟") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+        )
+        val rewardBlocks = selectedMinutes.coerceAtLeast(0) / StudyRules.STUDY_REWARD_INTERVAL_MINUTES
+        Text(
+            "本轮预计 +${rewardBlocks * StudyRules.STUDY_REWARD_KUDOS} 夸夸值 · ${rewardBlocks} 次单抽进度",
+            color = StudyColors.purple,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
         )
     }
 }
@@ -2853,7 +2939,9 @@ private fun drawBrush(rarity: StudyRarity): Brush = when (rarity) {
 }
 
 private fun drawCardBrush(rarity: StudyRarity): Brush = when (rarity) {
-    StudyRarity.Rainbow -> Brush.linearGradient(listOf(Color(0xFF102032), Color(0xFF28415A), Color(0xFF0B111C)))
+    StudyRarity.Rainbow -> Brush.linearGradient(
+        listOf(Color(0xFF163B52), Color(0xFF7D4A91), Color(0xFFC06B78), Color(0xFF1E5B63)),
+    )
     else -> drawBrush(rarity)
 }
 

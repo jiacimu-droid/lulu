@@ -9,7 +9,8 @@ object StudyRules {
     const val DISCOUNT_SINGLE_DRAW_COST = 100
     const val TEN_DRAW_COST = 800
     const val TASK_COMPLETE_KUDOS = 50
-    const val POMODORO_KUDOS = 50
+    const val STUDY_REWARD_INTERVAL_MINUTES = 5
+    const val STUDY_REWARD_KUDOS = 100
     const val OFFICIAL_ECONOMY_RESET_VERSION = 2
     const val DATA_LOSS_COMPENSATION_VERSION = 4
     const val NORMAL_FRAGMENTS_PER_OUTFIT = 10
@@ -61,19 +62,19 @@ object StudyRules {
     )
 
     val levels = listOf(
-        StudyLevel(1, 80, "启程", StudyReward(universalNormalFragments = 1, title = "通用普通碎片 x1")),
-        StudyLevel(2, 200, "稳定", StudyReward(universalNormalFragments = 1, title = "通用普通碎片 x1")),
-        StudyLevel(3, 400, "微光", StudyReward(universalNormalFragments = 2, title = "通用普通碎片 x2")),
-        StudyLevel(4, 800, "靠近", StudyReward(douyinFragments = 1, title = "抖音碎片 x1")),
+        StudyLevel(1, 80, "启程", StudyReward(singleDrawTickets = 1, title = "单抽券 x1")),
+        StudyLevel(2, 200, "稳定", StudyReward(singleDrawTickets = 2, title = "单抽券 x2")),
+        StudyLevel(3, 400, "微光", StudyReward(tenDrawTickets = 1, title = "十连抽券 x1")),
+        StudyLevel(4, 800, "靠近", StudyReward(douyinFragments = 1, title = "抖音时长券20分钟 x1")),
         StudyLevel(5, 1_500, "热望", StudyReward(singleDrawTickets = 2, title = "单抽券 x2")),
         StudyLevel(6, 2_500, "长跑", StudyReward(theaterFragments = 1, title = "剧场碎片 x1")),
         StudyLevel(7, 4_000, "星火", StudyReward(tenDrawTickets = 1, title = "十连抽券 x1")),
-        StudyLevel(8, 6_500, "破晓", StudyReward(gameFragments = 1, title = "游戏碎片 x1")),
+        StudyLevel(8, 6_500, "破晓", StudyReward(gameFragments = 1, title = "游戏畅玩券120分钟 x1")),
         StudyLevel(9, 10_000, "执灯", StudyReward(tenDrawTickets = 1, title = "十连抽券 x1")),
-        StudyLevel(10, 15_000, "织梦者", StudyReward(videoFragments = 1, title = "视频碎片 x1 + 称号「织梦者」")),
+        StudyLevel(10, 15_000, "织梦者", StudyReward(videoFragments = 1, title = "视频解锁卡 x1 + 称号「织梦者」")),
         StudyLevel(11, 22_000, "星桥", StudyReward(theaterFragments = 3, title = "剧场碎片 x3")),
         StudyLevel(12, 32_000, "远航", StudyReward(tenDrawTickets = 2, title = "十连抽券 x2")),
-        StudyLevel(13, 45_000, "回响", StudyReward(videoFragments = 2, title = "视频碎片 x2")),
+        StudyLevel(13, 45_000, "回响", StudyReward(videoFragments = 2, title = "视频解锁卡 x2")),
         StudyLevel(14, 60_000, "满愿", StudyReward(title = "任意完整画卷一套")),
         StudyLevel(15, 80_000, "星穹彼岸", StudyReward(title = "称号「星穹彼岸」")),
     )
@@ -87,7 +88,7 @@ object StudyRules {
         StudyAchievement("perfect_7", "连续全清7天", "连续7天待办全清", StudyReward(tenDrawTickets = 1, title = "十连抽券 x1")),
         StudyAchievement("deep_work_10h", "坐稳书桌", "累计学习时长10小时", StudyReward(kudos = 100, title = "夸夸值 100")),
         StudyAchievement("time_traveler", "时光旅人", "累计学习时长50小时", StudyReward(kudos = 200, title = "夸夸值 200")),
-        StudyAchievement("first_outfit", "第一画卷", "解锁第一套普通画卷", StudyReward(douyinFragments = 1, title = "抖音碎片 x1")),
+        StudyAchievement("first_outfit", "第一画卷", "解锁第一套普通画卷", StudyReward(douyinFragments = 1, title = "抖音时长券20分钟 x1")),
         StudyAchievement("outfit_collector", "画卷收藏家", "解锁任意3套普通画卷", StudyReward(theaterFragments = 2, title = "剧场碎片 x2")),
         StudyAchievement("theater_open", "剧场开幕", "攒够一次小剧场章节兑换", StudyReward(singleDrawTickets = 2, title = "单抽券 x2")),
         StudyAchievement("lucky_drawer", "好运初现", "累计获得20个抽卡碎片", StudyReward(kudos = 80, title = "夸夸值 80")),
@@ -268,40 +269,55 @@ object StudyRules {
         minutes: Int = 25,
         random: Random = Random.Default,
     ): StudyActionResult {
-        val box = mysteryBox(random)
+        val studiedMinutes = minutes.coerceAtLeast(0)
         val date = state.today.ifBlank { LocalDate.now().toString() }
         val todayRecord = state.dailyStudyRecords[date] ?: StudyDailyRecord()
+        val rewardMinutes = state.pendingRewardMinutes + studiedMinutes
+        val rewardCount = rewardMinutes / STUDY_REWARD_INTERVAL_MINUTES
+        val remainingRewardMinutes = rewardMinutes % STUDY_REWARD_INTERVAL_MINUTES
+        val rewardKudos = rewardCount * STUDY_REWARD_KUDOS
+        val purpleDrawsToday = if (state.dailyPurpleDrawDate == date) state.dailyPurpleDrawCount else 0
+        val drawsToday = if (state.dailyPurpleDrawDate == date) state.dailyDrawCount else 0
+        val grantPurpleSafety = todayRecord.studyMinutes + studiedMinutes >= 120 &&
+            drawsToday >= 30 &&
+            purpleDrawsToday == 0 &&
+            state.purpleSafetyGrantedDate != date
         val reward = StudyReward(
-            kudos = POMODORO_KUDOS,
-            mysteryBoxKudos = box.kudos,
-            universalNormalFragments = box.universalNormalFragments,
-            title = "番茄钟 +$POMODORO_KUDOS + 盲盒待开启",
+            kudos = rewardKudos,
+            purpleDrawTickets = if (grantPurpleSafety) 1 else 0,
+            title = buildList {
+                add(
+                    if (rewardCount > 0) {
+                        "学习 ${studiedMinutes} 分钟 +${rewardKudos} 夸夸值（${rewardCount} 抽卡进度）"
+                    } else {
+                        "学习 ${studiedMinutes} 分钟，抽卡进度 ${remainingRewardMinutes}/${STUDY_REWARD_INTERVAL_MINUTES} 分钟"
+                    },
+                )
+                if (grantPurpleSafety) add("今日零紫安全抽 x1")
+            }.joinToString(" · "),
         )
         return StudyActionResult(
             state = state.copy(
-                wallet = state.wallet.add(StudyReward(kudos = POMODORO_KUDOS)),
-                inventory = state.inventory.copy(
-                    unopenedMysteryBoxes = state.inventory.unopenedMysteryBoxes + box,
-                ),
+                wallet = state.wallet.add(reward),
+                pendingRewardMinutes = remainingRewardMinutes,
+                purpleSafetyGrantedDate = if (grantPurpleSafety) date else state.purpleSafetyGrantedDate,
                 inactiveStudyDays = 0,
                 lastStudyDate = date,
                 stats = state.stats.copy(
                     totalPomodoros = state.stats.totalPomodoros + 1,
-                    totalStudyMinutes = state.stats.totalStudyMinutes + minutes,
+                    totalStudyMinutes = state.stats.totalStudyMinutes + studiedMinutes,
                 ),
                 dailyStudyRecords = state.dailyStudyRecords + (
                     date to todayRecord.copy(
                         pomodoros = todayRecord.pomodoros + 1,
-                        studyMinutes = todayRecord.studyMinutes + minutes,
+                        studyMinutes = todayRecord.studyMinutes + studiedMinutes,
                     )
                     ),
-                recentEvents = state.recentEvents
-                    .addEvent(StudyEventType.Pomodoro, "番茄钟完成", "获得 $POMODORO_KUDOS 夸夸值")
-                    .addEvent(
-                        StudyEventType.MysteryBox,
-                        "盲盒待开启",
-                        "已放进收藏背包，可以现在开，也可以之后再开",
-                    ),
+                recentEvents = state.recentEvents.addEvent(
+                    StudyEventType.Pomodoro,
+                    "番茄钟完成",
+                    if (rewardCount > 0) "获得 $rewardKudos 夸夸值 · 累计 $rewardCount 抽" else "累计抽卡进度 ${remainingRewardMinutes}/${STUDY_REWARD_INTERVAL_MINUTES} 分钟",
+                ),
             ),
             reward = reward,
         )
@@ -378,10 +394,28 @@ object StudyRules {
             }
         }
         val refreshed = inventory.refreshUnlockStats()
+        val drawDate = state.today.ifBlank { LocalDate.now().toString() }
+        val previousPurpleCount = if (state.dailyPurpleDrawDate == drawDate) state.dailyPurpleDrawCount else 0
+        val previousDrawCount = if (state.dailyPurpleDrawDate == drawDate) state.dailyDrawCount else 0
+        val purpleCount = results.count { it.rarity == StudyRarity.Rare }
+        val nextPurpleCount = previousPurpleCount + purpleCount
+        val nextDrawCount = previousDrawCount + results.size
+        val studiedToday = state.dailyStudyRecords[drawDate]?.studyMinutes ?: 0
+        val grantPurpleSafety = studiedToday >= 120 &&
+            nextDrawCount >= 30 &&
+            nextPurpleCount == 0 &&
+            state.purpleSafetyGrantedDate != drawDate
         return StudyDrawActionResult(
             state = state.copy(
-                wallet = nextWallet.copy(kudos = nextWallet.kudos + overflowKudos),
+                wallet = nextWallet.copy(
+                    kudos = nextWallet.kudos + overflowKudos,
+                    purpleDrawTickets = nextWallet.purpleDrawTickets + if (grantPurpleSafety) 1 else 0,
+                ),
                 inventory = refreshed.first,
+                dailyPurpleDrawDate = drawDate,
+                dailyPurpleDrawCount = nextPurpleCount,
+                dailyDrawCount = nextDrawCount,
+                purpleSafetyGrantedDate = if (grantPurpleSafety) drawDate else state.purpleSafetyGrantedDate,
                 stats = state.stats.copy(
                     unlockedOutfitSets = refreshed.second.first,
                     unlockedTheaters = state.stats.unlockedTheaters,
@@ -394,6 +428,31 @@ object StudyRules {
                 ),
             ),
             results = results,
+        )
+    }
+
+    fun drawPurpleTicket(state: StudyState, random: Random = Random.Default): StudyDrawActionResult {
+        if (state.wallet.purpleDrawTickets <= 0) return StudyDrawActionResult(state, emptyList())
+        val result = drawRare(random)
+        val refreshed = state.inventory.addDrawResult(result).refreshUnlockStats()
+        val drawDate = state.today.ifBlank { LocalDate.now().toString() }
+        val previousPurpleCount = if (state.dailyPurpleDrawDate == drawDate) state.dailyPurpleDrawCount else 0
+        val previousDrawCount = if (state.dailyPurpleDrawDate == drawDate) state.dailyDrawCount else 0
+        return StudyDrawActionResult(
+            state = state.copy(
+                wallet = state.wallet.copy(purpleDrawTickets = state.wallet.purpleDrawTickets - 1),
+                inventory = refreshed.first,
+                dailyPurpleDrawDate = drawDate,
+                dailyPurpleDrawCount = previousPurpleCount + 1,
+                dailyDrawCount = previousDrawCount,
+                stats = state.stats.copy(unlockedOutfitSets = refreshed.second.first),
+                recentEvents = state.recentEvents.addEvent(
+                    StudyEventType.Draw,
+                    "今日零紫安全抽",
+                    result.title,
+                ),
+            ),
+            results = listOf(result),
         )
     }
 
@@ -498,7 +557,6 @@ object StudyRules {
         val dateText = date.toString()
         if (state.shopDate == dateText && state.shopItems.size == 3) return state
         val pool = listOf(
-            StudyShopItemType.UniversalNormalFragment to 5,
             StudyShopItemType.DouyinFragment to 7,
             StudyShopItemType.TheaterFragment to 7,
             StudyShopItemType.GameFragment to 3,
@@ -590,14 +648,20 @@ object StudyRules {
                 animeFragments = state.inventory.animeFragments - 1,
             )
         }
-        val rewardTitle = "${rewardType.label}时间已兑换"
+        val rewardTitle = when (rewardType) {
+            StudyEntertainmentReward.Douyin -> "抖音时长券已使用 · 20分钟"
+            StudyEntertainmentReward.Theater -> "剧场碎片已使用 · 1章"
+            StudyEntertainmentReward.Game -> "游戏畅玩券已使用 · 120分钟"
+            StudyEntertainmentReward.Video -> "视频解锁卡已使用"
+            StudyEntertainmentReward.Anime -> "番剧兑换券已使用 · 3小时"
+        }
         return StudyActionResult(
             state = state.copy(
                 inventory = inventory,
                 recentEvents = state.recentEvents.addEvent(
                     StudyEventType.Entertainment,
                     rewardTitle,
-                    "消耗 1 枚${rewardType.fragmentLabel()}碎片",
+                    "使用 1 张${rewardType.fragmentLabel()}",
                 ),
             ),
             reward = StudyReward(title = rewardTitle),
@@ -691,23 +755,25 @@ object StudyRules {
     private fun drawOne(random: Random): StudyDrawResult {
         val roll = random.nextDouble()
         return when {
-            roll < 0.93 -> {
+            roll < 0.9015 -> {
                 val outfit = outfitNames[random.nextInt(outfitNames.size)]
                 val part = outfitParts[random.nextInt(outfitParts.size)]
                 StudyDrawResult(StudyRarity.Normal, "normal:$outfit:$part", "$outfit-$part 碎片")
             }
-            roll < 0.97 -> if (random.nextInt(2) == 0) {
-                StudyDrawResult(StudyRarity.Rare, "rare:douyin", "抖音碎片", StudyFragmentType.Douyin)
+            roll < 0.9815 -> drawRare(random)
+            roll < 0.9965 -> if (random.nextDouble() < 0.8) {
+                StudyDrawResult(StudyRarity.Epic, "epic:game", "游戏畅玩券 · 120分钟", StudyFragmentType.Game)
             } else {
-                StudyDrawResult(StudyRarity.Rare, "rare:theater", "剧场碎片", StudyFragmentType.Theater)
+                StudyDrawResult(StudyRarity.Epic, "epic:video", "视频解锁卡", StudyFragmentType.Video)
             }
-            roll < 0.99 -> if (random.nextInt(2) == 0) {
-                StudyDrawResult(StudyRarity.Epic, "epic:game", "游戏碎片", StudyFragmentType.Game)
-            } else {
-                StudyDrawResult(StudyRarity.Epic, "epic:video", "视频碎片", StudyFragmentType.Video)
-            }
-            else -> StudyDrawResult(StudyRarity.Rainbow, "rainbow:anime", "动漫碎片", StudyFragmentType.Anime)
+            else -> StudyDrawResult(StudyRarity.Rainbow, "rainbow:anime", "番剧兑换券 · 3小时", StudyFragmentType.Anime)
         }
+    }
+
+    private fun drawRare(random: Random): StudyDrawResult = if (random.nextDouble() < 0.8125) {
+        StudyDrawResult(StudyRarity.Rare, "rare:douyin", "抖音时长券 · 20分钟", StudyFragmentType.Douyin)
+    } else {
+        StudyDrawResult(StudyRarity.Rare, "rare:theater", "剧场碎片", StudyFragmentType.Theater)
     }
 
     private fun <T> weighted(items: List<Pair<T, Int>>, random: Random): T {
@@ -728,6 +794,7 @@ private operator fun StudyReward.plus(other: StudyReward): StudyReward {
         mysteryBoxKudos = mysteryBoxKudos + other.mysteryBoxKudos,
         singleDrawTickets = singleDrawTickets + other.singleDrawTickets,
         tenDrawTickets = tenDrawTickets + other.tenDrawTickets,
+        purpleDrawTickets = purpleDrawTickets + other.purpleDrawTickets,
         universalNormalFragments = universalNormalFragments + other.universalNormalFragments,
         douyinFragments = douyinFragments + other.douyinFragments,
         theaterFragments = theaterFragments + other.theaterFragments,
@@ -745,6 +812,7 @@ private fun StudyWallet.add(reward: StudyReward): StudyWallet {
         totalKudosEarned = totalKudosEarned + positiveKudos,
         singleDrawTickets = singleDrawTickets + reward.singleDrawTickets,
         tenDrawTickets = tenDrawTickets + reward.tenDrawTickets,
+        purpleDrawTickets = purpleDrawTickets + reward.purpleDrawTickets,
     )
 }
 
@@ -822,11 +890,11 @@ internal fun StudyState.migrateLegacyEntertainmentFragments(): StudyState {
 }
 
 private fun StudyEntertainmentReward.fragmentLabel(): String = when (this) {
-    StudyEntertainmentReward.Douyin -> "抖音"
-    StudyEntertainmentReward.Theater -> "剧场"
-    StudyEntertainmentReward.Game -> "游戏"
-    StudyEntertainmentReward.Video -> "视频"
-    StudyEntertainmentReward.Anime -> "动漫"
+    StudyEntertainmentReward.Douyin -> "抖音时长券"
+    StudyEntertainmentReward.Theater -> "剧场碎片"
+    StudyEntertainmentReward.Game -> "游戏畅玩券"
+    StudyEntertainmentReward.Video -> "视频解锁卡"
+    StudyEntertainmentReward.Anime -> "番剧兑换券"
 }
 
 private fun StudyInventory.refreshUnlockStats(): Pair<StudyInventory, Pair<Int, Int>> {
@@ -866,11 +934,11 @@ private fun List<StudyEvent>.addEvent(type: StudyEventType, title: String, detai
 private fun StudyShopItemType.toShopItem(id: String): StudyShopItem {
     return when (this) {
         StudyShopItemType.UniversalNormalFragment -> StudyShopItem(id, this, "通用普通碎片 x1", 120)
-        StudyShopItemType.DouyinFragment -> StudyShopItem(id, this, "抖音碎片 x1", 160)
+        StudyShopItemType.DouyinFragment -> StudyShopItem(id, this, "抖音时长券20分钟 x1", 160)
         StudyShopItemType.TheaterFragment -> StudyShopItem(id, this, "剧场碎片 x1", 160)
-        StudyShopItemType.GameFragment -> StudyShopItem(id, this, "游戏碎片 x1", 400)
-        StudyShopItemType.VideoFragment -> StudyShopItem(id, this, "视频碎片 x1", 400)
-        StudyShopItemType.AnimeFragment -> StudyShopItem(id, this, "动漫碎片 x1", 800)
+        StudyShopItemType.GameFragment -> StudyShopItem(id, this, "游戏畅玩券120分钟 x1", 400)
+        StudyShopItemType.VideoFragment -> StudyShopItem(id, this, "视频解锁卡 x1", 400)
+        StudyShopItemType.AnimeFragment -> StudyShopItem(id, this, "番剧兑换券3小时 x1", 800)
         StudyShopItemType.SingleDrawTicket -> StudyShopItem(id, this, "单抽券 x1", 80)
     }
 }

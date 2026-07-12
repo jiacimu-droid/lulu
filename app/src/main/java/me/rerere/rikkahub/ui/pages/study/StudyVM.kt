@@ -149,7 +149,7 @@ class StudyVM(
 
     fun completePomodoro(minutes: Int) = reduce {
         val result = StudyRules.completePomodoro(it, minutes, Random.Default)
-        _effects.tryEmit(StudyEffect.MysteryBoxReady)
+        emitReward(result.reward.title)
         result.state
     }
 
@@ -198,6 +198,22 @@ class StudyVM(
             }
             starWishStore.update { updatedStarWish }
             _effects.tryEmit(StudyEffect.DrawResults(revealItems))
+        }
+    }
+
+    fun drawPurpleTicket() {
+        viewModelScope.launch {
+            var revealItems: List<StudyDrawReveal> = emptyList()
+            store.update { current ->
+                val result = StudyRules.drawPurpleTicket(current, Random.Default)
+                revealItems = result.results.map { drawResult -> StudyDrawReveal(drawResult) }
+                result.state
+            }
+            if (revealItems.isEmpty()) {
+                _effects.tryEmit(StudyEffect.Message("没有可用的今日零紫安全抽"))
+            } else {
+                _effects.tryEmit(StudyEffect.DrawResults(revealItems))
+            }
         }
     }
 

@@ -47,6 +47,8 @@ class StudyStorePersistenceTest {
         assertEquals(6, decoded.stats.totalPomodoros)
         assertEquals(8, decoded.stats.totalTasksCompleted)
         assertEquals(150, decoded.stats.totalStudyMinutes)
+        assertEquals(0, decoded.pendingRewardMinutes)
+        assertEquals(0, decoded.wallet.purpleDrawTickets)
     }
 
     @Test

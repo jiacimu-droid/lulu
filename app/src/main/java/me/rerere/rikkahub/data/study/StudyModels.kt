@@ -10,6 +10,12 @@ data class StudyState(
     val tasks: List<StudyTask> = emptyList(),
     val inventory: StudyInventory = StudyInventory(),
     val stats: StudyStats = StudyStats(),
+    /** Minutes studied since the last five-minute kudos settlement. */
+    val pendingRewardMinutes: Int = 0,
+    val dailyPurpleDrawDate: String? = null,
+    val dailyPurpleDrawCount: Int = 0,
+    val dailyDrawCount: Int = 0,
+    val purpleSafetyGrantedDate: String? = null,
     val dailyStudyRecords: Map<String, StudyDailyRecord> = emptyMap(),
     val signInStreak: Int = 0,
     val lastSignInDate: String? = null,
@@ -39,6 +45,7 @@ data class StudyWallet(
     val totalKudosEarned: Int = 0,
     val singleDrawTickets: Int = 0,
     val tenDrawTickets: Int = 0,
+    val purpleDrawTickets: Int = 0,
 )
 
 @Serializable
@@ -129,6 +136,7 @@ data class StudyReward(
     val mysteryBoxKudos: Int = 0,
     val singleDrawTickets: Int = 0,
     val tenDrawTickets: Int = 0,
+    val purpleDrawTickets: Int = 0,
     val universalNormalFragments: Int = 0,
     val douyinFragments: Int = 0,
     val theaterFragments: Int = 0,
@@ -181,19 +189,19 @@ enum class StudyRarity(val label: String) {
 
 @Serializable
 enum class StudyFragmentType(val label: String, val rarity: StudyRarity) {
-    Douyin("抖音碎片", StudyRarity.Rare),
+    Douyin("抖音时长券 · 20分钟", StudyRarity.Rare),
     Theater("剧场碎片", StudyRarity.Rare),
-    Game("游戏碎片", StudyRarity.Epic),
-    Video("视频碎片", StudyRarity.Epic),
-    Anime("动漫碎片", StudyRarity.Rainbow),
+    Game("游戏畅玩券 · 120分钟", StudyRarity.Epic),
+    Video("视频解锁卡", StudyRarity.Epic),
+    Anime("番剧兑换券 · 3小时", StudyRarity.Rainbow),
 }
 
 enum class StudyEntertainmentReward(val label: String) {
-    Douyin("抖音"),
+    Douyin("抖音时长券"),
     Theater("小剧场"),
-    Game("游戏"),
+    Game("游戏畅玩券"),
     Video("视频"),
-    Anime("动漫"),
+    Anime("番剧兑换券"),
 }
 
 @Serializable

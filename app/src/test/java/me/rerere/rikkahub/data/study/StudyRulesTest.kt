@@ -68,17 +68,17 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `pomodoro completion gives fixed kudos and stores an unopened mystery box`() {
+    fun `pomodoro completion settles kudos by accumulated five minute blocks`() {
         val result = StudyRules.completePomodoro(
             state = StudyState(today = "2026-06-30"),
             minutes = 18,
             random = Random(1),
         )
 
-        assertEquals(50, result.reward.kudos)
-        assertTrue(result.reward.mysteryBoxKudos in listOf(15, 25, 50, 100, 200))
-        assertEquals(50, result.state.wallet.kudos)
-        assertEquals(1, result.state.inventory.unopenedMysteryBoxes.size)
+        assertEquals(300, result.reward.kudos)
+        assertEquals(300, result.state.wallet.kudos)
+        assertEquals(3, result.state.pendingRewardMinutes)
+        assertEquals(0, result.state.inventory.unopenedMysteryBoxes.size)
         assertEquals(1, result.state.stats.totalPomodoros)
         assertEquals(18, result.state.stats.totalStudyMinutes)
     }
@@ -105,16 +105,17 @@ class StudyRulesTest {
 
     @Test
     fun `opening a stored mystery box applies its reward`() {
-        val completed = StudyRules.completePomodoro(
-            state = StudyState(today = "2026-06-30"),
-            minutes = 25,
-            random = Random(1),
+        val completed = StudyState(
+            today = "2026-06-30",
+            inventory = StudyInventory(
+                unopenedMysteryBoxes = listOf(StudyMysteryBoxReward(kudos = 50)),
+            ),
         )
 
-        val opened = StudyRules.openMysteryBox(completed.state)
+        val opened = StudyRules.openMysteryBox(completed)
 
         assertEquals(0, opened.state.inventory.unopenedMysteryBoxes.size)
-        assertEquals(50 + opened.reward.kudos, opened.state.wallet.kudos)
+        assertEquals(opened.reward.kudos, opened.state.wallet.kudos)
         assertEquals(opened.reward.universalNormalFragments, opened.state.inventory.universalNormalFragments)
     }
 
@@ -135,8 +136,8 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `universal fragments are configured only for levels and shop purchases`() {
-        assertTrue(StudyRules.levels.any { it.reward.universalNormalFragments > 0 })
+    fun `universal fragments are no longer configured as new rewards`() {
+        assertTrue(StudyRules.levels.none { it.reward.universalNormalFragments > 0 })
         assertTrue(StudyRules.achievements.none { it.reward.universalNormalFragments > 0 })
         val superMomentReward = StudyRules.claimSuperMoment(
             StudyState(),
@@ -298,24 +299,19 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `daily shop can sell universal normal fragments`() {
+    fun `daily shop no longer offers universal normal fragments`() {
         val refreshed = StudyRules.refreshShopIfNeeded(
             StudyState(wallet = StudyWallet(kudos = 1_000)),
             LocalDate.of(2026, 7, 6),
             FixedDrawRandom(ints = mutableListOf(0, 0, 0)),
         )
-        val bought = StudyRules.buyShopItem(refreshed, refreshed.shopItems.first().id)
-
         assertEquals(3, refreshed.shopItems.size)
-        assertTrue(refreshed.shopItems.all { it.type == StudyShopItemType.UniversalNormalFragment })
-        assertEquals(1, bought.state.inventory.universalNormalFragments)
-        assertEquals(880, bought.state.wallet.kudos)
+        assertTrue(refreshed.shopItems.none { it.type == StudyShopItemType.UniversalNormalFragment })
     }
 
     @Test
     fun `daily shop uses only supported purchasable item types`() {
         val allowed = setOf(
-            StudyShopItemType.UniversalNormalFragment,
             StudyShopItemType.DouyinFragment,
             StudyShopItemType.TheaterFragment,
             StudyShopItemType.GameFragment,
@@ -334,26 +330,24 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `mystery boxes never grant universal fragments`() {
-        val none = StudyRules.completePomodoro(
-            state = StudyState(today = "2026-07-06"),
-            minutes = 25,
-            random = FixedDrawRandom(ints = mutableListOf(0, 69)),
+    fun `study minutes keep remainder and grant daily purple safety after two hours`() {
+        val first = StudyRules.completePomodoro(
+            state = StudyState(
+                today = "2026-07-06",
+                dailyPurpleDrawDate = "2026-07-06",
+                dailyDrawCount = 30,
+            ),
+            minutes = 3,
         )
-        val one = StudyRules.completePomodoro(
-            state = StudyState(today = "2026-07-06"),
-            minutes = 25,
-            random = FixedDrawRandom(ints = mutableListOf(0, 70)),
-        )
-        val two = StudyRules.completePomodoro(
-            state = StudyState(today = "2026-07-06"),
-            minutes = 25,
-            random = FixedDrawRandom(ints = mutableListOf(0, 99)),
-        )
+        val second = StudyRules.completePomodoro(first.state, minutes = 2)
+        val longStudy = StudyRules.completePomodoro(second.state, minutes = 115)
 
-        assertEquals(0, none.reward.universalNormalFragments)
-        assertEquals(0, one.reward.universalNormalFragments)
-        assertEquals(0, two.reward.universalNormalFragments)
+        assertEquals(0, first.reward.kudos)
+        assertEquals(3, first.state.pendingRewardMinutes)
+        assertEquals(100, second.reward.kudos)
+        assertEquals(0, second.state.pendingRewardMinutes)
+        assertEquals(1, longStudy.reward.purpleDrawTickets)
+        assertEquals(1, longStudy.state.wallet.purpleDrawTickets)
     }
 
     @Test
@@ -590,9 +584,9 @@ class StudyRulesTest {
     @Test
     fun `draw pool has purple gold and rainbow entertainment fragments`() {
         val state = StudyState(wallet = StudyWallet(singleDrawTickets = 3))
-        val purple = StudyRules.draw(state, count = 1, random = FixedDrawRandom(doubles = mutableListOf(0.95), ints = mutableListOf(0))).state
-        val gold = StudyRules.draw(purple, count = 1, random = FixedDrawRandom(doubles = mutableListOf(0.98), ints = mutableListOf(1))).state
-        val rainbow = StudyRules.draw(gold, count = 1, random = FixedDrawRandom(doubles = mutableListOf(0.995))).state
+        val purple = StudyRules.draw(state, count = 1, random = FixedDrawRandom(doubles = mutableListOf(0.95, 0.0))).state
+        val gold = StudyRules.draw(purple, count = 1, random = FixedDrawRandom(doubles = mutableListOf(0.99, 0.99))).state
+        val rainbow = StudyRules.draw(gold, count = 1, random = FixedDrawRandom(doubles = mutableListOf(0.999))).state
 
         assertEquals(1, purple.inventory.douyinFragments)
         assertEquals(1, gold.inventory.videoFragments)
@@ -600,34 +594,52 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `purple and gold draws split evenly between their explicit fragment types`() {
+    fun `purple and gold draws split between their explicit reward types`() {
         var state = StudyState(wallet = StudyWallet(singleDrawTickets = 4))
 
         state = StudyRules.draw(
             state,
             count = 1,
-            random = FixedDrawRandom(doubles = mutableListOf(0.95), ints = mutableListOf(0)),
+            random = FixedDrawRandom(doubles = mutableListOf(0.95, 0.0)),
         ).state
         state = StudyRules.draw(
             state,
             count = 1,
-            random = FixedDrawRandom(doubles = mutableListOf(0.95), ints = mutableListOf(1)),
+            random = FixedDrawRandom(doubles = mutableListOf(0.95, 0.99)),
         ).state
         state = StudyRules.draw(
             state,
             count = 1,
-            random = FixedDrawRandom(doubles = mutableListOf(0.98), ints = mutableListOf(0)),
+            random = FixedDrawRandom(doubles = mutableListOf(0.99, 0.0)),
         ).state
         state = StudyRules.draw(
             state,
             count = 1,
-            random = FixedDrawRandom(doubles = mutableListOf(0.98), ints = mutableListOf(1)),
+            random = FixedDrawRandom(doubles = mutableListOf(0.99, 0.99)),
         ).state
 
         assertEquals(1, state.inventory.douyinFragments)
         assertEquals(1, state.inventory.theaterFragments)
         assertEquals(1, state.inventory.gameFragments)
         assertEquals(1, state.inventory.videoFragments)
+    }
+
+    @Test
+    fun `daily purple safety ticket grants one purple reward and is consumed`() {
+        val state = StudyState(
+            today = "2026-07-12",
+            wallet = StudyWallet(purpleDrawTickets = 1),
+        )
+
+        val drawn = StudyRules.drawPurpleTicket(
+            state,
+            random = FixedDrawRandom(doubles = mutableListOf(0.99)),
+        )
+
+        assertEquals(0, drawn.state.wallet.purpleDrawTickets)
+        assertEquals(1, drawn.state.inventory.theaterFragments)
+        assertEquals(1, drawn.state.dailyPurpleDrawCount)
+        assertEquals(StudyRarity.Rare, drawn.results.single().rarity)
     }
 
     @Test
@@ -686,9 +698,9 @@ class StudyRulesTest {
         assertEquals(0, anime.state.inventory.douyinFragments)
         assertEquals(0, anime.state.inventory.gameFragments)
         assertEquals(0, anime.state.inventory.animeFragments)
-        assertEquals("抖音时间已兑换", douyin.reward.title)
-        assertEquals("游戏时间已兑换", game.reward.title)
-        assertEquals("动漫时间已兑换", anime.reward.title)
+        assertEquals("抖音时长券已使用 · 20分钟", douyin.reward.title)
+        assertEquals("游戏畅玩券已使用 · 120分钟", game.reward.title)
+        assertEquals("番剧兑换券已使用 · 3小时", anime.reward.title)
     }
 
     private class FixedDrawRandom(
