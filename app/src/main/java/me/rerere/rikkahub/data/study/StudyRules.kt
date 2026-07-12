@@ -13,6 +13,8 @@ object StudyRules {
     const val STUDY_REWARD_KUDOS = 100
     const val OFFICIAL_ECONOMY_RESET_VERSION = 2
     const val DATA_LOSS_COMPENSATION_VERSION = 4
+    const val POMODORO_INTERRUPTION_COMPENSATION_VERSION = 1
+    const val POMODORO_INTERRUPTION_COMPENSATION_KUDOS = 400
     const val NORMAL_FRAGMENTS_PER_OUTFIT = 10
     private const val OVERFLOW_NORMAL_FRAGMENT_KUDOS = 100
     private const val INTERNAL_TEST_GRANT_VERSION = 1
@@ -428,6 +430,29 @@ object StudyRules {
                 ),
             ),
             results = results,
+        )
+    }
+
+    /**
+     * One-time private-build compensation for the Pomodoro that was interrupted by the update.
+     * Keep this idempotent because StudyStore applies migrations from several read/write paths.
+     */
+    fun grantPomodoroInterruptionCompensation(state: StudyState): StudyState {
+        if (state.pomodoroInterruptionCompensationVersion >= POMODORO_INTERRUPTION_COMPENSATION_VERSION) {
+            return state
+        }
+        val reward = StudyReward(
+            kudos = POMODORO_INTERRUPTION_COMPENSATION_KUDOS,
+            title = "番茄钟中断补偿 +${POMODORO_INTERRUPTION_COMPENSATION_KUDOS} 夸夸值",
+        )
+        return state.copy(
+            wallet = state.wallet.add(reward),
+            pomodoroInterruptionCompensationVersion = POMODORO_INTERRUPTION_COMPENSATION_VERSION,
+            recentEvents = state.recentEvents.addEvent(
+                StudyEventType.Pomodoro,
+                "番茄钟中断补偿",
+                reward.title,
+            ),
         )
     }
 

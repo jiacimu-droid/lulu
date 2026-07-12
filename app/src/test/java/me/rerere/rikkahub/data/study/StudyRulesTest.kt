@@ -507,6 +507,23 @@ class StudyRulesTest {
     }
 
     @Test
+    fun `interrupted pomodoro compensation grants 400 kudos once`() {
+        val state = StudyState(wallet = StudyWallet(kudos = 80, totalKudosEarned = 120))
+
+        val compensated = StudyRules.grantPomodoroInterruptionCompensation(state)
+        val duplicate = StudyRules.grantPomodoroInterruptionCompensation(compensated)
+
+        assertEquals(480, compensated.wallet.kudos)
+        assertEquals(520, compensated.wallet.totalKudosEarned)
+        assertEquals(
+            StudyRules.POMODORO_INTERRUPTION_COMPENSATION_VERSION,
+            compensated.pomodoroInterruptionCompensationVersion,
+        )
+        assertEquals(compensated, duplicate)
+        assertEquals("番茄钟中断补偿", compensated.recentEvents.last().title)
+    }
+
+    @Test
     fun `perfect streak only increments once per day`() {
         val state = StudyState(
             today = "2026-06-30",

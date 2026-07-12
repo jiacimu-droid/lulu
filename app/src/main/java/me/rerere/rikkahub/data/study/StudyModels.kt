@@ -37,6 +37,8 @@ data class StudyState(
     val generatedSchedules: Map<String, List<StudyScheduleBlock>> = emptyMap(),
     val selectedAssistantId: String? = null,
     val internalTestGrantVersion: Int = 0,
+    /** One-time compensation marker for the private build's interrupted Pomodoro update. */
+    val pomodoroInterruptionCompensationVersion: Int = 0,
 )
 
 @Serializable

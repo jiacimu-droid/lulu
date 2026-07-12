@@ -40,6 +40,7 @@ class StudyStore(
                     .migrateLegacyEntertainmentFragments()
                     .preserveOfficialEconomy()
                     .grantDataLossCompensation()
+                    .grantPomodoroInterruptionCompensation()
                 if (migrated != current) {
                     prefs.writeState(migrated)
                 }
@@ -57,7 +58,8 @@ class StudyStore(
                 it.ensureToday()
                     .migrateLegacyEntertainmentFragments()
                     .preserveOfficialEconomy()
-                    .grantDataLossCompensation(),
+                    .grantDataLossCompensation()
+                    .grantPomodoroInterruptionCompensation(),
                 LocalDate.now(),
                 Random.Default,
             )
@@ -80,7 +82,8 @@ class StudyStore(
             prefs.writeState(
                 state.migrateLegacyEntertainmentFragments()
                     .preserveOfficialEconomy()
-                    .grantDataLossCompensation(),
+                    .grantDataLossCompensation()
+                    .grantPomodoroInterruptionCompensation(),
             )
         }
     }
@@ -127,3 +130,6 @@ private fun StudyState.preserveOfficialEconomy(): StudyState {
 
 private fun StudyState.grantDataLossCompensation(): StudyState =
     StudyRules.grantDataLossCompensation(this)
+
+private fun StudyState.grantPomodoroInterruptionCompensation(): StudyState =
+    StudyRules.grantPomodoroInterruptionCompensation(this)
