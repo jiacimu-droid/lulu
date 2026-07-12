@@ -164,6 +164,11 @@ class ExamStudyPlanTest {
         assertTrue(ExamStudyPlan.studyHabitReference.contains("正式背诵 30-40 分钟"))
         assertTrue(ExamStudyPlan.studyHabitReference.contains("3 小时现在是健康状态的最低基线"))
         assertTrue(ExamStudyPlan.studyHabitReference.contains("单纯看框架不算"))
+        assertTrue(ExamStudyPlan.studyHabitReference.contains("标题写 3.5 小时不能只排 2 小时"))
+        assertTrue(ExamStudyPlan.studyHabitReference.contains("播放器四倍速不等于四倍学习效率"))
+        assertTrue(ExamStudyPlan.studyHabitReference.contains("设定每天学习时长前必须先算完整总账"))
+        assertTrue(ExamStudyPlan.studyHabitReference.contains("没有分钟账本时只能给日期范围"))
+        assertTrue(ExamStudyPlan.studyHabitReference.contains("月、周、日三层容量必须守恒"))
     }
 
     @Test
