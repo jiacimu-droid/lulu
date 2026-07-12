@@ -351,37 +351,41 @@ class GenerationHandler(
         } else {
             ""
         }
-        val system = buildString {
-            if (effectiveSystemPrompt.isNotBlank()) {
-                append(effectiveSystemPrompt)
-            }
-
+        val systemExtensions = buildString {
             // Tool prompts
             toolSystemPrompts.forEach { (_, prompt) ->
-                appendLine()
                 append(prompt)
+                appendLine()
             }
 
             // Plugin prompt injections
             if (pluginPromptInjections.isNotEmpty()) {
                 pluginPromptInjections.forEach { injection ->
-                    appendLine()
-                    appendLine()
                     append(injection)
+                    appendLine()
                 }
             }
 
             // Allow skip reply
             if (skipReplyPrompt.isNotBlank()) {
-                appendLine()
-                appendLine()
                 appendLine(skipReplyPrompt)
             }
-        }
+        }.trim()
         val limitedMessages = messages.limitContext(assistant.contextMessageSize)
             .compactOldToolOutputsForPrompt()
         val preTransformMessages = buildList {
-            if (system.isNotBlank()) add(UIMessage.system(prompt = system))
+            val systemParts = buildList {
+                if (effectiveSystemPrompt.isNotBlank()) {
+                    add(UIMessagePart.Text(effectiveSystemPrompt))
+                }
+                if (systemExtensions.isNotBlank()) {
+                    val separator = if (isEmpty()) "" else "\n\n"
+                    add(UIMessagePart.Text(separator + systemExtensions))
+                }
+            }
+            if (systemParts.isNotEmpty()) {
+                add(UIMessage(role = MessageRole.SYSTEM, parts = systemParts))
+            }
             addAll(limitedMessages)
         }
         val internalMessages = preTransformMessages.transforms(

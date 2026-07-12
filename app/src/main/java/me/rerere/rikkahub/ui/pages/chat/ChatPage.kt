@@ -177,6 +177,11 @@ private fun ChatPageContent(
     val toaster = LocalToaster.current
     var previewMode by rememberSaveable { mutableStateOf(false) }
     val hazeState = rememberHazeState()
+    val assistant = setting.getAssistantById(conversation.assistantId)
+        ?: setting.getCurrentAssistant()
+    val companionSnapshot = companionState.snapshots
+        .firstOrNull { it.assistantId == assistant.id.toString() }
+        ?: CompanionSnapshot.empty(assistant.id.toString())
 
     TTSAutoPlay(setting = setting, conversation = conversation, loading = loadingJob != null)
 
@@ -187,14 +192,10 @@ private fun ChatPageContent(
         AssistantBackground(setting = setting)
         Scaffold(
             topBar = {
-                val assistant = setting.getAssistantById(conversation.assistantId)
-                    ?: setting.getCurrentAssistant()
                 TopBar(
                     settings = setting,
                     assistant = assistant,
-                    companionSnapshot = companionState.snapshots
-                        .firstOrNull { it.assistantId == assistant.id.toString() }
-                        ?: CompanionSnapshot.empty(assistant.id.toString()),
+                    companionSnapshot = companionSnapshot,
                     navController = navController,
                     previewMode = previewMode,
                     onClickMenu = {
@@ -330,6 +331,7 @@ private fun ChatPageContent(
                 processingStatus = processingStatus,
                 previewMode = previewMode,
                 settings = setting,
+                currentCompanionDescription = companionSnapshot.state.selfScene,
                 hazeState = hazeState,
                 errors = errors,
                 onDismissError = onDismissError,

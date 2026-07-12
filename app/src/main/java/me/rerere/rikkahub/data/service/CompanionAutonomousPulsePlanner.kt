@@ -27,12 +27,27 @@ object CompanionAutonomousPulsePlanner {
             ?.let { ((it - input.nowMillis) / 60_000L).toInt().coerceAtLeast(1) }
         if (targetedDelay != null) {
             return CompanionAutonomousPulsePlan(
-                delayMinutes = targetedDelay + minMinutes,
+                delayMinutes = targetedDelay + if (input.setting.naturalScheduling) 15 else minMinutes,
                 reason = "targeted_active",
             )
         }
 
         val activeWorkCount = input.snapshot.activeWorkCount(input.nowMillis)
+        if (input.setting.naturalScheduling) {
+            val naturalDelay = when {
+                input.snapshot.relationship.unresolvedTension >= 0.6f -> 180..300
+                activeWorkCount > 0 && input.minutesSinceLastChat >= 45 -> 8..18
+                activeWorkCount > 0 -> 18..35
+                input.minutesSinceLastChat >= 360 -> 25..50
+                input.minutesSinceLastChat >= 120 -> 18..40
+                input.minutesSinceLastChat >= 45 -> 55..100
+                else -> 100..180
+            }.stableMinute(input)
+            return CompanionAutonomousPulsePlan(
+                delayMinutes = naturalDelay,
+                reason = "natural;${buildReason(input, activeWorkCount)}",
+            )
+        }
         val desired = when {
             input.snapshot.relationship.unresolvedTension >= 0.6f -> maxMinutes
             activeWorkCount > 0 -> when {
@@ -69,4 +84,12 @@ object CompanionAutonomousPulsePlanner {
             concern.status == CompanionConcernStatus.ACTIVE &&
                 concern.nextPerceptionAt?.let { it <= nowMillis } == true
         }
+
+    private fun IntRange.stableMinute(input: CompanionAutonomousPulseInput): Int {
+        if (first >= last) return first
+        val seed = input.nowMillis / 60_000L +
+            input.snapshot.updatedAt / 60_000L +
+            input.minutesSinceLastChat.coerceAtMost(10_000L)
+        return first + Math.floorMod(seed, (last - first + 1).toLong()).toInt()
+    }
 }

@@ -206,6 +206,31 @@ class LuluExpressionOutputTransformerTest {
         assertEquals("waiting", metadata.data["status"]?.jsonPrimitive?.content)
     }
 
+    @Test
+    fun `presence lookup never reuses metadata from a previous user turn`() {
+        val oldAssistant = splitLuluAssistantExpressionMessages(
+            listOf(
+                assistantMessage(
+                    """
+                    昨天的回复。
+                    <lulu_presence>
+                    status: 昨天的状态
+                    description: 昨天还在窗边等着。
+                    inner_voice: 昨天的心声。
+                    </lulu_presence>
+                    """.trimIndent(),
+                ),
+            ),
+        ).single()
+        val messages = listOf(
+            oldAssistant,
+            UIMessage.user("今天的新消息"),
+            assistantMessage("今天已经回复，但模型漏掉了状态块。"),
+        )
+
+        assertEquals(null, messages.companionModelPresence())
+    }
+
     private fun assistantMessage(text: String) = UIMessage(
         role = MessageRole.ASSISTANT,
         parts = listOf(UIMessagePart.Text(text)),

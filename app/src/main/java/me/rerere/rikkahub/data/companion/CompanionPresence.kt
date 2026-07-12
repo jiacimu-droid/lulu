@@ -17,6 +17,7 @@ fun buildCompanionStateFromTurn(
     assistantText: String,
     presence: CompanionModelPresence?,
     nowMillis: Long,
+    fallbackInnerThought: String? = null,
 ): CompanionState {
     val cleanPrevious = previous.sanitizedCompanionState()
     if (assistantText.isBlank()) return cleanPrevious
@@ -26,6 +27,7 @@ fun buildCompanionStateFromTurn(
         .ifBlank { "刚刚回应" }
     val innerThought = presence?.innerThought.cleanPresenceField(MAX_INNER_THOUGHT_LENGTH)
         ?: presence?.memoryThought.cleanPresenceField(MAX_INNER_THOUGHT_LENGTH)
+        ?: fallbackInnerThought.cleanPresenceField(MAX_INNER_THOUGHT_LENGTH)
         ?: cleanPrevious.innerThought
     val mood = presence?.mood.cleanPresenceField(MAX_STATE_FIELD_LENGTH) ?: cleanPrevious.mood
     val bodyState = presence?.bodyState.cleanPresenceField(MAX_STATE_FIELD_LENGTH) ?: cleanPrevious.bodyState

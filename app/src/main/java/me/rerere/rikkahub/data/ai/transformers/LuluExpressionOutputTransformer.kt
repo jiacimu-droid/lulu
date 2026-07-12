@@ -168,13 +168,15 @@ private fun String.normalizeLuluPresenceKey(): String? = when (trim().lowercase(
 }
 
 fun List<UIMessage>.companionModelPresence(): CompanionModelPresence? =
-    asReversed()
+    drop(indexOfLast { message -> message.role == MessageRole.USER } + 1)
+        .asReversed()
         .asSequence()
         .mapNotNull { message -> message.luluPresenceMetadata() }
         .firstOrNull()
         ?.data
         ?.toCompanionModelPresence()
-        ?: asReversed()
+        ?: drop(indexOfLast { message -> message.role == MessageRole.USER } + 1)
+            .asReversed()
             .asSequence()
             .flatMap { message -> message.parts.asReversed().asSequence() }
             .filterIsInstance<UIMessagePart.Tool>()

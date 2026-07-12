@@ -60,8 +60,8 @@ class ProactiveMessageWorker(
                 return
             }
 
-            val minMinutes = setting.minIntervalMinutes.coerceAtLeast(1)
-            val maxMinutes = setting.maxIntervalMinutes.coerceAtLeast(minMinutes)
+            val minMinutes = if (setting.naturalScheduling) 45 else setting.minIntervalMinutes.coerceAtLeast(1)
+            val maxMinutes = if (setting.naturalScheduling) 90 else setting.maxIntervalMinutes.coerceAtLeast(minMinutes)
             val delayMinutes = Random.nextInt(minMinutes, maxMinutes + 1)
             scheduleNext(context, setting, delayMinutes)
         }

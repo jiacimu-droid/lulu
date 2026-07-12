@@ -11,6 +11,7 @@ import org.junit.Test
 class CompanionAutonomousPulsePlannerTest {
     private val setting = ProactiveMessageSetting(
         enabled = true,
+        naturalScheduling = false,
         minIntervalMinutes = 30,
         maxIntervalMinutes = 90,
     )
@@ -151,5 +152,24 @@ class CompanionAutonomousPulsePlannerTest {
 
         assertEquals(390, plan.delayMinutes)
         assertTrue(plan.reason.contains("targeted_active"))
+    }
+
+    @Test
+    fun `natural scheduling uses context ranges instead of configured minute window`() {
+        val plan = CompanionAutonomousPulsePlanner.planNext(
+            input = CompanionAutonomousPulseInput(
+                setting = setting.copy(
+                    naturalScheduling = true,
+                    minIntervalMinutes = 1,
+                    maxIntervalMinutes = 2,
+                ),
+                snapshot = CompanionSnapshot.empty("assistant-a"),
+                minutesSinceLastChat = 180,
+                nowMillis = 1_700_000_000_000L,
+            ),
+        )
+
+        assertTrue(plan.delayMinutes in 18..40)
+        assertTrue(plan.reason.startsWith("natural;"))
     }
 }

@@ -587,6 +587,7 @@ class ChatService(
             previous = companionRuntime.snapshot(assistant.id.toString()).state,
             assistantText = reply,
             presence = listOf(replyMessage).companionModelPresence(),
+            fallbackInnerThought = "我刚刚在电话里回应了你，心里还留意着你接下来的反应。",
             nowMillis = nowMillis,
         )
         runCatching {
@@ -1030,6 +1031,8 @@ class ChatService(
                 previous = snapshotBeforeTurn.state,
                 assistantText = lastAssistantText,
                 presence = finalConversation.currentMessages.takeLast(8).companionModelPresence(),
+                fallbackInnerThought = turnPreparation.plan.innerThought
+                    ?: "我已经回应了这一轮对话，接下来先留意你会怎样继续。",
                 nowMillis = nowMillis,
             )
             val hasWakePlan = scheduledPlans.any { it.kind == ProactiveReminderKind.WAKE }

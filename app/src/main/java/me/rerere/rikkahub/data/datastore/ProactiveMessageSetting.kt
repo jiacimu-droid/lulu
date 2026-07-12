@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProactiveMessageSetting(
     val enabled: Boolean = false,
+    val naturalScheduling: Boolean = true,
     val minIntervalMinutes: Int = 30,
     val maxIntervalMinutes: Int = 90,
     val assistantId: String = "",

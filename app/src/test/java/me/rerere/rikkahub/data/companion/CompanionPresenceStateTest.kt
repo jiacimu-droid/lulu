@@ -74,6 +74,20 @@ class CompanionPresenceStateTest {
     }
 
     @Test
+    fun `planner inner thought replaces stale thought when presence block is missing`() {
+        val next = buildCompanionStateFromTurn(
+            previous = CompanionState(innerThought = "昨天的旧心声", updatedAt = 100L),
+            assistantText = "今天已经重新回应。",
+            presence = null,
+            nowMillis = 1_000L,
+            fallbackInnerThought = "我刚刚重新想过这一轮该怎样回应。",
+        )
+
+        assertEquals("我刚刚重新想过这一轮该怎样回应。", next.innerThought)
+        assertEquals(1_000L, next.updatedAt)
+    }
+
+    @Test
     fun `missing model fields do not preserve technical runtime narration`() {
         val previous = CompanionState(
             statusText = "副 API 判断中",

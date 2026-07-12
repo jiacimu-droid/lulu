@@ -227,6 +227,31 @@ class PromptInjectionTransformerTest {
         assertTrue(systemText.startsWith("Original system prompt"))
         assertTrue(systemText.endsWith("Appended content"))
     }
+
+    @Test
+    fun `system injections preserve stable prompt as a separate text part`() {
+        val original = UIMessage(
+            role = MessageRole.SYSTEM,
+            parts = listOf(
+                UIMessagePart.Text("Stable persona"),
+                UIMessagePart.Text("Tool extensions"),
+            ),
+        )
+        val injection = createModeInjection(
+            position = InjectionPosition.AFTER_SYSTEM_PROMPT,
+            content = "Dynamic lore",
+        )
+
+        val result = applyInjections(
+            messages = listOf(original, UIMessage.user("Hello")),
+            byPosition = mapOf(InjectionPosition.AFTER_SYSTEM_PROMPT to listOf(injection)),
+        )
+
+        assertEquals(
+            listOf("Stable persona", "Tool extensions", "\nDynamic lore"),
+            result.first().parts.filterIsInstance<UIMessagePart.Text>().map { it.text },
+        )
+    }
     // endregion
 
     // region BEFORE_SYSTEM_PROMPT tests

@@ -639,7 +639,7 @@ internal fun AssistantBasicContent(
                             val next = proactiveSetting.copy(enabled = enabled)
                             onUpdate(assistant.copy(proactiveMessageSetting = next))
                             if (enabled) {
-                                ProactiveMessageService.triggerNow(context, next)
+                                ProactiveMessageService.scheduleNext(context, next)
                             } else {
                                 ProactiveMessageService.cancel(context)
                             }
@@ -650,53 +650,73 @@ internal fun AssistantBasicContent(
             HorizontalDivider()
             FormItem(
                 modifier = Modifier.padding(8.dp),
-                label = { Text("最小间隔（分钟）") },
-                description = { Text("主动消息随机间隔的下限。") },
-            ) {
-                OutlinedTextField(
-                    value = proactiveSetting.minIntervalMinutes.toString(),
-                    onValueChange = { value ->
-                        value.toIntOrNull()
-                            ?.takeIf { it > 0 }
-                            ?.let { minutes ->
-                                onUpdate(
-                                    assistant.copy(
-                                        proactiveMessageSetting = proactiveSetting.copy(
-                                            minIntervalMinutes = minutes,
-                                            maxIntervalMinutes = proactiveSetting.maxIntervalMinutes.coerceAtLeast(minutes),
+                label = { Text("自然节奏") },
+                description = { Text("根据最近聊天、角色挂心、承诺和关系状态决定下一次判断，不按固定分钟循环发消息。") },
+                tail = {
+                    Switch(
+                        checked = proactiveSetting.naturalScheduling,
+                        onCheckedChange = { enabled ->
+                            onUpdate(
+                                assistant.copy(
+                                    proactiveMessageSetting = proactiveSetting.copy(naturalScheduling = enabled),
+                                ),
+                            )
+                        },
+                    )
+                },
+            )
+            if (!proactiveSetting.naturalScheduling) {
+                HorizontalDivider()
+                FormItem(
+                    modifier = Modifier.padding(8.dp),
+                    label = { Text("最小间隔（分钟）") },
+                    description = { Text("主动消息随机间隔的下限。") },
+                ) {
+                    OutlinedTextField(
+                        value = proactiveSetting.minIntervalMinutes.toString(),
+                        onValueChange = { value ->
+                            value.toIntOrNull()
+                                ?.takeIf { it > 0 }
+                                ?.let { minutes ->
+                                    onUpdate(
+                                        assistant.copy(
+                                            proactiveMessageSetting = proactiveSetting.copy(
+                                                minIntervalMinutes = minutes,
+                                                maxIntervalMinutes = proactiveSetting.maxIntervalMinutes.coerceAtLeast(minutes),
+                                            )
                                         )
                                     )
-                                )
-                            }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                )
-            }
-            HorizontalDivider()
-            FormItem(
-                modifier = Modifier.padding(8.dp),
-                label = { Text("最大间隔（分钟）") },
-                description = { Text("主动消息随机间隔的上限，必须大于等于最小间隔。") },
-            ) {
-                OutlinedTextField(
-                    value = proactiveSetting.maxIntervalMinutes.toString(),
-                    onValueChange = { value ->
-                        value.toIntOrNull()
-                            ?.takeIf { it >= proactiveSetting.minIntervalMinutes }
-                            ?.let { minutes ->
-                                onUpdate(
-                                    assistant.copy(
-                                        proactiveMessageSetting = proactiveSetting.copy(maxIntervalMinutes = minutes)
+                                }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                    )
+                }
+                HorizontalDivider()
+                FormItem(
+                    modifier = Modifier.padding(8.dp),
+                    label = { Text("最大间隔（分钟）") },
+                    description = { Text("主动消息随机间隔的上限，必须大于等于最小间隔。") },
+                ) {
+                    OutlinedTextField(
+                        value = proactiveSetting.maxIntervalMinutes.toString(),
+                        onValueChange = { value ->
+                            value.toIntOrNull()
+                                ?.takeIf { it >= proactiveSetting.minIntervalMinutes }
+                                ?.let { minutes ->
+                                    onUpdate(
+                                        assistant.copy(
+                                            proactiveMessageSetting = proactiveSetting.copy(maxIntervalMinutes = minutes)
+                                        )
                                     )
-                                )
-                            }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                )
+                                }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                    )
+                }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 HorizontalDivider()

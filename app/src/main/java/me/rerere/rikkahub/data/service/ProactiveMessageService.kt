@@ -141,8 +141,8 @@ class ProactiveMessageService : KoinComponent {
                 return
             }
 
-            val minMinutes = setting.minIntervalMinutes.coerceAtLeast(1)
-            val maxMinutes = setting.maxIntervalMinutes.coerceAtLeast(minMinutes)
+            val minMinutes = if (setting.naturalScheduling) 45 else setting.minIntervalMinutes.coerceAtLeast(1)
+            val maxMinutes = if (setting.naturalScheduling) 90 else setting.maxIntervalMinutes.coerceAtLeast(minMinutes)
             val delayMinutes = Random.nextInt(minMinutes, maxMinutes + 1)
             val triggerTime = java.lang.System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(delayMinutes.toLong())
 
@@ -1378,6 +1378,8 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                             assistant = assistant,
                             assistantText = replyText,
                             presence = finalPresence,
+                            fallbackInnerThought = autonomousPlan?.innerThought
+                                ?: "我刚刚主动联系了你，现在想看看你会不会回应。",
                             nowMillis = System.currentTimeMillis(),
                         )
                     }.onFailure { error ->
@@ -1472,7 +1474,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     ProactiveMessageService.scheduleNext(
                         context = this@ProactiveMessageTriggerService,
                         settings = settings,
-                        minutesSinceLastChat = 0L,
+                        minutesSinceLastChat = minutesSinceLastChat,
                         assistantId = assistantUuid,
                     )
                 }
@@ -1480,7 +1482,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     ProactiveMessageService.scheduleNext(
                         context = this@ProactiveMessageTriggerService,
                         settings = settings,
-                        minutesSinceLastChat = 0L,
+                        minutesSinceLastChat = minutesSinceLastChat,
                         assistantId = assistantUuid,
                     )
                 }
@@ -1612,12 +1614,14 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
         assistant: Assistant,
         assistantText: String,
         presence: CompanionModelPresence?,
+        fallbackInnerThought: String?,
         nowMillis: Long,
     ) {
         val unifiedState = buildCompanionStateFromTurn(
             previous = companionRuntime.snapshot(assistant.id.toString()).state,
             assistantText = assistantText,
             presence = presence,
+            fallbackInnerThought = fallbackInnerThought,
             nowMillis = nowMillis,
         )
         persistCompanionState(assistant, unifiedState, nowMillis)

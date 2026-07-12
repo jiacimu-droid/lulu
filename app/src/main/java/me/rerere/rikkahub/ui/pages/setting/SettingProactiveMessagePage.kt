@@ -60,7 +60,7 @@ fun SettingProactiveMessagePage(vm: SettingVM = koinInject()) {
                     // Enable switch
                     item(
                         headlineContent = { Text("启用主动消息") },
-                        supportingContent = { Text("开启后AI立即主动发一条消息，之后按设定间隔循环") },
+                        supportingContent = { Text("开启后按角色挂心、承诺、静默时长和关系状态自然判断是否联系你") },
                         trailingContent = {
                             Switch(
                                 checked = settings.proactiveMessageSetting.enabled,
@@ -68,8 +68,7 @@ fun SettingProactiveMessagePage(vm: SettingVM = koinInject()) {
                                     val newSetting = settings.proactiveMessageSetting.copy(enabled = enabled)
                                     vm.updateSettings(settings.copy(proactiveMessageSetting = newSetting))
                                     if (enabled) {
-                                        // 开启时立即触发第一次，然后安排后续
-                                        ProactiveMessageService.triggerNow(context, newSetting)
+                                        ProactiveMessageService.scheduleNext(context, newSetting)
                                     } else {
                                         ProactiveMessageService.cancel(context)
                                     }
@@ -88,7 +87,7 @@ fun SettingProactiveMessagePage(vm: SettingVM = koinInject()) {
                             }
                         }
                         item(
-                            headlineContent = { Text("下次触发时间") },
+                            headlineContent = { Text("下次情境判断") },
                             supportingContent = {
                                 val currentTime = System.currentTimeMillis()
                                 val triggerTime = nextTime
@@ -109,55 +108,75 @@ fun SettingProactiveMessagePage(vm: SettingVM = koinInject()) {
 
             item {
                 CardGroup {
-                    // Min interval
                     item(
-                        headlineContent = { Text("最小间隔 (分钟)") },
-                        supportingContent = {
-                            OutlinedTextField(
-                                value = settings.proactiveMessageSetting.minIntervalMinutes.toString(),
-                                onValueChange = { value ->
-                                    val minutes = value.toIntOrNull()
-                                    if (minutes != null && minutes > 0) {
-                                        vm.updateSettings(
-                                            settings.copy(
-                                                proactiveMessageSetting = settings.proactiveMessageSetting.copy(
-                                                    minIntervalMinutes = minutes
-                                                )
-                                            )
-                                        )
-                                    }
+                        headlineContent = { Text("自然节奏") },
+                        supportingContent = { Text("开启后不按固定分钟循环；后台触发只是重新感知和判断，不一定每次都发消息。") },
+                        trailingContent = {
+                            Switch(
+                                checked = settings.proactiveMessageSetting.naturalScheduling,
+                                onCheckedChange = { enabled ->
+                                    vm.updateSettings(
+                                        settings.copy(
+                                            proactiveMessageSetting = settings.proactiveMessageSetting.copy(
+                                                naturalScheduling = enabled,
+                                            ),
+                                        ),
+                                    )
                                 },
-                                placeholder = { Text("30") },
-                                singleLine = true,
-                                modifier = Modifier.padding(top = 8.dp),
                             )
                         },
                     )
+                    if (!settings.proactiveMessageSetting.naturalScheduling) {
+                        // Min interval
+                        item(
+                            headlineContent = { Text("最小间隔 (分钟)") },
+                            supportingContent = {
+                                OutlinedTextField(
+                                    value = settings.proactiveMessageSetting.minIntervalMinutes.toString(),
+                                    onValueChange = { value ->
+                                        val minutes = value.toIntOrNull()
+                                        if (minutes != null && minutes > 0) {
+                                            vm.updateSettings(
+                                                settings.copy(
+                                                    proactiveMessageSetting = settings.proactiveMessageSetting.copy(
+                                                        minIntervalMinutes = minutes
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    },
+                                    placeholder = { Text("30") },
+                                    singleLine = true,
+                                    modifier = Modifier.padding(top = 8.dp),
+                                )
+                            },
+                        )
 
-                    // Max interval
-                    item(
-                        headlineContent = { Text("最大间隔 (分钟)") },
-                        supportingContent = {
-                            OutlinedTextField(
-                                value = settings.proactiveMessageSetting.maxIntervalMinutes.toString(),
-                                onValueChange = { value ->
-                                    val minutes = value.toIntOrNull()
-                                    if (minutes != null && minutes >= settings.proactiveMessageSetting.minIntervalMinutes) {
-                                        vm.updateSettings(
-                                            settings.copy(
-                                                proactiveMessageSetting = settings.proactiveMessageSetting.copy(
-                                                    maxIntervalMinutes = minutes
+                        // Max interval
+                        item(
+                            headlineContent = { Text("最大间隔 (分钟)") },
+                            supportingContent = {
+                                OutlinedTextField(
+                                    value = settings.proactiveMessageSetting.maxIntervalMinutes.toString(),
+                                    onValueChange = { value ->
+                                        val minutes = value.toIntOrNull()
+                                        if (minutes != null && minutes >= settings.proactiveMessageSetting.minIntervalMinutes) {
+                                            vm.updateSettings(
+                                                settings.copy(
+                                                    proactiveMessageSetting = settings.proactiveMessageSetting.copy(
+                                                        maxIntervalMinutes = minutes
+                                                    )
                                                 )
                                             )
-                                        )
-                                    }
-                                },
-                                placeholder = { Text("90") },
-                                singleLine = true,
-                                modifier = Modifier.padding(top = 8.dp),
-                            )
-                        },
-                    )
+                                        }
+                                    },
+                                    placeholder = { Text("90") },
+                                    singleLine = true,
+                                    modifier = Modifier.padding(top = 8.dp),
+                                )
+                            },
+                        )
+                    }
                 }
             }
 

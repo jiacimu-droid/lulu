@@ -142,6 +142,7 @@ fun ChatList(
     previewMode: Boolean,
     settings: Settings,
     hazeState: HazeState,
+    currentCompanionDescription: String? = null,
     errors: List<ChatError> = emptyList(),
     onDismissError: (Uuid) -> Unit = {},
     onClearAllErrors: () -> Unit = {},
@@ -341,9 +342,17 @@ private fun ChatListNormal(
             ) { index, node ->
                 val groupedWithPrevious = displayNodes.getOrNull(index - 1)?.isVisuallyContinuousWith(node) == true
                 val groupedWithNext = displayNodes.getOrNull(index + 1)?.let(node::isVisuallyContinuousWith) == true
-                val latestPresenceDescription = remember(conversation.messageNodes, displayNodes.lastIndex, index) {
+                val latestPresenceDescription = remember(
+                    conversation.messageNodes,
+                    currentCompanionDescription,
+                    displayNodes.lastIndex,
+                    index,
+                ) {
                     if (index == displayNodes.lastIndex) {
-                        conversation.messageNodes.latestLuluPresenceDescription()
+                        currentCompanionDescription
+                            ?.trim()
+                            ?.takeIf(String::isNotBlank)
+                            ?: conversation.messageNodes.latestLuluPresenceDescription()
                     } else {
                         null
                     }
