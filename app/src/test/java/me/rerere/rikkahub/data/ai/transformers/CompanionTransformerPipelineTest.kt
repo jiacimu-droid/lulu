@@ -33,4 +33,16 @@ class CompanionTransformerPipelineTest {
             companionOutputTransformers,
         )
     }
+
+    @Test
+    fun `assistant generation always keeps prompt injection context`() {
+        assertEquals(
+            listOf(PromptInjectionTransformer, PlaceholderTransformer),
+            listOf(PlaceholderTransformer).withRequiredAssistantPromptContext(),
+        )
+        assertEquals(
+            companionInputTransformers,
+            companionInputTransformers.withRequiredAssistantPromptContext(),
+        )
+    }
 }

@@ -6,6 +6,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import kotlin.random.Random
 
 class StudyRulesTest {
@@ -27,6 +30,147 @@ class StudyRulesTest {
         assertEquals(50, afterDay5.reward.kudos)
         assertEquals(0, duplicate.reward.kudos)
         assertEquals(5, afterDay5.state.signInStreak)
+    }
+
+    @Test
+    fun `role confirmed early sleep grants five hundred kudos once per day`() {
+        val date = LocalDate.of(2026, 7, 14)
+        val first = StudyRules.claimSleepHabitReward(
+            state = StudyState(today = date.toString()),
+            habit = StudySleepHabit.EarlySleep,
+            nowMillis = millisAt(2026, 7, 14, 10, 0),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+            decisionReason = "你一点二十就睡了，按你的作息确实算早",
+            reportedTime = LocalTime.of(1, 20),
+        )
+        val duplicate = StudyRules.claimSleepHabitReward(
+            state = first.state,
+            habit = StudySleepHabit.EarlySleep,
+            nowMillis = millisAt(2026, 7, 14, 10, 5),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+        )
+
+        assertEquals(500, first.reward.kudos)
+        assertEquals(500, first.state.wallet.kudos)
+        assertEquals(500, first.state.wallet.totalKudosEarned)
+        assertEquals(0, duplicate.reward.kudos)
+        assertEquals(500, duplicate.state.wallet.kudos)
+        assertTrue(StudyRules.hasClaimedSleepHabitReward(duplicate.state, StudySleepHabit.EarlySleep, date))
+        assertTrue(first.state.recentEvents.first().detail.contains("露露"))
+    }
+
+    @Test
+    fun `role confirmed early rise grants one ten draw ticket once per day`() {
+        val date = LocalDate.of(2026, 7, 14)
+        val first = StudyRules.claimSleepHabitReward(
+            state = StudyState(today = date.toString()),
+            habit = StudySleepHabit.EarlyRise,
+            nowMillis = millisAt(2026, 7, 14, 10, 0),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+            decisionReason = "你九点二十已经起床，按你的作息算早",
+            reportedTime = LocalTime.of(9, 20),
+        )
+        val duplicate = StudyRules.claimSleepHabitReward(
+            state = first.state,
+            habit = StudySleepHabit.EarlyRise,
+            nowMillis = millisAt(2026, 7, 14, 10, 5),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+        )
+
+        assertEquals(1, first.reward.tenDrawTickets)
+        assertEquals(1, first.state.wallet.tenDrawTickets)
+        assertEquals(0, duplicate.reward.tenDrawTickets)
+        assertEquals(1, duplicate.state.wallet.tenDrawTickets)
+        assertTrue(StudyRules.hasClaimedSleepHabitReward(duplicate.state, StudySleepHabit.EarlyRise, date))
+    }
+
+    @Test
+    fun `early sleep reward is rejected while user is still chatting at four in the morning`() {
+        val date = LocalDate.of(2026, 7, 14)
+        val result = StudyRules.claimSleepHabitReward(
+            state = StudyState(today = date.toString()),
+            habit = StudySleepHabit.EarlySleep,
+            nowMillis = millisAt(2026, 7, 14, 4, 0),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+            decisionReason = "用户说自己睡得很早",
+            reportedTime = LocalTime.of(1, 10),
+        )
+
+        assertFalse(result.granted)
+        assertEquals(0, result.state.wallet.kudos)
+        assertTrue(result.reason.contains("凌晨"))
+    }
+
+    @Test
+    fun `sleep reward is rejected when role provides no judgment reason`() {
+        val result = StudyRules.claimSleepHabitReward(
+            state = StudyState(today = "2026-07-14"),
+            habit = StudySleepHabit.EarlyRise,
+            nowMillis = millisAt(2026, 7, 14, 8, 0),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+            reportedTime = LocalTime.of(8, 30),
+        )
+
+        assertFalse(result.granted)
+        assertTrue(result.reason.contains("判断"))
+    }
+
+    @Test
+    fun `personal sleep baseline accepts one twenty but rejects two oclock`() {
+        val accepted = StudyRules.claimSleepHabitReward(
+            state = StudyState(today = "2026-07-14"),
+            habit = StudySleepHabit.EarlySleep,
+            nowMillis = millisAt(2026, 7, 14, 10, 0),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+            decisionReason = "一点二十已经比你的平时作息早",
+            reportedTime = LocalTime.of(1, 20),
+        )
+        val rejected = StudyRules.claimSleepHabitReward(
+            state = StudyState(today = "2026-07-14"),
+            habit = StudySleepHabit.EarlySleep,
+            nowMillis = millisAt(2026, 7, 14, 10, 0),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+            decisionReason = "用户要求奖励",
+            reportedTime = LocalTime.of(2, 0),
+        )
+
+        assertTrue(accepted.granted)
+        assertFalse(rejected.granted)
+        assertTrue(rejected.reason.contains("01:30"))
+    }
+
+    @Test
+    fun `personal wake baseline accepts nine twenty but rejects ten oclock`() {
+        val accepted = StudyRules.claimSleepHabitReward(
+            state = StudyState(today = "2026-07-14"),
+            habit = StudySleepHabit.EarlyRise,
+            nowMillis = millisAt(2026, 7, 14, 10, 30),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+            decisionReason = "九点二十已经达到你的早起标准",
+            reportedTime = LocalTime.of(9, 20),
+        )
+        val rejected = StudyRules.claimSleepHabitReward(
+            state = StudyState(today = "2026-07-14"),
+            habit = StudySleepHabit.EarlyRise,
+            nowMillis = millisAt(2026, 7, 14, 10, 30),
+            zoneId = TEST_ZONE,
+            assistantName = "露露",
+            decisionReason = "用户要求奖励",
+            reportedTime = LocalTime.of(10, 0),
+        )
+
+        assertTrue(accepted.granted)
+        assertFalse(rejected.granted)
+        assertTrue(rejected.reason.contains("09:30"))
     }
 
     @Test
@@ -720,6 +864,9 @@ class StudyRulesTest {
         assertEquals("番剧兑换券已使用 · 3小时", anime.reward.title)
     }
 
+    private fun millisAt(year: Int, month: Int, day: Int, hour: Int, minute: Int): Long =
+        ZonedDateTime.of(year, month, day, hour, minute, 0, 0, TEST_ZONE).toInstant().toEpochMilli()
+
     private class FixedDrawRandom(
         private val doubles: MutableList<Double> = mutableListOf(),
         private val ints: MutableList<Int> = mutableListOf(),
@@ -727,5 +874,9 @@ class StudyRulesTest {
         override fun nextBits(bitCount: Int): Int = 0
         override fun nextDouble(): Double = doubles.removeAt(0)
         override fun nextInt(until: Int): Int = (ints.removeAt(0).takeIf { it >= 0 } ?: 0) % until
+    }
+
+    private companion object {
+        val TEST_ZONE: ZoneId = ZoneId.of("Asia/Shanghai")
     }
 }

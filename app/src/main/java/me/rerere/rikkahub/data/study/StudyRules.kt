@@ -1,6 +1,9 @@
 package me.rerere.rikkahub.data.study
 
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import kotlin.math.max
 import kotlin.random.Random
 
@@ -9,6 +12,14 @@ object StudyRules {
     const val DISCOUNT_SINGLE_DRAW_COST = 100
     const val TEN_DRAW_COST = 800
     const val TASK_COMPLETE_KUDOS = 50
+    const val EARLY_SLEEP_KUDOS = 500
+    const val EARLY_RISE_TEN_DRAW_TICKETS = 1
+    const val EARLY_SLEEP_EVENING_START_HOUR = 20
+    const val EARLY_SLEEP_CUTOFF_HOUR = 1
+    const val EARLY_SLEEP_CUTOFF_MINUTE = 30
+    const val EARLY_RISE_CUTOFF_HOUR = 9
+    const val EARLY_RISE_CUTOFF_MINUTE = 30
+    const val NIGHT_CONFLICT_END_HOUR = 5
     const val STUDY_REWARD_INTERVAL_MINUTES = 5
     const val STUDY_REWARD_KUDOS = 100
     const val OFFICIAL_ECONOMY_RESET_VERSION = 2
@@ -216,6 +227,105 @@ object StudyRules {
         )
     }
 
+    fun hasClaimedSleepHabitReward(
+        state: StudyState,
+        habit: StudySleepHabit,
+        date: LocalDate = state.today.toLocalDateOrToday(),
+    ): Boolean = sleepHabitClaimKey(date, habit) in state.sleepHabitRewardClaims
+
+    fun claimSleepHabitReward(
+        state: StudyState,
+        habit: StudySleepHabit,
+        nowMillis: Long = System.currentTimeMillis(),
+        zoneId: ZoneId = ZoneId.systemDefault(),
+        assistantName: String = "学习陪伴角色",
+        decisionReason: String = "",
+        reportedTime: LocalTime? = null,
+    ): StudySleepRewardResult {
+        val now = Instant.ofEpochMilli(nowMillis).atZone(zoneId)
+        val date = now.toLocalDate()
+        val current = if (state.today == date.toString()) state else rolloverToDate(state, date)
+        val claimKey = sleepHabitClaimKey(date, habit)
+        if (claimKey in current.sleepHabitRewardClaims) {
+            return StudySleepRewardResult(
+                state = current,
+                granted = false,
+                alreadyClaimed = true,
+                reason = "今天这项作息奖励已经发过了。",
+            )
+        }
+        if (habit == StudySleepHabit.EarlySleep && now.toLocalTime().isInObviousNightConflictWindow()) {
+            return StudySleepRewardResult(
+                state = current,
+                granted = false,
+                reason = "现在仍是凌晨且你正在聊天，不能把这一晚直接判定为早睡。",
+            )
+        }
+        if (reportedTime == null) {
+            return StudySleepRewardResult(
+                state = current,
+                granted = false,
+                reason = "还不知道具体几点睡或几点起；角色需要先问清时间，再按你的作息基线判断。",
+            )
+        }
+        val matchesPersonalBaseline = when (habit) {
+            StudySleepHabit.EarlySleep -> reportedTime.isEarlySleepForUser()
+            StudySleepHabit.EarlyRise -> reportedTime <= LocalTime.of(
+                EARLY_RISE_CUTOFF_HOUR,
+                EARLY_RISE_CUTOFF_MINUTE,
+            )
+        }
+        if (!matchesPersonalBaseline) {
+            val baseline = when (habit) {
+                StudySleepHabit.EarlySleep -> "最晚约01:30入睡"
+                StudySleepHabit.EarlyRise -> "最晚约09:30起床"
+            }
+            return StudySleepRewardResult(
+                state = current,
+                granted = false,
+                reason = "这次时间没有达到你的个人标准（$baseline），所以不发奖励。",
+            )
+        }
+        val cleanDecisionReason = decisionReason.trim()
+        if (cleanDecisionReason.isBlank()) {
+            return StudySleepRewardResult(
+                state = current,
+                granted = false,
+                reason = "角色需要先根据时间和对话作出判断，并写明认可理由，不能机械发奖。",
+            )
+        }
+
+        val reward = when (habit) {
+            StudySleepHabit.EarlySleep -> StudyReward(
+                kudos = EARLY_SLEEP_KUDOS,
+                title = "早睡奖励 +$EARLY_SLEEP_KUDOS 夸夸值",
+            )
+            StudySleepHabit.EarlyRise -> StudyReward(
+                tenDrawTickets = EARLY_RISE_TEN_DRAW_TICKETS,
+                title = "早起奖励 十连抽券 x$EARLY_RISE_TEN_DRAW_TICKETS",
+            )
+        }
+        val roleName = assistantName.trim().ifBlank { "学习陪伴角色" }
+        val eventTitle = when (habit) {
+            StudySleepHabit.EarlySleep -> "早睡被夸啦"
+            StudySleepHabit.EarlyRise -> "早起被夸啦"
+        }
+        val eventDetail = when (habit) {
+            StudySleepHabit.EarlySleep -> "$roleName 确认你昨晚按计划休息，+$EARLY_SLEEP_KUDOS 夸夸值"
+            StudySleepHabit.EarlyRise -> "$roleName 确认你今天按计划起床，十连抽券 x$EARLY_RISE_TEN_DRAW_TICKETS"
+        } + " · 判断：$cleanDecisionReason"
+        return StudySleepRewardResult(
+            state = current.copy(
+                wallet = current.wallet.add(reward),
+                sleepHabitRewardClaims = current.sleepHabitRewardClaims + claimKey,
+                recentEvents = current.recentEvents.addEvent(StudyEventType.Habit, eventTitle, eventDetail),
+            ),
+            reward = reward,
+            granted = true,
+            reason = reward.title,
+        )
+    }
+
     fun toggleTask(
         state: StudyState,
         taskId: String,
@@ -265,6 +375,17 @@ object StudyRules {
             reward = reward,
         )
     }
+
+    private fun sleepHabitClaimKey(date: LocalDate, habit: StudySleepHabit): String =
+        "${date}:${habit.name}"
+
+    private fun LocalTime.isInObviousNightConflictWindow(): Boolean =
+        this > LocalTime.of(EARLY_SLEEP_CUTOFF_HOUR, EARLY_SLEEP_CUTOFF_MINUTE) &&
+            this < LocalTime.of(NIGHT_CONFLICT_END_HOUR, 0)
+
+    private fun LocalTime.isEarlySleepForUser(): Boolean =
+        this >= LocalTime.of(EARLY_SLEEP_EVENING_START_HOUR, 0) ||
+            this <= LocalTime.of(EARLY_SLEEP_CUTOFF_HOUR, EARLY_SLEEP_CUTOFF_MINUTE)
 
     fun completePomodoro(
         state: StudyState,

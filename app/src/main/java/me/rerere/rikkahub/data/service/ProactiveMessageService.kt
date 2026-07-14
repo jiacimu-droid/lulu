@@ -1771,7 +1771,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
         assistant: Assistant,
     ): List<Tool> {
         return buildList {
-            add(createTodayStudyPlanTool())
+            add(createTodayStudyPlanTool(assistant.id.toString(), assistant.name))
 
             // 搜索工具
             if (settings.enableWebSearch) {

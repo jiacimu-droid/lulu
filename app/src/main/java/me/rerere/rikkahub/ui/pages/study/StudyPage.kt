@@ -131,6 +131,7 @@ import me.rerere.rikkahub.data.study.StudyInventory
 import me.rerere.rikkahub.data.study.StudyMysteryBoxReward
 import me.rerere.rikkahub.data.study.StudyRarity
 import me.rerere.rikkahub.data.study.StudyRules
+import me.rerere.rikkahub.data.study.StudySleepHabit
 import me.rerere.rikkahub.data.study.StudyShopItem
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyTip
@@ -250,6 +251,12 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             onPomodoro = { navController.navigate(Screen.StudyPomodoro) },
                             onOpenLevel = { showLevelDialog = true },
                             onSelectCompanion = { vm.selectCompanion(it.id.toString()) },
+                        )
+                    }
+                    item {
+                        SleepHabitRewardCard(
+                            state = state,
+                            assistantName = companionAssistant.name.ifBlank { "当前角色" },
                         )
                     }
                     item {
@@ -2111,6 +2118,81 @@ private fun GachaCard(
 }
 
 @Composable
+private fun SleepHabitRewardCard(
+    state: StudyState,
+    assistantName: String,
+) {
+    val today = LocalDate.now()
+    val earlySleepClaimed = StudyRules.hasClaimedSleepHabitReward(
+        state = state,
+        habit = StudySleepHabit.EarlySleep,
+        date = today,
+    )
+    val earlyRiseClaimed = StudyRules.hasClaimedSleepHabitReward(
+        state = state,
+        habit = StudySleepHabit.EarlyRise,
+        date = today,
+    )
+    StudyCard {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("作息任务", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                "个人标准：约01:30前睡、09:30前起。告诉 $assistantName 具体时间，由 TA 结合对话判断。每天每项一次。",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        SleepHabitRewardRow(
+            title = "昨晚早睡",
+            reward = "+${StudyRules.EARLY_SLEEP_KUDOS} 夸夸值",
+            claimed = earlySleepClaimed,
+        )
+        SleepHabitRewardRow(
+            title = "今天早起",
+            reward = "十连抽券 ×${StudyRules.EARLY_RISE_TEN_DRAW_TICKETS}",
+            claimed = earlyRiseClaimed,
+        )
+    }
+}
+
+@Composable
+private fun SleepHabitRewardRow(
+    title: String,
+    reward: String,
+    claimed: Boolean,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = if (claimed) {
+            MaterialTheme.colorScheme.secondaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerLow
+        },
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                Text(
+                    reward,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(
+                if (claimed) "今天已领取" else "等你告诉 TA",
+                style = MaterialTheme.typography.labelLarge,
+                color = if (claimed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
 private fun StarryLetterBackdrop(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier.background(Brush.verticalGradient(listOf(Color(0xFF161B38), Color(0xFF34264E), Color(0xFF111427))))) {
         drawCircle(Color(0x33FFF4D6), radius = size.minDimension * 0.22f, center = Offset(size.width * 0.82f, size.height * 0.18f))
@@ -2648,6 +2730,8 @@ private fun StudyGuideCard() {
             title = "每日获取",
             lines = listOf(
                 "签到：每天固定 50 夸夸值。",
+                "昨晚早睡：按你的作息，约01:30前入睡并经角色认可，可发 ${StudyRules.EARLY_SLEEP_KUDOS} 夸夸值。",
+                "今天早起：按你的作息，约09:30前起床并经角色认可，可发十连抽券 x${StudyRules.EARLY_RISE_TEN_DRAW_TICKETS}。",
                 "累计学习每满 ${StudyRules.STUDY_REWARD_INTERVAL_MINUTES} 分钟：${StudyRules.STUDY_REWARD_KUDOS} 夸夸值；不足部分跨番茄保留。",
                 "完成 1 项待办：50 夸夸值。",
                 "今日待办全清：触发超神时刻，固定给十连券 x1。",
@@ -2689,12 +2773,13 @@ private fun StudyGuideCard() {
                 "番茄钟开始前可选择语音鼓励。",
                 "番茄钟里可以和角色轻声聊天。",
                 "番茄钟结束后按实际累计学习时长发放夸夸值。",
+                "作息奖励按你的个人基线判断；角色必须知道具体时间，描述含糊会追问，明显矛盾或太晚会拒绝。",
             ),
         )
         GuideBlock(
             title = "当前已落地",
             lines = listOf(
-                "签到、待办、番茄钟、盲盒、惩罚、抽卡、超神、等级、成就、商店都已接入本地状态。",
+                "签到、作息任务、待办、番茄钟、盲盒、惩罚、抽卡、超神、等级、成就、商店都已接入本地状态。",
                 "收藏已按 20 套画卷、每套 10 个专属碎片展示。",
                 "旧存档通用普通碎片仍可自动补最佳目标，也可在收藏里指定画卷；新系统不再产出。",
                 "娱乐券与剧场碎片均按用途独立保存，卡池内不存在任何通用碎片。",

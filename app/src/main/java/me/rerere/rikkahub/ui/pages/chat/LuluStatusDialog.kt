@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import me.rerere.rikkahub.data.companion.CompanionCommitment
 import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
 import me.rerere.rikkahub.data.companion.CompanionConcern
@@ -76,12 +77,17 @@ fun LuluStatusDialog(
         state.mood.takeIf(String::isNotBlank)?.let { add("心情" to it) }
         state.bodyState.takeIf(String::isNotBlank)?.let { add("身体" to it) }
         state.mindState.takeIf(String::isNotBlank)?.let { add("精神" to it) }
-        state.activityMode.takeIf(String::isNotBlank)?.let { add("状态" to it) }
+        state.activityMode.takeIf(String::isNotBlank)?.let { add("正在" to it.toHumanActivityMode()) }
         snapshot.relationship.roleLabel.takeIf(String::isNotBlank)?.let { add("关系" to it) }
     }
+    val currentScene = state.selfScene.ifBlank { state.innerThought }
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
+        modifier = Modifier
+            .fillMaxWidth(0.92f)
+            .heightIn(max = 720.dp),
+        properties = DialogProperties(usePlatformDefaultWidth = false),
         title = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
@@ -112,14 +118,14 @@ fun LuluStatusDialog(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 420.dp),
+                        .heightIn(max = 520.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                     if (selectedTab == 0) {
                         item {
                             StatusSection(
-                                title = "心里想着",
-                                text = state.innerThought.ifBlank { "此刻还没有留下明确的心声。" },
+                                title = "此刻",
+                                text = currentScene.ifBlank { "此刻还没有留下明确的状态。" },
                             )
                         }
                         if (stateChips.isNotEmpty()) {
@@ -133,9 +139,6 @@ fun LuluStatusDialog(
                                     }
                                 }
                             }
-                        }
-                        state.selfScene.takeIf(String::isNotBlank)?.let { scene ->
-                            item { StatusSection(title = "此刻", text = scene) }
                         }
                         if (activeConcerns.isNotEmpty()) {
                             item { SectionTitle("正在挂心") }
@@ -233,8 +236,6 @@ private fun StatusSection(title: String, text: String) {
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 5,
-                overflow = TextOverflow.Ellipsis,
             )
         }
     }
@@ -361,4 +362,13 @@ private fun formatAbsoluteTime(timeMillis: Long): String {
     return Instant.ofEpochMilli(timeMillis)
         .atZone(ZoneId.systemDefault())
         .format(formatter)
+}
+
+private fun String.toHumanActivityMode(): String = when (trim().lowercase()) {
+    "waiting" -> "等你回应"
+    "conversation", "chatting" -> "和你聊天"
+    "planning" -> "想接下来的事"
+    "studying", "study" -> "陪你学习"
+    "resting", "rest" -> "休息"
+    else -> trim()
 }

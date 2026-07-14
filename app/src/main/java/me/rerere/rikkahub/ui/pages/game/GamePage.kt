@@ -77,6 +77,7 @@ import me.rerere.hugeicons.stroke.VolumeHigh
 import me.rerere.rikkahub.Screen
 import me.rerere.rikkahub.data.ai.ApiUsageSource
 import me.rerere.rikkahub.data.ai.ApiUsageStore
+import me.rerere.rikkahub.data.ai.transformers.transformMessages
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
@@ -232,21 +233,43 @@ fun PerfectManGamePage() {
                 ?: return@runCatching fallback
             val providerSetting = model.findProvider(settings.providers) ?: return@runCatching fallback
             val provider = providerManager.getProviderByType(providerSetting)
-            val playerPrompt = player?.let {
-                "你现在扮演坐在用户对面一起玩游戏的“${it.name.ifBlank { "玩家" }}”。" +
-                    "沿用这个角色的说话习惯、关系感和性格边界，但只输出当面会说出口的话。"
+            val playerPrompt = player?.let { assistant ->
+                buildString {
+                    appendLine("你现在扮演坐在用户对面一起玩游戏的“${assistant.name.ifBlank { "玩家" }}”。")
+                    appendLine("沿用这个角色的说话习惯、关系感和性格边界，但只输出当面会说出口的话。")
+                    if (assistant.systemPrompt.isNotBlank()) {
+                        appendLine("角色人设：")
+                        appendLine(assistant.systemPrompt)
+                    }
+                    if (assistant.appearancePrompt.isNotBlank()) {
+                        appendLine("角色外貌：")
+                        appendLine(assistant.appearancePrompt)
+                    }
+                }.trim()
             }.orEmpty()
+            val messages = buildList {
+                add(UIMessage.system(
+                    "你是坐在用户对面一起玩“满分男”的真人玩家，不是主持人、裁判或旁白。" +
+                        "只输出你会当面说出口的话。语气自然、会吐槽、会犹豫、会互动。" +
+                        "不要播报系统结果，不要解释规则。文案短、好猜、有画面感，不要色情，不要羞辱真实群体。",
+                ))
+                if (playerPrompt.isNotBlank()) add(UIMessage.system(playerPrompt))
+                add(UIMessage.user(prompt))
+            }.let { baseMessages ->
+                if (player == null) {
+                    baseMessages
+                } else {
+                    transformMessages(
+                        messages = baseMessages,
+                        assistant = player,
+                        modeInjections = settings.modeInjections,
+                        lorebooks = settings.lorebooks,
+                    )
+                }
+            }
             val chunk = provider.generateText(
                 providerSetting = providerSetting,
-                messages = buildList {
-                    add(UIMessage.system(
-                        "你是坐在用户对面一起玩“满分男”的真人玩家，不是主持人、裁判或旁白。" +
-                            "只输出你会当面说出口的话。语气自然、会吐槽、会犹豫、会互动。" +
-                            "不要播报系统结果，不要解释规则。文案短、好猜、有画面感，不要色情，不要羞辱真实群体。",
-                    ))
-                    if (playerPrompt.isNotBlank()) add(UIMessage.system(playerPrompt))
-                    add(UIMessage.user(prompt))
-                },
+                messages = messages,
                 params = TextGenerationParams(
                     model = model,
                     temperature = 0.8f,

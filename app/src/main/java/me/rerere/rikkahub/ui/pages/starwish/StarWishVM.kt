@@ -22,11 +22,13 @@ import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.ui.UIMessage
 import me.rerere.rikkahub.data.ai.ApiUsageSource
 import me.rerere.rikkahub.data.ai.ApiUsageStore
+import me.rerere.rikkahub.data.ai.transformers.transformMessages
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.repository.GenMediaRepository
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
+import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.starwish.StarWishGeneratedImage
 import me.rerere.rikkahub.data.starwish.StarWishImageLaunch
 import me.rerere.rikkahub.data.starwish.StarWishOutfitPrompts
@@ -331,10 +333,33 @@ class StarWishVM(
         val providerSetting = model.findProvider(settings.providers)
             ?: error("小剧场模型没有找到对应提供商。")
         val provider = providerManager.getProviderByType(providerSetting)
+        val assistant = settings.getCurrentAssistant()
         val prompt = StarWishRules.theaterChapterPrompt(seed, chapters, nextChapter, influence, guide)
+        val messages = transformMessages(
+            messages = listOf(
+                UIMessage.system(buildString {
+                    appendLine(
+                        "小剧场中的核心陪伴角色是 ${assistant.name.ifBlank { "当前角色" }}，" +
+                            "必须遵守其人设、关系边界与语言习惯。",
+                    )
+                    if (assistant.systemPrompt.isNotBlank()) {
+                        appendLine("角色人设：")
+                        appendLine(assistant.systemPrompt)
+                    }
+                    if (assistant.appearancePrompt.isNotBlank()) {
+                        appendLine("角色外貌：")
+                        appendLine(assistant.appearancePrompt)
+                    }
+                }.trim()),
+                UIMessage.user(prompt),
+            ),
+            assistant = assistant,
+            modeInjections = settings.modeInjections,
+            lorebooks = settings.lorebooks,
+        )
         val chunk = provider.generateText(
             providerSetting = providerSetting,
-            messages = listOf(UIMessage.user(prompt)),
+            messages = messages,
             params = TextGenerationParams(
                 model = model,
                 temperature = 0.9f,

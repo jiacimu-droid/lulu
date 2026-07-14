@@ -1512,7 +1512,7 @@ class ChatService(
         assistant: Assistant,
         conversationId: Uuid? = null,
     ): List<Tool> = buildList {
-        add(createTodayStudyPlanTool())
+        add(createTodayStudyPlanTool(assistant.id.toString(), assistant.name))
         conversationId?.let { add(createFavoriteCurrentUserMessageTool(it)) }
         if (settings.enableWebSearch) {
             addAll(createSearchTools(settings))

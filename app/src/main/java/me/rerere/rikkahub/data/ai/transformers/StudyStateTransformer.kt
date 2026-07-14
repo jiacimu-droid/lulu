@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import me.rerere.ai.ui.UIMessage
 import me.rerere.rikkahub.data.study.ExamStudyPlan
 import me.rerere.rikkahub.data.study.StudyRules
+import me.rerere.rikkahub.data.study.StudySleepHabit
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.data.study.StudyTaskSource
@@ -59,6 +60,17 @@ internal fun buildStudyCompanionContext(
         appendLine("本周学习：${timeOverview.weekPomodoros} 个番茄，${timeOverview.weekMinutes} 分钟")
         appendLine("累计番茄钟：${state.stats.totalPomodoros} 个；累计学习：${state.stats.totalStudyMinutes} 分钟")
         appendLine("夸夸值：当前 ${state.wallet.kudos}；累计 ${state.wallet.totalKudosEarned}；等级 Lv${level.level} ${level.title}")
+        appendLine(
+            "今日作息奖励：早睡 ${if (StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlySleep, today)) "已发放" else "未发放"}；" +
+                "早起 ${if (StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlyRise, today)) "已发放" else "未发放"}",
+        )
+        appendLine(
+            "作息奖励规则：用户自述昨晚早睡或今天早起时，由当前学习陪伴角色结合当前时间、前后对话和描述可信度判断；" +
+                "你的个人基线是最晚约01:30入睡、最晚约09:30起床。必须得到具体时间，没有时间就先追问；" +
+                "不要因为用户索要就自动发放，明显矛盾或超过个人基线时拒绝。角色认可后通过 today_study_plan 发放。" +
+                "早睡 +${StudyRules.EARLY_SLEEP_KUDOS} 夸夸值，早起发十连抽券 " +
+                "x${StudyRules.EARLY_RISE_TEN_DRAW_TICKETS}，每项每天一次。",
+        )
         if (completedTasks.isNotEmpty()) {
             appendLine("已完成/已划掉待办：")
             completedTasks.take(8).forEach { task ->

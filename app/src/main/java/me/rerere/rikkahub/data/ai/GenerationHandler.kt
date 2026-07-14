@@ -37,6 +37,7 @@ import me.rerere.rikkahub.data.ai.transformers.OutputMessageTransformer
 import me.rerere.rikkahub.data.ai.transformers.onGenerationFinish
 import me.rerere.rikkahub.data.ai.transformers.transforms
 import me.rerere.rikkahub.data.ai.transformers.visualTransforms
+import me.rerere.rikkahub.data.ai.transformers.withRequiredAssistantPromptContext
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
@@ -124,7 +125,7 @@ class GenerationHandler(
                             )
                         )
                     },
-                    transformers = inputTransformers,
+                    transformers = inputTransformers.withRequiredAssistantPromptContext(),
                     model = model,
                     providerImpl = providerImpl,
                     provider = provider,

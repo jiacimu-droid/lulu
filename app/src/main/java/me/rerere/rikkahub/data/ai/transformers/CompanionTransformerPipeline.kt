@@ -17,3 +17,6 @@ internal val companionOutputTransformers: List<OutputMessageTransformer> = listO
     RegexOutputTransformer,
     LuluExpressionOutputTransformer,
 )
+
+internal fun List<InputMessageTransformer>.withRequiredAssistantPromptContext(): List<InputMessageTransformer> =
+    if (PromptInjectionTransformer in this) this else listOf(PromptInjectionTransformer) + this

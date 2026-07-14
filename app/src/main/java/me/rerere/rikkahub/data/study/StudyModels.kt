@@ -33,6 +33,8 @@ data class StudyState(
     val purchasedShopItemIds: Set<String> = emptySet(),
     val manualShopRefreshDate: String? = null,
     val recentEvents: List<StudyEvent> = emptyList(),
+    /** Daily role-confirmed sleep rewards, keyed as yyyy-MM-dd:habit. */
+    val sleepHabitRewardClaims: Set<String> = emptySet(),
     val activePlanDate: String? = null,
     val generatedSchedules: Map<String, List<StudyScheduleBlock>> = emptyMap(),
     val selectedAssistantId: String? = null,
@@ -117,6 +119,7 @@ data class StudyEvent(
 @Serializable
 enum class StudyEventType {
     SignIn,
+    Habit,
     Task,
     Pomodoro,
     MysteryBox,
@@ -130,6 +133,12 @@ enum class StudyEventType {
     McDonalds,
     Fragment,
     Entertainment,
+}
+
+@Serializable
+enum class StudySleepHabit {
+    EarlySleep,
+    EarlyRise,
 }
 
 @Serializable
@@ -159,6 +168,14 @@ data class StudyMysteryBoxReward(
 data class StudyActionResult(
     val state: StudyState,
     val reward: StudyReward = StudyReward(),
+)
+
+data class StudySleepRewardResult(
+    val state: StudyState,
+    val granted: Boolean,
+    val reason: String,
+    val reward: StudyReward = StudyReward(),
+    val alreadyClaimed: Boolean = false,
 )
 
 data class StudyTimeOverview(

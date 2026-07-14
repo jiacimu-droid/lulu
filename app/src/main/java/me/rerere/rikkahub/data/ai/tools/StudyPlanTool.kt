@@ -8,6 +8,7 @@ import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -18,19 +19,28 @@ import me.rerere.ai.core.Tool
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.study.ExamStudyPlan
 import me.rerere.rikkahub.data.study.StudyRules
+import me.rerere.rikkahub.data.study.StudySleepHabit
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.data.study.StudyTaskSource
 import org.koin.core.context.GlobalContext
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeParseException
 
-fun createTodayStudyPlanTool(): Tool = Tool(
+fun createTodayStudyPlanTool(
+    assistantId: String? = null,
+    assistantName: String = "",
+): Tool = Tool(
     name = "today_study_plan",
     description = """
-        Read or update today's app-local study tasks. Use action=set_completion only after the user explicitly reports
-        generated schedule, pomodoro stats, kudos and rewards. Use this for 考研计划, 今日计划, 待办, 番茄钟,
-        completion status. Only existing tasks can change; this tool never creates or deletes tasks. Do not use calendar_tool.
+        Read or update today's app-local study state. Use action=set_completion only after the user explicitly reports
+        task completion. Use action=claim_sleep_reward only after the character has judged the user's early-sleep or
+        early-rise report credible from the current time and conversation. Do not grant merely because the user asks;
+        obtain the reported clock time, ask a follow-up when it is missing, and refuse obvious contradictions. The
+        user's personal baseline is sleep by about 01:30 and wake by about 09:30. Each reward is idempotent per day.
+        Use this for 考研计划, 今日计划, 待办, 番茄钟, 作息, 早睡, 早起, 夸夸值 and rewards.
+        Only existing tasks can change; this tool never creates or deletes tasks. Do not use calendar_tool.
     """.trimIndent().replace("\n", " "),
     parameters = {
         InputSchema.Obj(
@@ -40,8 +50,42 @@ fun createTodayStudyPlanTool(): Tool = Tool(
                     put("enum", buildJsonArray {
                         add(JsonPrimitive("read"))
                         add(JsonPrimitive("set_completion"))
+                        add(JsonPrimitive("claim_sleep_reward"))
                     })
-                    put("description", JsonPrimitive("Read state or update completion after an explicit user report."))
+                    put(
+                        "description",
+                        JsonPrimitive("Read state, update completion, or grant a self-reported sleep reward."),
+                    )
+                }
+                putJsonObject("sleep_habit") {
+                    put("type", JsonPrimitive("string"))
+                    put("enum", buildJsonArray {
+                        add(JsonPrimitive("early_sleep"))
+                        add(JsonPrimitive("early_rise"))
+                    })
+                    put(
+                        "description",
+                        JsonPrimitive("early_sleep means last night's bedtime; early_rise means today's wake-up."),
+                    )
+                }
+                putJsonObject("decision_reason") {
+                    put("type", JsonPrimitive("string"))
+                    put(
+                        "description",
+                        JsonPrimitive("A short in-character reason why the report is credible enough to reward."),
+                    )
+                }
+                putJsonObject("reported_hour") {
+                    put("type", JsonPrimitive("integer"))
+                    put("minimum", JsonPrimitive(0))
+                    put("maximum", JsonPrimitive(23))
+                    put("description", JsonPrimitive("The reported local hour of sleeping or waking."))
+                }
+                putJsonObject("reported_minute") {
+                    put("type", JsonPrimitive("integer"))
+                    put("minimum", JsonPrimitive(0))
+                    put("maximum", JsonPrimitive(59))
+                    put("description", JsonPrimitive("The reported minute of sleeping or waking."))
                 }
                 putJsonObject("complete_task_ids") {
                     put("type", JsonPrimitive("array"))
@@ -85,6 +129,73 @@ fun createTodayStudyPlanTool(): Tool = Tool(
                 put("changed_task_ids", buildJsonArray { changedIds.forEach { add(it) } })
                 put("state", buildTodayStudyPlanPayload(updatedState ?: runBlocking { store.state.first() }))
             }.toString()))
+        } else if (action == "claim_sleep_reward") {
+            val habit = when (params["sleep_habit"]?.jsonPrimitive?.contentOrNull) {
+                "early_sleep" -> StudySleepHabit.EarlySleep
+                "early_rise" -> StudySleepHabit.EarlyRise
+                else -> null
+            }
+            if (habit == null) {
+                listOf(UIMessagePart.Text(buildJsonObject {
+                    put("success", false)
+                    put("error", "sleep_habit must be early_sleep or early_rise")
+                }.toString()))
+            } else {
+                var blockedByCompanion = false
+                var alreadyClaimed = false
+                var granted = false
+                var rewardKudos = 0
+                var rewardTenDrawTickets = 0
+                var resultReason = ""
+                var updatedState: StudyState? = null
+                runBlocking {
+                    store.update { current ->
+                        val selectedAssistantId = current.selectedAssistantId
+                        if (
+                            assistantId != null &&
+                            selectedAssistantId != null &&
+                            assistantId != selectedAssistantId
+                        ) {
+                            blockedByCompanion = true
+                            updatedState = current
+                            current
+                        } else {
+                            val result = StudyRules.claimSleepHabitReward(
+                                state = current,
+                                habit = habit,
+                                assistantName = assistantName,
+                                decisionReason = params["decision_reason"]
+                                    ?.jsonPrimitive
+                                    ?.contentOrNull
+                                    .orEmpty(),
+                                reportedTime = params.reportedSleepClockTime(),
+                            )
+                            alreadyClaimed = result.alreadyClaimed
+                            granted = result.granted
+                            rewardKudos = result.reward.kudos
+                            rewardTenDrawTickets = result.reward.tenDrawTickets
+                            resultReason = result.reason
+                            updatedState = result.state
+                            result.state
+                        }
+                    }
+                }
+                val finalState = updatedState ?: runBlocking { store.state.first() }
+                listOf(UIMessagePart.Text(buildJsonObject {
+                    put("success", !blockedByCompanion)
+                    put("granted", !blockedByCompanion && granted)
+                    put("already_claimed_today", alreadyClaimed)
+                    if (blockedByCompanion) {
+                        put("error", "Only the character selected as today's study companion can grant this reward.")
+                    }
+                    put("reason", resultReason)
+                    put("reward", buildJsonObject {
+                        put("kudos", rewardKudos)
+                        put("ten_draw_tickets", rewardTenDrawTickets)
+                    })
+                    put("state", buildTodayStudyPlanPayload(finalState))
+                }.toString()))
+            }
         } else {
             val state = runBlocking { store.state.first() }
             listOf(UIMessagePart.Text(buildTodayStudyPlanPayload(state).toString()))
@@ -152,6 +263,13 @@ private fun JsonObject.stringSet(key: String): Set<String> = this[key]
     ?.toSet()
     .orEmpty()
 
+private fun JsonObject.reportedSleepClockTime(): LocalTime? {
+    val hour = this["reported_hour"]?.jsonPrimitive?.intOrNull ?: return null
+    val minute = this["reported_minute"]?.jsonPrimitive?.intOrNull ?: return null
+    if (hour !in 0..23 || minute !in 0..59) return null
+    return LocalTime.of(hour, minute)
+}
+
 private fun String.normalizedTaskTitle(): String = lowercase()
     .replace(Regex("[\\p{P}\\p{S}\\s]+"), "")
 
@@ -185,6 +303,26 @@ fun buildTodayStudyPlanPayload(
         put("total_kudos_earned", state.wallet.totalKudosEarned)
         put("level", level.level)
         put("level_title", level.title)
+        put("sleep_habits", buildJsonObject {
+            put(
+                "early_sleep_claimed_today",
+                StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlySleep, today),
+            )
+            put("early_sleep_reward_kudos", StudyRules.EARLY_SLEEP_KUDOS)
+            put("early_sleep_personal_cutoff", "01:30")
+            put(
+                "early_rise_claimed_today",
+                StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlyRise, today),
+            )
+            put("early_rise_reward_ten_draw_tickets", StudyRules.EARLY_RISE_TEN_DRAW_TICKETS)
+            put("early_rise_personal_cutoff", "09:30")
+            put(
+                "instruction",
+                "The character decides whether the report is credible from time and conversation. " +
+                    "Do not grant just because the user asks; ask when ambiguous and refuse contradictions. " +
+                    "Each habit can be granted once per day.",
+            )
+        })
         put("already_done", buildJsonArray {
             completedTasks.take(20).forEach { task ->
                 add(buildJsonObject {

@@ -199,6 +199,15 @@ private fun WorldbookEditorDialog(
                     Text("全局应用")
                     Switch(checked = globalApply, onCheckedChange = { globalApply = it })
                 }
+                Text(
+                    text = if (globalApply) {
+                        "已开启：这段常驻设定会自动加入所有角色相关的生成，无需再给每个角色单独勾选。"
+                    } else {
+                        "关闭后，只有在角色扩展里单独勾选这本世界书时才会加入。"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         },
         confirmButton = {
