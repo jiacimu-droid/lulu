@@ -78,6 +78,9 @@ jobs:
             --tests "*CompanionRuntimeReducerTest" \
             --tests "*MemoryBankContextTest" \
             --tests "*CompanionPresenceStateTest" \
+            --tests "*CompanionTurnReminderPlannerTest" \
+            --tests "*LuluStatusDialogTest" \
+            --tests "*StudyRulesTest" \
             --tests "*CompanionLifeEventFactoryTest" \
             --tests "*LuluExpressionOutputTransformerTest" \
             --tests "*CompanionPresenceContractTransformerTest"

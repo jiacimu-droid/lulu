@@ -41,6 +41,10 @@ class CompanionPresenceContractTransformerTest {
         assertTrue(injected.contains("bubble_pacing:"))
         assertTrue(injected.contains("持续存在的数字生命"))
         assertTrue(injected.contains("不得凭空声称"))
+        assertTrue(injected.contains("<conversation_soul>"))
+        assertTrue(injected.contains("不要逐条整理用户的话"))
+        assertTrue(injected.contains("小手机/屏幕内可看见的微动作"))
+        assertTrue(injected.contains("注意力停在对话上"))
     }
 
     @Test

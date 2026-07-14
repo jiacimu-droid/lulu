@@ -26,6 +26,9 @@ object StudyRules {
     const val DATA_LOSS_COMPENSATION_VERSION = 4
     const val POMODORO_INTERRUPTION_COMPENSATION_VERSION = 1
     const val POMODORO_INTERRUPTION_COMPENSATION_KUDOS = 400
+    const val GACHA_BAD_LUCK_COMPENSATION_VERSION = 1
+    const val GACHA_BAD_LUCK_COMPENSATION_TEN_DRAW_TICKETS = 4
+    const val NON_NORMAL_PITY_DRAW_COUNT = 30
     const val NORMAL_FRAGMENTS_PER_OUTFIT = 10
     private const val OVERFLOW_NORMAL_FRAGMENT_KUDOS = 100
     private const val INTERNAL_TEST_GRANT_VERSION = 1
@@ -505,9 +508,19 @@ object StudyRules {
         }
         var inventory = state.inventory
         var overflowKudos = 0
+        var drawsSinceNonNormal = state.drawsSinceNonNormal.coerceIn(0, NON_NORMAL_PITY_DRAW_COUNT - 1)
         val results = buildList {
             repeat(drawCount) {
-                val result = drawOne(random)
+                val result = if (drawsSinceNonNormal >= NON_NORMAL_PITY_DRAW_COUNT - 1) {
+                    drawRare(random)
+                } else {
+                    drawOne(random)
+                }
+                drawsSinceNonNormal = if (result.rarity == StudyRarity.Normal) {
+                    drawsSinceNonNormal + 1
+                } else {
+                    0
+                }
                 if (result.rarity == StudyRarity.Normal && inventory.isNormalFragmentFull(result.fragmentKey)) {
                     overflowKudos += OVERFLOW_NORMAL_FRAGMENT_KUDOS
                 } else {
@@ -538,6 +551,7 @@ object StudyRules {
                 dailyPurpleDrawDate = drawDate,
                 dailyPurpleDrawCount = nextPurpleCount,
                 dailyDrawCount = nextDrawCount,
+                drawsSinceNonNormal = drawsSinceNonNormal,
                 purpleSafetyGrantedDate = if (grantPurpleSafety) drawDate else state.purpleSafetyGrantedDate,
                 stats = state.stats.copy(
                     unlockedOutfitSets = refreshed.second.first,
@@ -573,6 +587,23 @@ object StudyRules {
                 StudyEventType.Pomodoro,
                 "番茄钟中断补偿",
                 reward.title,
+            ),
+        )
+    }
+
+    fun grantGachaBadLuckCompensation(state: StudyState): StudyState {
+        if (state.gachaBadLuckCompensationVersion >= GACHA_BAD_LUCK_COMPENSATION_VERSION) return state
+        val reward = StudyReward(
+            tenDrawTickets = GACHA_BAD_LUCK_COMPENSATION_TEN_DRAW_TICKETS,
+            title = "40抽全蓝体验补偿：十连抽券 x$GACHA_BAD_LUCK_COMPENSATION_TEN_DRAW_TICKETS",
+        )
+        return state.copy(
+            wallet = state.wallet.add(reward),
+            gachaBadLuckCompensationVersion = GACHA_BAD_LUCK_COMPENSATION_VERSION,
+            recentEvents = state.recentEvents.addEvent(
+                StudyEventType.Draw,
+                "40抽全蓝体验补偿",
+                "已补发十连抽券 x$GACHA_BAD_LUCK_COMPENSATION_TEN_DRAW_TICKETS（40抽）",
             ),
         )
     }

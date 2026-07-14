@@ -176,4 +176,20 @@ class CompanionPresenceStateTest {
         assertFalse(next.innerThought.contains("副 API", ignoreCase = true))
         assertFalse(next.selfScene.contains("后台", ignoreCase = true))
     }
+
+    @Test
+    fun `conversation recap is not stored as the visible current scene`() {
+        val next = buildCompanionStateFromTurn(
+            previous = CompanionState(),
+            assistantText = "去吃饭吧，我晚点再看看。",
+            presence = CompanionModelPresence(
+                description = "刚刚和你聊到了吃饭，注意力还停在这段对话上。",
+                innerThought = "希望你这次别只拿零食对付。",
+            ),
+            nowMillis = 1_000L,
+        )
+
+        assertEquals("", next.selfScene)
+        assertEquals("希望你这次别只拿零食对付。", next.innerThought)
+    }
 }

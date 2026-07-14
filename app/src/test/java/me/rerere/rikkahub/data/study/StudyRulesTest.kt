@@ -334,6 +334,28 @@ class StudyRulesTest {
     }
 
     @Test
+    fun `regular pool forces a purple result before thirty consecutive normal draws`() {
+        val alwaysNormal = object : Random() {
+            override fun nextBits(bitCount: Int): Int = 0
+            override fun nextDouble(): Double = 0.0
+            override fun nextInt(until: Int): Int = 0
+        }
+        var state = StudyState(wallet = StudyWallet(tenDrawTickets = 4))
+        val results = buildList {
+            repeat(4) {
+                val draw = StudyRules.draw(state, count = 10, random = alwaysNormal)
+                state = draw.state
+                addAll(draw.results)
+            }
+        }
+
+        assertEquals(40, results.size)
+        assertEquals(1, results.count { it.rarity == StudyRarity.Rare })
+        assertEquals(0, results.count { it.rarity == StudyRarity.Epic || it.rarity == StudyRarity.Rainbow })
+        assertEquals(10, state.drawsSinceNonNormal)
+    }
+
+    @Test
     fun `level lookup uses cumulative kudos and unclaimed level rewards`() {
         val state = StudyState(wallet = StudyWallet(totalKudosEarned = 4_000))
 
@@ -665,6 +687,22 @@ class StudyRulesTest {
         )
         assertEquals(compensated, duplicate)
         assertEquals("番茄钟中断补偿", compensated.recentEvents.last().title)
+    }
+
+    @Test
+    fun `forty draw bad luck compensation grants four ten draw tickets once`() {
+        val state = StudyState(wallet = StudyWallet(tenDrawTickets = 1))
+
+        val compensated = StudyRules.grantGachaBadLuckCompensation(state)
+        val duplicate = StudyRules.grantGachaBadLuckCompensation(compensated)
+
+        assertEquals(5, compensated.wallet.tenDrawTickets)
+        assertEquals(
+            StudyRules.GACHA_BAD_LUCK_COMPENSATION_VERSION,
+            compensated.gachaBadLuckCompensationVersion,
+        )
+        assertEquals(compensated, duplicate)
+        assertEquals("40抽全蓝体验补偿", compensated.recentEvents.last().title)
     }
 
     @Test

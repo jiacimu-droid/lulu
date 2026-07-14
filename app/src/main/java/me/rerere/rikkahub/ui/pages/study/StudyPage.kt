@@ -2735,7 +2735,7 @@ private fun StudyGuideCard() {
                 "累计学习每满 ${StudyRules.STUDY_REWARD_INTERVAL_MINUTES} 分钟：${StudyRules.STUDY_REWARD_KUDOS} 夸夸值；不足部分跨番茄保留。",
                 "完成 1 项待办：50 夸夸值。",
                 "今日待办全清：触发超神时刻，固定给十连券 x1。",
-                "当天累计学习120分钟且普通卡池已抽30抽仍为零紫：发放1次今日零紫安全抽。",
+                "普通卡池连续 ${StudyRules.NON_NORMAL_PITY_DRAW_COUNT} 抽没有紫/金/彩：第 ${StudyRules.NON_NORMAL_PITY_DRAW_COUNT} 抽直接保底紫色。",
             ),
         )
         GuideBlock(
@@ -2745,6 +2745,7 @@ private fun StudyGuideCard() {
                 "十连 ${StudyRules.TEN_DRAW_COST} 夸夸值。",
                 "蓝色画卷专属碎片 90.15%；紫色 8%（抖音20分钟 6.5% / 剧场碎片 1.5%）。",
                 "金色 1.5%（游戏120分钟 1.2% / 视频解锁卡 0.3%）；彩色番剧3小时 0.35%。",
+                "硬保底：连续 ${StudyRules.NON_NORMAL_PITY_DRAW_COUNT} 抽没有出现紫/金/彩时，第 ${StudyRules.NON_NORMAL_PITY_DRAW_COUNT} 抽必为紫色。",
                 "卡池、等级和神秘商店都不再产出通用碎片；旧存档中的通用碎片仍可使用。",
                 "每套画卷需要 10 个专属碎片；通用普通碎片可以补任意一套未满画卷。",
                 "娱乐券抽到即拥有；剧场碎片每枚可生成或续写小剧场 1 章。",

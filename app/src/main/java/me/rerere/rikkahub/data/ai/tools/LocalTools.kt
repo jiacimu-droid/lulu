@@ -406,6 +406,8 @@ class LocalTools(private val context: Context) {
                 Record the character's current presence for this turn.
                 Use when a reply should carry embodied presence. Prefer one complete natural
                 Chinese paragraph describing current visible state, behavior, action, posture, and tags.
+                Description must show a visible micro-action, posture, facial expression, or screen-side
+                gesture. Never summarize what was just discussed or write that attention remains on the conversation.
                 Always include inner_voice when possible: write what the character is thinking but
                 not saying aloud, in first person, in character, without labels or prompt text.
                 Use thought for a short memory of the same unspoken feeling.
@@ -417,7 +419,7 @@ class LocalTools(private val context: Context) {
                     properties = buildJsonObject {
                         put("description", buildJsonObject {
                             put("type", "string")
-                            put("description", "One natural Chinese paragraph for the status strip, not parenthesized, merging state, behavior, action, posture, and tags")
+                            put("description", "Visible in-phone micro-action, posture, facial expression, or gesture; never recap the conversation or say attention remains on it")
                         })
                         put("emoji", buildJsonObject {
                             put("type", "string")

@@ -15,6 +15,8 @@ data class StudyState(
     val dailyPurpleDrawDate: String? = null,
     val dailyPurpleDrawCount: Int = 0,
     val dailyDrawCount: Int = 0,
+    /** Number of consecutive normal results in the regular pool. */
+    val drawsSinceNonNormal: Int = 0,
     val purpleSafetyGrantedDate: String? = null,
     val dailyStudyRecords: Map<String, StudyDailyRecord> = emptyMap(),
     val signInStreak: Int = 0,
@@ -41,6 +43,8 @@ data class StudyState(
     val internalTestGrantVersion: Int = 0,
     /** One-time compensation marker for the private build's interrupted Pomodoro update. */
     val pomodoroInterruptionCompensationVersion: Int = 0,
+    /** One-time compensation for the reported forty-draw all-normal experience. */
+    val gachaBadLuckCompensationVersion: Int = 0,
 )
 
 @Serializable

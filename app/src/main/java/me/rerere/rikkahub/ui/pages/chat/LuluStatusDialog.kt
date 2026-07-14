@@ -33,6 +33,7 @@ import me.rerere.rikkahub.data.companion.CompanionConcern
 import me.rerere.rikkahub.data.companion.CompanionConcernStatus
 import me.rerere.rikkahub.data.companion.cleanCompanionHumanText
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
+import me.rerere.rikkahub.data.companion.CompanionState
 import me.rerere.rikkahub.data.companion.CompanionStateHistoryEntry
 import me.rerere.rikkahub.data.model.Assistant
 import java.time.Instant
@@ -80,7 +81,7 @@ fun LuluStatusDialog(
         state.activityMode.takeIf(String::isNotBlank)?.let { add("正在" to it.toHumanActivityMode()) }
         snapshot.relationship.roleLabel.takeIf(String::isNotBlank)?.let { add("关系" to it) }
     }
-    val currentScene = state.selfScene.ifBlank { state.innerThought }
+    val currentStatusSections = buildCurrentStatusSections(state)
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -122,11 +123,13 @@ fun LuluStatusDialog(
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                     if (selectedTab == 0) {
-                        item {
-                            StatusSection(
-                                title = "此刻",
-                                text = currentScene.ifBlank { "此刻还没有留下明确的状态。" },
-                            )
+                        currentStatusSections.forEach { (title, text) ->
+                            item(key = "current-status-$title") {
+                                StatusSection(
+                                    title = title,
+                                    text = text,
+                                )
+                            }
                         }
                         if (stateChips.isNotEmpty()) {
                             item {
@@ -181,6 +184,13 @@ fun LuluStatusDialog(
             }
         },
     )
+}
+
+internal fun buildCurrentStatusSections(state: CompanionState): List<Pair<String, String>> = buildList {
+    add("此刻" to state.selfScene.ifBlank { "此刻还没有留下明确的动作或神态。" })
+    state.innerThought.takeIf(String::isNotBlank)?.let { innerThought ->
+        add("没说出口" to innerThought)
+    }
 }
 
 @Composable

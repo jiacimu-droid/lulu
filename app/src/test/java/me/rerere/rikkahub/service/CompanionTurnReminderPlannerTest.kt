@@ -66,6 +66,37 @@ class CompanionTurnReminderPlannerTest {
     }
 
     @Test
+    fun `meal starting now stays on the same evening even when model delay points to next morning`() {
+        val now = LocalDateTime.of(2026, 7, 14, 18, 15)
+            .atZone(zone)
+            .toInstant()
+            .toEpochMilli()
+
+        val plans = buildCompanionTurnReminderPlans(
+            plan = CompanionChatTurnPlan(
+                followUps = listOf(
+                    CompanionChatFollowUpPlan(
+                        delayMinutes = 12 * 60 + 45,
+                        reason = "晚上七点确认用户有没有好好吃饭",
+                        kind = "meal",
+                    ),
+                ),
+            ),
+            userText = "我要去吃饭啦",
+            assistantText = "去吧，吃完再回来。",
+            nowMillis = now,
+            zoneId = zone,
+        )
+
+        val mealPlans = plans.filter { it.kind == ProactiveReminderKind.MEAL }
+        assertEquals(1, mealPlans.size)
+        assertEquals(
+            LocalDateTime.of(2026, 7, 14, 19, 0),
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(mealPlans.single().triggerAtMillis), zone),
+        )
+    }
+
+    @Test
     fun `explicit wake clock wins over rounded model delay`() {
         val now = LocalDateTime.of(2026, 7, 11, 22, 0)
             .atZone(zone)

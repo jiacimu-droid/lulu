@@ -182,6 +182,9 @@ class CompanionIntentPlannerTest {
 
         assertTrue(prompt.contains("本轮聊天前的行动规划"))
         assertTrue(prompt.contains("如果当前角色决定稍后主动找用户"))
+        assertTrue(prompt.contains("delayMinutes 永远是从 current_time 开始计算的相对分钟数"))
+        assertTrue(prompt.contains("绝不能误排到第二天早晨"))
+        assertTrue(prompt.contains("不能只写‘注意力还停在对话上’"))
         assertTrue(prompt.contains("<companion_runtime"))
         assertTrue(prompt.contains("安静留意"))
         assertTrue(prompt.contains("minutes_since_previous_interaction=45"))

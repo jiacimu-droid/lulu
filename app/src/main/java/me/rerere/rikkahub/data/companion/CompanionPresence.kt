@@ -44,7 +44,7 @@ fun buildCompanionStateFromTurn(
     val activityMode = presence?.activityMode.cleanModelPresenceField(MAX_STATE_FIELD_LENGTH)
         ?: cleanPrevious.activityMode
         .ifBlank { "conversation" }
-    val selfScene = presence?.description.cleanModelPresenceField(MAX_SCENE_LENGTH)
+    val selfScene = presence?.description.cleanModelSceneField(MAX_SCENE_LENGTH)
         ?: ""
     val candidate = cleanPrevious.copy(
         statusText = statusText,
@@ -92,6 +92,12 @@ private fun String?.cleanModelPresenceField(maxLength: Int): String? =
     cleanPresenceField(maxLength)
         ?.takeIf { !it.isTechnicalCompanionStateText() }
 
+private fun String?.cleanModelSceneField(maxLength: Int): String? =
+    cleanModelPresenceField(maxLength)
+        ?.takeIf { scene ->
+            CONVERSATION_RECAP_SCENE_MARKERS.none { marker -> marker in scene }
+        }
+
 private fun String?.cleanUsefulFallbackThought(maxLength: Int): String? =
     cleanModelPresenceField(maxLength)
         ?.takeIf { thought ->
@@ -103,3 +109,14 @@ private fun String?.cleanUsefulFallbackThought(maxLength: Int): String? =
 private const val MAX_STATE_FIELD_LENGTH = 120
 private const val MAX_INNER_THOUGHT_LENGTH = 600
 private const val MAX_SCENE_LENGTH = 800
+
+private val CONVERSATION_RECAP_SCENE_MARKERS = setOf(
+    "刚刚和你聊",
+    "刚才和你聊",
+    "刚刚聊到",
+    "刚才聊到",
+    "注意力还停在",
+    "注意力停在",
+    "这段对话上",
+    "刚刚的对话",
+)

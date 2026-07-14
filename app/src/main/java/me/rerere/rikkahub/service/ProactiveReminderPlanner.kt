@@ -133,7 +133,20 @@ internal fun buildCompanionTurnReminderPlans(
         .filterNot { fallback ->
             explicitDeterministicPlans.any { explicit -> fallback.conflictsWith(explicit) }
         }
-    val modelPlans = fromFollowUps + listOfNotNull(fromSingularFollowUp)
+    val rawModelPlans = fromFollowUps + listOfNotNull(fromSingularFollowUp)
+    // “我要去吃饭了” describes an activity starting now, not an ambiguous
+    // clock-time calculation task.  A model occasionally turns an intended
+    // same-evening check (for example 18:15 -> 19:00) into the next morning.
+    // Keep the deterministic relative meal policy as the single source of
+    // truth unless the user explicitly supplied a time.
+    val modelPlans = if (
+        deterministic?.kind == ProactiveReminderKind.MEAL &&
+        !userText.hasExplicitReminderTime()
+    ) {
+        rawModelPlans.filterNot { it.kind == ProactiveReminderKind.MEAL }
+    } else {
+        rawModelPlans
+    }
     // The model expresses clock times as a delay, which is easy to round
     // incorrectly (for example, turning 08:30 into 08:00). When the user
     // explicitly wrote a time, the deterministic parser is the source of
@@ -249,7 +262,7 @@ private fun String?.toCompanionReminderKind(reason: String): ProactiveReminderKi
 object ProactiveReminderPlanner {
     private const val MIN_DELAY_MILLIS = 60_000L
     private const val DEFAULT_SLEEP_DELAY_MINUTES = 30L
-    private const val DEFAULT_MEAL_DELAY_MINUTES = 20L
+    private const val DEFAULT_MEAL_DELAY_MINUTES = 45L
     private const val DEFAULT_STUDY_DELAY_MINUTES = 45L
 
     fun plan(

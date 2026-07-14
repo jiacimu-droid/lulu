@@ -41,6 +41,7 @@ class StudyStore(
                     .preserveOfficialEconomy()
                     .grantDataLossCompensation()
                     .grantPomodoroInterruptionCompensation()
+                    .grantGachaBadLuckCompensation()
                 if (migrated != current) {
                     prefs.writeState(migrated)
                 }
@@ -59,7 +60,8 @@ class StudyStore(
                     .migrateLegacyEntertainmentFragments()
                     .preserveOfficialEconomy()
                     .grantDataLossCompensation()
-                    .grantPomodoroInterruptionCompensation(),
+                    .grantPomodoroInterruptionCompensation()
+                    .grantGachaBadLuckCompensation(),
                 LocalDate.now(),
                 Random.Default,
             )
@@ -73,7 +75,15 @@ class StudyStore(
                 .migrateLegacyEntertainmentFragments()
                 .preserveOfficialEconomy()
                 .grantDataLossCompensation()
-            prefs.writeState(transform(migrated).preserveOfficialEconomy().grantDataLossCompensation())
+                .grantPomodoroInterruptionCompensation()
+                .grantGachaBadLuckCompensation()
+            prefs.writeState(
+                transform(migrated)
+                    .preserveOfficialEconomy()
+                    .grantDataLossCompensation()
+                    .grantPomodoroInterruptionCompensation()
+                    .grantGachaBadLuckCompensation(),
+            )
         }
     }
 
@@ -83,7 +93,8 @@ class StudyStore(
                 state.migrateLegacyEntertainmentFragments()
                     .preserveOfficialEconomy()
                     .grantDataLossCompensation()
-                    .grantPomodoroInterruptionCompensation(),
+                    .grantPomodoroInterruptionCompensation()
+                    .grantGachaBadLuckCompensation(),
             )
         }
     }
