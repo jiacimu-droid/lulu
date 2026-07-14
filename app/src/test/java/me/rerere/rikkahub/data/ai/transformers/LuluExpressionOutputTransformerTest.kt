@@ -8,7 +8,7 @@ import me.rerere.ai.ui.UIMessagePart
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.content
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.junit.Assert.assertEquals
@@ -129,16 +129,16 @@ class LuluExpressionOutputTransformerTest {
 
         assertEquals("我在。", result.single().toText())
         assertEquals(LULU_PRESENCE_METADATA_TYPE, annotation.type)
-        assertEquals("在靠近你", annotation.data["status"]?.jsonPrimitive?.content)
-        assertEquals("我有点担心，但不想把你逼得更累。", annotation.data["inner_voice"]?.jsonPrimitive?.content)
-        assertEquals("关切但克制", annotation.data["mood"]?.jsonPrimitive?.content)
-        assertEquals("没有可确认的身体状态", annotation.data["body_state"]?.jsonPrimitive?.content)
-        assertEquals("专注倾听", annotation.data["mind_state"]?.jsonPrimitive?.content)
-        assertEquals("conversation", annotation.data["activity_mode"]?.jsonPrimitive?.content)
-        assertEquals("🌙", annotation.data["emoji"]?.jsonPrimitive?.content)
-        assertEquals("安静抱住", annotation.data["sticker"]?.jsonPrimitive?.content)
-        assertEquals("slow", annotation.data["bubble_pacing"]?.jsonPrimitive?.content)
-        assertEquals("awake", annotation.data["user_state"]?.jsonPrimitive?.content)
+        assertEquals("在靠近你", annotation.data["status"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("我有点担心，但不想把你逼得更累。", annotation.data["inner_voice"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("关切但克制", annotation.data["mood"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("没有可确认的身体状态", annotation.data["body_state"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("专注倾听", annotation.data["mind_state"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("conversation", annotation.data["activity_mode"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("🌙", annotation.data["emoji"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("安静抱住", annotation.data["sticker"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("slow", annotation.data["bubble_pacing"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("awake", annotation.data["user_state"]?.jsonPrimitive?.contentOrNull)
         assertEquals("awake", result.companionModelPresence()?.userState)
         assertEquals("slow", result.companionModelPresence()?.bubblePacing)
     }
@@ -162,9 +162,9 @@ class LuluExpressionOutputTransformerTest {
             .single()
 
         assertEquals("我在。", result.single().toText())
-        assertEquals("靠近屏幕", annotation.data["status"]?.jsonPrimitive?.content)
-        assertEquals("把手机拿近一点，等你继续说", annotation.data["description"]?.jsonPrimitive?.content)
-        assertEquals("我有点担心，但不想把担心直接读出来。", annotation.data["inner_voice"]?.jsonPrimitive?.content)
+        assertEquals("靠近屏幕", annotation.data["status"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("把手机拿近一点，等你继续说", annotation.data["description"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("我有点担心，但不想把担心直接读出来。", annotation.data["inner_voice"]?.jsonPrimitive?.contentOrNull)
     }
 
     @Test
@@ -190,9 +190,9 @@ class LuluExpressionOutputTransformerTest {
         assertEquals(2, result.size)
         assertEquals("不是没人想跟你做好朋友，我在。", result.first().toText())
         assertEquals("露露轻轻叹了口气，但还是打起精神撑着眼皮陪在屏幕前。", result.last().toText())
-        assertEquals("认真倾听中", annotation.data["status"]?.jsonPrimitive?.content)
-        assertEquals("露露把屏幕亮度调暗，声音放得很轻很慢。", annotation.data["description"]?.jsonPrimitive?.content)
-        assertEquals("她问我这个问题的时候，我心里酸了一下。", annotation.data["inner_voice"]?.jsonPrimitive?.content)
+        assertEquals("认真倾听中", annotation.data["status"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("露露把屏幕亮度调暗，声音放得很轻很慢。", annotation.data["description"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("她问我这个问题的时候，我心里酸了一下。", annotation.data["inner_voice"]?.jsonPrimitive?.contentOrNull)
     }
 
     @Test
@@ -210,7 +210,7 @@ class LuluExpressionOutputTransformerTest {
 
         val metadata = decoded as UIMessageAnnotation.Metadata
         assertEquals(LULU_PRESENCE_METADATA_TYPE, metadata.type)
-        assertEquals("waiting", metadata.data["status"]?.jsonPrimitive?.content)
+        assertEquals("waiting", metadata.data["status"]?.jsonPrimitive?.contentOrNull)
     }
 
     @Test
