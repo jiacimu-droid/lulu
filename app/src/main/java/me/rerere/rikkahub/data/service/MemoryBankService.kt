@@ -21,6 +21,8 @@ import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
 import me.rerere.rikkahub.utils.JsonInstant
 import okhttp3.OkHttpClient
+import kotlin.math.ln
+import kotlin.math.max
 
 private const val MEMORY_DUPLICATE_VECTOR_THRESHOLD = 0.85
 private const val MEMORY_HEBBIAN_EDGE_DELTA = 0.025
@@ -385,7 +387,10 @@ class MemoryBankService(
     ): String = withContext(Dispatchers.IO) {
         val memories = buildList {
             if (assistantId != null) {
-                addAll(memoryBankDAO.getMemoriesByAssistant(assistantId).take(120))
+                // Recall must be able to reach an old ordinary memory.  The old
+                // 120-row window made early events effectively disappear unless
+                // they were pinned or manually marked important.
+                addAll(memoryBankDAO.getMemoriesByAssistant(assistantId))
                 addAll(memoryBankDAO.getPinnedRecallMemoriesForAssistant(assistantId, 3))
                 addAll(memoryBankDAO.getImportantRecallMemoriesForAssistant(assistantId, minImportance = 4, limit = 8))
             } else {
@@ -633,14 +638,35 @@ internal fun selectMemoryRecallItems(
     nowMillis: Long = System.currentTimeMillis(),
     reranker: (List<MemoryBankEntity>) -> List<MemoryRerankResult> = { emptyList() },
 ): List<MemoryBankEntity> {
-    val sorted = rankMemoryRecallCandidates(memories, query, queryVector)
+    val temporalIntent = query.detectMemoryTemporalIntent(nowMillis)
+    val sorted = rankMemoryRecallCandidates(memories, query, queryVector, nowMillis)
     val limit = maxItems ?: sorted.dynamicRecallLimit(queryVector)
-    val candidateLimit = if (maxItems == null) sorted.size.coerceAtMost(rerankCandidateCount.coerceIn(5, 60)) else limit
+    val rerankLimit = rerankCandidateCount.coerceIn(5, 60)
+    val candidateLimit = when {
+        temporalIntent != null -> sorted.size.coerceAtMost(maxOf(12, rerankLimit))
+        maxItems == null -> sorted.size.coerceAtMost(rerankLimit)
+        else -> limit
+    }
     val candidates = sorted.take(candidateLimit)
-    val direct = applyMemoryRerankResults(
+    val reranked = applyMemoryRerankResults(
         memories = candidates,
         results = runCatching { reranker(candidates) }.getOrDefault(emptyList()),
-    ).take(limit)
+    )
+    val temporalPool = if (temporalIntent != null) reranked else reranked.take(maxOf(12, limit * 3))
+    val direct = when (temporalIntent) {
+        MemoryTemporalIntent.First -> temporalPool.sortedBy { it.createdAt }.take(limit)
+        MemoryTemporalIntent.Latest -> temporalPool.sortedByDescending { it.createdAt }.take(limit)
+        MemoryTemporalIntent.Frequent -> temporalPool
+            .sortedWith(compareByDescending<MemoryBankEntity> { it.recallCount }.thenByDescending { it.createdAt })
+            .take(limit)
+        is MemoryTemporalIntent.Absolute -> temporalPool
+            .sortedWith(
+                compareByDescending<MemoryBankEntity> { it.createdAt in temporalIntent.startMillis..temporalIntent.endMillis }
+                    .thenBy { it.createdAt },
+            )
+            .take(limit)
+        null -> selectDiverseRecallMemories(reranked, limit)
+    }
     return direct
         .expandGraphMemories(sorted, graphEdges, maxRelatedItems = 2, nowMillis = nowMillis)
         .expandRelatedMemories(sorted, maxRelatedItems = 1)
@@ -651,11 +677,13 @@ private fun rankMemoryRecallCandidates(
     memories: List<MemoryBankEntity>,
     query: String,
     queryVector: List<Float>,
+    nowMillis: Long = System.currentTimeMillis(),
 ): List<MemoryBankEntity> {
     val queryTerms = query.recallQueryTerms()
+    val idfWeights = buildRecallIdfWeights(memories, queryTerms)
     return memories
         .filter { it.content.isNotBlank() && !it.deprecated }
-        .sortedByDescending { memory -> memory.recallScore(queryTerms, queryVector) }
+        .sortedByDescending { memory -> memory.recallScore(queryTerms, idfWeights, queryVector, nowMillis) }
         .deduplicateNearVectors()
 }
 
@@ -812,7 +840,12 @@ private fun MemoryBankEntity.recallSectionTitle(): String = when (memoryKind ?: 
     else -> "当前相关回忆"
 }
 
-private fun MemoryBankEntity.recallScore(queryTerms: List<String>, queryVector: List<Float>): Double {
+private fun MemoryBankEntity.recallScore(
+    queryTerms: List<String>,
+    idfWeights: Map<String, Double>,
+    queryVector: List<Float>,
+    nowMillis: Long,
+): Double {
     val text = listOfNotNull(
         title,
         content,
@@ -827,14 +860,111 @@ private fun MemoryBankEntity.recallScore(queryTerms: List<String>, queryVector: 
         peopleJson,
         topicsJson,
     ).joinToString("\n").lowercase()
-    val queryScore = queryTerms.count { term -> term in text } * 120.0
+    val queryScore = queryTerms.sumOf { term ->
+        if (term in text) (idfWeights[term] ?: 1.0) * 70.0 else 0.0
+    }
     val promiseScore = if ((memoryKind ?: type) == "promise") 160.0 else 0.0
     val pinnedScore = if (pinned) 220.0 else 0.0
     val importanceScore = importance.coerceIn(1, 5) * 24.0
     val confidenceScore = confidence.coerceIn(0.0, 1.0) * 20.0
-    val freshnessScore = createdAt.coerceAtLeast(0L) / 1_000_000_000_000.0
+    val ageDays = ((nowMillis - createdAt).coerceAtLeast(0L)) / 86_400_000.0
+    val freshnessScore = 42.0 / (1.0 + ageDays / 45.0)
+    val mentionScore = ln(1.0 + recallCount.coerceAtLeast(0)) * 12.0
     val vectorScore = cosineSimilarity(queryVector, decodeMemoryVector(embeddingVectorJson)) * 240.0
-    return vectorScore + queryScore + promiseScore + pinnedScore + importanceScore + confidenceScore + freshnessScore
+    return vectorScore + queryScore + promiseScore + pinnedScore + importanceScore + confidenceScore +
+        freshnessScore + mentionScore
+}
+
+private fun buildRecallIdfWeights(
+    memories: List<MemoryBankEntity>,
+    queryTerms: List<String>,
+): Map<String, Double> {
+    if (queryTerms.isEmpty() || memories.isEmpty()) return emptyMap()
+    val active = memories.filter { !it.deprecated }
+    val documentCount = active.size.coerceAtLeast(1)
+    return queryTerms.associateWith { term ->
+        val frequency = active.count { memory -> term in memory.recallSearchText() }
+        ln((documentCount + 1.0) / (frequency + 1.0)) + 1.0
+    }
+}
+
+private fun MemoryBankEntity.recallSearchText(): String = listOfNotNull(
+    title,
+    content,
+    memoryKind,
+    roleFeeling,
+    bodySense,
+    unspokenThought,
+    userSignal,
+    relationshipEffect,
+    tagsJson,
+    embeddingText,
+    peopleJson,
+    topicsJson,
+).joinToString("\n").lowercase()
+
+private fun selectDiverseRecallMemories(
+    candidates: List<MemoryBankEntity>,
+    limit: Int,
+): List<MemoryBankEntity> {
+    if (candidates.size <= 1 || limit <= 1) return candidates.take(limit)
+    val remaining = candidates.toMutableList()
+    val selected = mutableListOf<MemoryBankEntity>()
+    while (remaining.isNotEmpty() && selected.size < limit) {
+        val best = remaining.maxBy { candidate ->
+            val relevance = 1.0 - candidates.indexOf(candidate).toDouble() / max(1, candidates.size - 1)
+            val candidateVector = decodeMemoryVector(candidate.embeddingVectorJson)
+            val redundancy = if (candidateVector.isEmpty() || selected.isEmpty()) {
+                0.0
+            } else {
+                selected.maxOf { existing ->
+                    cosineSimilarity(candidateVector, decodeMemoryVector(existing.embeddingVectorJson))
+                }
+            }
+            relevance * 0.78 - redundancy * 0.22
+        }
+        selected += best
+        remaining -= best
+    }
+    return selected
+}
+
+private sealed interface MemoryTemporalIntent {
+    data object First : MemoryTemporalIntent
+    data object Latest : MemoryTemporalIntent
+    data object Frequent : MemoryTemporalIntent
+    data class Absolute(val startMillis: Long, val endMillis: Long) : MemoryTemporalIntent
+}
+
+private fun String.detectMemoryTemporalIntent(nowMillis: Long): MemoryTemporalIntent? {
+    val normalized = lowercase()
+    if (listOf("第一次", "最早", "一开始", "初次", "first time").any(normalized::contains)) {
+        return MemoryTemporalIntent.First
+    }
+    if (listOf("上次", "最近一次", "最后一次", "latest", "last time").any(normalized::contains)) {
+        return MemoryTemporalIntent.Latest
+    }
+    if (listOf("经常", "总是", "每次", "老是", "frequently", "usually").any(normalized::contains)) {
+        return MemoryTemporalIntent.Frequent
+    }
+    val monthMatch = Regex("(20\\d{2})[-年/.](0?[1-9]|1[0-2])月?").find(normalized)
+    if (monthMatch != null) {
+        val year = monthMatch.groupValues[1].toInt()
+        val month = monthMatch.groupValues[2].toInt()
+        val zone = java.time.ZoneId.systemDefault()
+        val start = java.time.LocalDate.of(year, month, 1).atStartOfDay(zone).toInstant().toEpochMilli()
+        val end = java.time.LocalDate.of(year, month, 1).plusMonths(1).atStartOfDay(zone).toInstant().toEpochMilli() - 1L
+        return MemoryTemporalIntent.Absolute(start, end)
+    }
+    val zone = java.time.ZoneId.systemDefault()
+    val now = java.time.Instant.ofEpochMilli(nowMillis).atZone(zone)
+    if ("去年" in normalized) {
+        val year = now.year - 1
+        val start = java.time.LocalDate.of(year, 1, 1).atStartOfDay(zone).toInstant().toEpochMilli()
+        val end = java.time.LocalDate.of(year + 1, 1, 1).atStartOfDay(zone).toInstant().toEpochMilli() - 1L
+        return MemoryTemporalIntent.Absolute(start, end)
+    }
+    return null
 }
 
 private fun List<MemoryBankEntity>.deduplicateNearVectors(): List<MemoryBankEntity> =

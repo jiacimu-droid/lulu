@@ -164,6 +164,9 @@ private fun String.normalizeLuluPresenceKey(): String? = when (trim().lowercase(
     "mind_state", "mind state", "mind", "精神状态", "注意状态" -> "mind_state"
     "activity_mode", "activity mode", "mode", "行动状态", "活动状态" -> "activity_mode"
     "user_state", "user state", "用户状态", "醒睡状态" -> "user_state"
+    "emoji", "表情", "表情符号" -> "emoji"
+    "sticker", "贴纸", "表情意图" -> "sticker"
+    "bubble_pacing", "bubble pacing", "pacing", "气泡节奏" -> "bubble_pacing"
     else -> null
 }
 
@@ -200,6 +203,9 @@ private fun kotlinx.serialization.json.JsonObject.toCompanionModelPresence(): Co
         mindState = this["mind_state"]?.jsonPrimitive?.contentOrNull,
         activityMode = this["activity_mode"]?.jsonPrimitive?.contentOrNull,
         userState = this["user_state"]?.jsonPrimitive?.contentOrNull,
+        emoji = this["emoji"]?.jsonPrimitive?.contentOrNull,
+        sticker = this["sticker"]?.jsonPrimitive?.contentOrNull,
+        bubblePacing = this["bubble_pacing"]?.jsonPrimitive?.contentOrNull,
     ).takeIf { presence ->
         presence.statusText.orEmpty().isNotBlank() ||
             presence.description.orEmpty().isNotBlank() ||
@@ -209,7 +215,10 @@ private fun kotlinx.serialization.json.JsonObject.toCompanionModelPresence(): Co
             presence.bodyState.orEmpty().isNotBlank() ||
             presence.mindState.orEmpty().isNotBlank() ||
             presence.activityMode.orEmpty().isNotBlank() ||
-            presence.userState.orEmpty().isNotBlank()
+            presence.userState.orEmpty().isNotBlank() ||
+            presence.emoji.orEmpty().isNotBlank() ||
+            presence.sticker.orEmpty().isNotBlank() ||
+            presence.bubblePacing.orEmpty().isNotBlank()
     }
 
 internal fun sanitizeLuluVisibleExpression(text: String): String {

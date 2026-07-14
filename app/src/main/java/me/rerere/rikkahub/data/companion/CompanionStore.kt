@@ -139,6 +139,17 @@ internal fun CompanionPersistedState.normalizedCompanionState(): CompanionPersis
 private fun CompanionSnapshot.merge(other: CompanionSnapshot): CompanionSnapshot = copy(
     state = if (other.state.updatedAt >= state.updatedAt) other.state else state,
     stateHistory = (stateHistory + other.stateHistory).distinctBy { it.id },
+    neuroState = if (other.neuroState.updatedAt >= neuroState.updatedAt) other.neuroState else neuroState,
+    privateImpression = if (other.privateImpression.updatedAt >= privateImpression.updatedAt) {
+        other.privateImpression
+    } else {
+        privateImpression
+    },
+    goals = (goals + other.goals)
+        .groupBy { it.id }
+        .values
+        .map { duplicates -> duplicates.maxBy { it.updatedAt } },
+    lifeEvents = (lifeEvents + other.lifeEvents).distinctBy { it.id },
     relationship = if (other.relationship.updatedAt >= relationship.updatedAt) {
         other.relationship
     } else {
@@ -160,6 +171,29 @@ private fun CompanionSnapshot.normalized(): CompanionSnapshot = copy(
         .takeLast(MAX_STATE_HISTORY_PER_ASSISTANT)
         .map { entry -> entry.copy(state = entry.state.normalizedForStorage()) }
         .filter { it.state.hasVisibleStateContent() },
+    neuroState = neuroState.normalizedForStorage(),
+    privateImpression = privateImpression.normalizedForStorage(),
+    goals = goals.ifEmpty { defaultCompanionGoals(assistantId) }
+        .filter { goal -> goal.assistantId == assistantId && goal.id.isNotBlank() && goal.title.isNotBlank() }
+        .groupBy { it.id }
+        .values
+        .map { duplicates -> duplicates.maxBy { it.updatedAt } }
+        .map { goal ->
+            goal.copy(
+                title = goal.title.cleanCompanionHumanText("").take(MAX_GOAL_TEXT_LENGTH),
+                category = goal.category.trim().take(MAX_STATE_TEXT_LENGTH),
+                progress = goal.progress.coerceIn(0f, 1f),
+                evidenceEventIds = goal.evidenceEventIds.filter(String::isNotBlank).distinct().takeLast(20),
+            )
+        }
+        .sortedWith(compareBy<CompanionGoal> { it.status != CompanionGoalStatus.ACTIVE }.thenByDescending { it.updatedAt })
+        .take(MAX_GOALS_PER_ASSISTANT),
+    lifeEvents = lifeEvents
+        .filter { event -> event.assistantId == assistantId && event.id.isNotBlank() && event.title.isNotBlank() }
+        .distinctBy { it.id }
+        .sortedWith(compareBy<CompanionLifeEvent> { it.startedAt }.thenBy { it.id })
+        .takeLast(MAX_LIFE_EVENTS_PER_ASSISTANT)
+        .map { it.normalizedForStorage() },
     relationship = relationship.copy(
         roleLabel = relationship.roleLabel.trim().take(MAX_STATE_TEXT_LENGTH),
         trust = relationship.trust.normalizedDimension(),
@@ -197,6 +231,40 @@ private fun CompanionSnapshot.normalized(): CompanionSnapshot = copy(
         )
         .take(MAX_COMMITMENTS_PER_ASSISTANT),
 )
+
+private fun CompanionNeuroState.normalizedForStorage(): CompanionNeuroState = copy(
+    dopamine = dopamine.normalizedDimension(),
+    serotonin = serotonin.normalizedDimension(),
+    cortisol = cortisol.normalizedDimension(),
+    oxytocin = oxytocin.normalizedDimension(),
+    norepinephrine = norepinephrine.normalizedDimension(),
+    energy = energy.normalizedDimension(),
+)
+
+private fun CompanionPrivateImpression.normalizedForStorage(): CompanionPrivateImpression = copy(
+    summary = summary.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_SUMMARY_LENGTH),
+    observedTraits = observedTraits.cleanImpressionItems(),
+    preferences = preferences.cleanImpressionItems(),
+    boundaries = boundaries.cleanImpressionItems(),
+    recentChanges = recentChanges.cleanImpressionItems(),
+)
+
+private fun CompanionLifeEvent.normalizedForStorage(): CompanionLifeEvent = copy(
+    title = title.cleanCompanionHumanText("").take(MAX_LIFE_EVENT_TITLE_LENGTH),
+    summary = summary.cleanCompanionHumanText("").take(MAX_LIFE_EVENT_SUMMARY_LENGTH),
+    evidenceReference = evidenceReference?.trim()?.take(MAX_EVIDENCE_REFERENCE_LENGTH)?.takeIf(String::isNotBlank),
+    relatedMemoryIds = relatedMemoryIds.filter(String::isNotBlank).distinct().takeLast(20),
+    importance = importance.coerceIn(1, 5),
+    endedAt = endedAt?.coerceAtLeast(startedAt),
+    createdAt = createdAt.coerceAtLeast(0L),
+)
+
+private fun List<String>.cleanImpressionItems(): List<String> = asSequence()
+    .map { it.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_ITEM_LENGTH) }
+    .filter(String::isNotBlank)
+    .distinct()
+    .toList()
+    .takeLast(MAX_PRIVATE_IMPRESSION_ITEMS)
 
 private fun CompanionState.normalizedForStorage(): CompanionState = copy(
     statusText = statusText.trim().take(MAX_STATE_TEXT_LENGTH),
@@ -285,6 +353,15 @@ private const val MAX_CONCERNS_PER_ASSISTANT = 300
 private const val MAX_COMMITMENTS_PER_ASSISTANT = 300
 private const val MAX_STATE_HISTORY_PER_ASSISTANT = 160
 private const val MAX_RELATIONSHIP_HISTORY_PER_ASSISTANT = 160
+private const val MAX_LIFE_EVENTS_PER_ASSISTANT = 300
+private const val MAX_GOALS_PER_ASSISTANT = 24
 private const val MAX_STATE_TEXT_LENGTH = 120
 private const val MAX_INNER_THOUGHT_LENGTH = 600
 private const val MAX_SELF_SCENE_LENGTH = 800
+private const val MAX_GOAL_TEXT_LENGTH = 180
+private const val MAX_LIFE_EVENT_TITLE_LENGTH = 120
+private const val MAX_LIFE_EVENT_SUMMARY_LENGTH = 500
+private const val MAX_EVIDENCE_REFERENCE_LENGTH = 240
+private const val MAX_PRIVATE_IMPRESSION_SUMMARY_LENGTH = 600
+private const val MAX_PRIVATE_IMPRESSION_ITEM_LENGTH = 240
+private const val MAX_PRIVATE_IMPRESSION_ITEMS = 20

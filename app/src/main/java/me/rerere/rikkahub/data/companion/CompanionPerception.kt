@@ -27,6 +27,8 @@ data class CompanionPerceptionPacket(
     val contextFacts: List<CompanionContextFact>,
     val activeConcerns: List<CompanionConcern>,
     val actionableCommitments: List<CompanionCommitment>,
+    val activeGoals: List<CompanionGoal>,
+    val recentLifeEvents: List<CompanionLifeEvent>,
     val availableToolNames: Set<String>,
     val memoryContext: String,
     val nowMillis: Long,
@@ -101,6 +103,21 @@ object CompanionPerceptionAssembler {
                 )
                 .take(MAX_ACTIONABLE_COMMITMENTS)
                 .toList(),
+            activeGoals = snapshot.goals.ifEmpty { defaultCompanionGoals(assistantId) }
+                .asSequence()
+                .filter { goal -> goal.assistantId == assistantId && goal.status == CompanionGoalStatus.ACTIVE }
+                .sortedByDescending { it.updatedAt }
+                .take(MAX_ACTIVE_GOALS)
+                .toList(),
+            recentLifeEvents = snapshot.lifeEvents
+                .asSequence()
+                .filter { event ->
+                    event.assistantId == assistantId &&
+                        event.status in setOf(CompanionLifeEventStatus.RUNNING, CompanionLifeEventStatus.COMPLETED)
+                }
+                .sortedByDescending { event -> event.endedAt ?: event.startedAt }
+                .take(MAX_RECENT_LIFE_EVENTS)
+                .toList(),
             availableToolNames = input.availableToolNames
                 .asSequence()
                 .map { it.trim() }
@@ -169,6 +186,8 @@ object CompanionPerceptionAssembler {
     private const val MAX_CONTEXT_VALUE_LENGTH = 500
     private const val MAX_ACTIVE_CONCERNS = 50
     private const val MAX_ACTIONABLE_COMMITMENTS = 50
+    private const val MAX_ACTIVE_GOALS = 12
+    private const val MAX_RECENT_LIFE_EVENTS = 20
     private const val MAX_TOOL_NAMES = 64
     private const val MILLIS_PER_DAY = 24L * 60L * 60L * 1_000L
 }
@@ -184,6 +203,21 @@ fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
         "relationship trust=${snapshot.relationship.trust} closeness=${snapshot.relationship.closeness} " +
             "reliability=${snapshot.relationship.reliability} tension=${snapshot.relationship.unresolvedTension}",
     )
+    appendLine(
+        "digital_neuro dopamine=${snapshot.neuroState.dopamine} serotonin=${snapshot.neuroState.serotonin} " +
+            "cortisol=${snapshot.neuroState.cortisol} oxytocin=${snapshot.neuroState.oxytocin} " +
+            "focus=${snapshot.neuroState.norepinephrine} energy=${snapshot.neuroState.energy}",
+    )
+    snapshot.privateImpression.takeIf { impression ->
+        impression.summary.isNotBlank() || impression.preferences.isNotEmpty() || impression.boundaries.isNotEmpty()
+    }?.let { impression ->
+        appendLine("private_impression:")
+        impression.summary.takeIf(String::isNotBlank)?.let { appendLine("- summary=${it.take(300)}") }
+        impression.observedTraits.take(4).forEach { appendLine("- observed_trait=${it.take(180)}") }
+        impression.preferences.take(4).forEach { appendLine("- preference=${it.take(180)}") }
+        impression.boundaries.take(4).forEach { appendLine("- boundary=${it.take(180)}") }
+        impression.recentChanges.takeLast(3).forEach { appendLine("- recent_change=${it.take(180)}") }
+    }
     if (snapshot.state.statusText.isNotBlank() || snapshot.state.innerThought.isNotBlank()) {
         appendLine(
             "state status=${snapshot.state.statusText.take(120)} " +
@@ -214,6 +248,22 @@ fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
                     "last_result=${commitment.lastActionResult?.summary?.take(300).orEmpty()}",
             )
         }
+    }
+    if (activeGoals.isNotEmpty()) {
+        appendLine("active_self_goals:")
+        activeGoals.take(6).forEach { goal ->
+            appendLine("- id=${goal.id} category=${goal.category} progress=${goal.progress} goal=${goal.title.take(180)}")
+        }
+    }
+    if (recentLifeEvents.isNotEmpty()) {
+        appendLine("recent_digital_life:")
+        recentLifeEvents.take(8).forEach { event ->
+            appendLine(
+                "- at=${event.endedAt ?: event.startedAt} type=${event.type.name} status=${event.status.name} " +
+                    "title=${event.title.take(120)} summary=${event.summary.take(240)} evidence=${event.evidenceReference.orEmpty().take(120)}",
+            )
+        }
+        appendLine("Only describe an activity as actually completed when it appears here with COMPLETED status or is backed by a current tool result.")
     }
     if (contextFacts.isNotEmpty()) {
         appendLine("perception_facts:")

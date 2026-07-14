@@ -107,6 +107,9 @@ import me.rerere.rikkahub.data.companion.CompanionPerceptionPacket
 import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.companion.CompanionTurnMutation
 import me.rerere.rikkahub.data.companion.CompanionToolExecution
+import me.rerere.rikkahub.data.companion.CompanionLifeEventSource
+import me.rerere.rikkahub.data.companion.buildConversationLifeEvent
+import me.rerere.rikkahub.data.companion.buildToolLifeEvent
 import me.rerere.rikkahub.data.companion.buildScheduledToolFollowUp
 import me.rerere.rikkahub.data.companion.CompanionTurnRole
 import me.rerere.rikkahub.data.companion.buildCompanionStateFromTurn
@@ -129,6 +132,7 @@ import me.rerere.rikkahub.data.service.AffectiveMemoryExtractor
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.service.buildAffectiveMemoryExtractionPlan
+import me.rerere.rikkahub.data.service.buildCompanionPrivateImpression
 import me.rerere.rikkahub.data.service.buildRelationshipEventsFromMemoryCandidates
 import me.rerere.rikkahub.web.BadRequestException
 import me.rerere.rikkahub.web.NotFoundException
@@ -1089,11 +1093,47 @@ class ChatService(
                 snapshot = snapshotBeforeTurn,
                 latestUserText = lastUserText,
             )
+            val finalAssistantMessage = finalConversation.currentMessages.lastOrNull { it.role == MessageRole.ASSISTANT }
+            val completedToolExecutions = (
+                turnPreparation.toolExecutions +
+                    listOfNotNull(deterministicWakeExecution) +
+                    finalConversation.currentMessages
+                        .flatMap { it.getTools() }
+                        .filter { it.isExecuted }
+                        .map { tool ->
+                            CompanionToolExecution(
+                                toolCallId = tool.toolCallId,
+                                toolName = tool.toolName,
+                                inputJson = tool.input,
+                                outputText = tool.output
+                                    .filterIsInstance<UIMessagePart.Text>()
+                                    .joinToString("\n") { it.text },
+                            )
+                        }
+                ).distinctBy { it.toolCallId }
+            val lifeEvents = buildList {
+                buildConversationLifeEvent(
+                    assistantId = assistant.id.toString(),
+                    assistantText = lastAssistantText,
+                    source = CompanionLifeEventSource.CHAT,
+                    evidenceReference = finalAssistantMessage?.id?.toString(),
+                    nowMillis = nowMillis,
+                )?.let(::add)
+                completedToolExecutions.mapNotNullTo(this) { execution ->
+                    buildToolLifeEvent(
+                        assistantId = assistant.id.toString(),
+                        execution = execution,
+                        source = CompanionLifeEventSource.TOOL,
+                        nowMillis = nowMillis,
+                    )
+                }
+            }
             runCatching {
                 companionRuntime.applyTurn(
                     CompanionTurnMutation(
                         assistantId = assistant.id.toString(),
                         state = unifiedState,
+                        lifeEvents = lifeEvents,
                         concernChanges = followUpDrafts.map { draft ->
                             CompanionConcernChange.Upsert(draft.toConcern(nowMillis))
                         },
@@ -1414,10 +1454,16 @@ class ChatService(
                     conversationId = conversationId.toString(),
                     createdAt = System.currentTimeMillis(),
                 )
-                if (relationshipEvents.isNotEmpty()) {
+                val privateImpression = buildCompanionPrivateImpression(
+                    previous = companionRuntime.snapshot(assistant.id.toString()).privateImpression,
+                    candidates = candidates,
+                    nowMillis = System.currentTimeMillis(),
+                )
+                if (relationshipEvents.isNotEmpty() || privateImpression.updatedAt > 0L) {
                     companionRuntime.applyTurn(
                         CompanionTurnMutation(
                             assistantId = assistant.id.toString(),
+                            privateImpression = privateImpression,
                             relationshipEvents = relationshipEvents,
                             nowMillis = System.currentTimeMillis(),
                         )

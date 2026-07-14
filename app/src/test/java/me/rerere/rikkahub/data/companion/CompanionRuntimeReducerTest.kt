@@ -3,9 +3,48 @@ package me.rerere.rikkahub.data.companion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CompanionRuntimeReducerTest {
+    @Test
+    fun `completed life events update neuro state once and remain idempotent`() {
+        val event = CompanionLifeEvent(
+            id = "music-event",
+            assistantId = ASSISTANT_A,
+            type = CompanionLifeEventType.MUSIC,
+            title = "操作了手机里的音乐",
+            evidenceReference = "tool-call-1",
+            startedAt = 100L,
+            endedAt = 100L,
+            createdAt = 100L,
+        )
+
+        val first = reduceCompanionRuntimeState(
+            current = CompanionPersistedState(),
+            mutation = CompanionTurnMutation(
+                assistantId = ASSISTANT_A,
+                lifeEvents = listOf(event),
+                nowMillis = 100L,
+            ),
+        )
+        val duplicate = reduceCompanionRuntimeState(
+            current = first.persistedState,
+            mutation = CompanionTurnMutation(
+                assistantId = ASSISTANT_A,
+                lifeEvents = listOf(event),
+                nowMillis = 100L,
+            ),
+        )
+
+        assertEquals(listOf("music-event"), duplicate.snapshot.lifeEvents.map { it.id })
+        assertTrue(first.snapshot.neuroState.dopamine > 0.5f)
+        assertEquals(first.snapshot.neuroState, duplicate.snapshot.neuroState)
+        val authenticLifeGoal = duplicate.snapshot.goals.single { it.id.endsWith(":goal:authentic-life") }
+        assertTrue(authenticLifeGoal.progress > 0f)
+        assertEquals(listOf("music-event"), authenticLifeGoal.evidenceEventIds)
+    }
+
     @Test
     fun `meaningful state changes are appended to state history without timestamp duplicates`() {
         val firstState = CompanionState(statusText = "在等你回话", innerThought = "我想再等等。", updatedAt = 100L)

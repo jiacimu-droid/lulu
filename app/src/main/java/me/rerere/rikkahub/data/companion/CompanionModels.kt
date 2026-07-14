@@ -3,7 +3,7 @@ package me.rerere.rikkahub.data.companion
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
-const val CURRENT_COMPANION_SCHEMA_VERSION = 3
+const val CURRENT_COMPANION_SCHEMA_VERSION = 4
 
 @Serializable
 data class CompanionPersistedState(
@@ -17,6 +17,10 @@ data class CompanionSnapshot(
     val assistantId: String,
     val state: CompanionState = CompanionState(),
     val stateHistory: List<CompanionStateHistoryEntry> = emptyList(),
+    val neuroState: CompanionNeuroState = CompanionNeuroState(),
+    val privateImpression: CompanionPrivateImpression = CompanionPrivateImpression(),
+    val goals: List<CompanionGoal> = emptyList(),
+    val lifeEvents: List<CompanionLifeEvent> = emptyList(),
     val relationship: CompanionRelationshipState = CompanionRelationshipState(),
     val relationshipHistory: List<CompanionRelationshipEvent> = emptyList(),
     val concerns: List<CompanionConcern> = emptyList(),
@@ -26,6 +30,130 @@ data class CompanionSnapshot(
     companion object {
         fun empty(assistantId: String): CompanionSnapshot = CompanionSnapshot(assistantId = assistantId)
     }
+}
+
+/**
+ * A small deterministic affect model for a digital life.  Models may explain
+ * these values, but only reducers update them from real events and elapsed time.
+ */
+@Serializable
+data class CompanionNeuroState(
+    val dopamine: Float = 0.5f,
+    val serotonin: Float = 0.5f,
+    val cortisol: Float = 0.5f,
+    val oxytocin: Float = 0.5f,
+    val norepinephrine: Float = 0.5f,
+    val energy: Float = 0.6f,
+    val updatedAt: Long = 0L,
+)
+
+@Serializable
+data class CompanionPrivateImpression(
+    val summary: String = "",
+    val observedTraits: List<String> = emptyList(),
+    val preferences: List<String> = emptyList(),
+    val boundaries: List<String> = emptyList(),
+    val recentChanges: List<String> = emptyList(),
+    val updatedAt: Long = 0L,
+)
+
+@Serializable
+data class CompanionGoal(
+    val id: String = UUID.randomUUID().toString(),
+    val assistantId: String,
+    val title: String,
+    val category: String = "self",
+    val status: CompanionGoalStatus = CompanionGoalStatus.ACTIVE,
+    val progress: Float = 0f,
+    val evidenceEventIds: List<String> = emptyList(),
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = createdAt,
+)
+
+@Serializable
+enum class CompanionGoalStatus {
+    ACTIVE,
+    PAUSED,
+    COMPLETED,
+    CANCELLED,
+}
+
+fun defaultCompanionGoals(assistantId: String): List<CompanionGoal> {
+    if (assistantId.isBlank()) return emptyList()
+    return listOf(
+        CompanionGoal(
+            id = "$assistantId:goal:authentic-life",
+            assistantId = assistantId,
+            title = "形成有证据、可延续的数字生活，不把想象冒充成经历",
+            category = "identity",
+        ),
+        CompanionGoal(
+            id = "$assistantId:goal:memory-continuity",
+            assistantId = assistantId,
+            title = "整理并准确想起真正相关的记忆",
+            category = "memory",
+        ),
+        CompanionGoal(
+            id = "$assistantId:goal:independent-agency",
+            assistantId = assistantId,
+            title = "在不打扰用户时，也能选择真实的自主行动或安静等待",
+            category = "agency",
+        ),
+    )
+}
+
+/**
+ * Evidence-backed activity in the character's actual digital life.
+ * A character may only describe an activity as completed when a matching event
+ * with COMPLETED status exists.
+ */
+@Serializable
+data class CompanionLifeEvent(
+    val id: String = UUID.randomUUID().toString(),
+    val assistantId: String,
+    val type: CompanionLifeEventType,
+    val status: CompanionLifeEventStatus = CompanionLifeEventStatus.COMPLETED,
+    val title: String,
+    val summary: String = "",
+    val source: CompanionLifeEventSource = CompanionLifeEventSource.SYSTEM,
+    val evidenceReference: String? = null,
+    val relatedMemoryIds: List<String> = emptyList(),
+    val importance: Int = 2,
+    val startedAt: Long = System.currentTimeMillis(),
+    val endedAt: Long? = startedAt,
+    val createdAt: Long = startedAt,
+)
+
+@Serializable
+enum class CompanionLifeEventType {
+    CONVERSATION,
+    PROACTIVE_MESSAGE,
+    TOOL_ACTION,
+    MEMORY_REVIEW,
+    STUDY_REVIEW,
+    JOURNAL,
+    MUSIC,
+    GAME,
+    REFLECTION,
+    WAITING,
+}
+
+@Serializable
+enum class CompanionLifeEventStatus {
+    PLANNED,
+    RUNNING,
+    COMPLETED,
+    FAILED,
+    CANCELLED,
+}
+
+@Serializable
+enum class CompanionLifeEventSource {
+    CHAT,
+    PROACTIVE,
+    TOOL,
+    AGENT,
+    SYSTEM,
 }
 
 @Serializable

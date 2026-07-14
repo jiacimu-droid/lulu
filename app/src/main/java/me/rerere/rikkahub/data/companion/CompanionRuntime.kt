@@ -153,6 +153,9 @@ private val RESCHEDULE_MARKERS = setOf(
 data class CompanionTurnMutation(
     val assistantId: String,
     val state: CompanionState? = null,
+    val privateImpression: CompanionPrivateImpression? = null,
+    val goals: List<CompanionGoal> = emptyList(),
+    val lifeEvents: List<CompanionLifeEvent> = emptyList(),
     val concernChanges: List<CompanionConcernChange> = emptyList(),
     val acceptedCommitments: List<CompanionCommitment> = emptyList(),
     val relationshipEvents: List<CompanionRelationshipEvent> = emptyList(),
@@ -381,6 +384,27 @@ fun reduceCompanionRuntimeState(
         events = mutation.relationshipEvents.filter { it.assistantId == assistantId },
         nowMillis = mutation.nowMillis,
     )
+    val existingLifeEventIds = existing.lifeEvents.mapTo(mutableSetOf()) { it.id }
+    val incomingLifeEvents = mutation.lifeEvents
+        .filter { event -> event.assistantId == assistantId && event.id.isNotBlank() }
+        .distinctBy { it.id }
+        .filterNot { it.id in existingLifeEventIds }
+    val nextNeuroState = reduceCompanionNeuroState(
+        previous = existing.neuroState,
+        lifeEvents = incomingLifeEvents,
+        relationshipEvents = relationshipReduction.appliedEvents,
+        nowMillis = mutation.nowMillis,
+    )
+    val nextPrivateImpression = mutation.privateImpression
+        ?.takeIf { it.updatedAt >= existing.privateImpression.updatedAt }
+        ?: existing.privateImpression
+    val nextGoals = reduceCompanionGoals(
+        assistantId = assistantId,
+        previous = existing.goals,
+        proposed = mutation.goals,
+        lifeEvents = incomingLifeEvents,
+        nowMillis = mutation.nowMillis,
+    )
     val concernChanges = mutation.concernChanges.filter { it.belongsTo(assistantId) }
     val acceptedCommitmentChanges = mutation.acceptedCommitments
         .filter { it.assistantId == assistantId }
@@ -415,6 +439,10 @@ fun reduceCompanionRuntimeState(
     val updatedSnapshot = existing.copy(
         state = nextState,
         stateHistory = nextStateHistory,
+        neuroState = nextNeuroState,
+        privateImpression = nextPrivateImpression,
+        goals = nextGoals,
+        lifeEvents = (existing.lifeEvents + incomingLifeEvents).distinctBy { it.id },
         relationship = relationshipReduction.relationship,
         relationshipHistory = existing.relationshipHistory.appendRelationshipEvents(
             relationshipReduction.appliedEvents,

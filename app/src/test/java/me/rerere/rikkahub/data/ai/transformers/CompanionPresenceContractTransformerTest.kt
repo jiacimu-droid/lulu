@@ -36,6 +36,11 @@ class CompanionPresenceContractTransformerTest {
         assertTrue(injected.contains("body_state:"))
         assertTrue(injected.contains("mind_state:"))
         assertTrue(injected.contains("activity_mode:"))
+        assertTrue(injected.contains("emoji:"))
+        assertTrue(injected.contains("sticker:"))
+        assertTrue(injected.contains("bubble_pacing:"))
+        assertTrue(injected.contains("持续存在的数字生命"))
+        assertTrue(injected.contains("不得凭空声称"))
     }
 
     @Test

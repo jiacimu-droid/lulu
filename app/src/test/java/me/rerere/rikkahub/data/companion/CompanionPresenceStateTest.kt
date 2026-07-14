@@ -2,7 +2,6 @@ package me.rerere.rikkahub.data.companion
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CompanionPresenceStateTest {
@@ -47,7 +46,7 @@ class CompanionPresenceStateTest {
     }
 
     @Test
-    fun `missing model description refreshes scene while preserving supplied runtime fields`() {
+    fun `missing model description clears an unverifiable old scene`() {
         val previous = CompanionState(
             statusText = "整理日程中",
             innerThought = "记着下午的安排。",
@@ -71,7 +70,7 @@ class CompanionPresenceStateTest {
         assertEquals("到点前再确认一次。", next.innerThought)
         assertEquals("稳定", next.mood)
         assertEquals("planning", next.activityMode)
-        assertEquals("刚刚和你聊到“下午三点的安排我记着。”，注意力还停在这段对话上。", next.selfScene)
+        assertEquals("", next.selfScene)
         assertEquals(1_000L, next.updatedAt)
         assertEquals(1_000L, next.sinceAt)
     }
@@ -87,13 +86,13 @@ class CompanionPresenceStateTest {
         )
 
         assertEquals("我刚刚重新想过这一轮该怎样回应。", next.innerThought)
-        assertEquals("刚刚和你聊到“今天已经重新回应。”，注意力还停在这段对话上。", next.selfScene)
+        assertEquals("", next.selfScene)
         assertEquals(1_000L, next.updatedAt)
         assertEquals(1_000L, next.sinceAt)
     }
 
     @Test
-    fun `each visible reply refreshes fallback scene thought and timestamps`() {
+    fun `visible replies update thought without inventing a scene`() {
         val first = buildCompanionStateFromTurn(
             previous = CompanionState(
                 innerThought = "昨天留下的旧心声。",
@@ -113,18 +112,18 @@ class CompanionPresenceStateTest {
         )
 
         assertEquals(
-            "刚才聊到“学习计划我已经重新排好了。”，我还在想怎样把下一步变得更容易开始。",
+            "这件事还没有真正结束，我想继续留意下一步有没有发生。",
             first.innerThought,
         )
-        assertEquals("刚刚和你聊到“学习计划我已经重新排好了。”，注意力还停在这段对话上。", first.selfScene)
+        assertEquals("", first.selfScene)
         assertEquals(1_000L, first.updatedAt)
         assertEquals(1_000L, first.sinceAt)
 
         assertEquals(
-            "刚才聊到“今晚早点休息，我会记着。”，我在留意你的状态，别让这段对话把该休息的时间也占掉。",
+            "我会先记住这次作息上的变化，之后再结合真实状态判断。",
             second.innerThought,
         )
-        assertEquals("刚刚和你聊到“今晚早点休息，我会记着。”，注意力还停在这段对话上。", second.selfScene)
+        assertEquals("", second.selfScene)
         assertEquals(2_000L, second.updatedAt)
         assertEquals(2_000L, second.sinceAt)
     }
@@ -148,9 +147,9 @@ class CompanionPresenceStateTest {
         )
 
         assertEquals("安静留意", next.statusText)
-        assertEquals("刚才聊到“我在。”，我刚刚把话说出来，也在等你接住下一句。", next.innerThought)
+        assertEquals("这轮话已经说完了，我先把真正值得延续的部分留下来。", next.innerThought)
         assertEquals("安静留意着现在的变化", next.mindState)
-        assertEquals("刚刚和你聊到“我在。”，注意力还停在这段对话上。", next.selfScene)
+        assertEquals("", next.selfScene)
         assertEquals(1_000L, next.updatedAt)
         assertEquals(1_000L, next.sinceAt)
         val visibleState = listOf(next.statusText, next.innerThought, next.mindState, next.selfScene).joinToString()
@@ -160,7 +159,7 @@ class CompanionPresenceStateTest {
     }
 
     @Test
-    fun `technical model presence falls back to the visible reply`() {
+    fun `technical model presence is removed without fabricating a visible reply scene`() {
         val next = buildCompanionStateFromTurn(
             previous = CompanionState(updatedAt = 100L, sinceAt = 50L),
             assistantText = "今晚早点休息，我会记着。",
@@ -172,8 +171,8 @@ class CompanionPresenceStateTest {
             nowMillis = 1_000L,
         )
 
-        assertTrue(next.innerThought.startsWith("刚才聊到“今晚早点休息，我会记着。”"))
-        assertEquals("刚刚和你聊到“今晚早点休息，我会记着。”，注意力还停在这段对话上。", next.selfScene)
+        assertEquals("我会先记住这次作息上的变化，之后再结合真实状态判断。", next.innerThought)
+        assertEquals("", next.selfScene)
         assertFalse(next.innerThought.contains("副 API", ignoreCase = true))
         assertFalse(next.selfScene.contains("后台", ignoreCase = true))
     }

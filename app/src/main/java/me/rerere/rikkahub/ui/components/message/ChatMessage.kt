@@ -110,6 +110,7 @@ import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.extendColors
 import me.rerere.rikkahub.data.datastore.ChatFontFamily
 import me.rerere.rikkahub.data.ai.transformers.luluPresenceMetadata
+import me.rerere.rikkahub.data.ai.transformers.LULU_PRESENCE_METADATA_TYPE
 import me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.layout.ContentScale
@@ -367,9 +368,16 @@ private data class LuluExpressionSnapshot(
     val emoji: String,
     val sticker: String,
     val gesture: String,
+    val bubblePacing: String = "normal",
 ) {
     fun toDisplayText(): String {
-        description.trim().takeIf { it.isNotBlank() }?.let { return it }
+        description.trim().takeIf { it.isNotBlank() }?.let { descriptionText ->
+            return buildString {
+                emoji.trim().takeIf(String::isNotBlank)?.let { append(it).append(' ') }
+                append(descriptionText)
+                sticker.trim().takeIf(String::isNotBlank)?.let { append(" · ").append(it) }
+            }
+        }
         val parts = listOf(emoji, sticker, gesture).map { it.trim() }.filter { it.isNotBlank() }
         return parts.takeIf { it.isNotEmpty() }
             ?.joinToString("，", prefix = "此刻状态：", postfix = "。")
@@ -378,24 +386,28 @@ private data class LuluExpressionSnapshot(
 }
 
 private fun UIMessage.latestLuluPresenceSnapshot(descriptionOverride: String?): LuluExpressionSnapshot? {
+    val metadata = luluPresenceMetadata()?.data
     val description = descriptionOverride
         ?.trim()
         ?.takeIf { it.isNotBlank() }
-        ?: luluPresenceMetadata()
-            ?.data
+        ?: metadata
             ?.get("description")
             ?.jsonPrimitive
             ?.contentOrNull
             ?.trim()
             ?.takeIf { it.isNotBlank() }
-    return description?.let {
+    val emoji = metadata?.get("emoji")?.jsonPrimitive?.contentOrNull.orEmpty()
+    val sticker = metadata?.get("sticker")?.jsonPrimitive?.contentOrNull.orEmpty()
+    val pacing = metadata?.get("bubble_pacing")?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "normal" }
+    return if (description != null || emoji.isNotBlank() || sticker.isNotBlank()) {
         LuluExpressionSnapshot(
-            description = it,
-            emoji = "",
-            sticker = "",
+            description = description.orEmpty(),
+            emoji = emoji,
+            sticker = sticker,
             gesture = "",
+            bubblePacing = pacing,
         )
-    }
+    } else null
 }
 
 private fun readLatestLuluExpressionSnapshot(file: File): LuluExpressionSnapshot? {
@@ -408,6 +420,7 @@ private fun readLatestLuluExpressionSnapshot(file: File): LuluExpressionSnapshot
             emoji = obj["emoji"]?.jsonPrimitive?.contentOrNull.orEmpty(),
             sticker = obj["sticker"]?.jsonPrimitive?.contentOrNull.orEmpty(),
             gesture = obj["gesture"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+            bubblePacing = obj["bubble_pacing"]?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "normal" },
         )
     }.getOrNull()
 }
@@ -433,6 +446,7 @@ private fun MessagePartsBlock(
     val hapticFeedback = LocalHapticFeedback.current
     val settings = LocalSettings.current
     val bubbleAlpha = 1f - settings.displaySetting.chatBubbleTransparency / 100f
+    val bubbleDelayMillis = remember(annotations) { annotations.luluBubbleDelayMillis() }
     val partsState by rememberUpdatedState(parts)
 
     val handleClickCitation: (String) -> Unit = remember {
@@ -558,7 +572,7 @@ private fun MessagePartsBlock(
                                                 visibleSegmentCount = visualSegments.size
                                             } else {
                                                 while (visibleSegmentCount < visualSegments.size) {
-                                                    delay(120)
+                                                    delay(bubbleDelayMillis)
                                                     visibleSegmentCount += 1
                                                 }
                                                 if (visibleSegmentCount > visualSegments.size) {
@@ -790,6 +804,23 @@ private fun MessagePartsBlock(
                 Text(stringResource(R.string.citations_count, urlCitations.size))
             }
         }
+    }
+}
+
+private fun List<UIMessageAnnotation>.luluBubbleDelayMillis(): Long {
+    val pacing = asReversed()
+        .asSequence()
+        .filterIsInstance<UIMessageAnnotation.Metadata>()
+        .firstOrNull { it.type == LULU_PRESENCE_METADATA_TYPE }
+        ?.data
+        ?.get("bubble_pacing")
+        ?.jsonPrimitive
+        ?.contentOrNull
+        ?.lowercase()
+    return when (pacing) {
+        "quick" -> 90L
+        "slow" -> 360L
+        else -> 180L
     }
 }
 

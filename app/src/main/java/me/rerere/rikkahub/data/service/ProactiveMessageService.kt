@@ -70,6 +70,13 @@ import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.companion.CompanionState
 import me.rerere.rikkahub.data.companion.CompanionTurnMutation
 import me.rerere.rikkahub.data.companion.CompanionTurnRole
+import me.rerere.rikkahub.data.companion.CompanionLifeEvent
+import me.rerere.rikkahub.data.companion.CompanionLifeEventSource
+import me.rerere.rikkahub.data.companion.CompanionToolExecution
+import me.rerere.rikkahub.data.companion.buildConversationLifeEvent
+import me.rerere.rikkahub.data.companion.buildAutonomousReflectionLifeEvent
+import me.rerere.rikkahub.data.companion.buildToolLifeEvent
+import me.rerere.rikkahub.data.companion.buildWaitingLifeEvent
 import me.rerere.rikkahub.data.companion.buildCompanionStateFromTurn
 import me.rerere.rikkahub.data.companion.commitmentStatusesBySourceMessageId
 import me.rerere.rikkahub.data.companion.isSleepSupervisionGoal
@@ -1141,6 +1148,21 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                                 nowMillis = nowMillis,
                             ),
                             nowMillis = nowMillis,
+                            lifeEvents = listOfNotNull(
+                                buildAutonomousReflectionLifeEvent(
+                                    assistantId = assistant.id.toString(),
+                                    reason = autonomousPlan.reason,
+                                    reviewedMemory = memoryContext.isNotBlank(),
+                                    evidenceReference = "autonomous:reflection:${nowMillis / 3_600_000L}",
+                                    nowMillis = nowMillis,
+                                ),
+                                buildWaitingLifeEvent(
+                                    assistantId = assistant.id.toString(),
+                                    reason = autonomousPlan.reason,
+                                    evidenceReference = "autonomous:wait:${nowMillis / 3_600_000L}",
+                                    nowMillis = nowMillis,
+                                ),
+                            ),
                         )
                     }.onFailure { error ->
                         Log.w(TAG, "Failed to persist waiting companion state", error)
@@ -1172,6 +1194,21 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                                     nowMillis = nowMillis,
                                 ),
                                 nowMillis = nowMillis,
+                                lifeEvents = listOfNotNull(
+                                    buildAutonomousReflectionLifeEvent(
+                                        assistantId = assistant.id.toString(),
+                                        reason = plan.reason,
+                                        reviewedMemory = memoryContext.isNotBlank(),
+                                        evidenceReference = "autonomous:reflection:${nowMillis / 3_600_000L}",
+                                        nowMillis = nowMillis,
+                                    ),
+                                    buildWaitingLifeEvent(
+                                        assistantId = assistant.id.toString(),
+                                        reason = plan.reason,
+                                        evidenceReference = "autonomous:deferred:${nowMillis / 3_600_000L}",
+                                        nowMillis = nowMillis,
+                                    ),
+                                ),
                             )
                         }.onFailure { error ->
                             Log.w(TAG, "Failed to persist deferred companion state", error)
@@ -1331,6 +1368,20 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 val replyText = aiMessage.parts.filterIsInstance<UIMessagePart.Text>()
                     .joinToString("\n") { it.text }.trim()
                 val finalPresence = finalMessages.companionModelPresence()
+                val completedToolExecutions = finalMessages
+                    .flatMap { it.getTools() }
+                    .filter { it.isExecuted }
+                    .map { tool ->
+                        CompanionToolExecution(
+                            toolCallId = tool.toolCallId,
+                            toolName = tool.toolName,
+                            inputJson = tool.input,
+                            outputText = tool.output
+                                .filterIsInstance<UIMessagePart.Text>()
+                                .joinToString("\n") { it.text },
+                        )
+                    }
+                    .distinctBy { it.toolCallId }
                 val executingCommitmentId = executingCommitment?.id
                 val currentCommitmentStatus = executingCommitment?.let { commitment ->
                     companionRuntime.snapshot(commitment.assistantId).commitments
@@ -1381,6 +1432,8 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                             fallbackInnerThought = autonomousPlan?.innerThought
                                 ?: "我刚刚主动联系了你，现在想看看你会不会回应。",
                             nowMillis = System.currentTimeMillis(),
+                            toolExecutions = completedToolExecutions,
+                            evidenceReference = aiMessage.id.toString(),
                         )
                     }.onFailure { error ->
                         Log.w(TAG, "Failed to persist proactive companion state projection", error)
@@ -1616,6 +1669,8 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
         presence: CompanionModelPresence?,
         fallbackInnerThought: String?,
         nowMillis: Long,
+        toolExecutions: List<CompanionToolExecution> = emptyList(),
+        evidenceReference: String? = null,
     ) {
         val unifiedState = buildCompanionStateFromTurn(
             previous = companionRuntime.snapshot(assistant.id.toString()).state,
@@ -1624,18 +1679,37 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             fallbackInnerThought = fallbackInnerThought,
             nowMillis = nowMillis,
         )
-        persistCompanionState(assistant, unifiedState, nowMillis)
+        val lifeEvents = buildList {
+            buildConversationLifeEvent(
+                assistantId = assistant.id.toString(),
+                assistantText = assistantText,
+                source = CompanionLifeEventSource.PROACTIVE,
+                evidenceReference = evidenceReference,
+                nowMillis = nowMillis,
+            )?.let(::add)
+            toolExecutions.mapNotNullTo(this) { execution ->
+                buildToolLifeEvent(
+                    assistantId = assistant.id.toString(),
+                    execution = execution,
+                    source = CompanionLifeEventSource.TOOL,
+                    nowMillis = nowMillis,
+                )
+            }
+        }
+        persistCompanionState(assistant, unifiedState, nowMillis, lifeEvents)
     }
 
     private suspend fun persistCompanionState(
         assistant: Assistant,
         state: CompanionState,
         nowMillis: Long,
+        lifeEvents: List<CompanionLifeEvent> = emptyList(),
     ) {
         companionRuntime.applyTurn(
             CompanionTurnMutation(
                 assistantId = assistant.id.toString(),
                 state = state,
+                lifeEvents = lifeEvents,
                 nowMillis = nowMillis,
             ),
         )

@@ -456,4 +456,48 @@ class MemoryBankContextTest {
 
         assertEquals(listOf(3, 1, 2), reranked.map { it.id })
     }
+
+    @Test
+    fun `first memory query selects the earliest relevant memory`() {
+        val memories = listOf(
+            MemoryBankEntity(id = 1, content = "第一次聊考研时决定先准备英语", createdAt = 100L),
+            MemoryBankEntity(id = 2, content = "后来聊考研时开始准备专业课", createdAt = 200L),
+            MemoryBankEntity(id = 3, content = "最近聊考研时调整了学习顺序", createdAt = 300L),
+        )
+
+        val selected = selectMemoryRecallItems(
+            memories = memories,
+            query = "我们第一次聊考研是什么时候",
+            maxItems = 1,
+            nowMillis = 1_000L,
+        )
+
+        assertEquals(listOf(1), selected.map { it.id })
+    }
+
+    @Test
+    fun `rare query terms outweigh common background terms`() {
+        val memories = buildList {
+            add(MemoryBankEntity(id = 1, content = "考研时约定过蓝莓协议", importance = 2, createdAt = 100L))
+            repeat(8) { index ->
+                add(
+                    MemoryBankEntity(
+                        id = index + 2,
+                        content = "考研复习安排第${index + 1}次调整",
+                        importance = 4,
+                        createdAt = 200L + index,
+                    ),
+                )
+            }
+        }
+
+        val selected = selectMemoryRecallItems(
+            memories = memories,
+            query = "考研 蓝莓协议",
+            maxItems = 1,
+            nowMillis = 1_000L,
+        )
+
+        assertEquals(listOf(1), selected.map { it.id })
+    }
 }

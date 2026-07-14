@@ -10,6 +10,9 @@ data class CompanionModelPresence(
     val mindState: String? = null,
     val activityMode: String? = null,
     val userState: String? = null,
+    val emoji: String? = null,
+    val sticker: String? = null,
+    val bubblePacing: String? = null,
 )
 
 fun buildCompanionStateFromTurn(
@@ -22,25 +25,10 @@ fun buildCompanionStateFromTurn(
     val cleanPrevious = previous.sanitizedCompanionState()
     if (assistantText.isBlank()) return cleanPrevious
 
-    // A model may omit the hidden <lulu_presence> block even though the visible
-    // reply was generated successfully.  Do not leave yesterday's scene and
-    // inner voice in the status dialog in that case.  The fallback is deliberately
-    // short and grounded in the actual reply; it is only used when the model did
-    // not provide a presence field, while fields that are actually supplied by
-    // the model still take precedence.
-    val fallbackReplySummary = assistantText
-        .trim()
-        .replace(Regex("\\s+"), " ")
-        .take(72)
-        .takeIf(String::isNotBlank)
-    val fallbackScene = if (
-        presence?.description.cleanModelPresenceField(MAX_SCENE_LENGTH) == null &&
-        fallbackReplySummary != null
-    ) {
-        "刚刚和你聊到“$fallbackReplySummary”，注意力还停在这段对话上。"
-    } else {
-        null
-    }
+    // A scene is part of the character's life, not a paraphrase of the message
+    // that was just sent. CompanionState has no evidence reference, so an old
+    // scene cannot safely be treated as verified. Clear it unless this turn
+    // supplies a fresh scene grounded by the runtime contract.
     val fallbackThought = fallbackThoughtForReply(assistantText)
 
     val statusText = presence?.statusText.cleanModelPresenceField(MAX_STATE_FIELD_LENGTH)
@@ -57,8 +45,7 @@ fun buildCompanionStateFromTurn(
         ?: cleanPrevious.activityMode
         .ifBlank { "conversation" }
     val selfScene = presence?.description.cleanModelPresenceField(MAX_SCENE_LENGTH)
-        ?: fallbackScene.cleanModelPresenceField(MAX_SCENE_LENGTH)
-        ?: cleanPrevious.selfScene
+        ?: ""
     val candidate = cleanPrevious.copy(
         statusText = statusText,
         innerThought = innerThought,
@@ -83,19 +70,14 @@ fun buildCompanionStateFromTurn(
 }
 
 private fun fallbackThoughtForReply(reply: String): String {
-    val summary = reply
-        .trim()
-        .replace(Regex("\\s+"), " ")
-        .take(36)
-    val topic = "刚才聊到“$summary”"
     return when {
         reply.contains("学习") || reply.contains("课程") || reply.contains("背") || reply.contains("题") ->
-            "$topic，我还在想怎样把下一步变得更容易开始。"
+            "这件事还没有真正结束，我想继续留意下一步有没有发生。"
         reply.contains("睡") || reply.contains("休息") || reply.contains("困") ->
-            "$topic，我在留意你的状态，别让这段对话把该休息的时间也占掉。"
+            "我会先记住这次作息上的变化，之后再结合真实状态判断。"
         reply.contains("？") || reply.contains("?") || reply.contains("吗") ->
-            "$topic，我有点想知道你会怎么接这句话。"
-        else -> "$topic，我刚刚把话说出来，也在等你接住下一句。"
+            "这个问题还悬着，我想知道你真正会怎么回答。"
+        else -> "这轮话已经说完了，我先把真正值得延续的部分留下来。"
     }
 }
 
