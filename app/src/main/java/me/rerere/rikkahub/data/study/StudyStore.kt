@@ -144,3 +144,6 @@ private fun StudyState.grantDataLossCompensation(): StudyState =
 
 private fun StudyState.grantPomodoroInterruptionCompensation(): StudyState =
     StudyRules.grantPomodoroInterruptionCompensation(this)
+
+private fun StudyState.grantGachaBadLuckCompensation(): StudyState =
+    StudyRules.grantGachaBadLuckCompensation(this)
