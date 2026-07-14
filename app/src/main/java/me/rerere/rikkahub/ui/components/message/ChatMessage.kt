@@ -111,6 +111,7 @@ import me.rerere.rikkahub.ui.theme.extendColors
 import me.rerere.rikkahub.data.datastore.ChatFontFamily
 import me.rerere.rikkahub.data.ai.transformers.luluPresenceMetadata
 import me.rerere.rikkahub.data.ai.transformers.LULU_PRESENCE_METADATA_TYPE
+import me.rerere.rikkahub.data.ai.transformers.LULU_BUBBLE_SEGMENT_METADATA_TYPE
 import me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.layout.ContentScale
@@ -554,7 +555,15 @@ private fun MessagePartsBlock(
                                     }
                                 } else {
                                     if (settings.displaySetting.showAssistantBubble) {
-                                        val visualSegments = remember(displayText) { displayText.splitIntoVisualBubbles() }
+                                        val isPresegmentedBubble = remember(annotations) {
+                                            annotations.any { annotation ->
+                                                annotation is UIMessageAnnotation.Metadata &&
+                                                    annotation.type == LULU_BUBBLE_SEGMENT_METADATA_TYPE
+                                            }
+                                        }
+                                        val visualSegments = remember(displayText, isPresegmentedBubble) {
+                                            if (isPresegmentedBubble) listOf(displayText) else displayText.splitIntoVisualBubbles()
+                                        }
                                         var visibleSegmentCount by remember(animateAssistantSegments) {
                                             mutableIntStateOf(
                                                 if (!animateAssistantSegments) {

@@ -14,6 +14,7 @@ import me.rerere.rikkahub.utils.JsonInstant
 import kotlin.uuid.Uuid
 
 const val LULU_PRESENCE_METADATA_TYPE = "lulu_presence"
+const val LULU_BUBBLE_SEGMENT_METADATA_TYPE = "lulu_bubble_segment"
 
 private val LULU_PRESENCE_BLOCK_REGEX =
     Regex("(?is)<\\s*lulu[_\\s-]*presence\\s*>\\s*([\\s\\S]*?)\\s*</\\s*lulu[_\\s-]*presence\\s*>")
@@ -53,13 +54,20 @@ internal fun splitLuluAssistantExpressionMessages(messages: List<UIMessage>): Li
     val last = withPresence.lastOrNull() ?: return withPresence
     if (last.role != MessageRole.ASSISTANT) return withPresence
     val textPart = last.parts.singleOrNull() as? UIMessagePart.Text ?: return withPresence
-    val segments = splitLuluExpressionBubbles(textPart.text)
+    val segments = splitCompanionExpressionBubbles(textPart.text)
     if (segments.size <= 1) return withPresence
 
     val splitMessages = segments.mapIndexed { index, segment ->
         last.copy(
             id = if (index == 0) last.id else Uuid.random(),
             parts = listOf(textPart.copy(text = segment)),
+            annotations = last.annotations + UIMessageAnnotation.Metadata(
+                type = LULU_BUBBLE_SEGMENT_METADATA_TYPE,
+                data = buildJsonObject {
+                    put("index", index)
+                    put("count", segments.size)
+                },
+            ),
             usage = if (index == 0) last.usage else null,
             translation = null,
         )
@@ -243,7 +251,7 @@ internal fun sanitizeLuluVisibleExpression(text: String): String {
         .trim()
 }
 
-private fun splitLuluExpressionBubbles(text: String): List<String> {
+internal fun splitCompanionExpressionBubbles(text: String): List<String> {
     val clean = text.trim()
     if (clean.isBlank()) return listOf(clean)
     if (clean.contains("```") || clean.contains("\n- ") || clean.contains("\n1. ")) return listOf(clean)
@@ -251,8 +259,9 @@ private fun splitLuluExpressionBubbles(text: String): List<String> {
     val paragraphSegments = clean.split(Regex("\\n\\s*\\n+"))
         .map { it.trim() }
         .filter { it.isNotBlank() }
-    val roughSegments = if (paragraphSegments.size > 1) {
-        paragraphSegments
+    val usesParagraphRhythm = paragraphSegments.size > 1 || clean.contains('\n')
+    val roughSegments = if (usesParagraphRhythm) {
+        segmentParagraphBubbles(paragraphSegments)
     } else {
         clean.split(Regex("(?<=[.!?~\\u3002\\uFF01\\uFF1F\\u2026])\\s*"))
             .map { it.trim() }
@@ -264,6 +273,7 @@ private fun splitLuluExpressionBubbles(text: String): List<String> {
             }
     }
     if (roughSegments.size <= 1) return listOf(clean)
+    val maxBubbles = if (usesParagraphRhythm) 4 else 3
 
     return roughSegments
         .fold(mutableListOf<String>()) { acc, segment ->
@@ -271,7 +281,11 @@ private fun splitLuluExpressionBubbles(text: String): List<String> {
             when {
                 last == null -> acc += segment
                 segment.length < 5 && last.length + segment.length <= 22 -> acc[acc.lastIndex] = "$last$segment"
-                acc.size >= 3 -> acc[acc.lastIndex] = "$last$segment"
+                acc.size >= maxBubbles -> acc[acc.lastIndex] = if (usesParagraphRhythm) {
+                    "$last\n$segment"
+                } else {
+                    "$last$segment"
+                }
                 else -> acc += segment
             }
             acc
@@ -281,3 +295,60 @@ private fun splitLuluExpressionBubbles(text: String): List<String> {
         .takeIf { it.size > 1 }
         ?: listOf(clean)
 }
+
+private fun segmentParagraphBubbles(paragraphs: List<String>): List<String> {
+    val result = mutableListOf<String>()
+    paragraphs.forEach { paragraph ->
+        val paragraphBubbles = paragraph.splitParagraphBubbleUnits()
+        paragraphBubbles.forEachIndexed { index, bubble ->
+            val previous = result.lastOrNull()
+            if (
+                index == 0 &&
+                previous != null &&
+                bubble.startsWithDependentConnector() &&
+                previous.visualBubbleLength() + bubble.visualBubbleLength() <= 48
+            ) {
+                result[result.lastIndex] = "$previous$bubble"
+            } else {
+                result += bubble
+            }
+        }
+    }
+    return result
+}
+
+private fun String.splitParagraphBubbleUnits(): List<String> {
+    val units = split(Regex("(?<=[.!?~～。！？…])\\s*|\\n+"))
+        .map(String::trim)
+        .filter(String::isNotBlank)
+    if (units.size <= 1) return listOf(trim())
+
+    return units.fold(mutableListOf<String>()) { bubbles, unit ->
+        val previous = bubbles.lastOrNull()
+        when {
+            previous == null -> bubbles += unit
+            (!previous.endsWithTerminalPunctuation() || unit.startsWithAnaphoricContinuation()) &&
+                previous.visualBubbleLength() + unit.visualBubbleLength() <= 44 -> {
+                bubbles[bubbles.lastIndex] = "$previous$unit"
+            }
+            else -> bubbles += unit
+        }
+        bubbles
+    }
+}
+
+private fun String.startsWithDependentConnector(): Boolean = DEPENDENT_BUBBLE_CONNECTORS.any { startsWith(it) }
+
+private fun String.startsWithAnaphoricContinuation(): Boolean =
+    startsWith("这是") || startsWith("那是") || startsWith("这就是") || startsWith("那就是")
+
+private fun String.endsWithTerminalPunctuation(): Boolean {
+    val last = lastOrNull() ?: return false
+    return last in setOf('.', '!', '?', '~', '～', '。', '！', '？', '…')
+}
+
+private fun String.visualBubbleLength(): Int = count { !it.isWhitespace() }
+
+private val DEPENDENT_BUBBLE_CONNECTORS = listOf(
+    "但", "不过", "可是", "只是", "而且", "所以", "因为",
+)

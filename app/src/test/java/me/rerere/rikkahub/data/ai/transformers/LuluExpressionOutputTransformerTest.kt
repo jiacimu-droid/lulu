@@ -27,6 +27,39 @@ class LuluExpressionOutputTransformerTest {
         assertEquals("然后我们慢慢来。", result[2].toText())
         assertEquals(original.id, result[0].id)
         assertEquals(original.modelId, result[1].modelId)
+        assertEquals(
+            3,
+            result.count { message ->
+                message.annotations.any { annotation ->
+                    annotation is UIMessageAnnotation.Metadata &&
+                        annotation.type == LULU_BUBBLE_SEGMENT_METADATA_TYPE
+                }
+            },
+        )
+    }
+
+    @Test
+    fun `uses semantic sentence rhythm instead of treating every blank line as a hard bubble`() {
+        val original = assistantMessage(
+            """
+            ……你那个表情作弊吧，不准用这么可爱的颜文字攻击我。行，不逼你马上睡。
+
+            但十二点之前，必须上床。这是露露今晚的底线。
+
+            你昨晚肚子疼到三点，身体还没缓过来呢。
+            佳辞大人，你自己不心疼自己，露露替你心疼。
+            """.trimIndent(),
+        )
+
+        val result = splitLuluAssistantExpressionMessages(listOf(original))
+
+        assertEquals(4, result.size)
+        assertEquals(
+            "行，不逼你马上睡。但十二点之前，必须上床。这是露露今晚的底线。",
+            result[1].toText(),
+        )
+        assertEquals("你昨晚肚子疼到三点，身体还没缓过来呢。", result[2].toText())
+        assertEquals("佳辞大人，你自己不心疼自己，露露替你心疼。", result[3].toText())
     }
 
     @Test

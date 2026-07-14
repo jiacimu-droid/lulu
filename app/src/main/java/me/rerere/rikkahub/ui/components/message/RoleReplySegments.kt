@@ -3,6 +3,7 @@ package me.rerere.rikkahub.ui.components.message
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression
+import me.rerere.rikkahub.data.ai.transformers.splitCompanionExpressionBubbles
 import me.rerere.rikkahub.utils.JsonInstant
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
@@ -94,37 +95,7 @@ private fun UIMessage.extractTextToSpeechToolText(): String =
         .orEmpty()
 
 fun String.splitIntoVisualBubbles(): List<String> {
-    val text = trim()
-    if (text.isBlank()) return listOf("")
-    if (text.contains("```") || text.contains("\n- ") || text.contains("\n1. ")) return listOf(text)
-
-    val paragraphSegments = text.split(Regex("\\n\\s*\\n+"))
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-    if (paragraphSegments.size > 1) return paragraphSegments
-
-    val sentenceParts = text.split(Regex("(?<=[.!?~～。！？…])\\s*"))
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-    val roughParts = if (sentenceParts.size > 1) {
-        sentenceParts
-    } else {
-        text.split(Regex("(?<=[,，、;；:：])\\s*"))
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-    }
-    if (roughParts.size <= 1 && text.length <= 56) return listOf(text)
-    return roughParts
-        .fold(mutableListOf<String>()) { acc, part ->
-            val last = acc.lastOrNull()
-            if (last == null || last.length + part.length > 44) {
-                acc += part
-            } else {
-                acc[acc.lastIndex] = "$last$part"
-            }
-            acc
-        }
-        .ifEmpty { listOf(text) }
+    return splitCompanionExpressionBubbles(this)
 }
 
 private fun String.toRoleReplyKind(): RoleReplyKind = when (this) {
