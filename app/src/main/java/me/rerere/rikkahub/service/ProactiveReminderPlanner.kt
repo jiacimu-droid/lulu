@@ -159,11 +159,19 @@ internal fun buildCompanionTurnReminderPlans(
     } else {
         modelPlans + deterministicPlans
     }
-    val wakePlan = initialPlans.firstOrNull { it.kind == ProactiveReminderKind.WAKE }
+    val hasWakeSemantics = COMPANION_WAKE_WORDS.any { marker -> marker in userText.lowercase() }
+    val normalizedInitialPlans = initialPlans.map { reminder ->
+        if (hasWakeSemantics && reminder.kind == ProactiveReminderKind.SCHEDULE) {
+            reminder.copy(kind = ProactiveReminderKind.WAKE)
+        } else {
+            reminder
+        }
+    }
+    val wakePlan = normalizedInitialPlans.firstOrNull { it.kind == ProactiveReminderKind.WAKE }
     val localHour = Instant.ofEpochMilli(nowMillis).atZone(zoneId).hour
     val sleepSupervision = wakePlan
         ?.takeIf { wake ->
-            initialPlans.none { it.kind == ProactiveReminderKind.SLEEP } &&
+            normalizedInitialPlans.none { it.kind == ProactiveReminderKind.SLEEP } &&
                 wake.triggerAtMillis - nowMillis in MIN_SLEEP_SUPERVISION_LEAD_MILLIS..MAX_SLEEP_SUPERVISION_LEAD_MILLIS &&
                 (localHour >= 22 || localHour < 5)
         }
@@ -181,7 +189,7 @@ internal fun buildCompanionTurnReminderPlans(
                 ),
             )
         }
-    return (initialPlans + listOfNotNull(sleepSupervision))
+    return (normalizedInitialPlans + listOfNotNull(sleepSupervision))
         .distinctBy { reminder -> reminder.kind to (reminder.triggerAtMillis / 60_000L) }
         .sortedBy { it.triggerAtMillis }
         .take(MAX_COMPANION_TURN_REMINDERS)
