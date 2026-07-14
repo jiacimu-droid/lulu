@@ -349,7 +349,7 @@ class StudyRulesTest {
             }
         }
 
-        assertEquals(40, results.size)
+        assertEquals(11, results.size)
         assertEquals(1, results.count { it.rarity == StudyRarity.Rare })
         assertEquals(0, results.count { it.rarity == StudyRarity.Epic || it.rarity == StudyRarity.Rainbow })
         assertEquals(10, state.drawsSinceNonNormal)
@@ -779,7 +779,7 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `ten draw omits full fragments but keeps valid pity reward`() {
+    fun `ten draw omits every full fragment but still counts the attempts`() {
         val outfit = StudyRules.outfitNames.first()
         val key = "normal:$outfit:${StudyRules.outfitParts.first()}"
         val state = StudyState(
@@ -795,9 +795,8 @@ class StudyRulesTest {
         val drawn = StudyRules.draw(state, count = 10, random = alwaysSameFullFragment)
 
         assertEquals(0, drawn.state.wallet.kudos)
-        assertEquals(1, drawn.results.size)
-        assertEquals(StudyRarity.Rare, drawn.results.single().rarity)
-        assertEquals(1, drawn.state.inventory.douyinFragments)
+        assertTrue(drawn.results.isEmpty())
+        assertEquals(0, drawn.state.inventory.douyinFragments)
         assertEquals(10, drawn.state.dailyDrawCount)
     }
 
