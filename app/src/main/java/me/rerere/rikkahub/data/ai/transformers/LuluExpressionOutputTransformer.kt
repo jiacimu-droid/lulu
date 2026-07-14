@@ -263,7 +263,7 @@ internal fun splitCompanionExpressionBubbles(text: String): List<String> {
     val roughSegments = if (usesParagraphRhythm) {
         segmentParagraphBubbles(paragraphSegments)
     } else {
-        clean.split(Regex("(?<=[.!?~\\u3002\\uFF01\\uFF1F\\u2026])\\s*"))
+        clean.split(COMPANION_SENTENCE_BOUNDARY_REGEX)
             .map { it.trim() }
             .filter { it.isNotBlank() }
             .ifEmpty {
@@ -318,7 +318,7 @@ private fun segmentParagraphBubbles(paragraphs: List<String>): List<String> {
 }
 
 private fun String.splitParagraphBubbleUnits(): List<String> {
-    val units = split(Regex("(?<=[.!?~～。！？…])\\s*|\\n+"))
+    val units = split(COMPANION_SENTENCE_OR_LINE_BOUNDARY_REGEX)
         .map(String::trim)
         .filter(String::isNotBlank)
     if (units.size <= 1) return listOf(trim())
@@ -352,3 +352,9 @@ private fun String.visualBubbleLength(): Int = count { !it.isWhitespace() }
 private val DEPENDENT_BUBBLE_CONNECTORS = listOf(
     "但", "不过", "可是", "只是", "而且", "所以", "因为",
 )
+
+private val COMPANION_SENTENCE_BOUNDARY_REGEX =
+    Regex("(?<=[.!?~～。！？])\\s*|(?<=…)(?=\\s|$)\\s*")
+
+private val COMPANION_SENTENCE_OR_LINE_BOUNDARY_REGEX =
+    Regex("(?<=[.!?~～。！？])\\s*|(?<=…)(?=\\s|$)\\s*|\\n+")
