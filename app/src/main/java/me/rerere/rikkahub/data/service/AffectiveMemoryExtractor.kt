@@ -154,7 +154,7 @@ internal fun buildDeterministicMemoryCandidates(
         .reversed()
 }
 
-internal fun buildDeterministicMemoryCandidates(
+internal fun buildDeterministicMemoryCandidatesFromNodes(
     messageNodes: List<me.rerere.rikkahub.data.model.MessageNode>,
     limit: Int = 6,
 ): List<AffectiveMemoryCandidate> = buildDeterministicMemoryCandidates(

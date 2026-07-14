@@ -20,7 +20,7 @@ import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.buildCompanionPrivateImpression
-import me.rerere.rikkahub.data.service.buildDeterministicMemoryCandidates
+import me.rerere.rikkahub.data.service.buildDeterministicMemoryCandidatesFromNodes
 import me.rerere.rikkahub.data.service.buildRelationshipEventsFromMemoryCandidates
 import kotlin.uuid.Uuid
 
@@ -138,7 +138,7 @@ class MemoryBankVM(
         var recoveredCount = 0
         for (assistant in assistants) {
             for (conversation in conversationRepository.getRecentConversations(assistant.id, limit = 8)) {
-                val candidates = buildDeterministicMemoryCandidates(conversation.messageNodes, limit = 6)
+                val candidates = buildDeterministicMemoryCandidatesFromNodes(conversation.messageNodes, limit = 6)
                 if (candidates.isEmpty()) continue
                 val nowMillis = System.currentTimeMillis()
                 val saved = memoryBankService.saveExtractedMemories(
