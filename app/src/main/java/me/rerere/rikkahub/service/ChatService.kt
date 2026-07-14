@@ -151,6 +151,54 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.uuid.Uuid
 
 private const val TAG = "ChatService"
+
+internal fun buildDirectFactAnswerGuard(
+    userText: String,
+    passiveFacts: List<CompanionContextFact>,
+    toolExecutions: List<CompanionToolExecution>,
+): String {
+    if (!asksForCurrentLocation(userText)) return ""
+    val freshOutputs = toolExecutions
+        .asReversed()
+        .filter { it.toolName == "get_location" }
+        .map { it.outputText }
+    val passiveOutputs = passiveFacts
+        .asReversed()
+        .filter { it.key == "perception.get_location" }
+        .map { it.value }
+    val location = (freshOutputs + passiveOutputs)
+        .firstNotNullOfOrNull(::confirmedLocationSummary)
+        ?: return ""
+    return buildString {
+        appendLine("<direct_fact_answer priority=\"highest\">")
+        appendLine("用户本轮正在直接询问自己的当前位置。程序已经确认的位置事实：$location")
+        appendLine("必须结合角色人设自然、明确地回答这个位置；不得回答不知道、无法查看、没有定位或让用户自己确认。")
+        appendLine("不要提工具、JSON、后台输入或数据采集，只把位置当作你此刻确实知道的事实。")
+        append("</direct_fact_answer>")
+    }
+}
+
+private fun confirmedLocationSummary(raw: String): String? {
+    val root = runCatching { JsonInstant.parseToJsonElement(raw.trim()) as? JsonObject }.getOrNull() ?: return null
+    if (root["success"]?.jsonPrimitive?.contentOrNull != "true") return null
+    fun field(name: String): String? = root[name]
+        ?.jsonPrimitive
+        ?.contentOrNull
+        ?.trim()
+        ?.takeIf { it.isNotBlank() && !it.equals("Unknown address", ignoreCase = true) }
+    val addressParts = listOf("place_name", "address", "city", "district", "street")
+        .mapNotNull(::field)
+        .distinct()
+    val latitude = field("latitude")
+    val longitude = field("longitude")
+    val coordinates = if (latitude != null && longitude != null) "$latitude,$longitude" else null
+    val summaryParts = buildList {
+        if (addressParts.isNotEmpty()) add("地址=${addressParts.joinToString("；")}")
+        coordinates?.let { add("坐标=$it") }
+    }
+    return summaryParts.takeIf { it.isNotEmpty() }?.joinToString("；")
+}
+
 private val WAKE_CANCELLATION_MARKERS = setOf(
     "不用叫",
     "别叫我",
@@ -1697,6 +1745,11 @@ class ChatService(
             plan = plan,
             tools = tools,
         )
+        val directFactAnswerGuard = buildDirectFactAnswerGuard(
+            userText = latestUserText,
+            passiveFacts = passiveFacts,
+            toolExecutions = toolExecutions,
+        )
         val promptContext = buildString {
             appendLine(unifiedContext)
             appendLine()
@@ -1721,6 +1774,10 @@ class ChatService(
             if (plan.expressionAffordances.isNotEmpty()) {
                 appendLine("本轮可用表达池：${plan.expressionAffordances.joinToString(", ") { it.name }}")
                 appendLine("表达池只是表达层 affordance，不决定是否行动，也不要逐字复述这些标签。")
+                appendLine()
+            }
+            directFactAnswerGuard.takeIf(String::isNotBlank)?.let { guard ->
+                appendLine(guard)
                 appendLine()
             }
         }
@@ -1785,11 +1842,18 @@ class ChatService(
                     )
                 }.getOrNull()
             }
-        return if (modelPlan != null) {
-            ChatTurnPlanResult(plan = modelPlan)
-        } else {
-            ChatTurnPlanResult(plan = CompanionChatTurnPlan())
-        }
+        val requiredFactChecks = ProactiveToolPlanner.requiredFactChecks(
+            userText = perception.recentTurns.lastOrNull { it.role == CompanionTurnRole.USER }?.content.orEmpty(),
+            availableToolNames = perception.availableToolNames,
+        )
+        val basePlan = modelPlan ?: CompanionChatTurnPlan()
+        return ChatTurnPlanResult(
+            plan = basePlan.copy(
+                toolRequests = (requiredFactChecks + basePlan.toolRequests)
+                    .distinctBy { it.toolName }
+                    .take(5),
+            ),
+        )
     }
 
     private fun Assistant.toLuluPlannerPersona(

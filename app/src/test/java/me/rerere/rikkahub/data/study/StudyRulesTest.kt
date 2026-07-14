@@ -761,7 +761,7 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `drawing a completed normal outfit part converts overflow into kudos`() {
+    fun `drawing a completed normal outfit part returns no resource`() {
         val key = "normal:${StudyRules.outfitNames.first()}:${StudyRules.outfitParts.first()}"
         val state = StudyState(
             wallet = StudyWallet(kudos = StudyRules.SINGLE_DRAW_COST),
@@ -777,7 +777,27 @@ class StudyRulesTest {
         assertEquals(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT, drawn.state.inventory.normalFragments[key])
         assertEquals(1, drawn.results.size)
         assertEquals(result.fragmentKey, drawn.results.first().fragmentKey)
-        assertEquals(100, drawn.state.wallet.kudos)
+        assertEquals(0, drawn.state.wallet.kudos)
+    }
+
+    @Test
+    fun `ten draw with full fragments still costs the full eight hundred`() {
+        val outfit = StudyRules.outfitNames.first()
+        val key = "normal:$outfit:${StudyRules.outfitParts.first()}"
+        val state = StudyState(
+            wallet = StudyWallet(kudos = StudyRules.TEN_DRAW_COST),
+            inventory = StudyInventory(normalFragments = mapOf(key to StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT)),
+        )
+        val alwaysSameFullFragment = object : Random() {
+            override fun nextBits(bitCount: Int): Int = 0
+            override fun nextDouble(): Double = 0.0
+            override fun nextInt(until: Int): Int = 0
+        }
+
+        val drawn = StudyRules.draw(state, count = 10, random = alwaysSameFullFragment)
+
+        assertEquals(0, drawn.state.wallet.kudos)
+        assertEquals(10, drawn.results.size)
     }
 
     @Test
@@ -821,6 +841,25 @@ class StudyRulesTest {
         assertEquals(1, state.inventory.theaterFragments)
         assertEquals(1, state.inventory.gameFragments)
         assertEquals(1, state.inventory.videoFragments)
+    }
+
+    @Test
+    fun `purple draw gives theater a two point five percent share of the full pool`() {
+        var state = StudyState(wallet = StudyWallet(singleDrawTickets = 2))
+
+        state = StudyRules.draw(
+            state,
+            count = 1,
+            random = FixedDrawRandom(doubles = mutableListOf(0.95, 0.68)),
+        ).state
+        state = StudyRules.draw(
+            state,
+            count = 1,
+            random = FixedDrawRandom(doubles = mutableListOf(0.95, 0.70)),
+        ).state
+
+        assertEquals(1, state.inventory.douyinFragments)
+        assertEquals(1, state.inventory.theaterFragments)
     }
 
     @Test

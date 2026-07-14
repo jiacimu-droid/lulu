@@ -1,9 +1,62 @@
 package me.rerere.rikkahub.service
 
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Test
+import me.rerere.rikkahub.data.companion.CompanionContextFact
+import me.rerere.rikkahub.data.companion.CompanionToolExecution
 
 class ProactiveToolPlannerTest {
+    @Test
+    fun `direct current location question always requires a fresh location fact`() {
+        val requests = ProactiveToolPlanner.requiredFactChecks(
+            userText = "你知道我现在在哪里吗？",
+            availableToolNames = setOf("get_location", "explore_nearby"),
+        )
+
+        assertEquals(listOf("get_location"), requests.map { it.toolName })
+        assertTrue(requests.single().argumentsJson.contains("force_refresh"))
+    }
+
+    @Test
+    fun `confirmed address is promoted into a direct answer guard`() {
+        val guard = buildDirectFactAnswerGuard(
+            userText = "你知道我在哪里吗",
+            passiveFacts = listOf(
+                CompanionContextFact(
+                    key = "perception.get_location",
+                    value = """{"success":true,"latitude":30.1,"longitude":104.1,"address":"四川省成都市测试路1号","city":"成都市","district":"测试区","precise_address_available":true}""",
+                    observedAt = 1L,
+                ),
+            ),
+            toolExecutions = emptyList(),
+        )
+
+        assertTrue(guard.contains("四川省成都市测试路1号"))
+        assertTrue(guard.contains("不得回答不知道"))
+    }
+
+    @Test
+    fun `fresh planned location result takes priority over passive location`() {
+        val guard = buildDirectFactAnswerGuard(
+            userText = "我现在在哪",
+            passiveFacts = listOf(
+                CompanionContextFact("perception.get_location", """{"success":true,"address":"旧地址"}""", 1L),
+            ),
+            toolExecutions = listOf(
+                CompanionToolExecution(
+                    toolCallId = "fresh",
+                    toolName = "get_location",
+                    inputJson = "{}",
+                    outputText = """{"success":true,"address":"新地址","city":"成都市"}""",
+                ),
+            ),
+        )
+
+        assertTrue(guard.contains("新地址"))
+        assertTrue(!guard.contains("旧地址"))
+    }
+
     @Test
     fun `tired message should request health context`() {
         val plan = ProactiveToolPlanner.plan(

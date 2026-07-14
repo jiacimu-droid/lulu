@@ -8,6 +8,21 @@ data class ProactiveToolRequest(
 )
 
 object ProactiveToolPlanner {
+    fun requiredFactChecks(
+        userText: String,
+        availableToolNames: Set<String>,
+    ): List<ProactiveToolRequest> = buildList {
+        if (asksForCurrentLocation(userText) && "get_location" in availableToolNames) {
+            add(
+                ProactiveToolRequest(
+                    toolName = "get_location",
+                    reason = "用户正在直接询问自己当前在哪里；回复前必须刷新定位并基于结果回答，不能只展示工具后声称不知道。",
+                    argumentsJson = """{"include_address":true,"force_refresh":true}""",
+                ),
+            )
+        }
+    }
+
     fun plan(
         userText: String,
         availableToolNames: Set<String>,
@@ -337,3 +352,19 @@ object ProactiveToolPlanner {
         "帮我", "给我", "帮我记", "记得", "提醒我", "叫我", "到时候", "可以", "麻烦", "顺手"
     )
 }
+
+internal fun asksForCurrentLocation(userText: String): Boolean {
+    val normalized = userText.lowercase().replace(" ", "")
+    return CURRENT_LOCATION_QUESTIONS.any { it in normalized }
+}
+
+private val CURRENT_LOCATION_QUESTIONS = setOf(
+    "我在哪里",
+    "我在哪",
+    "我现在在哪里",
+    "我现在在哪",
+    "你知道我在哪里",
+    "你知道我在哪",
+    "我的当前位置",
+    "我的位置是什么",
+)

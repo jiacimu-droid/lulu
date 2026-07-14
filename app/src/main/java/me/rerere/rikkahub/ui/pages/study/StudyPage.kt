@@ -2,6 +2,7 @@ package me.rerere.rikkahub.ui.pages.study
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.media.MediaPlayer
 import android.media.MediaMetadataRetriever
 import android.widget.VideoView
 import androidx.compose.animation.AnimatedContent
@@ -51,6 +52,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -104,6 +106,7 @@ import kotlinx.coroutines.withContext
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Add01
 import me.rerere.hugeicons.stroke.AiMagic
+import me.rerere.hugeicons.stroke.ArrowLeft01
 import me.rerere.hugeicons.stroke.ArrowUp02
 import me.rerere.hugeicons.stroke.BookOpen02
 import me.rerere.hugeicons.stroke.Chart
@@ -154,6 +157,7 @@ import java.time.LocalDate
 import kotlin.uuid.Uuid
 
 private enum class StudySection(val label: String) {
+    Companion("陪伴"),
     Today("今日"),
     Gacha("抽卡"),
     Collection("收藏"),
@@ -177,6 +181,7 @@ private enum class DailyDashboardView(val label: String) {
     Plan("今日计划"),
     Tomorrow("明日待办"),
     Tips("Tips"),
+    Overview("周月计划"),
 }
 
 private const val DEFAULT_RAINBOW_DRAW_VIDEO_URI = "raw:star_wish_rainbow_draw"
@@ -195,7 +200,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
             ?: settings.getCurrentAssistant()
     }
     val snackbarHostState = remember { SnackbarHostState() }
-    var section by remember { mutableStateOf(StudySection.Today) }
+    var section by remember { mutableStateOf(StudySection.Companion) }
     var newTask by remember { mutableStateOf("") }
     var drawDialog by remember { mutableStateOf<List<StudyDrawReveal>?>(null) }
     var pendingBoxDialog by remember { mutableStateOf(false) }
@@ -204,6 +209,8 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
     var showLevelDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val isGachaSection = section == StudySection.Gacha
+    val pageColor = if (isGachaSection) StudyColors.starryPage else StudyColors.page
 
     LaunchedEffect(Unit) {
         vm.effects.collect { effect ->
@@ -221,134 +228,184 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeFlexibleTopAppBar(
-                title = { Text("考研") },
-                navigationIcon = { BackButton() },
+                title = { Text(if (isGachaSection) "星夜来信" else "考研") },
+                navigationIcon = {
+                    if (isGachaSection) {
+                        Surface(
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                                .size(48.dp)
+                                .clickable { navController.popBackStack() },
+                            shape = CircleShape,
+                            color = Color.White.copy(alpha = 0.10f),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.14f)),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(HugeIcons.ArrowLeft01, contentDescription = "返回")
+                            }
+                        }
+                    } else {
+                        BackButton()
+                    }
+                },
                 scrollBehavior = scrollBehavior,
-                colors = CustomColors.topBarColors,
+                colors = if (isGachaSection) {
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = StudyColors.starryPage,
+                        scrolledContainerColor = StudyColors.starryPageDeep,
+                        navigationIconContentColor = Color.White,
+                        titleContentColor = Color.White,
+                    )
+                } else {
+                    CustomColors.topBarColors
+                },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = StudyColors.page,
+        containerColor = pageColor,
     ) { padding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(StudyColors.page),
-            contentPadding = padding + PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                .background(pageColor),
         ) {
-            item {
-                SectionChips(selected = section, onSelected = { section = it })
+            if (isGachaSection) {
+                StarryLetterBackdrop(Modifier.fillMaxSize())
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                0f to StudyColors.starryPage.copy(alpha = 0.32f),
+                                0.55f to Color.Transparent,
+                                1f to StudyColors.starryPageDeep.copy(alpha = 0.72f),
+                            ),
+                        ),
+                )
             }
-            when (section) {
-                StudySection.Today -> {
-                    item {
-                        StudyHero(
-                            state = state,
-                            assistant = companionAssistant,
-                            assistants = settings.assistants,
-                            onSignIn = vm::signIn,
-                            onPomodoro = { navController.navigate(Screen.StudyPomodoro) },
-                            onOpenLevel = { showLevelDialog = true },
-                            onSelectCompanion = { vm.selectCompanion(it.id.toString()) },
-                        )
-                    }
-                    item {
-                        SleepHabitRewardCard(
-                            state = state,
-                            assistantName = companionAssistant.name.ifBlank { "当前角色" },
-                        )
-                    }
-                    item {
-                        DailyStudyDashboard(
-                            tasks = state.tasks,
-                            assistantName = companionAssistant.name.ifBlank { "当前角色" },
-                            generatedSchedule = state.generatedSchedules[LocalDate.now().toString()],
-                            isGeneratingSchedule = isGeneratingSchedule,
-                            newTask = newTask,
-                            onNewTask = { newTask = it },
-                            onAdd = {
-                                vm.addTask(newTask)
-                                newTask = ""
-                            },
-                            onGenerateSchedule = vm::generateTodaySchedule,
-                            onToggle = vm::toggleTask,
-                            onDelete = vm::deleteTask,
-                        )
-                    }
-                    item { PlanOverviewCard() }
-                    item {
-                        TodayProgressCard(
-                            state = state,
-                            onClaimNormal = { vm.claimSuperMoment(SuperMomentChoice.NormalFragments) },
-                            onClaimRare = { vm.claimSuperMoment(SuperMomentChoice.RareFragment) },
-                        )
-                    }
-                    item { RecentEventsCard(events = state.recentEvents) }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = padding + PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                item {
+                    SectionChips(
+                        selected = section,
+                        onSelected = { section = it },
+                        dark = isGachaSection,
+                    )
                 }
-                StudySection.Gacha -> {
-                    item {
-                        GachaCard(
-                            state = state,
-                            onSingle = { vm.draw(1) },
-                            onTen = { vm.draw(10) },
-                            onPurple = vm::drawPurpleTicket,
-                        )
+                when (section) {
+                    StudySection.Companion -> {
+                        item {
+                            StudyHero(
+                                state = state,
+                                assistant = companionAssistant,
+                                assistants = settings.assistants,
+                                onSignIn = vm::signIn,
+                                onPomodoro = { navController.navigate(Screen.StudyPomodoro) },
+                                onOpenLevel = { showLevelDialog = true },
+                                onSelectCompanion = { vm.selectCompanion(it.id.toString()) },
+                            )
+                        }
+                        item {
+                            SleepHabitRewardCard(
+                                state = state,
+                                assistantName = companionAssistant.name.ifBlank { "当前角色" },
+                            )
+                        }
+                        item { RecentEventsCard(events = state.recentEvents) }
                     }
-                }
-                StudySection.Collection -> {
-                    item {
-                        CollectionCard(
-                            inventory = state.inventory,
-                            onUseUniversalNormalTarget = vm::applyUniversalNormal,
-                            onOpenMysteryBox = { vm.openMysteryBox(it) },
-                            onRedeemDouyin = { vm.redeemEntertainment(StudyEntertainmentReward.Douyin) },
-                            onRedeemGame = {
-                                vm.redeemEntertainment(StudyEntertainmentReward.Game)
-                                navController.navigate(Screen.GameHub)
-                            },
-                            onRedeemAnime = { vm.redeemEntertainment(StudyEntertainmentReward.Anime) },
-                            onOpenStarWish = { navController.navigate(Screen.StarWish) },
-                            onOpenImageGen = { outfit ->
-                                val scroll = StarWishRules.scrollForOutfit(outfit)
-                                val prompt = StarWishRules.imagePromptForCompanion(
-                                    basePrompt = scroll.soloPrompt,
-                                    assistant = companionAssistant,
-                                    interaction = false,
-                                    userNickname = settings.displaySetting.userNickname,
-                                    userProfile = settings.displaySetting.userProfile,
-                                    userAppearancePrompt = settings.displaySetting.userAppearancePrompt,
-                                )
-                                navController.navigate(
-                                    Screen.ImageGen(
-                                        initialPrompt = prompt,
-                                        count = 1,
-                                        autoGenerate = false,
-                                    ),
-                                )
-                            },
-                        )
+                    StudySection.Today -> {
+                        item {
+                            DailyStudyDashboard(
+                                tasks = state.tasks,
+                                assistantName = companionAssistant.name.ifBlank { "当前角色" },
+                                generatedSchedule = state.generatedSchedules[LocalDate.now().toString()],
+                                isGeneratingSchedule = isGeneratingSchedule,
+                                newTask = newTask,
+                                onNewTask = { newTask = it },
+                                onAdd = {
+                                    vm.addTask(newTask)
+                                    newTask = ""
+                                },
+                                onGenerateSchedule = vm::generateTodaySchedule,
+                                onToggle = vm::toggleTask,
+                                onDelete = vm::deleteTask,
+                            )
+                        }
+                        item {
+                            TodayProgressCard(
+                                state = state,
+                                onClaimNormal = { vm.claimSuperMoment(SuperMomentChoice.NormalFragments) },
+                                onClaimRare = { vm.claimSuperMoment(SuperMomentChoice.RareFragment) },
+                            )
+                        }
                     }
-                }
-                StudySection.Achievements -> {
-                    item {
-                        AchievementCard(
-                            state = state,
-                            onClaim = vm::claimAchievement,
-                        )
+                    StudySection.Gacha -> {
+                        item {
+                            GachaCard(
+                                state = state,
+                                onSingle = { vm.draw(1) },
+                                onTen = { vm.draw(10) },
+                                onPurple = vm::drawPurpleTicket,
+                            )
+                        }
                     }
-                }
-                StudySection.Shop -> {
-                    item {
-                        ShopCard(
-                            state = state,
-                            onRefresh = vm::refreshShop,
-                            onBuy = vm::buyShopItem,
-                        )
+                    StudySection.Collection -> {
+                        item {
+                            CollectionCard(
+                                inventory = state.inventory,
+                                onUseUniversalNormalTarget = vm::applyUniversalNormal,
+                                onOpenMysteryBox = { vm.openMysteryBox(it) },
+                                onRedeemDouyin = { vm.redeemEntertainment(StudyEntertainmentReward.Douyin) },
+                                onRedeemGame = {
+                                    vm.redeemEntertainment(StudyEntertainmentReward.Game)
+                                    navController.navigate(Screen.GameHub)
+                                },
+                                onRedeemAnime = { vm.redeemEntertainment(StudyEntertainmentReward.Anime) },
+                                onOpenStarWish = { navController.navigate(Screen.StarWish) },
+                                onOpenImageGen = { outfit ->
+                                    val scroll = StarWishRules.scrollForOutfit(outfit)
+                                    val prompt = StarWishRules.imagePromptForCompanion(
+                                        basePrompt = scroll.soloPrompt,
+                                        assistant = companionAssistant,
+                                        interaction = false,
+                                        userNickname = settings.displaySetting.userNickname,
+                                        userProfile = settings.displaySetting.userProfile,
+                                        userAppearancePrompt = settings.displaySetting.userAppearancePrompt,
+                                    )
+                                    navController.navigate(
+                                        Screen.ImageGen(
+                                            initialPrompt = prompt,
+                                            count = 1,
+                                            autoGenerate = false,
+                                        ),
+                                    )
+                                },
+                            )
+                        }
                     }
-                }
-                StudySection.Guide -> {
-                    item { StudyGuideCard() }
+                    StudySection.Achievements -> {
+                        item {
+                            AchievementCard(
+                                state = state,
+                                onClaim = vm::claimAchievement,
+                            )
+                        }
+                    }
+                    StudySection.Shop -> {
+                        item {
+                            ShopCard(
+                                state = state,
+                                onRefresh = vm::refreshShop,
+                                onBuy = vm::buyShopItem,
+                            )
+                        }
+                    }
+                    StudySection.Guide -> {
+                        item { StudyGuideCard() }
+                    }
                 }
             }
         }
@@ -821,7 +878,11 @@ private fun HeroMetric(label: String, value: String, modifier: Modifier = Modifi
 }
 
 @Composable
-private fun SectionChips(selected: StudySection, onSelected: (StudySection) -> Unit) {
+private fun SectionChips(
+    selected: StudySection,
+    onSelected: (StudySection) -> Unit,
+    dark: Boolean = false,
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
@@ -829,7 +890,21 @@ private fun SectionChips(selected: StudySection, onSelected: (StudySection) -> U
             .horizontalScroll(rememberScrollState()),
     ) {
         StudySection.entries.forEach { section ->
-            FilterChip(selected = selected == section, onClick = { onSelected(section) }, label = { Text(section.label) })
+            FilterChip(
+                selected = selected == section,
+                onClick = { onSelected(section) },
+                label = { Text(section.label) },
+                colors = if (dark) {
+                    FilterChipDefaults.filterChipColors(
+                        containerColor = Color.White.copy(alpha = 0.06f),
+                        labelColor = Color.White.copy(alpha = 0.72f),
+                        selectedContainerColor = Color(0xFFD9C5FF).copy(alpha = 0.20f),
+                        selectedLabelColor = Color.White,
+                    )
+                } else {
+                    FilterChipDefaults.filterChipColors()
+                },
+            )
         }
     }
 }
@@ -928,6 +1003,7 @@ private fun DailyStudyDashboard(
             )
             DailyDashboardView.Tomorrow -> TomorrowPlanContent(tomorrowPlan = tomorrowPlan)
             DailyDashboardView.Tips -> StudyTipsContent(tips = tips)
+            DailyDashboardView.Overview -> PlanOverviewContent()
         }
     }
 }
@@ -1117,12 +1193,12 @@ private fun StudyTipsContent(tips: List<StudyTip>) {
 }
 
 @Composable
-private fun PlanOverviewCard() {
+private fun PlanOverviewContent() {
     var planView by remember { mutableStateOf(PlanView.Weekly) }
     val today = LocalDate.now()
     val week = ExamStudyPlan.weekForDate(today) ?: ExamStudyPlan.weeklyPlans.firstOrNull()
 
-    StudyCard {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             PlanView.entries.forEach { view ->
                 FilterChip(
@@ -1636,6 +1712,9 @@ private fun DrawVideoLayer(
         setVideoURI(resolveAppVideoUri(context, videoUri))
         setOnPreparedListener { player ->
             player.isLooping = false
+            runCatching {
+                player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
+            }
             if (shouldPlay) {
                 start()
             } else {
@@ -1998,8 +2077,9 @@ private fun GachaCard(
     val singleCost = if (StudyRules.hasSingleDrawDiscount(state)) StudyRules.DISCOUNT_SINGLE_DRAW_COST else StudyRules.SINGLE_DRAW_COST
     Card(
         shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF101427)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0x55101427)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.14f)),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Box(
@@ -2039,7 +2119,7 @@ private fun GachaCard(
                     }
                     Spacer(Modifier.weight(1f))
                     Text(
-                        "券可抽 ${state.wallet.singleDrawTickets + state.wallet.tenDrawTickets * 10} 次",
+                        "夸夸值 ${state.wallet.kudos} · 券可抽 ${state.wallet.singleDrawTickets + state.wallet.tenDrawTickets * 10} 次",
                         color = Color.White.copy(alpha = 0.78f),
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -2074,7 +2154,7 @@ private fun GachaCard(
                     FragmentWalletPill("番剧3小时", state.inventory.animeFragments, Color(0xFF8DE0DC))
                 }
                 Text(
-                    "紫色：抖音20分钟 / 剧场 · 金色：游戏120分钟 / 视频",
+                    "紫色：抖音20分钟 5.5% / 剧场 2.5% · 金色：游戏120分钟 / 视频",
                     color = Color.White.copy(alpha = 0.64f),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.fillMaxWidth(),
@@ -2743,7 +2823,8 @@ private fun StudyGuideCard() {
             lines = listOf(
                 "单抽 ${StudyRules.SINGLE_DRAW_COST} 夸夸值。",
                 "十连 ${StudyRules.TEN_DRAW_COST} 夸夸值。",
-                "蓝色画卷专属碎片 90.15%；紫色 8%（抖音20分钟 6.5% / 剧场碎片 1.5%）。",
+                "画卷碎片已经集满后再抽到同名蓝色碎片，不返夸夸值、抽卡券或其他资源。",
+                "蓝色画卷专属碎片 90.15%；紫色 8%（抖音20分钟 5.5% / 剧场碎片 2.5%）。",
                 "金色 1.5%（游戏120分钟 1.2% / 视频解锁卡 0.3%）；彩色番剧3小时 0.35%。",
                 "硬保底：连续 ${StudyRules.NON_NORMAL_PITY_DRAW_COUNT} 抽没有出现紫/金/彩时，第 ${StudyRules.NON_NORMAL_PITY_DRAW_COUNT} 抽必为紫色。",
                 "卡池、等级和神秘商店都不再产出通用碎片；旧存档中的通用碎片仍可使用。",
@@ -2968,6 +3049,8 @@ private fun StudyCard(content: @Composable ColumnScope.() -> Unit) {
 
 private object StudyColors {
     val page = Color(0xFFF7F3EA)
+    val starryPage = Color(0xFF151831)
+    val starryPageDeep = Color(0xFF090C1B)
     val hero = Color(0xFFFFE6B8)
     val softBlue = Color(0xFFDCECF4)
     val blue = Color(0xFF3D7EA6)

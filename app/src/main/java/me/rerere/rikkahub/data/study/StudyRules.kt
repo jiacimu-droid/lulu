@@ -30,7 +30,7 @@ object StudyRules {
     const val GACHA_BAD_LUCK_COMPENSATION_TEN_DRAW_TICKETS = 4
     const val NON_NORMAL_PITY_DRAW_COUNT = 30
     const val NORMAL_FRAGMENTS_PER_OUTFIT = 10
-    private const val OVERFLOW_NORMAL_FRAGMENT_KUDOS = 100
+    private const val UNIVERSAL_NORMAL_OVERFLOW_KUDOS = 100
     private const val INTERNAL_TEST_GRANT_VERSION = 1
 
     val outfitNames = listOf(
@@ -507,7 +507,6 @@ object StudyRules {
             else -> return StudyDrawActionResult(state, emptyList())
         }
         var inventory = state.inventory
-        var overflowKudos = 0
         var drawsSinceNonNormal = state.drawsSinceNonNormal.coerceIn(0, NON_NORMAL_PITY_DRAW_COUNT - 1)
         val results = buildList {
             repeat(drawCount) {
@@ -521,9 +520,7 @@ object StudyRules {
                 } else {
                     0
                 }
-                if (result.rarity == StudyRarity.Normal && inventory.isNormalFragmentFull(result.fragmentKey)) {
-                    overflowKudos += OVERFLOW_NORMAL_FRAGMENT_KUDOS
-                } else {
+                if (result.rarity != StudyRarity.Normal || !inventory.isNormalFragmentFull(result.fragmentKey)) {
                     inventory = inventory.addDrawResult(result)
                 }
                 add(result)
@@ -544,7 +541,6 @@ object StudyRules {
         return StudyDrawActionResult(
             state = state.copy(
                 wallet = nextWallet.copy(
-                    kudos = nextWallet.kudos + overflowKudos,
                     purpleDrawTickets = nextWallet.purpleDrawTickets + if (grantPurpleSafety) 1 else 0,
                 ),
                 inventory = refreshed.first,
@@ -560,8 +556,7 @@ object StudyRules {
                 recentEvents = state.recentEvents.addEvent(
                     StudyEventType.Draw,
                     if (drawCount == 10) "十连抽" else "单抽",
-                    "获得 ${results.size} 个碎片" +
-                        if (overflowKudos > 0) "，溢出转换夸夸值 $overflowKudos" else "",
+                    "完成 ${results.size} 抽；已满的蓝色碎片不返还任何资源",
                 ),
             ),
             results = results,
@@ -850,17 +845,20 @@ object StudyRules {
         if (state.inventory.isNormalFragmentFull(key)) {
             return StudyActionResult(
                 state = state.copy(
-                    wallet = state.wallet.copy(kudos = state.wallet.kudos + OVERFLOW_NORMAL_FRAGMENT_KUDOS),
+                    wallet = state.wallet.copy(kudos = state.wallet.kudos + UNIVERSAL_NORMAL_OVERFLOW_KUDOS),
                     inventory = state.inventory.copy(
                         universalNormalFragments = state.inventory.universalNormalFragments - 1,
                     ),
                     recentEvents = state.recentEvents.addEvent(
                         StudyEventType.Fragment,
                         "碎片溢出转换",
-                        "${normalTitle(key)} 已满，转换为夸夸值 $OVERFLOW_NORMAL_FRAGMENT_KUDOS",
+                        "${normalTitle(key)} 已满，转换为夸夸值 $UNIVERSAL_NORMAL_OVERFLOW_KUDOS",
                     ),
                 ),
-                reward = StudyReward(kudos = OVERFLOW_NORMAL_FRAGMENT_KUDOS, title = "碎片已满，转换为夸夸值 $OVERFLOW_NORMAL_FRAGMENT_KUDOS"),
+                reward = StudyReward(
+                    kudos = UNIVERSAL_NORMAL_OVERFLOW_KUDOS,
+                    title = "碎片已满，转换为夸夸值 $UNIVERSAL_NORMAL_OVERFLOW_KUDOS",
+                ),
             )
         }
         val inventory = state.inventory.copy(
@@ -947,7 +945,7 @@ object StudyRules {
         }
     }
 
-    private fun drawRare(random: Random): StudyDrawResult = if (random.nextDouble() < 0.8125) {
+    private fun drawRare(random: Random): StudyDrawResult = if (random.nextDouble() < 0.6875) {
         StudyDrawResult(StudyRarity.Rare, "rare:douyin", "抖音时长券 · 20分钟", StudyFragmentType.Douyin)
     } else {
         StudyDrawResult(StudyRarity.Rare, "rare:theater", "剧场碎片", StudyFragmentType.Theater)
