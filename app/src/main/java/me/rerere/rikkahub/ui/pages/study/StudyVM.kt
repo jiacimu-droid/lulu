@@ -176,7 +176,11 @@ class StudyVM(
             store.update { current ->
                 val result = StudyRules.draw(current, count, Random.Default)
                 if (result.results.isEmpty()) {
-                    message = "夸夸值或抽卡券不够"
+                    message = if (result.state.wallet != current.wallet) {
+                        "这次抽到的内容已经集满，没有获得任何奖励"
+                    } else {
+                        "夸夸值或抽卡券不够"
+                    }
                     return@update result.state
                 }
                 var updatedStudy = result.state

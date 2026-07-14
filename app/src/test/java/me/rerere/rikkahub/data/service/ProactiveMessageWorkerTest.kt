@@ -32,4 +32,16 @@ class ProactiveMessageWorkerTest {
 
         assertEquals(0L, spec.delayMillis)
     }
+
+    @Test
+    fun `overdue commitment is requeued immediately instead of left waiting`() {
+        assertEquals(
+            11_000L,
+            recoveredCommitmentTriggerAt(dueAt = 5_000L, nowMillis = 10_000L),
+        )
+        assertEquals(
+            30_000L,
+            recoveredCommitmentTriggerAt(dueAt = 30_000L, nowMillis = 10_000L),
+        )
+    }
 }

@@ -373,6 +373,28 @@ class ExamStudyPlanTest {
     }
 
     @Test
+    fun `chapter ledger keeps criminal and civil chapter counts separate from question book size`() {
+        assertEquals(25, ExamStudyPlan.criminalLawChapterCount)
+        assertEquals(54, ExamStudyPlan.civilLawChapterCount)
+        assertEquals(270, ExamStudyPlan.criminalLawChapterFiveCourseMinutes)
+        assertTrue(ExamStudyPlan.studyHabitReference.contains("第 5 章原始课程约 270 分钟（4.5 小时）"))
+    }
+
+    @Test
+    fun `criminal chapters three to seven wait for chapter seven before formal map`() {
+        val july14 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 14))!!.tasks.joinToString("\n") { it.title }
+        val july16 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 16))!!.tasks.joinToString("\n") { it.title }
+        val july17 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 17))!!.tasks.joinToString("\n") { it.title }
+
+        assertFalse(july14.contains("第 3-4 章正式框架图"))
+        assertTrue(july14.contains("等第 7 章听完后再画"))
+        assertFalse(july16.contains("补齐刑法第 3-4 章正式框架图"))
+        assertTrue(july16.contains("不画第 3-7 章正式连接框架"))
+        assertTrue(july17.contains("确认第 3-7 章课程全部结束后"))
+        assertTrue(july17.contains("正式连接框架图"))
+    }
+
+    @Test
     fun julyLegalTheoryReviewAdvancesInChapterOrder() {
         val expectedChapters = mapOf(
             13 to "法理第 1 章",

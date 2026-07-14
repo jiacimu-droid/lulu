@@ -9,35 +9,6 @@ import me.rerere.rikkahub.utils.JsonInstant
 import java.nio.charset.StandardCharsets
 import java.util.UUID
 
-fun buildConversationLifeEvent(
-    assistantId: String,
-    assistantText: String,
-    source: CompanionLifeEventSource,
-    evidenceReference: String?,
-    nowMillis: Long,
-): CompanionLifeEvent? {
-    val summary = assistantText.cleanLifeEventText(280)
-    if (assistantId.isBlank() || summary.isBlank()) return null
-    val type = if (source == CompanionLifeEventSource.PROACTIVE) {
-        CompanionLifeEventType.PROACTIVE_MESSAGE
-    } else {
-        CompanionLifeEventType.CONVERSATION
-    }
-    return CompanionLifeEvent(
-        id = stableLifeEventId(assistantId, type, evidenceReference),
-        assistantId = assistantId,
-        type = type,
-        title = if (type == CompanionLifeEventType.PROACTIVE_MESSAGE) "主动联系了你" else "和你聊了一会儿",
-        summary = summary,
-        source = source,
-        evidenceReference = evidenceReference,
-        importance = if (type == CompanionLifeEventType.PROACTIVE_MESSAGE) 3 else 2,
-        startedAt = nowMillis,
-        endedAt = nowMillis,
-        createdAt = nowMillis,
-    )
-}
-
 fun buildToolLifeEvent(
     assistantId: String,
     execution: CompanionToolExecution,
@@ -46,15 +17,15 @@ fun buildToolLifeEvent(
 ): CompanionLifeEvent? {
     if (assistantId.isBlank() || execution.toolCallId.isBlank() || execution.toolName.isBlank()) return null
     val successful = execution.outputText.toolExecutionSucceeded()
-    val details = execution.outputText.toLifeEventSummary(execution.toolName)
-    val descriptor = execution.toolName.toLifeEventDescriptor()
+    if (!successful) return null
+    val descriptor = execution.toMeaningfulLifeEventDescriptor() ?: return null
     return CompanionLifeEvent(
         id = stableLifeEventId(assistantId, descriptor.type, execution.toolCallId),
         assistantId = assistantId,
         type = descriptor.type,
-        status = if (successful) CompanionLifeEventStatus.COMPLETED else CompanionLifeEventStatus.FAILED,
-        title = if (successful) descriptor.completedTitle else descriptor.failedTitle,
-        summary = details,
+        status = CompanionLifeEventStatus.COMPLETED,
+        title = descriptor.completedTitle,
+        summary = execution.toLifeEventSummary(descriptor),
         source = source,
         evidenceReference = execution.toolCallId,
         importance = descriptor.importance,
@@ -113,47 +84,34 @@ fun buildAutonomousReflectionLifeEvent(
 private data class LifeEventDescriptor(
     val type: CompanionLifeEventType,
     val completedTitle: String,
-    val failedTitle: String,
     val importance: Int,
 )
 
-private fun String.toLifeEventDescriptor(): LifeEventDescriptor = when (this) {
+private fun CompanionToolExecution.toMeaningfulLifeEventDescriptor(): LifeEventDescriptor? = when (toolName) {
     "write_lulu_journal" -> LifeEventDescriptor(
         CompanionLifeEventType.JOURNAL,
         "写下了一篇辞海日记",
-        "想写日记，但没有保存成功",
         4,
     )
-    "control_music" -> LifeEventDescriptor(
-        CompanionLifeEventType.MUSIC,
-        "操作了手机里的音乐",
-        "尝试操作音乐，但没有成功",
-        2,
-    )
+    "control_music" -> {
+        val action = inputJson.parseObjectOrNull()?.get("action")?.jsonPrimitive?.contentOrNull.orEmpty()
+        if (action.isBlank() || action == "get_now_playing") null else LifeEventDescriptor(
+            CompanionLifeEventType.MUSIC,
+            "操作了手机里的音乐",
+            2,
+        )
+    }
     "play_companion_game" -> LifeEventDescriptor(
         CompanionLifeEventType.GAME,
         "完成了一局信号寻踪",
-        "想玩一局信号寻踪，但游戏没有完成",
         3,
     )
-    "today_study_plan" -> LifeEventDescriptor(
-        CompanionLifeEventType.STUDY_REVIEW,
-        "查看或整理了考研计划",
-        "尝试查看考研计划，但没有成功",
-        3,
-    )
-    "favorite_user_message" -> LifeEventDescriptor(
-        CompanionLifeEventType.MEMORY_REVIEW,
-        "收藏了一句想留下来的话",
-        "想收藏这句话，但没有成功",
-        4,
-    )
-    else -> LifeEventDescriptor(
-        CompanionLifeEventType.TOOL_ACTION,
-        "完成了一次数字行动",
-        "尝试了一次数字行动，但没有成功",
-        2,
-    )
+    "set_alarm" -> LifeEventDescriptor(CompanionLifeEventType.TOOL_ACTION, "设置了一次设备提醒", 3)
+    "calendar_tool" -> {
+        val action = inputJson.parseObjectOrNull()?.get("action")?.jsonPrimitive?.contentOrNull
+        if (action == "create") LifeEventDescriptor(CompanionLifeEventType.TOOL_ACTION, "写入了一项日程", 3) else null
+    }
+    else -> null
 }
 
 private fun String.toolExecutionSucceeded(): Boolean {
@@ -167,20 +125,73 @@ private fun String.toolExecutionSucceeded(): Boolean {
         .none { marker -> contains(marker, ignoreCase = true) }
 }
 
-private fun String.toLifeEventSummary(toolName: String): String {
-    if (toolName != "play_companion_game") return cleanLifeEventText(320)
-    val output = runCatching { JsonInstant.parseToJsonElement(trim()).jsonObject }.getOrNull()
-        ?: return cleanLifeEventText(320)
-    val score = output["score"]?.jsonPrimitive?.intOrNull
-    val maxScore = output["max_score"]?.jsonPrimitive?.intOrNull
-    val found = output["signals_found"]?.jsonPrimitive?.intOrNull
-    val result = output["result"]?.jsonPrimitive?.contentOrNull.orEmpty().trim()
-    return buildString {
-        append("信号寻踪")
-        if (score != null && maxScore != null) append("得分 $score/$maxScore")
-        if (found != null) append("，找到 $found 个信号")
-        if (result.isNotBlank()) append("。$result")
+private fun CompanionToolExecution.toLifeEventSummary(descriptor: LifeEventDescriptor): String {
+    val input = inputJson.parseObjectOrNull()
+    val output = outputText.parseObjectOrNull()
+    return when (descriptor.type) {
+        CompanionLifeEventType.GAME -> {
+            if (output == null) return "完成了一局信号寻踪"
+            val score = output["score"]?.jsonPrimitive?.intOrNull
+            val maxScore = output["max_score"]?.jsonPrimitive?.intOrNull
+            val found = output["signals_found"]?.jsonPrimitive?.intOrNull
+            val result = output["result"]?.jsonPrimitive?.contentOrNull.orEmpty().trim()
+            buildString {
+                append("信号寻踪")
+                if (score != null && maxScore != null) append("得分 $score/$maxScore")
+                if (found != null) append("，找到 $found 个信号")
+                if (result.isNotBlank()) append("。$result")
+            }.cleanLifeEventText(320)
+        }
+        CompanionLifeEventType.JOURNAL -> {
+            val title = input?.get("title")?.jsonPrimitive?.contentOrNull.orEmpty().trim()
+            if (title.isBlank()) "写下了一篇辞海日记" else "写下了日记：《${title.take(80)}》"
+        }
+        CompanionLifeEventType.MUSIC -> {
+            val action = input?.get("action")?.jsonPrimitive?.contentOrNull.orEmpty().trim()
+            val label = when (action) {
+                "play" -> "开始播放音乐"
+                "pause" -> "暂停了音乐"
+                "next" -> "切换到了下一首"
+                "previous" -> "切换到了上一首"
+                else -> "操作了手机里的音乐"
+            }
+            label
+        }
+        CompanionLifeEventType.TOOL_ACTION -> when (toolName) {
+            "set_alarm" -> {
+                val hour = input?.get("hour")?.jsonPrimitive?.intOrNull
+                val minute = input?.get("minute")?.jsonPrimitive?.intOrNull
+                val label = input?.get("label")?.jsonPrimitive?.contentOrNull.orEmpty().trim()
+                if (hour != null && minute != null) {
+                    "设置了 ${"%02d:%02d".format(hour, minute)} 的设备提醒${label.takeIf(String::isNotBlank)?.let { "：${it.take(80)}" }.orEmpty()}"
+                } else {
+                    "设置了一次设备提醒"
+                }
+            }
+            "calendar_tool" -> {
+                val title = input?.get("title")?.jsonPrimitive?.contentOrNull.orEmpty().trim()
+                if (title.isBlank()) "写入了一项日程" else "写入了日程：${title.take(100)}"
+            }
+            else -> descriptor.completedTitle
+        }
+        else -> descriptor.completedTitle
     }.cleanLifeEventText(320)
+}
+
+private fun String.parseObjectOrNull() = runCatching {
+    JsonInstant.parseToJsonElement(trim()).jsonObject
+}.getOrNull()
+
+fun CompanionLifeEvent.isMeaningfulDigitalLifeEvidence(): Boolean {
+    if (status != CompanionLifeEventStatus.COMPLETED) return false
+    return when (type) {
+        CompanionLifeEventType.JOURNAL,
+        CompanionLifeEventType.MUSIC,
+        CompanionLifeEventType.GAME,
+        CompanionLifeEventType.MEMORY_REVIEW -> true
+        CompanionLifeEventType.TOOL_ACTION -> title.startsWith("设置了") || title.startsWith("写入了")
+        else -> false
+    }
 }
 
 private fun String.cleanLifeEventText(maxLength: Int): String = lineSequence()

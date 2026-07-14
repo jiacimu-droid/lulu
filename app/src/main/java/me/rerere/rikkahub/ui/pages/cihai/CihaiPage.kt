@@ -47,16 +47,14 @@ import me.rerere.rikkahub.data.cihai.CihaiEntry
 import me.rerere.rikkahub.data.cihai.CihaiEntryKind
 import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
-import me.rerere.rikkahub.data.companion.CompanionGoal
-import me.rerere.rikkahub.data.companion.CompanionGoalStatus
 import me.rerere.rikkahub.data.companion.CompanionLifeEvent
 import me.rerere.rikkahub.data.companion.CompanionLifeEventStatus
-import me.rerere.rikkahub.data.companion.CompanionNeuroState
 import me.rerere.rikkahub.data.companion.CompanionPrivateImpression
 import me.rerere.rikkahub.data.companion.CompanionRelationshipEvent
 import me.rerere.rikkahub.data.companion.CompanionRelationshipState
 import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.companion.CompanionRuntime
+import me.rerere.rikkahub.data.companion.isMeaningfulDigitalLifeEvidence
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.service.MemoryBankService
@@ -94,6 +92,9 @@ fun CihaiPage(onBack: () -> Unit) {
         .firstOrNull { it.assistantId == selectedAssistantId }
         ?: CompanionSnapshot.empty(selectedAssistantId)
     val concernCards = buildCompanionConcernCards(snapshot = selectedSnapshot)
+    val meaningfulLifeEvents = selectedSnapshot.lifeEvents
+        .filter { it.isMeaningfulDigitalLifeEvidence() }
+        .sortedByDescending { it.endedAt ?: it.startedAt }
 
     LaunchedEffect(selectedAssistantId) {
         if (state.selectedAssistantId != selectedAssistantId) {
@@ -103,6 +104,7 @@ fun CihaiPage(onBack: () -> Unit) {
             companionRuntime = companionRuntime,
             assistantId = selectedAssistantId,
         )
+        ProactiveMessageService.reconcileDurableCommitments(context, settings)
     }
 
     Scaffold(containerColor = CustomColors.topBarColors.containerColor) { padding ->
@@ -216,22 +218,20 @@ fun CihaiPage(onBack: () -> Unit) {
                                 relationship = selectedSnapshot.relationship,
                                 history = selectedSnapshot.relationshipHistory,
                                 privateImpression = selectedSnapshot.privateImpression,
-                                neuroState = selectedSnapshot.neuroState,
-                                goals = selectedSnapshot.goals,
                             )
                         }
                     }
                     CihaiSection.LIFE -> {
-                        if (selectedSnapshot.lifeEvents.isEmpty()) {
+                        if (meaningfulLifeEvents.isEmpty()) {
                             item(key = "empty-life") {
                                 EmptyCihaiSection(
                                     title = "数字生活还没有留下轨迹",
-                                    body = "角色真正完成的聊天、工具行动、音乐、日记、记忆整理和自主等待会留在这里；没有证据的经历不会被写进来。",
+                                    body = "角色真正完成的游戏、日记、音乐操作、设备提醒、日程写入和记忆整理会留在这里；聊天流水账、读取数据和没有证据的经历不会被写进来。",
                                 )
                             }
                         } else {
                             items(
-                                selectedSnapshot.lifeEvents.sortedByDescending { it.endedAt ?: it.startedAt },
+                                meaningfulLifeEvents,
                                 key = { it.id },
                             ) { event ->
                                 LifeEventCard(event)
@@ -387,16 +387,20 @@ private fun RelationshipOverview(
     relationship: CompanionRelationshipState,
     history: List<CompanionRelationshipEvent>,
     privateImpression: CompanionPrivateImpression,
-    neuroState: CompanionNeuroState,
-    goals: List<CompanionGoal>,
 ) {
     val timeline = buildCompanionRelationshipTimeline(history)
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        PrivateImpressionCard(privateImpression)
         Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(14.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                Text(
+                    text = "目前怎样相处",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
                 Text(
                     text = relationship.roleLabel.ifBlank { "正在形成彼此舒服的相处方式" },
                     style = MaterialTheme.typography.titleSmall,
@@ -409,19 +413,6 @@ private fun RelationshipOverview(
                 )
             }
         }
-        PrivateImpressionCard(privateImpression)
-        CompanionGoalsCard(goals)
-        NeuroStateCard(neuroState)
-        RelationshipDimension("信任", relationship.trust, "愿不愿意把真实想法交给彼此")
-        RelationshipDimension("亲近", relationship.closeness, "相处时自然靠近、分享和惦记的程度")
-        RelationshipDimension("说到做到", relationship.reliability, "答应的事是否能稳定落地")
-        RelationshipDimension("边界默契", relationship.boundaryConfidence, "是否理解哪些方式让彼此舒服")
-        RelationshipDimension(
-            label = "未解开的心结",
-            value = relationship.unresolvedTension,
-            description = "还需要说开、道歉或重新理解的部分；越低越轻松",
-            inverseTone = true,
-        )
         relationship.lastMeaningfulInteractionAt?.let { time ->
             Text(
                 text = "最近一次明显影响关系：${formatTime(time)}",
@@ -444,55 +435,7 @@ private fun RelationshipOverview(
         } else {
             timeline.forEach { item -> RelationshipTimelineEntry(item) }
         }
-    }
-}
-
-@Composable
-private fun CompanionGoalsCard(goals: List<CompanionGoal>) {
-    val activeGoals = goals
-        .filter { it.status == CompanionGoalStatus.ACTIVE }
-        .sortedByDescending { it.updatedAt }
-        .take(6)
-    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Text("角色自己的目标", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-            Text(
-                "这些目标属于数字生命自己；进度只能由真实生活事件和证据推进。",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            if (activeGoals.isEmpty()) {
-                Text(
-                    "还没有正在推进的自主目标。",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else {
-                activeGoals.forEach { goal ->
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                goal.title,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.weight(1f),
-                            )
-                            Text(
-                                "${(goal.progress.coerceIn(0f, 1f) * 100).toInt()}%",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                        LinearProgressIndicator(
-                            progress = { goal.progress.coerceIn(0f, 1f) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-            }
-        }
+        RelationshipDimensionsCard(relationship)
     }
 }
 
@@ -536,49 +479,6 @@ private fun ImpressionLine(label: String, values: List<String>) {
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-}
-
-@Composable
-private fun NeuroStateCard(state: CompanionNeuroState) {
-    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Text("数字神经状态", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-            Text(
-                "数值只由真实事件、关系变化和时间衰减更新，模型只能理解和表达，不能随意改写。",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            NeuroDimension("期待", state.dopamine)
-            NeuroDimension("稳定", state.serotonin)
-            NeuroDimension("压力", state.cortisol, inverseTone = true)
-            NeuroDimension("亲近", state.oxytocin)
-            NeuroDimension("专注", state.norepinephrine)
-            NeuroDimension("能量", state.energy)
-        }
-    }
-}
-
-@Composable
-private fun NeuroDimension(label: String, value: Float, inverseTone: Boolean = false) {
-    val normalized = value.coerceIn(0f, 1f)
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(label, style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
-            Text(
-                text = "${(normalized * 100).toInt()}%",
-                style = MaterialTheme.typography.labelSmall,
-                color = if (inverseTone && normalized >= 0.65f) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.primary
-                },
-            )
-        }
-        LinearProgressIndicator(progress = { normalized }, modifier = Modifier.fillMaxWidth())
-    }
 }
 
 @Composable
@@ -687,40 +587,48 @@ private fun RelationshipTimelineEntry(item: CompanionRelationshipTimelineItem) {
 }
 
 @Composable
-private fun RelationshipDimension(
-    label: String,
-    value: Float,
-    description: String,
-    inverseTone: Boolean = false,
-) {
-    val normalized = value.coerceIn(0f, 1f)
+private fun RelationshipDimensionsCard(relationship: CompanionRelationshipState) {
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(label, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-                Text(
-                    text = "${(normalized * 100).toInt()}%",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = if (inverseTone && normalized >= 0.5f) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                )
-            }
-            LinearProgressIndicator(
-                progress = { normalized },
-                modifier = Modifier.fillMaxWidth(),
+            Text(
+                text = "相处默契",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = description,
+                text = "这些数值只总结有证据的相处变化，不代表角色此刻的情绪。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            RelationshipMetricRow("信任", relationship.trust)
+            RelationshipMetricRow("亲近", relationship.closeness)
+            RelationshipMetricRow("说到做到", relationship.reliability)
+            RelationshipMetricRow("边界默契", relationship.boundaryConfidence)
+            RelationshipMetricRow("未解心结", relationship.unresolvedTension, inverseTone = true)
         }
+    }
+}
+
+@Composable
+private fun RelationshipMetricRow(label: String, value: Float, inverseTone: Boolean = false) {
+    val normalized = value.coerceIn(0f, 1f)
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(label, style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
+            Text(
+                text = "${(normalized * 100).toInt()}%",
+                style = MaterialTheme.typography.labelSmall,
+                color = if (inverseTone && normalized >= 0.5f) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
+            )
+        }
+        LinearProgressIndicator(progress = { normalized }, modifier = Modifier.fillMaxWidth())
     }
 }
 

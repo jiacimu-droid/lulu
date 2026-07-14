@@ -113,7 +113,7 @@ object CompanionPerceptionAssembler {
                 .asSequence()
                 .filter { event ->
                     event.assistantId == assistantId &&
-                        event.status in setOf(CompanionLifeEventStatus.RUNNING, CompanionLifeEventStatus.COMPLETED)
+                        event.isMeaningfulDigitalLifeEvidence()
                 }
                 .sortedByDescending { event -> event.endedAt ?: event.startedAt }
                 .take(MAX_RECENT_LIFE_EVENTS)

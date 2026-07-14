@@ -167,14 +167,14 @@ fun MemoryBankPage(
 
             item { Spacer(modifier = Modifier.height(4.dp)) }
 
-            // 助手筛选
-            if (assistantIds.isNotEmpty()) {
-                item {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("查看哪个角色的记忆", style = MaterialTheme.typography.titleSmall)
                     AssistantFilterRow(
                         selectedAssistantId = selectedAssistantId,
                         assistantIds = assistantIds,
                         assistantLabels = assistantLabels,
-                        onAssistantSelected = { vm.setSelectedAssistantId(it) }
+                        onAssistantSelected = { vm.setSelectedAssistantId(it) },
                     )
                 }
             }
@@ -222,14 +222,24 @@ fun MemoryBankPage(
 
             if (memories.isEmpty() && !loading) {
                 item {
-                    Text(
-                        text = "暂无记忆数据",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text("这个角色还没有长期记忆", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                "系统只保存明确偏好、边界、纠正、承诺和重要共同事件；普通寒暄不会为了凑数写进来。",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            TextButton(onClick = vm::repairMemoriesFromHistory) {
+                                Icon(HugeIcons.Refresh01, contentDescription = null)
+                                Spacer(Modifier.width(6.dp))
+                                Text("重新整理已有聊天")
+                            }
+                        }
+                    }
                 }
             }
         }

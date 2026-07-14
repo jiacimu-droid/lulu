@@ -151,4 +151,37 @@ class AffectiveMemoryExtractorTest {
         assertTrue(candidate.isDurableMemoryCandidate())
         assertEquals(candidate.content, candidate.toEntity("assistant-1", "conversation-1").content)
     }
+
+    @Test
+    fun `deterministic fallback keeps explicit preference boundary and correction only`() {
+        val candidates = buildDeterministicMemoryCandidates(
+            turns = listOf(
+                MemoryExtractionTurn("ordinary", "user", "今天吃了饭。"),
+                MemoryExtractionTurn("preference", "user", "我更喜欢点一下切换页面，不喜欢一直上下滑。"),
+                MemoryExtractionTurn("boundary", "user", "我不希望你把普通聊天重复放进生活记录。"),
+                MemoryExtractionTurn("correction", "user", "纠正一下，民法应该是五十四章。"),
+            ),
+        )
+
+        assertEquals(3, candidates.size)
+        assertEquals(setOf("user_preference", "user_boundary", "correction"), candidates.map { it.type }.toSet())
+        assertTrue(candidates.all { it.content.startsWith("我记得") })
+        assertTrue(candidates.all { it.isDurableMemoryCandidate() })
+        assertFalse(candidates.any { it.sourceMessageNodeIds == listOf("ordinary") })
+    }
+
+    @Test
+    fun `deterministic fallback rejects tool dumps`() {
+        val candidates = buildDeterministicMemoryCandidates(
+            turns = listOf(
+                MemoryExtractionTurn(
+                    "tool",
+                    "user",
+                    "我希望你记住 {\"success\":true,\"path\":\"/data/user/0/file.json\"}",
+                ),
+            ),
+        )
+
+        assertTrue(candidates.isEmpty())
+    }
 }

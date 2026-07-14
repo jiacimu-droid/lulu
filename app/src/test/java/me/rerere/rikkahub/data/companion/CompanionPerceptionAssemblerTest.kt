@@ -175,6 +175,35 @@ class CompanionPerceptionAssemblerTest {
         assertTrue(prompt.contains("app_usage"))
     }
 
+    @Test
+    fun `digital life context excludes chat logs and internal tool records`() {
+        val packet = CompanionPerceptionAssembler.assemble(
+            input = input(),
+            snapshot = CompanionSnapshot(
+                assistantId = "assistant-a",
+                lifeEvents = listOf(
+                    lifeEvent("chat", CompanionLifeEventType.CONVERSATION, "和你聊了一会儿"),
+                    lifeEvent("state", CompanionLifeEventType.TOOL_ACTION, "完成了一次数字行动"),
+                    lifeEvent("game", CompanionLifeEventType.GAME, "完成了一局信号寻踪"),
+                    lifeEvent("alarm", CompanionLifeEventType.TOOL_ACTION, "设置了一次设备提醒"),
+                ),
+            ),
+        )
+
+        assertEquals(listOf("alarm", "game"), packet.recentLifeEvents.map { it.id })
+        val prompt = packet.toPromptContext()
+        assertEquals(false, prompt.contains("和你聊了一会儿"))
+        assertEquals(false, prompt.contains("完成了一次数字行动"))
+    }
+
+    private fun lifeEvent(id: String, type: CompanionLifeEventType, title: String) = CompanionLifeEvent(
+        id = id,
+        assistantId = "assistant-a",
+        type = type,
+        title = title,
+        startedAt = if (id == "alarm") 2L else 1L,
+    )
+
     private fun input(assistantId: String = "assistant-a") = CompanionPerceptionInput(
         assistantId = assistantId,
         assistantName = "角色 A",

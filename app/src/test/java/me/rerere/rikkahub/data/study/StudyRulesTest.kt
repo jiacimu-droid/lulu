@@ -767,21 +767,19 @@ class StudyRulesTest {
             wallet = StudyWallet(kudos = StudyRules.SINGLE_DRAW_COST),
             inventory = StudyInventory(normalFragments = mapOf(key to StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT)),
         )
-        val result = StudyDrawResult(StudyRarity.Normal, key, StudyRules.normalTitle(key))
-
         val drawn = StudyRules.draw(state, count = 1, random = object : Random() {
             override fun nextBits(bitCount: Int): Int = 0
             override fun nextInt(until: Int): Int = 0
         })
 
         assertEquals(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT, drawn.state.inventory.normalFragments[key])
-        assertEquals(1, drawn.results.size)
-        assertEquals(result.fragmentKey, drawn.results.first().fragmentKey)
+        assertTrue(drawn.results.isEmpty())
         assertEquals(0, drawn.state.wallet.kudos)
+        assertEquals(1, drawn.state.dailyDrawCount)
     }
 
     @Test
-    fun `ten draw with full fragments still costs the full eight hundred`() {
+    fun `ten draw omits full fragments but keeps valid pity reward`() {
         val outfit = StudyRules.outfitNames.first()
         val key = "normal:$outfit:${StudyRules.outfitParts.first()}"
         val state = StudyState(
@@ -797,7 +795,10 @@ class StudyRulesTest {
         val drawn = StudyRules.draw(state, count = 10, random = alwaysSameFullFragment)
 
         assertEquals(0, drawn.state.wallet.kudos)
-        assertEquals(10, drawn.results.size)
+        assertEquals(1, drawn.results.size)
+        assertEquals(StudyRarity.Rare, drawn.results.single().rarity)
+        assertEquals(1, drawn.state.inventory.douyinFragments)
+        assertEquals(10, drawn.state.dailyDrawCount)
     }
 
     @Test

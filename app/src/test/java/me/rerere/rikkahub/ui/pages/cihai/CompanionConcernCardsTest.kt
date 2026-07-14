@@ -53,7 +53,7 @@ class CompanionConcernCardsTest {
         val card = buildCompanionConcernCards(snapshot, nowMillis = NOW).single()
 
         assertEquals("起床提醒", card.title)
-        assertEquals("已经到点", card.statusText)
+        assertEquals("已逾期，正在补发", card.statusText)
         assertEquals("七点半前确认你已经起床", card.commitmentText)
         assertTrue(card.overdue)
         assertTrue(card.nextPerceptionText.startsWith("原定留意时间："))
@@ -79,6 +79,7 @@ class CompanionConcernCardsTest {
 
         assertEquals("commitment:calendar", card.id)
         assertEquals("日程安排", card.title)
+        assertEquals("即将发送", card.statusText)
     }
 
     @Test

@@ -109,7 +109,6 @@ import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.companion.CompanionTurnMutation
 import me.rerere.rikkahub.data.companion.CompanionToolExecution
 import me.rerere.rikkahub.data.companion.CompanionLifeEventSource
-import me.rerere.rikkahub.data.companion.buildConversationLifeEvent
 import me.rerere.rikkahub.data.companion.buildToolLifeEvent
 import me.rerere.rikkahub.data.companion.buildScheduledToolFollowUp
 import me.rerere.rikkahub.data.companion.CompanionTurnRole
@@ -133,8 +132,11 @@ import me.rerere.rikkahub.data.service.AffectiveMemoryExtractor
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.service.buildAffectiveMemoryExtractionPlan
+import me.rerere.rikkahub.data.service.buildDeterministicMemoryCandidates
 import me.rerere.rikkahub.data.service.buildCompanionPrivateImpression
 import me.rerere.rikkahub.data.service.buildRelationshipEventsFromMemoryCandidates
+import me.rerere.rikkahub.data.service.isDurableMemoryCandidate
+import me.rerere.rikkahub.data.service.normalizedMemoryIdentity
 import me.rerere.rikkahub.data.service.syncCompanionPrivateImpression
 import me.rerere.rikkahub.web.BadRequestException
 import me.rerere.rikkahub.web.NotFoundException
@@ -348,7 +350,17 @@ class ChatService(
 
     private val lifecycleObserver = LifecycleEventObserver { _, event ->
         when (event) {
-            Lifecycle.Event.ON_START -> _isForeground.value = true
+            Lifecycle.Event.ON_START -> {
+                _isForeground.value = true
+                appScope.launch {
+                    runCatching {
+                        val settings = settingsStore.settingsFlowRaw.first()
+                        ProactiveMessageService.reconcileDurableCommitments(context, settings)
+                    }.onFailure { error ->
+                        Log.e(TAG, "Failed to reconcile overdue companion commitments", error)
+                    }
+                }
+            }
             Lifecycle.Event.ON_STOP -> _isForeground.value = false
             else -> {}
         }
@@ -1152,7 +1164,6 @@ class ChatService(
                 snapshot = snapshotBeforeTurn,
                 latestUserText = lastUserText,
             )
-            val finalAssistantMessage = finalConversation.currentMessages.lastOrNull { it.role == MessageRole.ASSISTANT }
             val completedToolExecutions = (
                 turnPreparation.toolExecutions +
                     listOfNotNull(deterministicWakeExecution) +
@@ -1171,13 +1182,6 @@ class ChatService(
                         }
                 ).distinctBy { it.toolCallId }
             val lifeEvents = buildList {
-                buildConversationLifeEvent(
-                    assistantId = assistant.id.toString(),
-                    assistantText = lastAssistantText,
-                    source = CompanionLifeEventSource.CHAT,
-                    evidenceReference = finalAssistantMessage?.id?.toString(),
-                    nowMillis = nowMillis,
-                )?.let(::add)
                 completedToolExecutions.mapNotNullTo(this) { execution ->
                     buildToolLifeEvent(
                         assistantId = assistant.id.toString(),
@@ -1485,8 +1489,12 @@ class ChatService(
                     ),
                 )
                 val rawText = chunk.choices.firstOrNull()?.message?.toText().orEmpty()
-                val candidates = AffectiveMemoryExtractor.parseExtractionResult(rawText)
-                    .memories
+                val modelCandidates = AffectiveMemoryExtractor.parseExtractionResult(rawText).memories
+                val deterministicCandidates = buildDeterministicMemoryCandidates(plan.turns)
+                val candidates = (modelCandidates + deterministicCandidates)
+                    .map { it.normalized() }
+                    .filter { it.isDurableMemoryCandidate() }
+                    .distinctBy { it.content.normalizedMemoryIdentity() }
                     .take(8)
                 if (candidates.isEmpty()) {
                     memoryBankService.markExtractionProcessed(

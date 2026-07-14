@@ -74,7 +74,6 @@ import me.rerere.rikkahub.data.companion.CompanionTurnRole
 import me.rerere.rikkahub.data.companion.CompanionLifeEvent
 import me.rerere.rikkahub.data.companion.CompanionLifeEventSource
 import me.rerere.rikkahub.data.companion.CompanionToolExecution
-import me.rerere.rikkahub.data.companion.buildConversationLifeEvent
 import me.rerere.rikkahub.data.companion.buildAutonomousReflectionLifeEvent
 import me.rerere.rikkahub.data.companion.buildToolLifeEvent
 import me.rerere.rikkahub.data.companion.buildWaitingLifeEvent
@@ -356,7 +355,10 @@ class ProactiveMessageService : KoinComponent {
             scheduleTargeted(
                 context = context,
                 setting = setting,
-                triggerAtMillis = maxOf(commitment.dueAt, System.currentTimeMillis() + 1_000L),
+                triggerAtMillis = recoveredCommitmentTriggerAt(
+                    dueAt = commitment.dueAt,
+                    nowMillis = System.currentTimeMillis(),
+                ),
                 reason = commitment.promise,
                 userText = commitment.actionPlan.contextText,
                 kind = commitment.actionPlan.category.ifBlank { "commitment" },
@@ -1745,13 +1747,6 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
             nowMillis = nowMillis,
         )
         val lifeEvents = buildList {
-            buildConversationLifeEvent(
-                assistantId = assistant.id.toString(),
-                assistantText = assistantText,
-                source = CompanionLifeEventSource.PROACTIVE,
-                evidenceReference = evidenceReference,
-                nowMillis = nowMillis,
-            )?.let(::add)
             toolExecutions.mapNotNullTo(this) { execution ->
                 buildToolLifeEvent(
                     assistantId = assistant.id.toString(),
@@ -2357,3 +2352,6 @@ internal fun buildTargetedProactiveSensingInstruction(
         }
     }
 }
+
+internal fun recoveredCommitmentTriggerAt(dueAt: Long, nowMillis: Long): Long =
+    maxOf(dueAt, nowMillis + 1_000L)

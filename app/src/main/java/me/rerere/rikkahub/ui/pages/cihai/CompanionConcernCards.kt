@@ -163,8 +163,7 @@ private fun CompanionConcern.toCardModel(
             title = commitment.concernTitle(),
             nextPerceptionText = targetAt.toPerceptionText(nowMillis),
             statusText = when {
-                commitment?.status == CompanionCommitmentStatus.EXECUTING -> "正在处理"
-                commitment?.status == CompanionCommitmentStatus.RETRY_SCHEDULED -> "等待重试"
+                commitment != null -> commitment.deliveryStatusText(nowMillis)
                 isOverdue -> targetAt.deliveryStatusText(nowMillis)
                 status == CompanionConcernStatus.PAUSED -> "暂缓留意"
                 else -> "挂心中"
@@ -191,11 +190,7 @@ private fun CompanionCommitment.toCardModel(nowMillis: Long): SortableConcernCar
             subjectKeys = setOf(subjectKey),
             title = concernTitle(),
             nextPerceptionText = dueAt.toPerceptionText(nowMillis),
-            statusText = when (status) {
-                CompanionCommitmentStatus.EXECUTING -> "正在处理"
-                CompanionCommitmentStatus.RETRY_SCHEDULED -> "等待重试"
-                else -> if (isOverdue) dueAt.deliveryStatusText(nowMillis) else "挂心中"
-            },
+            statusText = deliveryStatusText(nowMillis),
             eventText = promise.cleanCompanionHumanText("我会在合适的时候再确认这件事。"),
             goalText = actionPlan.userFacingSummary
                 .cleanCompanionHumanText("")
@@ -248,5 +243,14 @@ private fun Long?.toPerceptionText(nowMillis: Long): String {
 private fun Long?.deliveryStatusText(nowMillis: Long): String = when {
     this == null -> "挂心中"
     nowMillis - this > 12L * 60L * 60L * 1_000L -> "未送达"
-    else -> "等待发送"
+    this <= nowMillis -> "已逾期，正在补发"
+    else -> "即将发送"
+}
+
+private fun CompanionCommitment.deliveryStatusText(nowMillis: Long): String = when {
+    nowMillis - dueAt > 12L * 60L * 60L * 1_000L -> "未送达"
+    status == CompanionCommitmentStatus.EXECUTING -> "正在处理"
+    status == CompanionCommitmentStatus.RETRY_SCHEDULED && dueAt > nowMillis -> "等待重试"
+    dueAt <= nowMillis -> "已逾期，正在补发"
+    else -> "即将发送"
 }

@@ -137,6 +137,73 @@ internal fun AffectiveMemoryCandidate.isDurableMemoryCandidate(): Boolean {
 internal fun String.normalizedMemoryIdentity(): String = lowercase()
     .replace(Regex("[\\p{P}\\p{S}\\s]+"), "")
 
+internal fun buildDeterministicMemoryCandidates(
+    turns: List<MemoryExtractionTurn>,
+    limit: Int = 6,
+): List<AffectiveMemoryCandidate> {
+    if (limit <= 0) return emptyList()
+    val identities = mutableSetOf<String>()
+    return turns
+        .asReversed()
+        .asSequence()
+        .filter { it.role.equals("user", ignoreCase = true) }
+        .mapNotNull { turn -> turn.toDeterministicMemoryCandidate() }
+        .filter { candidate -> identities.add(candidate.content.normalizedMemoryIdentity()) }
+        .take(limit)
+        .toList()
+        .reversed()
+}
+
+internal fun buildDeterministicMemoryCandidates(
+    messageNodes: List<me.rerere.rikkahub.data.model.MessageNode>,
+    limit: Int = 6,
+): List<AffectiveMemoryCandidate> = buildDeterministicMemoryCandidates(
+    turns = messageNodes.toMemoryExtractionTurns(),
+    limit = limit,
+)
+
+private fun MemoryExtractionTurn.toDeterministicMemoryCandidate(): AffectiveMemoryCandidate? {
+    val quote = text.trim()
+        .lineSequence()
+        .map(String::trim)
+        .filter(String::isNotBlank)
+        .joinToString(" ")
+        .replace(Regex("\\s+"), " ")
+        .take(220)
+    if (quote.length < 8 || quote.looksLikeRawToolOrTraceDump() || quote.looksLikeVocabularyDrill()) return null
+    val type = when {
+        DETERMINISTIC_BOUNDARY_MARKERS.any { it in quote } -> "user_boundary"
+        DETERMINISTIC_CORRECTION_MARKERS.any { it in quote } -> "correction"
+        DETERMINISTIC_PREFERENCE_MARKERS.any { it in quote } -> "user_preference"
+        else -> return null
+    }
+    val title = when (type) {
+        "user_boundary" -> "你明确说过的边界"
+        "correction" -> "你纠正过的一件事"
+        else -> "你明确表达的偏好"
+    }
+    val relationshipEffect = when (type) {
+        "user_boundary" -> "我需要尊重这条边界，不能让你反复纠正我。"
+        "correction" -> "我需要以这次纠正为准，旧理解不能继续沿用。"
+        else -> "这会影响我以后怎样陪伴、建议和回应你。"
+    }
+    return AffectiveMemoryCandidate(
+        type = type,
+        title = title,
+        content = "我记得你明确说过：“$quote”",
+        unspokenThought = "我得把这句话落实到之后的行动里，而不是只在这一轮口头答应。",
+        userSignal = quote,
+        relationshipEffect = relationshipEffect,
+        importance = if (type == "user_preference") 3 else 4,
+        confidence = 1.0,
+        tags = listOf(type, "用户原话"),
+        embeddingText = quote,
+        sourceMessageNodeIds = listOf(nodeId),
+        evidenceMessageNodeIds = listOf(nodeId),
+        topics = listOf(title),
+    )
+}
+
 private fun AffectiveMemoryCandidate.hasAffectiveSummary(): Boolean =
     !roleFeeling.isNullOrBlank() ||
         !bodySense.isNullOrBlank() ||
@@ -201,6 +268,31 @@ private fun String.looksLikeVocabularyDrill(): Boolean {
     val hasSentencePunctuation = contains("。") || contains("，") || contains(". ") || contains("?")
     return uniqueRatio > 0.75 && !hasSentencePunctuation
 }
+
+private val DETERMINISTIC_BOUNDARY_MARKERS = listOf(
+    "我不希望",
+    "我不喜欢",
+    "不要再",
+    "别再",
+    "不许",
+)
+
+private val DETERMINISTIC_CORRECTION_MARKERS = listOf(
+    "不是这样的",
+    "不是这个意思",
+    "应该是",
+    "纠正一下",
+    "更正一下",
+    "你理解错了",
+)
+
+private val DETERMINISTIC_PREFERENCE_MARKERS = listOf(
+    "我更喜欢",
+    "我喜欢",
+    "我希望",
+    "我想要",
+    "对我来说",
+)
 
 object AffectiveMemoryExtractor {
     fun buildExtractionPrompt(

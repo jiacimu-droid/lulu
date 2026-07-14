@@ -508,6 +508,7 @@ object StudyRules {
         }
         var inventory = state.inventory
         var drawsSinceNonNormal = state.drawsSinceNonNormal.coerceIn(0, NON_NORMAL_PITY_DRAW_COUNT - 1)
+        val generatedResults = mutableListOf<StudyDrawResult>()
         val results = buildList {
             repeat(drawCount) {
                 val result = if (drawsSinceNonNormal >= NON_NORMAL_PITY_DRAW_COUNT - 1) {
@@ -515,6 +516,7 @@ object StudyRules {
                 } else {
                     drawOne(random)
                 }
+                generatedResults += result
                 drawsSinceNonNormal = if (result.rarity == StudyRarity.Normal) {
                     drawsSinceNonNormal + 1
                 } else {
@@ -522,17 +524,17 @@ object StudyRules {
                 }
                 if (result.rarity != StudyRarity.Normal || !inventory.isNormalFragmentFull(result.fragmentKey)) {
                     inventory = inventory.addDrawResult(result)
+                    add(result)
                 }
-                add(result)
             }
         }
         val refreshed = inventory.refreshUnlockStats()
         val drawDate = state.today.ifBlank { LocalDate.now().toString() }
         val previousPurpleCount = if (state.dailyPurpleDrawDate == drawDate) state.dailyPurpleDrawCount else 0
         val previousDrawCount = if (state.dailyPurpleDrawDate == drawDate) state.dailyDrawCount else 0
-        val purpleCount = results.count { it.rarity == StudyRarity.Rare }
+        val purpleCount = generatedResults.count { it.rarity == StudyRarity.Rare }
         val nextPurpleCount = previousPurpleCount + purpleCount
-        val nextDrawCount = previousDrawCount + results.size
+        val nextDrawCount = previousDrawCount + generatedResults.size
         val studiedToday = state.dailyStudyRecords[drawDate]?.studyMinutes ?: 0
         val grantPurpleSafety = studiedToday >= 120 &&
             nextDrawCount >= 30 &&
@@ -556,7 +558,7 @@ object StudyRules {
                 recentEvents = state.recentEvents.addEvent(
                     StudyEventType.Draw,
                     if (drawCount == 10) "十连抽" else "单抽",
-                    "完成 ${results.size} 抽；已满的蓝色碎片不返还任何资源",
+                    "完成 $drawCount 抽；获得 ${results.size} 项，已满的蓝色碎片不返回任何结果",
                 ),
             ),
             results = results,

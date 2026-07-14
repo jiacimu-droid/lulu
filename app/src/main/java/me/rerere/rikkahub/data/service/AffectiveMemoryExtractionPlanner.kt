@@ -47,7 +47,7 @@ fun buildAffectiveMemoryExtractionPlan(
     return null
 }
 
-private fun List<MessageNode>.toMemoryExtractionTurns(): List<MemoryExtractionTurn> =
+internal fun List<MessageNode>.toMemoryExtractionTurns(): List<MemoryExtractionTurn> =
     mapNotNull { node ->
         val message = runCatching { node.currentMessage }.getOrNull() ?: return@mapNotNull null
         if (message.role != MessageRole.USER && message.role != MessageRole.ASSISTANT) return@mapNotNull null
