@@ -63,6 +63,18 @@ class LuluExpressionOutputTransformerTest {
     }
 
     @Test
+    fun `recognizes CRLF paragraph breaks when merging a dependent paragraph`() {
+        val result = splitCompanionExpressionBubbles(
+            "先别急。\r\n\r\n但今晚要早点睡。\r\n\r\n明天再慢慢说。",
+        )
+
+        assertEquals(
+            listOf("先别急。但今晚要早点睡。", "明天再慢慢说。"),
+            result,
+        )
+    }
+
+    @Test
     fun `keeps message unchanged when reply is short`() {
         val original = assistantMessage("OK.")
 

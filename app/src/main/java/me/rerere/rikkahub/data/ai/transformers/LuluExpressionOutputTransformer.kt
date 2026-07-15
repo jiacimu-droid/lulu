@@ -246,8 +246,9 @@ internal fun sanitizeLuluVisibleExpression(text: String): String {
     return withoutPresenceBlocks
         .lineSequence()
         .map { it.trim() }
-        .filter { line -> line.isNotBlank() && internalPrefixes.none { prefix -> line.startsWith(prefix) } }
+        .filterNot { line -> line.isNotBlank() && internalPrefixes.any { prefix -> line.startsWith(prefix) } }
         .joinToString("\n")
+        .replace(Regex("\n{3,}"), "\n\n")
         .trim()
 }
 
@@ -256,7 +257,8 @@ internal fun splitCompanionExpressionBubbles(text: String): List<String> {
     if (clean.isBlank()) return listOf(clean)
     if (clean.contains("```") || clean.contains("\n- ") || clean.contains("\n1. ")) return listOf(clean)
 
-    val paragraphSegments = clean.split(Regex("\\n\\s*\\n+"))
+    val normalized = clean.replace("\r\n", "\n").replace('\r', '\n')
+    val paragraphSegments = normalized.split(COMPANION_PARAGRAPH_BOUNDARY_REGEX)
         .map { it.trim() }
         .filter { it.isNotBlank() }
     val usesParagraphRhythm = paragraphSegments.size > 1 || clean.contains('\n')
@@ -352,6 +354,9 @@ private fun String.visualBubbleLength(): Int = count { !it.isWhitespace() }
 private val DEPENDENT_BUBBLE_CONNECTORS = listOf(
     "但", "不过", "可是", "只是", "而且", "所以", "因为",
 )
+
+private val COMPANION_PARAGRAPH_BOUNDARY_REGEX =
+    Regex("(?:\\r?\\n)[ \\t]*(?:\\r?\\n)+")
 
 private val COMPANION_SENTENCE_BOUNDARY_REGEX =
     Regex("(?<=[.!?~～。！？])\\s*|(?<=…)(?=\\s|$)\\s*")
