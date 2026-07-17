@@ -284,7 +284,26 @@ fun Route.conversationRoutes(
             val request = call.receive<SelectMessageNodeRequest>()
 
             chatService.initializeConversation(uuid)
-            chatService.selectMessageNode(uuid, nodeId, request.selectIndex)
+            val conversation = chatService.getConversationFlow(uuid).first()
+            val targetNode = conversation.messageNodes.firstOrNull { it.id == nodeId }
+                ?: throw NotFoundException("Message node not found")
+            if (request.selectIndex !in targetNode.messages.indices) {
+                throw BadRequestException("Invalid selectIndex")
+            }
+            if (targetNode.selectIndex != request.selectIndex) {
+                chatService.saveConversation(
+                    uuid,
+                    conversation.copy(
+                        messageNodes = conversation.messageNodes.map { node ->
+                            if (node.id == nodeId) {
+                                node.copy(selectIndex = request.selectIndex)
+                            } else {
+                                node
+                            }
+                        },
+                    ),
+                )
+            }
 
             call.respond(HttpStatusCode.Accepted, mapOf("status" to "accepted"))
         }
