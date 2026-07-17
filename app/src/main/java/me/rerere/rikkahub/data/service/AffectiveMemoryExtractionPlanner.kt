@@ -1,5 +1,6 @@
 package me.rerere.rikkahub.data.service
 
+import me.rerere.ai.core.MessageRole
 import me.rerere.rikkahub.data.model.MessageNode
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
