@@ -64,6 +64,8 @@ data class CompanionPrivateImpression(
     val uncertainties: List<String> = emptyList(),
     val unresolvedMatters: List<String> = emptyList(),
     val evidenceMessageNodeIds: List<String> = emptyList(),
+    /** Evidence explicitly dismissed by the user must not silently rebuild deleted profile cards. */
+    val dismissedProfileEvidenceMessageNodeIds: List<String> = emptyList(),
     val observedTraits: List<String> = emptyList(),
     val preferences: List<String> = emptyList(),
     val boundaries: List<String> = emptyList(),
