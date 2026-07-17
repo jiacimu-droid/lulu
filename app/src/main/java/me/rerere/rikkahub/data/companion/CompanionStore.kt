@@ -101,6 +101,91 @@ class CompanionStore(
         }
     }
 
+    suspend fun deleteLifeEvent(assistantId: String, eventId: String) {
+        if (assistantId.isBlank() || eventId.isBlank()) return
+        updateSnapshot(assistantId) { snapshot ->
+            snapshot.copy(lifeEvents = snapshot.lifeEvents.filterNot { it.id == eventId })
+        }
+    }
+
+    suspend fun deleteCommitment(assistantId: String, commitmentId: String) {
+        if (assistantId.isBlank() || commitmentId.isBlank()) return
+        updateSnapshot(assistantId) { snapshot ->
+            snapshot.copy(commitments = snapshot.commitments.filterNot { it.id == commitmentId })
+        }
+    }
+
+    suspend fun clearRelationshipNarrative(assistantId: String) {
+        if (assistantId.isBlank()) return
+        updateSnapshot(assistantId) { snapshot ->
+            snapshot.copy(
+                privateImpression = snapshot.privateImpression.copy(
+                    relationshipTitle = "",
+                    relationshipNarrative = "",
+                    updatedAt = System.currentTimeMillis(),
+                ),
+            )
+        }
+    }
+
+    suspend fun clearUserPortrait(assistantId: String) {
+        if (assistantId.isBlank()) return
+        updateSnapshot(assistantId) { snapshot ->
+            snapshot.copy(
+                privateImpression = snapshot.privateImpression.copy(
+                    summary = "",
+                    userPortrait = "",
+                    observedTraits = emptyList(),
+                    preferences = emptyList(),
+                    boundaries = emptyList(),
+                    updatedAt = System.currentTimeMillis(),
+                ),
+            )
+        }
+    }
+
+    suspend fun clearInteractionUnderstanding(assistantId: String) {
+        if (assistantId.isBlank()) return
+        updateSnapshot(assistantId) { snapshot ->
+            snapshot.copy(
+                privateImpression = snapshot.privateImpression.copy(
+                    interactionUnderstanding = "",
+                    updatedAt = System.currentTimeMillis(),
+                ),
+            )
+        }
+    }
+
+    suspend fun clearUnresolvedRelationshipMatters(assistantId: String) {
+        if (assistantId.isBlank()) return
+        updateSnapshot(assistantId) { snapshot ->
+            snapshot.copy(
+                privateImpression = snapshot.privateImpression.copy(
+                    unresolvedMatters = emptyList(),
+                    updatedAt = System.currentTimeMillis(),
+                ),
+            )
+        }
+    }
+
+    suspend fun deleteRelationshipEvent(assistantId: String, eventId: String) {
+        if (assistantId.isBlank() || eventId.isBlank()) return
+        updateSnapshot(assistantId) { snapshot ->
+            val remaining = snapshot.relationshipHistory.filterNot { it.id == eventId }
+            val rebuilt = CompanionRelationshipReducer.apply(
+                assistantId = assistantId,
+                current = CompanionRelationshipState(),
+                appliedEventIds = emptySet(),
+                events = remaining,
+                nowMillis = System.currentTimeMillis(),
+            )
+            snapshot.copy(
+                relationship = rebuilt.relationship,
+                relationshipHistory = remaining,
+            )
+        }
+    }
+
     private fun decodeState(raw: String?): CompanionPersistedState {
         if (raw.isNullOrBlank()) return CompanionPersistedState()
         return runCatching { json.decodeFromString<CompanionPersistedState>(raw) }
@@ -271,6 +356,13 @@ private fun CompanionNeuroState.normalizedForStorage(): CompanionNeuroState = co
 
 private fun CompanionPrivateImpression.normalizedForStorage(): CompanionPrivateImpression = copy(
     summary = summary.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_SUMMARY_LENGTH),
+    relationshipTitle = relationshipTitle.cleanCompanionHumanText("").take(MAX_STATE_TEXT_LENGTH),
+    relationshipNarrative = relationshipNarrative.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_SUMMARY_LENGTH * 2),
+    userPortrait = userPortrait.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_SUMMARY_LENGTH * 2),
+    interactionUnderstanding = interactionUnderstanding.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_SUMMARY_LENGTH * 2),
+    uncertainties = uncertainties.cleanImpressionItems(8),
+    unresolvedMatters = unresolvedMatters.cleanImpressionItems(8),
+    evidenceMessageNodeIds = evidenceMessageNodeIds.filter(String::isNotBlank).distinct().takeLast(80),
     observedTraits = observedTraits.cleanImpressionItems(),
     preferences = preferences.cleanImpressionItems(),
     boundaries = boundaries.cleanImpressionItems(),
