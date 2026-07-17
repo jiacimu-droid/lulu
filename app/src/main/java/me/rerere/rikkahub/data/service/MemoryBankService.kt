@@ -891,9 +891,11 @@ internal fun selectMemoryRecallItems(
             .take(limit)
         null -> selectDiverseRecallMemories(reranked, limit)
     }
+    val expansionCandidates = memories
+        .filter { it.content.isNotBlank() && !it.deprecated }
     return direct
-        .expandGraphMemories(sorted, graphEdges, maxRelatedItems = 2, nowMillis = nowMillis)
-        .expandRelatedMemories(sorted, maxRelatedItems = 1)
+        .expandGraphMemories(expansionCandidates, graphEdges, maxRelatedItems = 2, nowMillis = nowMillis)
+        .expandRelatedMemories(expansionCandidates, maxRelatedItems = 1)
         .distinctBy { it.recallDistinctKey() }
 }
 
