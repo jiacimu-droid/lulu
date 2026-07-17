@@ -29,7 +29,7 @@ fun buildToolLifeEvent(
         source = source,
         evidenceReference = execution.toolCallId,
         detailsJson = if (descriptor.type == CompanionLifeEventType.GAME) {
-            execution.outputText.trim().takeIf { it.startsWith("{") }
+            execution.outputText.trim().takeIf { it.startsWith("{") }.orEmpty()
         } else {
             ""
         },
