@@ -232,7 +232,14 @@ fun CihaiPage(onBack: () -> Unit) {
                             }
                         } else {
                             items(recentActivityEvents, key = { "activity-${it.id}" }) { event ->
-                                LifeEventCard(event)
+                                LifeEventCard(
+                                    event = event,
+                                    onDelete = {
+                                        scope.launch {
+                                            companionStore.deleteLifeEvent(selectedAssistantId, event.id)
+                                        }
+                                    },
+                                )
                             }
                         }
                     }
@@ -272,7 +279,14 @@ fun CihaiPage(onBack: () -> Unit) {
                                 )
                             }
                             items(activeCommitments, key = { "commitment-${it.id}" }) { commitment ->
-                                CommitmentCard(commitment)
+                                CommitmentCard(
+                                    commitment = commitment,
+                                    onDelete = {
+                                        scope.launch {
+                                            companionStore.deleteCommitment(selectedAssistantId, commitment.id)
+                                        }
+                                    },
+                                )
                             }
                         }
                         if (fulfilledCommitments.isNotEmpty()) {
@@ -284,7 +298,14 @@ fun CihaiPage(onBack: () -> Unit) {
                                 )
                             }
                             items(fulfilledCommitments, key = { "fulfilled-commitment-${it.id}" }) { commitment ->
-                                CommitmentCard(commitment)
+                                CommitmentCard(
+                                    commitment = commitment,
+                                    onDelete = {
+                                        scope.launch {
+                                            companionStore.deleteCommitment(selectedAssistantId, commitment.id)
+                                        }
+                                    },
+                                )
                             }
                         }
                         if (activeResponsibilityAnchors.isEmpty() && activeCommitments.isEmpty() && fulfilledCommitments.isEmpty()) {
@@ -362,6 +383,23 @@ fun CihaiPage(onBack: () -> Unit) {
                                 relationship = selectedSnapshot.relationship,
                                 history = selectedSnapshot.relationshipHistory,
                                 privateImpression = selectedSnapshot.privateImpression,
+                                onDeleteNarrative = {
+                                    scope.launch { companionStore.clearRelationshipNarrative(selectedAssistantId) }
+                                },
+                                onDeletePortrait = {
+                                    scope.launch { companionStore.clearUserPortrait(selectedAssistantId) }
+                                },
+                                onDeleteInteraction = {
+                                    scope.launch { companionStore.clearInteractionUnderstanding(selectedAssistantId) }
+                                },
+                                onDeleteUnresolved = {
+                                    scope.launch { companionStore.clearUnresolvedRelationshipMatters(selectedAssistantId) }
+                                },
+                                onDeleteTimelineEvent = { eventId ->
+                                    scope.launch {
+                                        companionStore.deleteRelationshipEvent(selectedAssistantId, eventId)
+                                    }
+                                },
                             )
                         }
                     }
@@ -378,7 +416,14 @@ fun CihaiPage(onBack: () -> Unit) {
                                 meaningfulLifeEvents,
                                 key = { it.id },
                             ) { event ->
-                                LifeEventCard(event)
+                                LifeEventCard(
+                                    event = event,
+                                    onDelete = {
+                                        scope.launch {
+                                            companionStore.deleteLifeEvent(selectedAssistantId, event.id)
+                                        }
+                                    },
+                                )
                             }
                         }
                     }
@@ -423,9 +468,9 @@ internal enum class CihaiSection(
         emptyBody = "角色真实完成的数字行动、记忆整理、游戏和提醒都会出现在这里。",
     ),
     COMMITMENTS(
-        label = "承诺",
+        label = "约定",
         entryKind = null,
-        emptyTitle = "还没有写下的承诺",
+        emptyTitle = "还没有写下的约定",
         emptyBody = "角色答应持续照看或替你完成的事，会在这里具象化展示。",
     ),
     CONCERNS(
@@ -461,17 +506,18 @@ internal enum class CihaiSection(
 }
 
 internal fun visibleCihaiSections(): List<CihaiSection> = listOf(
-    CihaiSection.ACTIVITY,
-    CihaiSection.COMMITMENTS,
-    CihaiSection.CONCERNS,
-    CihaiSection.RESPONSIBILITIES,
-    CihaiSection.RELATIONSHIP,
     CihaiSection.LIFE,
+    CihaiSection.CONCERNS,
+    CihaiSection.COMMITMENTS,
+    CihaiSection.RELATIONSHIP,
     CihaiSection.DIARY,
 )
 
 @Composable
-private fun CommitmentCard(commitment: CompanionCommitment) {
+private fun CommitmentCard(
+    commitment: CompanionCommitment,
+    onDelete: () -> Unit,
+) {
     val now = System.currentTimeMillis()
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
@@ -494,6 +540,13 @@ private fun CommitmentCard(commitment: CompanionCommitment) {
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = HugeIcons.Delete01,
+                        contentDescription = "删除这条约定",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -700,103 +753,142 @@ private fun RelationshipOverview(
     relationship: CompanionRelationshipState,
     history: List<CompanionRelationshipEvent>,
     privateImpression: CompanionPrivateImpression,
+    onDeleteNarrative: () -> Unit,
+    onDeletePortrait: () -> Unit,
+    onDeleteInteraction: () -> Unit,
+    onDeleteUnresolved: () -> Unit,
+    onDeleteTimelineEvent: (String) -> Unit,
 ) {
-    val timeline = buildCompanionRelationshipTimeline(history)
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        PrivateImpressionCard(privateImpression)
-        Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(
-                    text = "目前怎样相处",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = relationship.roleLabel.ifBlank { "正在形成彼此舒服的相处方式" },
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = relationshipSummary(relationship),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+    val timeline = buildCompanionRelationshipTimeline(history, limit = 8)
+    val relationshipTitle = privateImpression.relationshipTitle
+        .ifBlank { relationship.roleLabel }
+        .ifBlank { "还在形成只属于我们的相处方式" }
+    val relationshipNarrative = privateImpression.relationshipNarrative.ifBlank {
+        "我还没有足够证据替我们的关系下定义。等真正重要的袒露、兑现、边界或修复发生后，我会用自己的口吻写下理解。"
+    }
+    val portrait = privateImpression.userPortrait
+        .ifBlank { privateImpression.summary }
+        .ifBlank {
+            (
+                privateImpression.observedTraits.takeLast(2) +
+                    privateImpression.preferences.takeLast(2) +
+                    privateImpression.boundaries.takeLast(1)
+                ).distinct().joinToString("；")
         }
-        relationship.lastMeaningfulInteractionAt?.let { time ->
-            Text(
-                text = "最近一次明显影响关系：${formatTime(time)}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+        .ifBlank { "我还在认识你，不想拿几句普通聊天草率地定义你。" }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        RelationshipTextCard(
+            eyebrow = "我们现在",
+            heading = relationshipTitle,
+            body = relationshipNarrative,
+            onDelete = onDeleteNarrative.takeIf {
+                privateImpression.relationshipTitle.isNotBlank() ||
+                    privateImpression.relationshipNarrative.isNotBlank()
+            },
+        )
+        RelationshipTextCard(
+            eyebrow = "我眼中的你",
+            body = portrait,
+            onDelete = onDeletePortrait.takeIf {
+                privateImpression.userPortrait.isNotBlank() ||
+                    privateImpression.summary.isNotBlank() ||
+                    privateImpression.observedTraits.isNotEmpty() ||
+                    privateImpression.preferences.isNotEmpty() ||
+                    privateImpression.boundaries.isNotEmpty()
+            },
+        )
+        privateImpression.interactionUnderstanding.takeIf(String::isNotBlank)?.let { understanding ->
+            RelationshipTextCard(
+                eyebrow = "我学会怎样和你相处",
+                body = understanding,
+                onDelete = onDeleteInteraction,
             )
         }
+
         Text(
-            text = "最近变化",
+            text = "我们之间的重要片段",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(top = 4.dp),
         )
         if (timeline.isEmpty()) {
             Text(
-                text = "还没有形成可记录的关系变化。之后的重要袒露、边界、承诺和修复会留在这里。",
+                text = "还没有真正改变我们关系的片段。普通寒暄和聊天次数不会被拿来假装关系升级。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else {
-            timeline.forEach { item -> RelationshipTimelineEntry(item) }
+            timeline.forEach { item ->
+                RelationshipTimelineEntry(
+                    item = item,
+                    onDelete = { onDeleteTimelineEvent(item.id) },
+                )
+            }
         }
-        RelationshipDimensionsCard(relationship)
+
+        privateImpression.unresolvedMatters.takeIf(List<String>::isNotEmpty)?.let { matters ->
+            RelationshipTextCard(
+                eyebrow = "还没有说开的事",
+                body = matters.takeLast(3).joinToString("；"),
+                onDelete = onDeleteUnresolved,
+                warning = true,
+            )
+        }
     }
 }
 
 @Composable
-private fun PrivateImpressionCard(impression: CompanionPrivateImpression) {
+private fun RelationshipTextCard(
+    eyebrow: String,
+    body: String,
+    heading: String = "",
+    onDelete: (() -> Unit)? = null,
+    warning: Boolean = false,
+) {
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text("角色眼中的你", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-            if (
-                impression.summary.isBlank() &&
-                impression.observedTraits.isEmpty() &&
-                impression.preferences.isEmpty() &&
-                impression.boundaries.isEmpty() &&
-                impression.recentChanges.isEmpty()
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "还没有形成有证据的私密印象。重要偏好、边界和关系变化会从长期记忆中逐渐沉淀。",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = eyebrow,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (warning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
                 )
-            } else {
-                impression.summary.takeIf(String::isNotBlank)?.let { summary ->
-                    Text(summary, style = MaterialTheme.typography.bodyMedium)
+                onDelete?.let { delete ->
+                    IconButton(onClick = delete) {
+                        Icon(
+                            imageVector = HugeIcons.Delete01,
+                            contentDescription = "删除$eyebrow",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
-                ImpressionLine("观察", impression.observedTraits.takeLast(3))
-                ImpressionLine("偏好", impression.preferences.takeLast(3))
-                ImpressionLine("边界", impression.boundaries.takeLast(3))
-                ImpressionLine("最近变化", impression.recentChanges.takeLast(3))
             }
+            heading.takeIf(String::isNotBlank)?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
         }
     }
 }
 
 @Composable
-private fun ImpressionLine(label: String, values: List<String>) {
-    if (values.isEmpty()) return
-    Text(
-        text = "$label：${values.joinToString("；")}",
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-}
-
-@Composable
-private fun LifeEventCard(event: CompanionLifeEvent) {
+private fun LifeEventCard(
+    event: CompanionLifeEvent,
+    onDelete: () -> Unit,
+) {
     val statusText = when (event.status) {
         CompanionLifeEventStatus.PLANNED -> "计划中"
         CompanionLifeEventStatus.RUNNING -> "进行中"
@@ -823,6 +915,13 @@ private fun LifeEventCard(event: CompanionLifeEvent) {
                 )
                 Surface(shape = RoundedCornerShape(999.dp), color = statusColor) {
                     Text(statusText, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = HugeIcons.Delete01,
+                        contentDescription = "删除这条生活记录",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
             event.summary.takeIf(String::isNotBlank)?.let { summary ->
@@ -859,7 +958,10 @@ private fun me.rerere.rikkahub.data.companion.CompanionLifeEventType.lifeEventLa
 }
 
 @Composable
-private fun RelationshipTimelineEntry(item: CompanionRelationshipTimelineItem) {
+private fun RelationshipTimelineEntry(
+    item: CompanionRelationshipTimelineItem,
+    onDelete: () -> Unit,
+) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -881,6 +983,13 @@ private fun RelationshipTimelineEntry(item: CompanionRelationshipTimelineItem) {
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = HugeIcons.Delete01,
+                        contentDescription = "删除这段关系记录",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
             item.detail?.let { detail ->
                 Text(
@@ -889,68 +998,8 @@ private fun RelationshipTimelineEntry(item: CompanionRelationshipTimelineItem) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            item.deltaText.takeIf(String::isNotBlank)?.let { delta ->
-                Text(
-                    text = delta,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
         }
     }
-}
-
-@Composable
-private fun RelationshipDimensionsCard(relationship: CompanionRelationshipState) {
-    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = "相处默契",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = "这些数值只总结有证据的相处变化，不代表角色此刻的情绪。",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            RelationshipMetricRow("信任", relationship.trust)
-            RelationshipMetricRow("亲近", relationship.closeness)
-            RelationshipMetricRow("说到做到", relationship.reliability)
-            RelationshipMetricRow("边界默契", relationship.boundaryConfidence)
-            RelationshipMetricRow("未解心结", relationship.unresolvedTension, inverseTone = true)
-        }
-    }
-}
-
-@Composable
-private fun RelationshipMetricRow(label: String, value: Float, inverseTone: Boolean = false) {
-    val normalized = value.coerceIn(0f, 1f)
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(label, style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
-            Text(
-                text = "${(normalized * 100).toInt()}%",
-                style = MaterialTheme.typography.labelSmall,
-                color = if (inverseTone && normalized >= 0.5f) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.primary
-                },
-            )
-        }
-        LinearProgressIndicator(progress = { normalized }, modifier = Modifier.fillMaxWidth())
-    }
-}
-
-private fun relationshipSummary(relationship: CompanionRelationshipState): String = when {
-    relationship.unresolvedTension >= 0.6f -> "现在有一些没有解开的情绪，角色会更谨慎地靠近和修复。"
-    relationship.trust >= 0.75f && relationship.closeness >= 0.65f -> "彼此已经很熟悉，很多关心和表达可以更自然。"
-    relationship.trust >= 0.6f -> "信任正在稳定形成，角色会逐渐更自然地记住和回应重要的事。"
-    else -> "关系还在慢慢建立，角色会通过尊重边界和兑现承诺来积累信任。"
 }
 
 @Composable
