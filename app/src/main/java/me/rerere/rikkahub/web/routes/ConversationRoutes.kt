@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import me.rerere.ai.core.MessageRole
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.service.ChatService
@@ -192,8 +193,17 @@ fun Route.conversationRoutes(
             val conversation = conversationRepo.getConversationById(uuid)
                 ?: throw NotFoundException("Conversation not found")
 
-            chatService.generateTitle(uuid, conversation, force = true)
-            call.respond(HttpStatusCode.Accepted, mapOf("status" to "accepted"))
+            val title = conversation.currentMessages
+                .firstOrNull { it.role == MessageRole.USER }
+                ?.toText()
+                ?.trim()
+                ?.lineSequence()
+                ?.firstOrNull { it.isNotBlank() }
+                ?.take(50)
+                ?.ifBlank { null }
+                ?: "新对话"
+            conversationRepo.updateConversation(conversation.copy(title = title))
+            call.respond(HttpStatusCode.OK, mapOf("status" to "updated"))
         }
 
         // POST /api/conversations/{id}/title - Update conversation title
