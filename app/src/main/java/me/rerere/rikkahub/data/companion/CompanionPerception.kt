@@ -215,13 +215,22 @@ fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
         ?.let(::appendLine)
     snapshot.privateImpression.takeIf { impression ->
         impression.summary.isNotBlank() ||
+            impression.relationshipNarrative.isNotBlank() ||
+            impression.userPortrait.isNotBlank() ||
+            impression.interactionUnderstanding.isNotBlank() ||
+            impression.unresolvedMatters.isNotEmpty() ||
             impression.observedTraits.isNotEmpty() ||
             impression.preferences.isNotEmpty() ||
             impression.boundaries.isNotEmpty() ||
             impression.recentChanges.isNotEmpty()
     }?.let { impression ->
         appendLine("private_impression:")
-        impression.summary.takeIf(String::isNotBlank)?.let { appendLine("- summary=${it.take(300)}") }
+        impression.relationshipTitle.takeIf(String::isNotBlank)?.let { appendLine("- relationship_title=${it.take(160)}") }
+        impression.relationshipNarrative.takeIf(String::isNotBlank)?.let { appendLine("- relationship_narrative=${it.take(600)}") }
+        impression.userPortrait.takeIf(String::isNotBlank)?.let { appendLine("- user_portrait=${it.take(600)}") }
+        impression.interactionUnderstanding.takeIf(String::isNotBlank)?.let { appendLine("- interaction_understanding=${it.take(600)}") }
+        impression.unresolvedMatters.takeLast(3).forEach { appendLine("- unresolved_matter=${it.take(240)}") }
+        impression.summary.takeIf(String::isNotBlank)?.let { appendLine("- legacy_summary=${it.take(300)}") }
         impression.observedTraits.take(4).forEach { appendLine("- observed_trait=${it.take(180)}") }
         impression.preferences.take(4).forEach { appendLine("- preference=${it.take(180)}") }
         impression.boundaries.take(4).forEach { appendLine("- boundary=${it.take(180)}") }
