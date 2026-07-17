@@ -349,7 +349,7 @@ class StudyRulesTest {
             }
         }
 
-        assertEquals(11, results.size)
+        assertEquals(40, results.size)
         assertEquals(1, results.count { it.rarity == StudyRarity.Rare })
         assertEquals(0, results.count { it.rarity == StudyRarity.Epic || it.rarity == StudyRarity.Rainbow })
         assertEquals(10, state.drawsSinceNonNormal)
@@ -761,7 +761,7 @@ class StudyRulesTest {
     }
 
     @Test
-    fun `drawing a completed normal outfit part returns no resource`() {
+    fun `drawing a completed normal outfit part still reports the result`() {
         val key = "normal:${StudyRules.outfitNames.first()}:${StudyRules.outfitParts.first()}"
         val state = StudyState(
             wallet = StudyWallet(kudos = StudyRules.SINGLE_DRAW_COST),
@@ -773,13 +773,14 @@ class StudyRulesTest {
         })
 
         assertEquals(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT, drawn.state.inventory.normalFragments[key])
-        assertTrue(drawn.results.isEmpty())
+        assertEquals(1, drawn.results.size)
+        assertTrue(drawn.results.single().alreadyFull)
         assertEquals(0, drawn.state.wallet.kudos)
         assertEquals(1, drawn.state.dailyDrawCount)
     }
 
     @Test
-    fun `ten draw omits every full fragment but still counts the attempts`() {
+    fun `ten draw reports every full fragment and still counts the attempts`() {
         val outfit = StudyRules.outfitNames.first()
         val key = "normal:$outfit:${StudyRules.outfitParts.first()}"
         val state = StudyState(
@@ -795,7 +796,8 @@ class StudyRulesTest {
         val drawn = StudyRules.draw(state, count = 10, random = alwaysSameFullFragment)
 
         assertEquals(0, drawn.state.wallet.kudos)
-        assertTrue(drawn.results.isEmpty())
+        assertEquals(10, drawn.results.size)
+        assertTrue(drawn.results.all { it.alreadyFull })
         assertEquals(0, drawn.state.inventory.douyinFragments)
         assertEquals(10, drawn.state.dailyDrawCount)
     }
