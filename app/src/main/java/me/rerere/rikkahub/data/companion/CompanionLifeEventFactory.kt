@@ -30,7 +30,9 @@ fun buildToolLifeEvent(
         evidenceReference = execution.toolCallId,
         detailsJson = if (descriptor.type == CompanionLifeEventType.GAME) {
             execution.outputText.trim().takeIf { it.startsWith("{") }
-        } ?: "",
+        } else {
+            ""
+        },
         importance = descriptor.importance,
         startedAt = nowMillis,
         endedAt = nowMillis,
