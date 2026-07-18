@@ -270,6 +270,7 @@ private val COMPANION_INTERNAL_LINE_PREFIXES = listOf(
 )
 
 internal fun sanitizeLuluVisibleExpression(text: String): String {
+    val hadPrivateContext = COMPANION_PRIVATE_BLOCK_REGEX.containsMatchIn(text)
     val withoutPrivateBlocks = COMPANION_PRIVATE_BLOCK_REGEX.replace(
         LULU_PRESENCE_BLOCK_REGEX.replace(text, ""),
         "",
@@ -310,7 +311,7 @@ internal fun sanitizeLuluVisibleExpression(text: String): String {
         .replace(Regex("\n{3,}"), "\n\n")
         .trim()
         .ifBlank {
-            if (containsInternalLeak) COMPANION_LEAK_FALLBACK else ""
+            if (containsInternalLeak || hadPrivateContext) COMPANION_LEAK_FALLBACK else ""
         }
 }
 
