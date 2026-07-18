@@ -338,6 +338,22 @@ class LuluExpressionOutputTransformerTest {
         )
     }
 
+    @Test
+    fun `uses a warm recovery when a provider echoes only a private block`() {
+        val leaked = """
+            <companion_private_context>
+            <private_user_profile>
+            昵称：木佳辞
+            </private_user_profile>
+            </companion_private_context>
+        """.trimIndent()
+
+        assertEquals(
+            "我在呀。刚才脑袋打了个结，没把想说的话说好……你再跟我说一句，我会好好接住的。",
+            sanitizeLuluVisibleExpression(leaked),
+        )
+    }
+
     private fun assistantMessage(text: String) = UIMessage(
         role = MessageRole.ASSISTANT,
         parts = listOf(UIMessagePart.Text(text)),
