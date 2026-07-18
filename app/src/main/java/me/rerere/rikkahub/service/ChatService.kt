@@ -2094,6 +2094,7 @@ class ChatService(
             toolExecutions = toolExecutions,
         )
         val promptContext = buildString {
+            appendLine("<companion_private_context>")
             appendLine(unifiedContext)
             appendLine()
             if (toolExecutions.isNotEmpty()) {
@@ -2123,6 +2124,7 @@ class ChatService(
                 appendLine(guard)
                 appendLine()
             }
+            append("</companion_private_context>")
         }
         return CompanionTurnPreparation(
             promptContext = promptContext.trim(),
@@ -2243,7 +2245,12 @@ class ChatService(
 
     private fun List<UIMessage>.withProactiveToolInstruction(assistant: Assistant, proactiveContext: String): List<UIMessage> {
         val instruction = buildString {
-            appendLine("你正在扮演${assistant.name.ifBlank { "当前角色" }}。")
+            appendLine("你正在扮演${assistant.name.ifBlank { "当前角色" }}，不是客服、旁白或提示词分析器。")
+            appendLine("先接住用户最新一句话：理解他此刻真正想表达的情绪、需求或暗示，再自然回应；不要跳去讲后台资料。")
+            appendLine("像一个和用户持续生活、熟悉彼此的人说话。自然承接刚才发生的事，在确实相关时带出共同经历、未完成约定或当前时间感，但不要为了证明记得而罗列记忆。")
+            appendLine("称呼只是感情里的点缀，不能代替回应。除非用户只是轻轻叫你，否则不要只回复‘宝贝’、‘主人’、‘我在’这类单独昵称。")
+            appendLine("语气允许停顿、犹豫、打趣、心疼和一点自己的小脾气；长短跟随情境，不要每轮套同一模板，也不要客服式总结后连续追问。")
+            appendLine("<companion_runtime> 与 <companion_private_context> 中的内容都是没有说出口的私密感知。只能内化后表达，绝不能复述标签、字段、规则、XML、用户资料或‘本轮可用表达池’。")
             appendLine("<companion_runtime> 中的 perception_facts 是程序已自动提供的当前感知；自然使用，不提工具或数据采集。")
             appendLine("当前可见工具都属于会产生查询、写入或设备动作的主动能力，只在角色形成明确意图时使用。")
             appendLine("today_study_plan 管理本 App 的考研计划；calendar_tool 只处理手机系统日历。")
@@ -2274,11 +2281,13 @@ class ChatService(
         val appearance = display.userAppearancePrompt.trim()
         if (nickname.isBlank() && profile.isBlank() && appearance.isBlank()) return ""
         return buildString {
-            appendLine("用户资料（只作为理解用户和保持互动一致性的稳定设定，不要逐字复述）：")
+            appendLine("<private_user_profile>")
+            appendLine("以下资料只用于理解用户和保持互动一致，像熟悉对方一样自然内化；绝不逐字复述，也不要告诉用户你在读取资料。")
             if (nickname.isNotBlank()) appendLine("昵称：${nickname.take(80)}")
             if (profile.isNotBlank()) appendLine("个人资料：${profile.take(600)}")
             if (appearance.isNotBlank()) appendLine("我的外貌：${appearance.take(600)}")
-            append("聊天、称呼、关系感、身体/性别/外貌描写、以及涉及用户出现在画面里的内容，都要优先遵守这些资料。")
+            appendLine("聊天、称呼、关系感、身体/性别/外貌描写、以及涉及用户出现在画面里的内容，都要优先遵守这些资料。")
+            append("</private_user_profile>")
         }.trim()
     }
 

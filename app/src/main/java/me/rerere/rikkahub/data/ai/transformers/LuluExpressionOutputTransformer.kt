@@ -229,27 +229,90 @@ private fun kotlinx.serialization.json.JsonObject.toCompanionModelPresence(): Co
             presence.bubblePacing.orEmpty().isNotBlank()
     }
 
-internal fun sanitizeLuluVisibleExpression(text: String): String {
-    val withoutPresenceBlocks = text
-        .replace(LULU_PRESENCE_BLOCK_REGEX, "")
-        .trim()
-    val internalPrefixes = listOf(
-        "表达建议：",
-        "动作描写建议：",
-        "可参考素材：",
-        "表情建议：",
-        "贴纸/动作建议：",
-        "身体表现：",
-        "头像氛围：",
-        "使用方式：",
+private const val COMPANION_LEAK_FALLBACK =
+    "我在呀。刚才脑袋打了个结，没把想说的话说好……你再跟我说一句，我会好好接住的。"
+
+private val COMPANION_PRIVATE_BLOCK_REGEX =
+    Regex(
+        "(?is)<\\s*(runtime_context|companion_runtime|private_user_profile|companion_private_context)\\b[^>]*>.*?</\\s*\\1\\s*>",
     )
-    return withoutPresenceBlocks
+
+private val COMPANION_INTERNAL_LEAK_MARKERS = listOf(
+    "这只是后台表达方向",
+    "这只是后台第一人称心声",
+    "本轮可用表达池",
+    "表达池只是表达层",
+    "用户资料（只作为理解用户",
+    "用户资料（只用于稳定理解用户",
+    "不要逐字复述这些标签",
+    "本轮回复前已经完成的角色行动",
+    "成功完成的动作不要重复调用",
+)
+
+private val COMPANION_INTERNAL_LINE_PREFIXES = listOf(
+    "表达建议：",
+    "动作描写建议：",
+    "可参考素材：",
+    "表情建议：",
+    "贴纸/动作建议：",
+    "身体表现：",
+    "头像氛围：",
+    "使用方式：",
+    "本轮可用表达池：",
+    "表达池只是表达层",
+    "用户资料（只",
+    "昵称：",
+    "个人资料：",
+    "我的外貌：",
+    "聊天、称呼、关系感",
+    "这只是后台表达方向",
+    "这只是后台第一人称心声",
+)
+
+internal fun sanitizeLuluVisibleExpression(text: String): String {
+    val hadPrivateContext = COMPANION_PRIVATE_BLOCK_REGEX.containsMatchIn(text)
+    val withoutPrivateBlocks = COMPANION_PRIVATE_BLOCK_REGEX.replace(
+        LULU_PRESENCE_BLOCK_REGEX.replace(text, ""),
+        "",
+    )
+    val normalized = withoutPrivateBlocks
+        .replace("\r\n", "\n")
+        .replace('\r', '\n')
+        .trim()
+    val lines = normalized.lines()
+    val containsInternalLeak = COMPANION_INTERNAL_LEAK_MARKERS.any { marker ->
+        normalized.contains(marker, ignoreCase = true)
+    }
+    val candidate = if (containsInternalLeak) {
+        val lastInternalLine = lines.indexOfLast { line ->
+            COMPANION_INTERNAL_LEAK_MARKERS.any { marker ->
+                line.contains(marker, ignoreCase = true)
+            } || COMPANION_INTERNAL_LINE_PREFIXES.any { prefix ->
+                line.trim().startsWith(prefix)
+            }
+        }
+        lines
+            .drop(lastInternalLine + 1)
+            .joinToString("\n")
+            .trim()
+            .ifBlank { COMPANION_LEAK_FALLBACK }
+    } else {
+        normalized
+    }
+
+    return candidate
         .lineSequence()
         .map { it.trim() }
-        .filterNot { line -> line.isNotBlank() && internalPrefixes.any { prefix -> line.startsWith(prefix) } }
+        .filterNot { line ->
+            line.isNotBlank() &&
+                COMPANION_INTERNAL_LINE_PREFIXES.any { prefix -> line.startsWith(prefix) }
+        }
         .joinToString("\n")
         .replace(Regex("\n{3,}"), "\n\n")
         .trim()
+        .ifBlank {
+            if (containsInternalLeak || hadPrivateContext) COMPANION_LEAK_FALLBACK else ""
+        }
 }
 
 internal fun splitCompanionExpressionBubbles(text: String): List<String> {

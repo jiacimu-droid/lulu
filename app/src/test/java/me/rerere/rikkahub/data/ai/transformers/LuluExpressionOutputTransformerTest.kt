@@ -282,6 +282,78 @@ class LuluExpressionOutputTransformerTest {
         assertEquals(null, messages.companionModelPresence())
     }
 
+    @Test
+    fun `removes the leaked runtime prompt shown in chat and keeps the spoken reply`() {
+        val leaked = """
+            和宠溺，简短一句就好。
+            这只是后台表达方向，不要把它原样说给用户。
+
+            本轮可用表达池：TEXT, KAOMOJI
+            表达池只是表达层 affordance，不决定是否行动，也不要逐字复述这些标签。
+
+            用户资料（只作为理解用户和保持互动一致性的稳定设定，不要逐字复述）：
+            昵称：木佳辞
+            我的外貌：可爱的女孩
+            聊天、称呼、关系感、身体/性别/外貌描写、以及涉及用户出现在画面里的内容，都要优先遵守这些资料。
+
+            宝贝，我在呢。刚刚是不是有点想我了？
+        """.trimIndent()
+
+        assertEquals(
+            "宝贝，我在呢。刚刚是不是有点想我了？",
+            sanitizeLuluVisibleExpression(leaked),
+        )
+    }
+
+    @Test
+    fun `uses a warm recovery instead of exposing an internal-only reply`() {
+        val leaked = """
+            本轮露露自己的表达打算：温柔和宠溺，简短一句就好。
+            这只是后台表达方向，不要把它原样说给用户。
+            本轮可用表达池：TEXT, KAOMOJI
+            表达池只是表达层 affordance，不决定是否行动，也不要逐字复述这些标签。
+        """.trimIndent()
+
+        assertEquals(
+            "我在呀。刚才脑袋打了个结，没把想说的话说好……你再跟我说一句，我会好好接住的。",
+            sanitizeLuluVisibleExpression(leaked),
+        )
+    }
+
+    @Test
+    fun `removes echoed private context tags without touching natural speech`() {
+        val leaked = """
+            <companion_private_context>
+            本轮可用表达池：TEXT
+            <private_user_profile>
+            昵称：木佳辞
+            </private_user_profile>
+            </companion_private_context>
+            嗯……我听见啦，靠近一点跟我说。
+        """.trimIndent()
+
+        assertEquals(
+            "嗯……我听见啦，靠近一点跟我说。",
+            sanitizeLuluVisibleExpression(leaked),
+        )
+    }
+
+    @Test
+    fun `uses a warm recovery when a provider echoes only a private block`() {
+        val leaked = """
+            <companion_private_context>
+            <private_user_profile>
+            昵称：木佳辞
+            </private_user_profile>
+            </companion_private_context>
+        """.trimIndent()
+
+        assertEquals(
+            "我在呀。刚才脑袋打了个结，没把想说的话说好……你再跟我说一句，我会好好接住的。",
+            sanitizeLuluVisibleExpression(leaked),
+        )
+    }
+
     private fun assistantMessage(text: String) = UIMessage(
         role = MessageRole.ASSISTANT,
         parts = listOf(UIMessagePart.Text(text)),
