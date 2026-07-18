@@ -233,24 +233,82 @@ internal fun sanitizeLuluVisibleExpression(text: String): String {
     val withoutPresenceBlocks = text
         .replace(LULU_PRESENCE_BLOCK_REGEX, "")
         .trim()
-    val internalPrefixes = listOf(
-        "表达建议：",
-        "动作描写建议：",
-        "可参考素材：",
-        "表情建议：",
-        "贴纸/动作建议：",
-        "身体表现：",
-        "头像氛围：",
-        "使用方式：",
-    )
-    return withoutPresenceBlocks
+    val lines = withoutPresenceBlocks
         .lineSequence()
-        .map { it.trim() }
-        .filterNot { line -> line.isNotBlank() && internalPrefixes.any { prefix -> line.startsWith(prefix) } }
+        .map(String::trim)
+        .toList()
+    val promptLeakScore = lines.count { line -> line.looksLikeInternalPromptLeak() }
+    if (promptLeakScore >= 2) {
+        val visibleLines = lines.filterNot { line ->
+            line.isBlank() ||
+                line.looksLikeInternalPromptLeak() ||
+                line.looksLikeInternalPromptContinuation()
+        }
+        return visibleLines
+            .joinToString("\n")
+            .replace(Regex("\n{3,}"), "\n\n")
+            .trim()
+            .ifBlank { LULU_PROMPT_LEAK_RECOVERY_REPLY }
+    }
+
+    return lines
+        .filterNot { line -> line.isNotBlank() && line.looksLikeInternalPromptLeak() }
         .joinToString("\n")
         .replace(Regex("\n{3,}"), "\n\n")
         .trim()
 }
+
+private fun String.looksLikeInternalPromptLeak(): Boolean {
+    if (isBlank()) return false
+    val normalized = lowercase()
+    return INTERNAL_PROMPT_PREFIXES.any { prefix -> startsWith(prefix) } ||
+        INTERNAL_PROMPT_MARKERS.any { marker -> marker in normalized }
+}
+
+private fun String.looksLikeInternalPromptContinuation(): Boolean {
+    if (isBlank()) return false
+    val normalized = lowercase()
+    return normalized.startsWith("昵称：") ||
+        normalized.startsWith("我的外貌：") ||
+        normalized.startsWith("外貌：") ||
+        normalized.startsWith("关系：") ||
+        normalized.startsWith("称呼：") ||
+        normalized.startsWith("性别：") ||
+        normalized.startsWith("表达池") ||
+        normalized.contains("不要逐字复述") ||
+        normalized.contains("不要把它原样说给用户") ||
+        normalized.contains("都要优先遵守这些资料")
+}
+
+private val INTERNAL_PROMPT_PREFIXES = listOf(
+    "表达建议：",
+    "动作描写建议：",
+    "可参考素材：",
+    "表情建议：",
+    "贴纸/动作建议：",
+    "身体表现：",
+    "头像氛围：",
+    "使用方式：",
+    "本轮可用表达池：",
+    "表达池只是表达层",
+    "用户资料（",
+    "用户资料(",
+    "后台表达方向",
+)
+
+private val INTERNAL_PROMPT_MARKERS = listOf(
+    "affordance",
+    "kaomoji",
+    "后台表达方向",
+    "只作为理解用户和保持互动一致性",
+    "不要逐字复述",
+    "不要把它原样说给用户",
+    "不决定是否行动",
+    "优先遵守这些资料",
+)
+
+private const val LULU_PROMPT_LEAK_RECOVERY_REPLY =
+    "我在呀，刚刚脑袋卡了一下，没有好好接住你。再跟我说一句嘛。"
 
 internal fun splitCompanionExpressionBubbles(text: String): List<String> {
     val clean = text.trim()
