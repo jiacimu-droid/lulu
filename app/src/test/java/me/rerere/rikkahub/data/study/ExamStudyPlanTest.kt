@@ -128,29 +128,34 @@ class ExamStudyPlanTest {
     }
 
     @Test
-    fun julyEighteenUsesCourseFirstAndRollingRecitation() {
+    fun julyEighteenUsesThreeHourCourseFirstPlan() {
         val plan = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 18))
         val titles = plan?.tasks.orEmpty().joinToString("\n") { it.title }
 
-        assertTrue(plan?.title.orEmpty().contains("4 小时基线"))
-        assertTrue(titles.contains("课程 110-120 分钟"))
+        assertTrue(plan?.title.orEmpty().contains("3 小时稳定日"))
+        assertTrue(titles.contains("第 5 章课程已完成"))
+        assertTrue(titles.contains("第 6-7 章课程 65-70 分钟"))
         assertTrue(titles.contains("达到约 70%"))
         assertTrue(titles.contains("机动复盘缓冲"))
-        assertTrue(titles.contains("每日广播体操"))
+        assertTrue(titles.contains("每日运动"))
     }
 
     @Test
     fun unfinishedNewChaptersDoNotUnlockCombinedPracticeEarly() {
-        val text = listOf(
-            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 14)),
-            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 16)),
+        val beforeClosure = listOf(
+            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 18)),
+            ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 19)),
             ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 20)),
         ).flatMap { it?.tasks.orEmpty() }.joinToString("\n") { it.title }
+        val gatedPractice = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 21))
+            ?.tasks.orEmpty().joinToString("\n") { it.title }
 
-        assertTrue(text.contains("第 5 章"))
-        assertTrue(text.contains("第 6-7 章"))
-        assertTrue(text.contains("第 8 章"))
-        assertFalse(text.contains("第 3-7 章合并题"))
+        assertTrue(beforeClosure.contains("第 5 章课程已完成"))
+        assertTrue(beforeClosure.contains("第 6-7 章"))
+        assertFalse(beforeClosure.contains("第 8 章"))
+        assertFalse(beforeClosure.contains("第 3-7 章合并题"))
+        assertTrue(gatedPractice.contains("仅在刑法第 7 章课程确认听完后"))
+        assertTrue(gatedPractice.contains("第 3-7 章合并题"))
     }
 
     @Test
@@ -329,50 +334,28 @@ class ExamStudyPlanTest {
     }
 
     @Test
-    fun dailyLoadUsesFourHoursAsBaselineAndGrowsOnlyByGate() {
-        val restDay = LocalDate.of(2026, 7, 19)
+    fun dailyLoadUsesThreeHoursThisWeekAndGrowsOnlyByGate() {
+        val restDay = LocalDate.of(2026, 7, 26)
 
         assertEquals(210, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 15)))
-        assertEquals(240, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 20)))
-        assertEquals(270, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 22)))
-        assertEquals(270, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 27)))
-        assertEquals(300, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 8, 3)))
-        assertEquals(330, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 8, 10)))
-        assertEquals(360, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 8, 17)))
-        assertEquals(420, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 9, 16)))
-        assertEquals(450, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 10, 1)))
+        assertEquals(240, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 17)))
+        assertEquals(180, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 18)))
+        assertEquals(180, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 19)))
+        assertEquals(180, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 25)))
+        assertEquals(210, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 7, 27)))
+        assertEquals(240, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 8, 3)))
+        assertEquals(270, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 8, 10)))
+        assertEquals(300, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 8, 17)))
+        assertEquals(390, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 9, 16)))
+        assertEquals(420, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 10, 1)))
         assertEquals(480, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 11, 1)))
         assertEquals(420, ExamStudyPlan.plannedStudyMinutes(LocalDate.of(2026, 12, 10)))
         assertEquals(0, ExamStudyPlan.plannedStudyMinutes(restDay))
         val schedule = ExamStudyPlan.todaySchedule(LocalDate.of(2026, 7, 20))
         assertTrue(schedule.first().title.contains("广播体操"))
         assertTrue(schedule.joinToString("\n") { it.detail }.contains("固定核心约"))
-        assertTrue(ExamStudyPlan.studyHabitReference.contains("4 小时是当前新基线"))
+        assertTrue(ExamStudyPlan.studyHabitReference.contains("3 小时健康日"))
     }
-
-    @Test
-    fun julyTenHeadacheBacklogIsRebalancedWithoutSkippingLegalTheoryChapters() {
-        val july10 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 10))!!
-        val july11 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 11))!!.tasks.joinToString("\n") { it.title }
-        val july12 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 12))!!.tasks.joinToString("\n") { it.title }
-        val july13 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 13))!!.tasks.joinToString("\n") { it.title }
-        val july15 = ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 15))!!.tasks.joinToString("\n") { it.title }
-
-        assertTrue(july10.title.contains("头晕"))
-        assertTrue(july10.tasks.isEmpty())
-        assertTrue(july11.contains("法理第 1 章"))
-        assertTrue(july11.contains("刑法第 1 章框架图欠账"))
-        assertTrue(july11.contains("状态允许再选做"))
-        assertTrue(july12.contains("已完成"))
-        assertTrue(july12.contains("优先修复睡眠"))
-        assertTrue(july13.contains("刑法第 2 章独立题组"))
-        assertTrue(july13.contains("法理第 1 章正式闭卷背诵"))
-        assertTrue(july13.contains("英语"))
-        assertFalse(july13.contains("法理第 4 章"))
-        assertFalse(july13.contains("法理第 8 章"))
-        assertTrue(july15.contains("法理第 1 章"))
-    }
-
     @Test
     fun `chapter ledger keeps criminal and civil chapter counts separate from question book size`() {
         assertEquals(25, ExamStudyPlan.criminalLawChapterCount)
@@ -650,7 +633,8 @@ class ExamStudyPlanTest {
         assertFalse(julyTasks.any { it.contains("政治") })
         assertTrue(septemberTasks.any { it.kind == StudyPlanTaskKind.English && !it.title.contains("不背单词") })
         assertTrue(septemberTasks.any { it.kind == StudyPlanTaskKind.Politics })
-        assertTrue(ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 19))!!.tasks.isEmpty())
+        assertFalse(ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 19))!!.tasks.isEmpty())
+        assertTrue(ExamStudyPlan.todayPlan(LocalDate.of(2026, 7, 26))!!.tasks.isEmpty())
     }
 
     @Test
