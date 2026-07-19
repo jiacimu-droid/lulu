@@ -546,15 +546,15 @@ fun VoiceCallPage(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF101522),
-                    scrolledContainerColor = Color(0xFF101522),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White,
+                    containerColor = Color(0xFFFFF8F3),
+                    scrolledContainerColor = Color(0xFFF7F0EC),
+                    titleContentColor = Color(0xFF303744),
+                    navigationIconContentColor = Color(0xFF303744),
+                    actionIconContentColor = Color(0xFF303744),
                 ),
             )
         },
-        containerColor = Color(0xFF101522),
+        containerColor = Color(0xFFFFF8F3),
     ) { padding ->
         if (currentSession == null) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -569,7 +569,7 @@ fun VoiceCallPage(
                 .padding(padding)
                 .background(
                     Brush.verticalGradient(
-                        listOf(Color(0xFF101522), Color(0xFF1A2233), Color(0xFF0C111C)),
+                        listOf(Color(0xFFFFF8F3), Color(0xFFF4EFF8), Color(0xFFEAF2F6)),
                     ),
                 )
                 .padding(horizontal = 18.dp),
@@ -587,14 +587,14 @@ fun VoiceCallPage(
                         .clip(CircleShape)
                         .background(
                             Brush.radialGradient(
-                                listOf(Color(0x665C7FD8), Color(0x225C7FD8), Color.Transparent),
+                                listOf(Color(0x66C7AEDF), Color(0x33AFC9DC), Color.Transparent),
                             ),
                         ),
                 )
                 Surface(
                     modifier = Modifier.size(144.dp),
                     shape = CircleShape,
-                    color = Color.White.copy(alpha = 0.09f),
+                    color = Color.White.copy(alpha = 0.88f),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         UIAvatar(
@@ -609,7 +609,7 @@ fun VoiceCallPage(
                 text = assistantName,
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = Color(0xFF303744),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -623,12 +623,12 @@ fun VoiceCallPage(
                     isHistoryOnly = isHistoryOnly,
                 ),
                 style = MaterialTheme.typography.labelMedium,
-                color = Color(0xFFB8C7D9),
+                color = Color(0xFF747D8E),
             )
             if (stage == CallStage.Ringing) {
                 Surface(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
-                    color = Color.White.copy(alpha = 0.06f),
+                    color = Color.White.copy(alpha = 0.76f),
                     shape = MaterialTheme.shapes.extraLarge,
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -639,13 +639,13 @@ fun VoiceCallPage(
                         ) {
                             Text(
                                 "语音来电",
-                                color = Color.White,
+                                color = Color(0xFF303744),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.SemiBold,
                             )
                             Text(
                                 "接听后会从最近的聊天和共同经历自然继续。",
-                                color = Color(0xFFB8C7D9),
+                                color = Color(0xFF747D8E),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                         }
@@ -857,8 +857,8 @@ private fun CallContentCard(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.08f),
-            contentColor = Color(0xFFF5F7FC),
+            containerColor = Color.White.copy(alpha = 0.78f),
+            contentColor = Color(0xFF303744),
         ),
     ) {
         when {
@@ -885,15 +885,15 @@ private fun IdleCallPanel(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text("随时都可以聊一会儿", style = MaterialTheme.typography.titleMedium, color = Color(0xFFDCE6F7))
+        Text("随时都可以聊一会儿", style = MaterialTheme.typography.titleMedium, color = Color(0xFF303744))
         Spacer(Modifier.height(8.dp))
-        Text("呼叫 $assistantName", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF91A3BC))
+        Text("呼叫 $assistantName", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF747D8E))
         Spacer(Modifier.height(28.dp))
         Surface(
             modifier = Modifier.size(96.dp).clickable(onClick = onStartCall),
             shape = CircleShape,
-            color = Color(0xFFDAE4FF),
-            contentColor = Color(0xFF263B67),
+            color = Color(0xFFDCE8FF),
+            contentColor = Color(0xFF365682),
             shadowElevation = 12.dp,
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -901,7 +901,7 @@ private fun IdleCallPanel(
             }
         }
         Spacer(Modifier.height(14.dp))
-        Text("开始通话", style = MaterialTheme.typography.labelLarge, color = Color(0xFFCFD9EB))
+        Text("开始通话", style = MaterialTheme.typography.labelLarge, color = Color(0xFF596579))
     }
 }
 
@@ -1036,7 +1036,7 @@ private fun TranscriptSegmentBubble(
     text: String,
     isUser: Boolean,
 ) {
-    val color = if (isUser) Color(0xFF435F9B) else Color(0xFF222D43)
+    val color = if (isUser) Color(0xFFDCE8FF) else Color(0xFFFFF9F4)
     Box(
         modifier = Modifier
             .widthIn(max = 280.dp)
@@ -1044,7 +1044,7 @@ private fun TranscriptSegmentBubble(
             .background(color)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Text(text = text, style = MaterialTheme.typography.bodyMedium, color = Color(0xFFF5F7FC))
+        Text(text = text, style = MaterialTheme.typography.bodyMedium, color = Color(0xFF303744))
     }
 }
 
