@@ -527,7 +527,8 @@ fun PerfectManGamePage() {
             val settings = settingsStore.settingsFlow.first()
             val player = selectedPlayerAssistantId
                 ?.let { id -> settings.assistants.firstOrNull { it.id.toString() == id } }
-            val model = settings.findModelById(player?.chatModelId ?: settings.chatModelId)
+                ?: return@runCatching fallback
+            val model = settings.findModelById(player.chatModelId ?: settings.chatModelId)
                 ?.takeIf { it.type == ModelType.CHAT }
                 ?: return@runCatching fallback
             val providerSetting = model.findProvider(settings.providers) ?: return@runCatching fallback
@@ -625,7 +626,7 @@ fun PerfectManGamePage() {
                             status = CompanionLifeEventStatus.COMPLETED,
                             title = "一起玩完了一轮满分男",
                             summary = "$phaseLabel，第 $completedRound 轮相差 ${roundResult.diff} 分。",
-                            source = CompanionLifeEventSource.AGENT,
+                            source = CompanionLifeEventSource.CHAT,
                             evidenceReference = "perfect-man-round:$completedRound:$nowMillis",
                             importance = 3,
                             startedAt = nowMillis,
@@ -675,6 +676,12 @@ fun PerfectManGamePage() {
                     "只输出角色台词，不要说后台校准分。",
                 fallback = GAME_REPLY_FAILURE_MARKER,
             )
+            if (reply == GAME_REPLY_FAILURE_MARKER) {
+                generatedPrompt = ""
+                opponentLine = reply
+                isGenerating = false
+                return@launch
+            }
             val guess = Regex("""(\d{1,2})\s*分""").find(reply)?.groupValues?.getOrNull(1)?.toIntOrNull()
                 ?.coerceIn(0, 10)
                 ?: fallbackGuess
@@ -889,7 +896,7 @@ private fun PerfectManPlayerSelector(
                 Text("选择玩家", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    selectedPlayer?.name?.takeIf { it.isNotBlank() } ?: "默认 API",
+                    selectedPlayer?.name?.takeIf { it.isNotBlank() } ?: "未选择角色",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
