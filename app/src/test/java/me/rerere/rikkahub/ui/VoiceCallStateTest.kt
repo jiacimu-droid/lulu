@@ -42,9 +42,40 @@ class VoiceCallStateTest {
 
     @Test
     fun `end of speech delay adapts to punctuation and short utterances`() {
-        assertEquals(850L, voiceCallEndOfSpeechDelayMillis("你在吗？"))
-        assertEquals(1_450L, voiceCallEndOfSpeechDelayMillis("喂"))
-        assertEquals(1_000L, voiceCallEndOfSpeechDelayMillis("我今天想和你认真聊一件事情"))
+        assertEquals(1_250L, voiceCallEndOfSpeechDelayMillis("你在吗？"))
+        assertEquals(1_900L, voiceCallEndOfSpeechDelayMillis("喂"))
+        assertEquals(1_600L, voiceCallEndOfSpeechDelayMillis("我今天想和你认真聊一件事情"))
+    }
+
+    @Test
+    fun `only the latest stable ASR revision can commit a user turn`() {
+        assertFalse(
+            shouldCommitVoiceTranscript(
+                scheduledRevision = 4L,
+                currentRevision = 5L,
+                userTurnSubmitting = false,
+                stageActive = true,
+                transcript = "后半句已经到了",
+            ),
+        )
+        assertFalse(
+            shouldCommitVoiceTranscript(
+                scheduledRevision = 5L,
+                currentRevision = 5L,
+                userTurnSubmitting = true,
+                stageActive = true,
+                transcript = "完整一句",
+            ),
+        )
+        assertTrue(
+            shouldCommitVoiceTranscript(
+                scheduledRevision = 5L,
+                currentRevision = 5L,
+                userTurnSubmitting = false,
+                stageActive = true,
+                transcript = "完整一句",
+            ),
+        )
     }
 
     @Test

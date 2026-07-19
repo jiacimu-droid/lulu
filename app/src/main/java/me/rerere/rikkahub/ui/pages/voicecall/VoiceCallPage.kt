@@ -27,6 +27,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
@@ -38,6 +39,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -75,9 +78,11 @@ import me.rerere.hugeicons.stroke.StopCircle
 import me.rerere.hugeicons.stroke.TransactionHistory
 import me.rerere.hugeicons.stroke.VolumeHigh
 import me.rerere.rikkahub.Screen
+import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.getAssistantTTSProvider
 import me.rerere.rikkahub.data.datastore.getAssistantById
 import me.rerere.rikkahub.data.model.Avatar
+import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.voicecall.ProactiveCallManager
 import me.rerere.rikkahub.data.voicecall.VoiceCallLine
 import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
@@ -136,6 +141,7 @@ fun VoiceCallPage(
     }
     val repository = remember(context) { VoiceCallRepository(context.applicationContext) }
     val chatService: ChatService = koinInject()
+    val settingsStore: SettingsStore = koinInject()
     val tts = LocalTTSState.current
     val asr = LocalASRState.current
     val asrState by asr.state.collectAsState()
@@ -167,8 +173,38 @@ fun VoiceCallPage(
     var silenceJob by remember { mutableStateOf<Job?>(null) }
     var sleepJob by remember { mutableStateOf<Job?>(null) }
     var assistantGenerationJob by remember { mutableStateOf<Job?>(null) }
+    var transcriptRevision by remember { mutableLongStateOf(0L) }
+    var userTurnSubmitting by remember { mutableStateOf(false) }
     val latestSession by rememberUpdatedState(session)
     val latestStage by rememberUpdatedState(stage)
+
+    fun updateProactiveCallEnabled(enabled: Boolean) {
+        val targetAssistant = assistant ?: return
+        scope.launch {
+            val nextSettings = settings.copy(
+                proactiveMessageSetting = if (enabled) {
+                    settings.proactiveMessageSetting.copy(enabled = true)
+                } else {
+                    settings.proactiveMessageSetting
+                },
+                assistants = settings.assistants.map { item ->
+                    if (item.id == targetAssistant.id) {
+                        item.copy(proactiveCallSetting = item.proactiveCallSetting.copy(enabled = enabled))
+                    } else {
+                        item
+                    }
+                },
+            )
+            settingsStore.update(nextSettings)
+            if (enabled) {
+                ProactiveMessageService.scheduleNext(
+                    context = context,
+                    settings = nextSettings,
+                    assistantId = targetAssistant.id,
+                )
+            }
+        }
+    }
 
     fun saveLine(line: VoiceCallLine, speak: Boolean = false) {
         val current = session ?: return
@@ -304,68 +340,76 @@ fun VoiceCallPage(
 
     fun startListening() {
         if (isHistoryOnly || sleepMode || stage != CallStage.Active || assistantTurnInProgress || isSpeaking) return
-        if (asrState.status != ASRStatus.Idle && asrState.status != ASRStatus.Error) return
+        if (userTurnSubmitting || (asrState.status != ASRStatus.Idle && asrState.status != ASRStatus.Error)) return
         lastTranscript = ""
+        transcriptRevision++
         asr.start { transcript ->
+            if (userTurnSubmitting || assistantTurnInProgress || stage != CallStage.Active) return@start
             val text = transcript.trim()
             if (text.isBlank() || text == lastTranscript) return@start
             lastTranscript = text
+            transcriptRevision++
+            val scheduledRevision = transcriptRevision
             silenceJob?.cancel()
             silenceJob = scope.launch {
                 delay(voiceCallEndOfSpeechDelayMillis(text))
-                asr.stop()
+                if (!shouldCommitVoiceTranscript(
+                        scheduledRevision = scheduledRevision,
+                        currentRevision = transcriptRevision,
+                        userTurnSubmitting = userTurnSubmitting,
+                        stageActive = stage == CallStage.Active,
+                        transcript = lastTranscript,
+                    )
+                ) return@launch
+
                 val finalText = lastTranscript.trim()
-                if (finalText.isNotBlank()) {
-                    saveLine(VoiceCallLine(role = VoiceCallRole.User, text = finalText))
-                    assistantTurnInProgress = true
-                    val streamedReply = StringBuilder()
-                    val streamSpeaker = createStreamSpeaker(streamedReply)
-                    val reply = try {
-                        chatService.sendVoiceCallTurn(
+                userTurnSubmitting = true
+                assistantTurnInProgress = true
+                asr.stop()
+                saveLine(VoiceCallLine(role = VoiceCallRole.User, text = finalText))
+                val streamedReply = StringBuilder()
+                val streamSpeaker = createStreamSpeaker(streamedReply)
+                val reply = try {
+                    chatService.sendVoiceCallTurn(
+                        conversationId = Uuid.parse(conversationId),
+                        text = "${finalText}\n\n$VOICE_CALL_REPLY_PROMPT",
+                        visibleUserText = finalText,
+                        onPartialReply = streamSpeaker,
+                    ).takeIf(::isUsableVoiceCallReply)
+                        ?: if (streamedReply.isEmpty()) chatService.sendVoiceCallTurn(
                             conversationId = Uuid.parse(conversationId),
-                            text = "$finalText\n\n$VOICE_CALL_REPLY_PROMPT",
-                            visibleUserText = finalText,
+                            text = "${finalText}\n\n$VOICE_CALL_RETRY_PROMPT",
+                            visibleUserText = null,
                             onPartialReply = streamSpeaker,
-                        ).takeIf(::isUsableVoiceCallReply)
-                            ?: if (streamedReply.isEmpty()) chatService.sendVoiceCallTurn(
-                                conversationId = Uuid.parse(conversationId),
-                                text = "$finalText\n\n$VOICE_CALL_RETRY_PROMPT",
-                                visibleUserText = null,
-                                onPartialReply = streamSpeaker,
-                            ).takeIf(::isUsableVoiceCallReply) else null
-                    } catch (cancellation: CancellationException) {
-                        throw cancellation
-                    } catch (_: Throwable) {
-                        null
-                    }
-                    if (reply != null) {
-                        assistantSay(
-                            text = reply,
-                            replayable = true,
-                            speak = streamedReply.isEmpty(),
-                        )
-                    } else if (streamedReply.isNotEmpty()) {
-                        assistantSay(
-                            text = streamedReply.toString(),
-                            replayable = true,
-                            speak = false,
-                        )
-                    } else {
-                        assistantTurnInProgress = false
-                        saveLine(
-                            VoiceCallLine(
-                                role = VoiceCallRole.System,
-                                text = "这一轮回复生成失败，已恢复倾听。",
-                                replayable = false,
-                            ),
-                        )
-                    }
+                        ).takeIf(::isUsableVoiceCallReply) else null
+                } catch (cancellation: CancellationException) {
+                    throw cancellation
+                } catch (_: Throwable) {
+                    null
+                } finally {
+                    userTurnSubmitting = false
+                }
+                if (reply != null) {
+                    assistantSay(text = reply, replayable = true, speak = streamedReply.isEmpty())
+                } else if (streamedReply.isNotEmpty()) {
+                    assistantSay(text = streamedReply.toString(), replayable = true, speak = false)
+                } else {
+                    assistantTurnInProgress = false
+                    saveLine(
+                        VoiceCallLine(
+                            role = VoiceCallRole.System,
+                            text = "这一轮回复生成失败，已恢复倾听。",
+                            replayable = false,
+                        ),
+                    )
                 }
             }
         }
     }
 
     fun endCall() {
+        transcriptRevision++
+        userTurnSubmitting = true
         silenceJob?.cancel()
         sleepJob?.cancel()
         assistantGenerationJob?.cancel()
@@ -375,6 +419,7 @@ fun VoiceCallPage(
         session = ended ?: session?.copy(status = VoiceCallStatus.Ended, endedAt = System.currentTimeMillis())
         VoiceCallForegroundService.stop(context.applicationContext)
         stage = CallStage.Idle
+        userTurnSubmitting = false
         session = repository.createSession(
             conversationId = conversationId,
             assistantId = assistantId,
@@ -503,8 +548,8 @@ fun VoiceCallPage(
     val currentSession = session
     Scaffold(
         topBar = {
-            LargeFlexibleTopAppBar(
-                title = { Text(if (isHistoryOnly) "通话记录" else "语音通话") },
+            TopAppBar(
+                title = { Text(if (isHistoryOnly) "通话记录" else "") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(HugeIcons.ArrowLeft02, contentDescription = null)
@@ -536,7 +581,6 @@ fun VoiceCallPage(
                     navigationIconContentColor = Color.White,
                     actionIconContentColor = Color.White,
                 ),
-                scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
             )
         },
         containerColor = Color(0xFF101522),
@@ -587,6 +631,34 @@ fun VoiceCallPage(
                 style = MaterialTheme.typography.labelMedium,
                 color = Color(0xFFB8C7D9),
             )
+            if (!isHistoryOnly && stage != CallStage.Ringing && assistant != null) {
+                Surface(
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = 0.08f),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(start = 12.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Column(modifier = Modifier.weight(1f, fill = false)) {
+                            Text("角色主动来电", color = Color(0xFFEAF0FB), style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                if (assistant.proactiveCallSetting.enabled) "已开启 · 可在合适时主动联系" else "已关闭",
+                                color = Color(0xFF9EADC3),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
+                        Switch(
+                            checked = assistant.proactiveCallSetting.enabled,
+                            onCheckedChange = ::updateProactiveCallEnabled,
+                        )
+                        TextButton(onClick = { navController.navigate(Screen.SettingProactiveMessage) }) {
+                            Text("设置")
+                        }
+                    }
+                }
+            }
 
             if (stage == CallStage.Ringing) {
                 Surface(
@@ -663,12 +735,23 @@ fun VoiceCallPage(
                         }
                     }
                 } else {
-                    SleepModePanel(
-                        enabled = sleepMode,
-                        minutes = sleepMinutes,
-                        onEnabledChange = { sleepMode = it },
-                        onMinutesChange = { sleepMinutes = it },
-                    )
+                    if (sleepMode) {
+                        SleepModePanel(
+                            enabled = sleepMode,
+                            minutes = sleepMinutes,
+                            onEnabledChange = { sleepMode = it },
+                            onMinutesChange = { sleepMinutes = it },
+                        )
+                    } else {
+                        FilterChip(
+                            selected = false,
+                            onClick = { sleepMode = true },
+                            label = { Text("哄睡模式") },
+                            leadingIcon = {
+                                Icon(HugeIcons.Moon02, contentDescription = null, modifier = Modifier.size(18.dp))
+                            },
+                        )
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -800,7 +883,13 @@ private fun CallContentCard(
     onReplay: (VoiceCallLine) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier, colors = CustomColors.cardColorsOnSurfaceContainer) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.08f),
+            contentColor = Color(0xFFF5F7FC),
+        ),
+    ) {
         when {
             stage == CallStage.Idle && !isHistoryOnly -> IdleCallPanel(
                 assistantName = assistantName,
@@ -971,7 +1060,7 @@ private fun TranscriptSegmentBubble(
     text: String,
     isUser: Boolean,
 ) {
-    val color = if (isUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
+    val color = if (isUser) Color(0xFF435F9B) else Color(0xFF222D43)
     Box(
         modifier = Modifier
             .widthIn(max = 280.dp)
@@ -979,7 +1068,7 @@ private fun TranscriptSegmentBubble(
             .background(color)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Text(text = text, style = MaterialTheme.typography.bodyMedium)
+        Text(text = text, style = MaterialTheme.typography.bodyMedium, color = Color(0xFFF5F7FC))
     }
 }
 
@@ -1220,13 +1309,25 @@ internal fun isUsableVoiceCallReply(text: String?): Boolean {
         clean != "（本轮回复生成不完整，请重试）"
 }
 
+internal fun shouldCommitVoiceTranscript(
+    scheduledRevision: Long,
+    currentRevision: Long,
+    userTurnSubmitting: Boolean,
+    stageActive: Boolean,
+    transcript: String,
+): Boolean =
+    scheduledRevision == currentRevision &&
+        !userTurnSubmitting &&
+        stageActive &&
+        transcript.isNotBlank()
+
 internal fun voiceCallEndOfSpeechDelayMillis(transcript: String): Long {
     val clean = transcript.trim()
-    if (clean.lastOrNull() in setOf('。', '！', '？', '.', '!', '?')) return 850L
+    if (clean.lastOrNull() in setOf('。', '！', '？', '.', '!', '?')) return 1_250L
     return when {
-        clean.length <= 4 -> 1_450L
-        clean.length <= 12 -> 1_200L
-        else -> 1_000L
+        clean.length <= 4 -> 1_900L
+        clean.length <= 12 -> 1_750L
+        else -> 1_600L
     }
 }
 
