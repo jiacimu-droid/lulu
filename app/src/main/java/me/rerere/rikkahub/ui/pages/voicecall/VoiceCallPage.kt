@@ -562,7 +562,7 @@ fun VoiceCallPage(
                         asrStatus = asrState.status,
                     )
                     val canInterruptAssistant =
-                        stage == CallStage.Active && !sleepMode && (isSpeaking || assistantTurnInProgress)
+                        stage in setOf(CallStage.Connecting, CallStage.Active) && !sleepMode && (isSpeaking || assistantTurnInProgress)
                     FilledTonalButton(
                         onClick = {
                             if (canInterruptAssistant) {
