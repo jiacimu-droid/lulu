@@ -304,7 +304,11 @@ class RouteActivity : ComponentActivity() {
                 ),
             )
         }
-        ProactiveCallManager.dismissIncomingCall(this)
+        if (autoStart) {
+            ProactiveCallManager.markAnswered(this, assistantId)
+        } else {
+            ProactiveCallManager.dismissIncomingCall(this)
+        }
         return true
     }
 
