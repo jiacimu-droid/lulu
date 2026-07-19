@@ -639,7 +639,7 @@ fun VoiceCallPage(
                     ) {
                         FilledTonalButton(
                             onClick = {
-                                ProactiveCallManager.dismissIncomingCall(context)
+                                ProactiveCallManager.markDeclined(context, assistantId)
                                 endCall()
                                 navController.popBackStack()
                             },
@@ -650,7 +650,7 @@ fun VoiceCallPage(
                         }
                         Button(
                             onClick = {
-                                ProactiveCallManager.dismissIncomingCall(context)
+                                ProactiveCallManager.markAnswered(context, assistantId)
                                 startCall()
                             },
                             modifier = Modifier.weight(1f).height(58.dp),
