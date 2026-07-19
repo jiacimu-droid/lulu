@@ -1133,6 +1133,11 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                 val activeTools = allTools.activeModelTools()
                 val nowMillis = System.currentTimeMillis()
                 val screenInteractive = (getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
+                val recentCallOutcome = ProactiveCallManager.recentOutcomeContext(
+                    context = this@ProactiveMessageTriggerService,
+                    assistantId = assistantUuid.toString(),
+                    nowMillis = nowMillis,
+                )
                 val passiveFacts = collectCompanionPassivePerceptionFacts(
                     tools = allTools,
                     observedAt = nowMillis,
@@ -1140,6 +1145,14 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     key = "perception.screen_interactive",
                     value = screenInteractive.toString(),
                     observedAt = nowMillis,
+                ) + listOfNotNull(
+                    recentCallOutcome?.let { outcome ->
+                        CompanionContextFact(
+                            key = "interaction.recent_proactive_call_outcome",
+                            value = outcome,
+                            observedAt = nowMillis,
+                        )
+                    },
                 )
                 val latestDeviceActivityAt = latestForegroundUsageAt(passiveFacts)
                 val memoryQuery = listOfNotNull(
