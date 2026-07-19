@@ -43,7 +43,6 @@ import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.voicecall.ProactiveCallManager
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.CardGroup
-import me.rerere.rikkahub.ui.context.LocalNavController
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.utils.plus
 import org.koin.androidx.compose.koinViewModel
@@ -57,7 +56,6 @@ fun AssistantCallSettingsPage(id: String) {
     val vm: AssistantDetailVM = koinViewModel(parameters = { parametersOf(id) })
     val assistant by vm.assistant.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val navController = LocalNavController.current
     val settingsStore = koinInject<SettingsStore>()
     val conversationRepository = koinInject<ConversationRepository>()
     val scope = rememberCoroutineScope()
