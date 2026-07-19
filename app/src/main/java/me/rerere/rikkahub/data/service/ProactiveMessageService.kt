@@ -1278,7 +1278,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                                 mindState = if (completed) "还在回味刚才的选择" else "记着这次没有完成",
                                 activityMode = if (completed) "playing" else "waiting",
                                 selfScene = if (completed) {
-                                    "${assistant.name.ifBlank { "当前角色" }}刚刚在 App 里真实完成了一局信号寻踪，结果已经留在生活记录里。"
+                                    "${assistant.name.ifBlank { "当前角色" }}刚刚在 App 里真实完成了${activityEvent?.title?.takeIf { it.isNotBlank() } ?: "一局小游戏"}，结果已经留在生活记录里。"
                                 } else {
                                     "${assistant.name.ifBlank { "当前角色" }}刚才尝试进行一次自己的数字活动，但没有把它说成已经完成。"
                                 },
