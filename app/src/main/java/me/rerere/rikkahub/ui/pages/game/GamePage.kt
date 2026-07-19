@@ -667,7 +667,6 @@ fun PerfectManGamePage() {
         isGenerating = true
         opponentLine = GAME_GENERATING_MARKER
         scope.launch {
-            val fallbackGuess = PerfectManGuess.estimate(description)
             val reply = generatePerfectManText(
                 prompt = "你现在坐在用户对面猜分。真实分数是 $targetScore/10，只用来校准你的猜测。" +
                     "用户给你的描述是：$description\n" +
@@ -684,7 +683,12 @@ fun PerfectManGamePage() {
             }
             val guess = Regex("""(\d{1,2})\s*分""").find(reply)?.groupValues?.getOrNull(1)?.toIntOrNull()
                 ?.coerceIn(0, 10)
-                ?: fallbackGuess
+            if (guess == null) {
+                generatedPrompt = ""
+                opponentLine = GAME_REPLY_FORMAT_FAILURE_MARKER
+                isGenerating = false
+                return@launch
+            }
             generatedPrompt = reply
             opponentLine = reply
             val nextResult = RoundResult(
@@ -1139,6 +1143,7 @@ private fun actionTitle(phase: PerfectManPhase, promptReady: Boolean): String =
 private const val GAME_WAITING_MARKER = "（选择角色并开始这一轮）"
 private const val GAME_GENERATING_MARKER = "（正在生成角色回应）"
 private const val GAME_REPLY_FAILURE_MARKER = "（本轮角色回复生成失败，请重试）"
+private const val GAME_REPLY_FORMAT_FAILURE_MARKER = "（本轮角色回复缺少有效分数，请重试）"
 
 private enum class VoiceInputTarget {
     Flaw,
