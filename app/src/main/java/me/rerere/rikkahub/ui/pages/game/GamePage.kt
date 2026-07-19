@@ -123,7 +123,7 @@ fun GameHubPage() {
         .filter { event ->
             event.type == CompanionLifeEventType.GAME &&
                 event.status == CompanionLifeEventStatus.COMPLETED &&
-                event.detailsJson.isNotBlank()
+                event.detailsJson.contains("\"game\":\"signal_hunt\"")
         }
         .maxByOrNull { it.endedAt ?: it.startedAt }
     val latestSignalAssistant = latestSignalEvent?.let { event ->
@@ -139,14 +139,32 @@ fun GameHubPage() {
             ),
             GameTile(
                 title = "满分男",
-                subtitle = "满分的人，离谱的缺点，猜对方会扣几分",
+                subtitle = "轮流描述和猜分，角色会按自己的人设参与",
                 enabled = true,
                 onClick = { navController.navigate(Screen.PerfectManGame) },
             ),
-        ) + List(6) { index ->
             GameTile(
-                title = "小游戏 ${index + 2}",
-                subtitle = "慢慢补充",
+                title = "一起猜拳",
+                subtitle = "你和角色同时出手，对局会成为共同经历",
+                enabled = true,
+                onClick = { navController.navigate(Screen.QuickCompanionGame("rock_paper_scissors")) },
+            ),
+            GameTile(
+                title = "骰子对决",
+                subtitle = "双方各掷一次骰子，看看这一轮谁的点数更高",
+                enabled = true,
+                onClick = { navController.navigate(Screen.QuickCompanionGame("dice_duel")) },
+            ),
+            GameTile(
+                title = "井字棋",
+                subtitle = "你执 X、角色执 O，角色会取胜也会主动拦截",
+                enabled = true,
+                onClick = { navController.navigate(Screen.QuickCompanionGame("tic_tac_toe")) },
+            ),
+        ) + List(3) { index ->
+            GameTile(
+                title = "待解锁游戏 ${index + 1}",
+                subtitle = "后续继续扩展",
                 enabled = false,
                 onClick = {},
             )
@@ -800,7 +818,7 @@ private fun GameHero() {
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                 )
-                Text("先放轻量局，后面慢慢补小游戏。", color = Color.White.copy(alpha = 0.84f))
+                Text("和角色一起玩，完成的对局会进入真实共同经历。", color = Color.White.copy(alpha = 0.84f))
             }
         }
     }
@@ -1181,7 +1199,7 @@ private object PerfectManGuess {
     }
 }
 
-private object GameColors {
+internal object GameColors {
     val background = Color(0xFFF8F4F0)
     val accent = Color(0xFF8B3D5E)
     val success = Color(0xFF2E8B68)
