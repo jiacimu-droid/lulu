@@ -118,6 +118,7 @@ import me.rerere.hugeicons.stroke.Package
 import me.rerere.hugeicons.stroke.Play
 import me.rerere.hugeicons.stroke.StopCircle
 import me.rerere.rikkahub.Screen
+import me.rerere.rikkahub.data.datastore.PomodoroTheme
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.getAssistantTTSProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
@@ -484,6 +485,7 @@ fun StudyPomodoroPage() {
     var minutes by remember { mutableIntStateOf(25) }
     var customMinutes by remember { mutableStateOf("") }
     var taskText by remember { mutableStateOf("") }
+    var showThemePicker by remember { mutableStateOf(false) }
     val voiceEnabled = settings.pomodoroVoiceEnabled
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -493,6 +495,9 @@ fun StudyPomodoroPage() {
             LargeFlexibleTopAppBar(
                 title = { Text("番茄钟") },
                 navigationIcon = { BackButton() },
+                actions = {
+                    TextButton(onClick = { showThemePicker = true }) { Text("配色") }
+                },
                 scrollBehavior = scrollBehavior,
                 colors = CustomColors.topBarColors,
             )
@@ -561,6 +566,15 @@ fun StudyPomodoroPage() {
             }
         }
     }
+    if (showThemePicker) {
+        PomodoroThemePickerDialog(
+            selected = settings.pomodoroTheme,
+            onSelect = { theme ->
+                scope.launch { settingsStore.update { it.copy(pomodoroTheme = theme) } }
+            },
+            onDismiss = { showThemePicker = false },
+        )
+    }
 }
 
 @Composable
@@ -575,6 +589,7 @@ fun StudyPomodoroFocusPage(
     val assistant = settings.getCurrentAssistant()
     val chatService: ChatService = koinInject()
     val conversationRepository = koinInject<ConversationRepository>()
+    val settingsStore = koinInject<SettingsStore>()
     val tts = LocalTTSState.current
     val scope = rememberCoroutineScope()
     val safeMinutes = minutes.coerceAtLeast(1)
@@ -586,6 +601,8 @@ fun StudyPomodoroFocusPage(
     var userLine by remember { mutableStateOf("") }
     var coachReply by remember { mutableStateOf("") }
     var waitingReply by remember { mutableStateOf(false) }
+    var showThemePicker by remember { mutableStateOf(false) }
+    val focusPalette = focusPalette(settings.pomodoroTheme)
     val studiedSeconds = (totalSeconds - remainingSeconds).coerceIn(0, totalSeconds)
 
     fun finishPomodoro(early: Boolean) {
@@ -660,14 +677,21 @@ fun StudyPomodoroFocusPage(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(focusBrush()),
+            .background(focusBrush(settings.pomodoroTheme)),
     ) {
+        TextButton(
+            onClick = { showThemePicker = true },
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 12.dp, end = 12.dp),
+            colors = ButtonDefaults.textButtonColors(contentColor = focusPalette.primaryText),
+        ) {
+            Text("配色", fontWeight = FontWeight.SemiBold)
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        listOf(Color.White.copy(alpha = 0.18f), Color.Transparent, Color(0xFF5C6B7D).copy(alpha = 0.06f))
+                        listOf(focusPalette.topGlow, Color.Transparent, focusPalette.bottomGlow)
                     )
                 )
                 .padding(horizontal = 22.dp, vertical = 24.dp)
@@ -679,17 +703,19 @@ fun StudyPomodoroFocusPage(
                 timeText = secondsText(remainingSeconds),
                 task = task.ifBlank { "专注这一轮" },
                 progress = remainingSeconds.toFloat() / totalSeconds.coerceAtLeast(1),
+                palette = focusPalette,
             )
             Spacer(Modifier.height(12.dp))
             Text(
                 "已学习 ${studyDurationText(studiedSeconds)}",
-                color = Color(0xFF445063),
+                color = focusPalette.secondaryText,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
             )
             OutlinedButton(
                 onClick = { finishPomodoro(early = true) },
                 enabled = !finished,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = focusPalette.primaryText),
             ) {
                 Icon(HugeIcons.StopCircle, null)
                 Spacer(Modifier.width(8.dp))
@@ -700,7 +726,7 @@ fun StudyPomodoroFocusPage(
                 Text(
                     text = if (waitingReply) "正在回复..." else coachReply,
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF445063),
+                    color = focusPalette.primaryText,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                 )
@@ -710,6 +736,7 @@ fun StudyPomodoroFocusPage(
                 userLine = userLine,
                 chatText = chatText,
                 assistantName = assistant.name.ifBlank { "当前角色" },
+                palette = focusPalette,
                 onChatChange = { chatText = it },
                 onSend = {
                     val text = chatText.trim()
@@ -742,6 +769,15 @@ fun StudyPomodoroFocusPage(
                 },
             )
         }
+    }
+    if (showThemePicker) {
+        PomodoroThemePickerDialog(
+            selected = settings.pomodoroTheme,
+            onSelect = { theme ->
+                scope.launch { settingsStore.update { it.copy(pomodoroTheme = theme) } }
+            },
+            onDismiss = { showThemePicker = false },
+        )
     }
 }
 
