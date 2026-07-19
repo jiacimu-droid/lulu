@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -74,6 +75,7 @@ import me.rerere.rikkahub.Screen
 import me.rerere.rikkahub.data.datastore.getAssistantTTSProvider
 import me.rerere.rikkahub.data.datastore.getAssistantById
 import me.rerere.rikkahub.data.model.Avatar
+import me.rerere.rikkahub.data.voicecall.ProactiveCallManager
 import me.rerere.rikkahub.data.voicecall.VoiceCallLine
 import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
 import me.rerere.rikkahub.data.voicecall.VoiceCallRole
@@ -103,6 +105,7 @@ import kotlin.uuid.Uuid
 
 private enum class CallStage {
     Idle,
+    Ringing,
     Connecting,
     Active,
     Ended,
@@ -113,6 +116,9 @@ fun VoiceCallPage(
     conversationId: String,
     assistantId: String,
     sessionId: String? = null,
+    incomingCall: Boolean = false,
+    autoStart: Boolean = false,
+    incomingReason: String = "",
 ) {
     val navController = LocalNavController.current
     val settings = LocalSettings.current
@@ -133,7 +139,15 @@ fun VoiceCallPage(
     val assistantName = assistant?.name?.ifBlank { "对方" } ?: "对方"
     val isHistoryOnly = sessionId != null
     var session by remember(sessionId, conversationId, assistantId) { mutableStateOf<VoiceCallSession?>(null) }
-    var stage by remember(sessionId) { mutableStateOf(if (isHistoryOnly) CallStage.Ended else CallStage.Idle) }
+    var stage by remember(sessionId, incomingCall) {
+        mutableStateOf(
+            when {
+                isHistoryOnly -> CallStage.Ended
+                incomingCall -> CallStage.Ringing
+                else -> CallStage.Idle
+            },
+        )
+    }
     var showMiniWindow by remember { mutableStateOf(false) }
     var sleepMode by remember { mutableStateOf(false) }
     var sleepMinutes by remember { mutableLongStateOf(20L) }
@@ -210,7 +224,7 @@ fun VoiceCallPage(
     }
 
     fun startCall() {
-        if (isHistoryOnly || stage != CallStage.Idle) return
+        if (isHistoryOnly || stage !in setOf(CallStage.Idle, CallStage.Ringing)) return
         VoiceCallForegroundService.start(context.applicationContext, assistantName)
         stage = CallStage.Connecting
         assistantGenerationJob?.cancel()
@@ -229,6 +243,7 @@ fun VoiceCallPage(
                         assistantName = assistantName,
                         recentOpenings = recentOpenings,
                         variationSeed = System.currentTimeMillis(),
+                        incomingReason = incomingReason.takeIf(String::isNotBlank),
                     ),
                     visibleUserText = null,
                     onPartialReply = streamSpeaker,
@@ -240,6 +255,7 @@ fun VoiceCallPage(
                             recentOpenings = recentOpenings,
                             variationSeed = System.currentTimeMillis() + 1L,
                             retry = true,
+                            incomingReason = incomingReason.takeIf(String::isNotBlank),
                         ),
                         visibleUserText = null,
                         onPartialReply = streamSpeaker,
@@ -367,6 +383,13 @@ fun VoiceCallPage(
                 initialLines = emptyList(),
                 persistImmediately = false,
             )
+    }
+
+    LaunchedEffect(autoStart, incomingCall, session?.id) {
+        if (autoStart && incomingCall && session != null && stage == CallStage.Ringing) {
+            ProactiveCallManager.dismissIncomingCall(context)
+            startCall()
+        }
     }
 
     LaunchedEffect(isSpeaking, stage, sleepMode, assistantTurnInProgress, asrState.status) {
@@ -978,6 +1001,7 @@ private fun statusText(
 ): String {
     if (isHistoryOnly) return "已保存的通话记录"
     if (stage == CallStage.Idle) return "准备通话"
+    if (stage == CallStage.Ringing) return "正在呼叫你"
     if (sleepMode) return "哄睡中"
     if (stage == CallStage.Connecting) return "正在接通"
     if (stage == CallStage.Ended) return "已挂断"
@@ -1049,6 +1073,7 @@ private fun miniStatusText(stage: CallStage, isSpeaking: Boolean): String {
     if (isSpeaking) return "正在说话"
     return when (stage) {
         CallStage.Idle -> "待机"
+        CallStage.Ringing -> "来电中"
         CallStage.Connecting -> "接通中"
         CallStage.Active -> "通话中"
         CallStage.Ended -> "已挂断"
@@ -1060,13 +1085,19 @@ internal fun buildVoiceCallOpeningPrompt(
     recentOpenings: List<String> = emptyList(),
     variationSeed: Long = 0L,
     retry: Boolean = false,
+    incomingReason: String? = null,
 ): String {
     val recent = recentOpenings
         .take(6)
         .joinToString("\n") { "- ${it.take(180)}" }
         .ifBlank { "- 无" }
+    val callOrigin = if (incomingReason.isNullOrBlank()) {
+        "这是用户刚打来的一通语音电话，现在已经接通。"
+    } else {
+        "这是你根据自己的判断主动打给用户的一通语音电话，用户刚刚接听。你决定来电时的内部理由是：$incomingReason。理由只帮助你保持动机连续，不要求逐字说出。"
+    }
     return """
-        这是用户刚打来的一通语音电话，现在已经接通。
+        $callOrigin
         你是用户设定的“$assistantName”。最高优先级是完整遵守该角色原本的人设、关系类型、边界、世界观和说话方式；电话场景不能把角色改写成默认温柔、亲密或恋爱型陪伴者。
         请结合跨聊天与电话的最近上下文，像同一个人自然接起电话。若上次有未说完的话、明确立场或承诺，可以顺势承接，但不要复述记忆资料。
         主动说第一句话，1到2句，只输出真正说出口的话，不要动作、心理、环境、标签或后台说明。
