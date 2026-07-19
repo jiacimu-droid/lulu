@@ -490,7 +490,9 @@ fun reduceCompanionRuntimeState(
         ?: existing.state
     val nextContinuity = mutation.continuity
         ?.takeIf { candidate -> candidate.updatedAt >= existing.continuity.updatedAt }
-        ?.copy(updatedAt = maxOf(mutation.continuity.updatedAt, mutation.nowMillis))
+        ?.let { candidate ->
+            candidate.copy(updatedAt = maxOf(candidate.updatedAt, mutation.nowMillis))
+        }
         ?: existing.continuity
     val nextStateHistory = if (
         mutation.state != null &&
