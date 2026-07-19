@@ -884,6 +884,24 @@ class ChatService(
                 )
                 updateConversation(conversationId, updated)
                 saveConversation(conversationId, updated)
+                val settings = settingsStore.settingsFlow.first()
+                val assistant = settings.getAssistantById(updated.assistantId)
+                    ?: settings.getCurrentAssistant()
+                val snapshot = companionRuntime.snapshot(assistant.id.toString())
+                val nowMillis = System.currentTimeMillis()
+                companionRuntime.applyTurn(
+                    CompanionTurnMutation(
+                        assistantId = assistant.id.toString(),
+                        continuity = CompanionContinuity(
+                            conversationId = conversationId.toString(),
+                            modality = CompanionInteractionModality.PROACTIVE,
+                            lastUserText = snapshot.continuity.lastUserText,
+                            lastAssistantText = aiMessage.toText().take(800),
+                            updatedAt = nowMillis,
+                        ),
+                        nowMillis = nowMillis,
+                    ),
+                )
             } catch (e: Exception) {
                 Log.e(TAG, "addProactiveMessage failed, conversationId=$conversationId", e)
             }
