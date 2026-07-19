@@ -2175,7 +2175,7 @@ private fun GachaCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(590.dp)
+                .height(650.dp)
                 .clip(RoundedCornerShape(28.dp)),
         ) {
             StarryLetterBackdrop(Modifier.fillMaxSize())
