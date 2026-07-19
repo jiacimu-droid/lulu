@@ -21,7 +21,6 @@ import me.rerere.rikkahub.RouteActivity
 import me.rerere.rikkahub.data.datastore.ProactiveCallSetting
 import me.rerere.rikkahub.data.datastore.shouldUseProactiveCallChannel
 import java.time.LocalDateTime
-import kotlin.math.absoluteValue
 
 object ProactiveCallManager {
     const val ACTION_INCOMING_CALL = "me.rerere.rikkahub.action.PROACTIVE_INCOMING_CALL"
@@ -51,7 +50,7 @@ object ProactiveCallManager {
         if (!setting.allowMobileData && !isOnWifi(context)) return false
         val lastCall = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getLong(KEY_LAST_CALL_PREFIX + assistantId, 0L)
-        val selector = ((nowMillis / 60_000L).hashCode() xor assistantId.hashCode()).absoluteValue % 100
+        val selector = (((nowMillis / 60_000L).hashCode() xor assistantId.hashCode()) and Int.MAX_VALUE) % 100
         return shouldUseProactiveCallChannel(
             setting = setting,
             localHour = LocalDateTime.now().hour,
@@ -80,7 +79,7 @@ object ProactiveCallManager {
             autoStart = false,
         )
         if (ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-            markCallOffered(appContext, assistantId)
+            markCallOffered(appContext, assistantId, countForCooldown = !force)
             appContext.startActivity(ringingIntent)
             return true
         }
@@ -143,7 +142,7 @@ object ProactiveCallManager {
             builder.setFullScreenIntent(ringingPendingIntent, true)
         }
         NotificationManagerCompat.from(appContext).notify(NOTIFICATION_ID, builder.build())
-        markCallOffered(appContext, assistantId)
+        markCallOffered(appContext, assistantId, countForCooldown = !force)
         return true
     }
 
@@ -224,11 +223,17 @@ object ProactiveCallManager {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 
-    private fun markCallOffered(context: Context, assistantId: String) {
+    private fun markCallOffered(
+        context: Context,
+        assistantId: String,
+        countForCooldown: Boolean,
+    ) {
         val now = System.currentTimeMillis()
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
-            .putLong(KEY_LAST_CALL_PREFIX + assistantId, now)
+            .apply {
+                if (countForCooldown) putLong(KEY_LAST_CALL_PREFIX + assistantId, now)
+            }
             .putString(KEY_PENDING_ASSISTANT, assistantId)
             .putLong(KEY_PENDING_AT, now)
             .remove(KEY_OUTCOME_ASSISTANT)
