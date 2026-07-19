@@ -399,7 +399,6 @@ fun VoiceCallPage(
     LaunchedEffect(stage) {
         if (stage == CallStage.Ringing) {
             runCatching {
-                incomingRingtone?.isLooping = true
                 incomingRingtone?.play()
             }
         } else {
@@ -409,7 +408,7 @@ fun VoiceCallPage(
 
     LaunchedEffect(autoStart, incomingCall, session?.id) {
         if (autoStart && incomingCall && session != null && stage == CallStage.Ringing) {
-            ProactiveCallManager.dismissIncomingCall(context)
+            ProactiveCallManager.markAnswered(context, assistantId)
             startCall()
         }
     }
