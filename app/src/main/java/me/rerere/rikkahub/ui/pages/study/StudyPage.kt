@@ -954,8 +954,7 @@ private fun SectionChips(
 @Composable
 private fun TodayPomodoroLaunchCard(onClick: () -> Unit) {
     ElevatedCard(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         colors = CardDefaults.elevatedCardColors(containerColor = Color(0xFFF1F5FF)),
         shape = RoundedCornerShape(24.dp),
     ) {
