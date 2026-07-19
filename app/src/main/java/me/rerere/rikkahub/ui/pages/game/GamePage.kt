@@ -592,7 +592,7 @@ fun PerfectManGamePage() {
             chunk.usage?.let { usage ->
                 apiUsageStore.record(
                     source = ApiUsageSource.GAME,
-                    title = "满分男：${player?.name?.takeIf { it.isNotBlank() } ?: "默认 API"}",
+                    title = "满分男：${player.name.ifBlank { "当前角色" }}",
                     model = model.displayName.ifBlank { model.modelId },
                     provider = providerSetting.name.ifBlank { providerSetting.id.toString() },
                     usage = usage,
@@ -1179,18 +1179,6 @@ private val PerfectManExamples = listOf(
     "记得所有纪念日，但礼物永远买同款保温杯。",
     "声音特别好听，但睡前故事只讲刑法案例。",
 )
-
-private object PerfectManGuess {
-    fun estimate(description: String): Int {
-        val text = description.lowercase()
-        return when {
-            listOf("不洗", "骂", "抠", "油", "爹味", "恶心").any { it in text } -> Random.nextInt(0, 4)
-            listOf("但是", "不过", "有点", "偶尔", "一般").any { it in text } -> Random.nextInt(4, 8)
-            listOf("温柔", "帅", "会照顾", "稳定", "尊重", "好听").any { it in text } -> Random.nextInt(7, 11)
-            else -> Random.nextInt(3, 9)
-        }
-    }
-}
 
 internal object GameColors {
     val background = Color(0xFFF8F4F0)
