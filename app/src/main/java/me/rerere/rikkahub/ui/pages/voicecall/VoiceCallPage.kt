@@ -344,7 +344,7 @@ fun VoiceCallPage(
         lastTranscript = ""
         transcriptRevision++
         asr.start { transcript ->
-            if (userTurnSubmitting || stage != CallStage.Active) return@start
+            if (userTurnSubmitting || assistantTurnInProgress || stage != CallStage.Active) return@start
             val text = transcript.trim()
             if (text.isBlank() || text == lastTranscript) return@start
             lastTranscript = text
