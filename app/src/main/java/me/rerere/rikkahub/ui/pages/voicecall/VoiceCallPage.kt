@@ -1,5 +1,6 @@
 package me.rerere.rikkahub.ui.pages.voicecall
 
+import android.media.RingtoneManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -125,6 +126,14 @@ fun VoiceCallPage(
     val navController = LocalNavController.current
     val settings = LocalSettings.current
     val context = androidx.compose.ui.platform.LocalContext.current
+    val incomingRingtone = remember(context) {
+        runCatching {
+            RingtoneManager.getRingtone(
+                context.applicationContext,
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE),
+            )
+        }.getOrNull()
+    }
     val repository = remember(context) { VoiceCallRepository(context.applicationContext) }
     val chatService: ChatService = koinInject()
     val tts = LocalTTSState.current
@@ -387,6 +396,17 @@ fun VoiceCallPage(
             )
     }
 
+    LaunchedEffect(stage) {
+        if (stage == CallStage.Ringing) {
+            runCatching {
+                incomingRingtone?.isLooping = true
+                incomingRingtone?.play()
+            }
+        } else {
+            runCatching { incomingRingtone?.stop() }
+        }
+    }
+
     LaunchedEffect(autoStart, incomingCall, session?.id) {
         if (autoStart && incomingCall && session != null && stage == CallStage.Ringing) {
             ProactiveCallManager.dismissIncomingCall(context)
@@ -452,6 +472,7 @@ fun VoiceCallPage(
 
     DisposableEffect(Unit) {
         onDispose {
+            runCatching { incomingRingtone?.stop() }
             silenceJob?.cancel()
             sleepJob?.cancel()
             if (!isHistoryOnly) asr.stop()
