@@ -23,6 +23,8 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilledIconButton
@@ -507,11 +509,17 @@ fun VoiceCallPage(
                         Icon(HugeIcons.TransactionHistory, contentDescription = null)
                     }
                 },
-                colors = CustomColors.topBarColors,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF101522),
+                    scrolledContainerColor = Color(0xFF101522),
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White,
+                ),
                 scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
             )
         },
-        containerColor = CustomColors.topBarColors.containerColor,
+        containerColor = Color(0xFF101522),
     ) { padding ->
         if (currentSession == null) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -521,7 +529,15 @@ fun VoiceCallPage(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFF101522), Color(0xFF1A2233), Color(0xFF0C111C)),
+                    ),
+                )
+                .padding(horizontal = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -529,11 +545,13 @@ fun VoiceCallPage(
             UIAvatar(
                 name = assistantName,
                 value = assistant?.avatar ?: Avatar.Dummy,
-                modifier = Modifier.size(84.dp),
+                modifier = Modifier.size(128.dp),
             )
             Text(
                 text = assistantName,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -547,10 +565,37 @@ fun VoiceCallPage(
                     isHistoryOnly = isHistoryOnly,
                 ),
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = Color(0xFFB8C7D9),
             )
 
-            CallContentCard(
+            if (stage == CallStage.Ringing) {
+                Surface(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    color = Color.White.copy(alpha = 0.06f),
+                    shape = MaterialTheme.shapes.extraLarge,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.padding(24.dp),
+                        ) {
+                            Text(
+                                "语音来电",
+                                color = Color.White,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Text(
+                                "接听后会从最近的聊天和共同经历自然继续。",
+                                color = Color(0xFFB8C7D9),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
+                }
+            } else {
+                CallContentCard(
                 stage = stage,
                 isHistoryOnly = isHistoryOnly,
                 assistantName = assistantName,
@@ -562,60 +607,96 @@ fun VoiceCallPage(
                     }
                 },
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-            )
+                )
+            }
 
             if (!isHistoryOnly) {
-                SleepModePanel(
-                    enabled = sleepMode,
-                    minutes = sleepMinutes,
-                    onEnabledChange = { sleepMode = it },
-                    onMinutesChange = { sleepMinutes = it },
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    val canStartListening = shouldStartVoiceCallListening(
-                        stageActive = stage == CallStage.Active,
-                        isHistoryOnly = isHistoryOnly,
-                        sleepMode = sleepMode,
-                        assistantTurnInProgress = assistantTurnInProgress,
-                        isSpeaking = isSpeaking,
-                        asrStatus = asrState.status,
-                    )
-                    val canInterruptAssistant =
-                        stage in setOf(CallStage.Connecting, CallStage.Active) && !sleepMode && (isSpeaking || assistantTurnInProgress)
-                    FilledTonalButton(
-                        onClick = {
-                            if (canInterruptAssistant) {
-                                silenceJob?.cancel()
-                                assistantGenerationJob?.cancel()
-                                tts.stop()
-                                assistantTurnInProgress = false
-                            } else if (asrState.status == ASRStatus.Idle || asrState.status == ASRStatus.Error) {
-                                startListening()
-                            } else {
-                                asr.stop()
-                            }
-                        },
-                        enabled = asrState.status == ASRStatus.Listening || canStartListening || canInterruptAssistant,
+                if (stage == CallStage.Ringing) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(18.dp),
                     ) {
-                        Icon(HugeIcons.VolumeHigh, contentDescription = null)
-                        Text(
-                            when {
-                                canInterruptAssistant -> "打断并说话"
-                                asrState.status == ASRStatus.Listening -> "停止倾听"
-                                else -> "开始倾听"
+                        FilledTonalButton(
+                            onClick = {
+                                ProactiveCallManager.dismissIncomingCall(context)
+                                endCall()
+                                navController.popBackStack()
                             },
-                        )
+                            modifier = Modifier.weight(1f).height(58.dp),
+                        ) {
+                            Icon(HugeIcons.Cancel01, contentDescription = null)
+                            Text("拒绝")
+                        }
+                        Button(
+                            onClick = {
+                                ProactiveCallManager.dismissIncomingCall(context)
+                                startCall()
+                            },
+                            modifier = Modifier.weight(1f).height(58.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF6F91B2),
+                                contentColor = Color.White,
+                            ),
+                        ) {
+                            Icon(HugeIcons.Call02, contentDescription = null)
+                            Text("接听")
+                        }
                     }
-                    FilledIconButton(
-                        onClick = { endCall() },
-                        enabled = stage != CallStage.Idle,
-                        modifier = Modifier.size(58.dp),
+                } else {
+                    SleepModePanel(
+                        enabled = sleepMode,
+                        minutes = sleepMinutes,
+                        onEnabledChange = { sleepMode = it },
+                        onMinutesChange = { sleepMinutes = it },
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(HugeIcons.Cancel01, contentDescription = null)
+                        val canStartListening = shouldStartVoiceCallListening(
+                            stageActive = stage == CallStage.Active,
+                            isHistoryOnly = isHistoryOnly,
+                            sleepMode = sleepMode,
+                            assistantTurnInProgress = assistantTurnInProgress,
+                            isSpeaking = isSpeaking,
+                            asrStatus = asrState.status,
+                        )
+                        val canInterruptAssistant =
+                            stage in setOf(CallStage.Connecting, CallStage.Active) &&
+                                !sleepMode &&
+                                (isSpeaking || assistantTurnInProgress)
+                        FilledTonalButton(
+                            onClick = {
+                                if (canInterruptAssistant) {
+                                    silenceJob?.cancel()
+                                    assistantGenerationJob?.cancel()
+                                    tts.stop()
+                                    assistantTurnInProgress = false
+                                } else if (asrState.status == ASRStatus.Idle || asrState.status == ASRStatus.Error) {
+                                    startListening()
+                                } else {
+                                    asr.stop()
+                                }
+                            },
+                            enabled = asrState.status == ASRStatus.Listening || canStartListening || canInterruptAssistant,
+                        ) {
+                            Icon(HugeIcons.VolumeHigh, contentDescription = null)
+                            Text(
+                                when {
+                                    canInterruptAssistant -> "打断并说话"
+                                    asrState.status == ASRStatus.Listening -> "停止倾听"
+                                    else -> "开始倾听"
+                                },
+                            )
+                        }
+                        FilledIconButton(
+                            onClick = { endCall() },
+                            enabled = stage !in setOf(CallStage.Idle, CallStage.Ringing),
+                            modifier = Modifier.size(58.dp),
+                        ) {
+                            Icon(HugeIcons.Cancel01, contentDescription = null)
+                        }
                     }
                 }
             }
