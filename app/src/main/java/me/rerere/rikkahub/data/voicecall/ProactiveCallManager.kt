@@ -66,11 +66,6 @@ object ProactiveCallManager {
     ): Boolean {
         if (!force && !shouldOffer(context, assistantId, setting)) return false
         val appContext = context.applicationContext
-        appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putLong(KEY_LAST_CALL_PREFIX + assistantId, System.currentTimeMillis())
-            .apply()
-
         val ringingIntent = routeIntent(
             context = appContext,
             assistantId = assistantId,
@@ -80,6 +75,7 @@ object ProactiveCallManager {
             autoStart = false,
         )
         if (ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            markCallOffered(appContext, assistantId)
             appContext.startActivity(ringingIntent)
             return true
         }
@@ -141,6 +137,7 @@ object ProactiveCallManager {
             builder.setFullScreenIntent(ringingPendingIntent, true)
         }
         NotificationManagerCompat.from(appContext).notify(NOTIFICATION_ID, builder.build())
+        markCallOffered(appContext, assistantId)
         return true
     }
 
@@ -163,6 +160,13 @@ object ProactiveCallManager {
         putExtra(EXTRA_REASON, reason)
         putExtra(EXTRA_AUTO_START, autoStart)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+    }
+
+    private fun markCallOffered(context: Context, assistantId: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putLong(KEY_LAST_CALL_PREFIX + assistantId, System.currentTimeMillis())
+            .apply()
     }
 
     private fun isOnWifi(context: Context): Boolean {
