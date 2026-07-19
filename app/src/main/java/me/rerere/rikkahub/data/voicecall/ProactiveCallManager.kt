@@ -34,6 +34,11 @@ object ProactiveCallManager {
 
     private const val PREFS_NAME = "proactive_call_state"
     private const val KEY_LAST_CALL_PREFIX = "last_call:"
+    private const val KEY_PENDING_ASSISTANT = "pending_assistant"
+    private const val KEY_PENDING_AT = "pending_at"
+    private const val KEY_OUTCOME_ASSISTANT = "outcome_assistant"
+    private const val KEY_OUTCOME = "outcome"
+    private const val KEY_OUTCOME_AT = "outcome_at"
     private const val NOTIFICATION_ID = 2411
     private const val RING_TIMEOUT_MILLIS = 60_000L
 
@@ -94,6 +99,7 @@ object ProactiveCallManager {
             .build()
         val declineIntent = Intent(appContext, ProactiveCallActionReceiver::class.java).apply {
             action = ACTION_DECLINE_CALL
+            putExtra(EXTRA_ASSISTANT_ID, assistantId)
         }
         val declinePendingIntent = PendingIntent.getBroadcast(
             appContext,
@@ -145,6 +151,62 @@ object ProactiveCallManager {
         NotificationManagerCompat.from(context.applicationContext).cancel(NOTIFICATION_ID)
     }
 
+    fun markAnswered(context: Context, assistantId: String) {
+        dismissIncomingCall(context)
+        context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_PENDING_ASSISTANT)
+            .remove(KEY_PENDING_AT)
+            .remove(KEY_OUTCOME_ASSISTANT)
+            .remove(KEY_OUTCOME)
+            .remove(KEY_OUTCOME_AT)
+            .apply()
+    }
+
+    fun markDeclined(context: Context, assistantId: String) {
+        dismissIncomingCall(context)
+        val now = System.currentTimeMillis()
+        context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_PENDING_ASSISTANT)
+            .remove(KEY_PENDING_AT)
+            .putString(KEY_OUTCOME_ASSISTANT, assistantId)
+            .putString(KEY_OUTCOME, "用户拒绝了上一次主动来电")
+            .putLong(KEY_OUTCOME_AT, now)
+            .apply()
+    }
+
+    fun recentOutcomeContext(
+        context: Context,
+        assistantId: String,
+        nowMillis: Long = System.currentTimeMillis(),
+    ): String? {
+        val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val pendingAssistant = prefs.getString(KEY_PENDING_ASSISTANT, null)
+        val pendingAt = prefs.getLong(KEY_PENDING_AT, 0L)
+        if (
+            pendingAssistant == assistantId &&
+            pendingAt > 0L &&
+            nowMillis - pendingAt > RING_TIMEOUT_MILLIS
+        ) {
+            prefs.edit()
+                .remove(KEY_PENDING_ASSISTANT)
+                .remove(KEY_PENDING_AT)
+                .putString(KEY_OUTCOME_ASSISTANT, assistantId)
+                .putString(KEY_OUTCOME, "用户未接上一次主动来电")
+                .putLong(KEY_OUTCOME_AT, pendingAt + RING_TIMEOUT_MILLIS)
+                .apply()
+        }
+        val outcomeAssistant = prefs.getString(KEY_OUTCOME_ASSISTANT, null)
+        val outcomeAt = prefs.getLong(KEY_OUTCOME_AT, 0L)
+        return prefs.getString(KEY_OUTCOME, null)
+            ?.takeIf {
+                outcomeAssistant == assistantId &&
+                    outcomeAt > 0L &&
+                    nowMillis - outcomeAt <= 7L * 24L * 60L * 60L * 1_000L
+            }
+    }
+
     private fun routeIntent(
         context: Context,
         assistantId: String,
@@ -163,9 +225,15 @@ object ProactiveCallManager {
     }
 
     private fun markCallOffered(context: Context, assistantId: String) {
+        val now = System.currentTimeMillis()
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
-            .putLong(KEY_LAST_CALL_PREFIX + assistantId, System.currentTimeMillis())
+            .putLong(KEY_LAST_CALL_PREFIX + assistantId, now)
+            .putString(KEY_PENDING_ASSISTANT, assistantId)
+            .putLong(KEY_PENDING_AT, now)
+            .remove(KEY_OUTCOME_ASSISTANT)
+            .remove(KEY_OUTCOME)
+            .remove(KEY_OUTCOME_AT)
             .apply()
     }
 
@@ -179,7 +247,10 @@ object ProactiveCallManager {
 class ProactiveCallActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ProactiveCallManager.ACTION_DECLINE_CALL) {
-            ProactiveCallManager.dismissIncomingCall(context)
+            intent.getStringExtra(ProactiveCallManager.EXTRA_ASSISTANT_ID)
+                ?.takeIf(String::isNotBlank)
+                ?.let { assistantId -> ProactiveCallManager.markDeclined(context, assistantId) }
+                ?: ProactiveCallManager.dismissIncomingCall(context)
         }
     }
 }
