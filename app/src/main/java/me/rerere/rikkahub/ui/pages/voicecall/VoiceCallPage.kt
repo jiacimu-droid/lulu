@@ -197,7 +197,11 @@ fun VoiceCallPage(
             )
             settingsStore.update(nextSettings)
             if (enabled) {
-                ProactiveMessageService.scheduleNext(context, nextSettings.proactiveMessageSetting)
+                ProactiveMessageService.scheduleNext(
+                    context = context,
+                    settings = nextSettings,
+                    assistantId = targetAssistant.id,
+                )
             }
         }
     }
