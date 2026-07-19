@@ -1,5 +1,6 @@
 package me.rerere.rikkahub.ui.pages.setting
 
+import android.app.NotificationManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -220,6 +221,30 @@ fun SettingProactiveMessagePage(vm: SettingVM = koinInject()) {
                                 )
                             },
                         )
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            item(
+                                headlineContent = { Text("全屏来电系统权限") },
+                                supportingContent = {
+                                    val manager = context.getSystemService(NotificationManager::class.java)
+                                    Text(
+                                        if (manager.canUseFullScreenIntent()) {
+                                            "✅ 系统已允许锁屏全屏来电"
+                                        } else {
+                                            "⚠️ 系统尚未允许；仍会使用普通来电通知"
+                                        },
+                                    )
+                                },
+                                onClick = {
+                                    runCatching {
+                                        context.startActivity(
+                                            Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
+                                                data = Uri.parse("package:${context.packageName}")
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                        }
                         item(
                             headlineContent = { Text("最短来电间隔（小时）") },
                             supportingContent = {
