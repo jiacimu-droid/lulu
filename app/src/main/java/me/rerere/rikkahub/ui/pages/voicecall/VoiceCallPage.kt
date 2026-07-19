@@ -544,8 +544,8 @@ fun VoiceCallPage(
     val currentSession = session
     Scaffold(
         topBar = {
-            LargeFlexibleTopAppBar(
-                title = { Text(if (isHistoryOnly) "通话记录" else "语音通话") },
+            TopAppBar(
+                title = { Text(if (isHistoryOnly) "通话记录" else "") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(HugeIcons.ArrowLeft02, contentDescription = null)
@@ -577,7 +577,6 @@ fun VoiceCallPage(
                     navigationIconContentColor = Color.White,
                     actionIconContentColor = Color.White,
                 ),
-                scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
             )
         },
         containerColor = Color(0xFF101522),
@@ -628,6 +627,34 @@ fun VoiceCallPage(
                 style = MaterialTheme.typography.labelMedium,
                 color = Color(0xFFB8C7D9),
             )
+            if (!isHistoryOnly && stage != CallStage.Ringing && assistant != null) {
+                Surface(
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = 0.08f),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(start = 12.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Column(modifier = Modifier.weight(1f, fill = false)) {
+                            Text("角色主动来电", color = Color(0xFFEAF0FB), style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                if (assistant.proactiveCallSetting.enabled) "已开启 · 可在合适时主动联系" else "已关闭",
+                                color = Color(0xFF9EADC3),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
+                        Switch(
+                            checked = assistant.proactiveCallSetting.enabled,
+                            onCheckedChange = ::updateProactiveCallEnabled,
+                        )
+                        TextButton(onClick = { navController.navigate(Screen.SettingProactiveMessage) }) {
+                            Text("设置")
+                        }
+                    }
+                }
+            }
 
             if (stage == CallStage.Ringing) {
                 Surface(
@@ -704,12 +731,23 @@ fun VoiceCallPage(
                         }
                     }
                 } else {
-                    SleepModePanel(
-                        enabled = sleepMode,
-                        minutes = sleepMinutes,
-                        onEnabledChange = { sleepMode = it },
-                        onMinutesChange = { sleepMinutes = it },
-                    )
+                    if (sleepMode) {
+                        SleepModePanel(
+                            enabled = sleepMode,
+                            minutes = sleepMinutes,
+                            onEnabledChange = { sleepMode = it },
+                            onMinutesChange = { sleepMinutes = it },
+                        )
+                    } else {
+                        FilterChip(
+                            selected = false,
+                            onClick = { sleepMode = true },
+                            label = { Text("哄睡模式") },
+                            leadingIcon = {
+                                Icon(HugeIcons.Moon02, contentDescription = null, modifier = Modifier.size(18.dp))
+                            },
+                        )
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -841,7 +879,13 @@ private fun CallContentCard(
     onReplay: (VoiceCallLine) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier, colors = CustomColors.cardColorsOnSurfaceContainer) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.08f),
+            contentColor = Color(0xFFF5F7FC),
+        ),
+    ) {
         when {
             stage == CallStage.Idle && !isHistoryOnly -> IdleCallPanel(
                 assistantName = assistantName,
@@ -1012,7 +1056,7 @@ private fun TranscriptSegmentBubble(
     text: String,
     isUser: Boolean,
 ) {
-    val color = if (isUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
+    val color = if (isUser) Color(0xFF435F9B) else Color(0xFF222D43)
     Box(
         modifier = Modifier
             .widthIn(max = 280.dp)
@@ -1020,7 +1064,7 @@ private fun TranscriptSegmentBubble(
             .background(color)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Text(text = text, style = MaterialTheme.typography.bodyMedium)
+        Text(text = text, style = MaterialTheme.typography.bodyMedium, color = Color(0xFFF5F7FC))
     }
 }
 
@@ -1261,13 +1305,25 @@ internal fun isUsableVoiceCallReply(text: String?): Boolean {
         clean != "（本轮回复生成不完整，请重试）"
 }
 
+internal fun shouldCommitVoiceTranscript(
+    scheduledRevision: Long,
+    currentRevision: Long,
+    userTurnSubmitting: Boolean,
+    stageActive: Boolean,
+    transcript: String,
+): Boolean =
+    scheduledRevision == currentRevision &&
+        !userTurnSubmitting &&
+        stageActive &&
+        transcript.isNotBlank()
+
 internal fun voiceCallEndOfSpeechDelayMillis(transcript: String): Long {
     val clean = transcript.trim()
-    if (clean.lastOrNull() in setOf('。', '！', '？', '.', '!', '?')) return 850L
+    if (clean.lastOrNull() in setOf('。', '！', '？', '.', '!', '?')) return 1_250L
     return when {
-        clean.length <= 4 -> 1_450L
-        clean.length <= 12 -> 1_200L
-        else -> 1_000L
+        clean.length <= 4 -> 1_900L
+        clean.length <= 12 -> 1_750L
+        else -> 1_600L
     }
 }
 
