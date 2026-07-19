@@ -42,6 +42,7 @@ import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.voicecall.ProactiveCallManager
 import me.rerere.rikkahub.data.service.ProactiveMessageWorker
 import org.koin.compose.koinInject
+import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,10 +148,26 @@ fun SettingProactiveMessagePage(vm: SettingVM = koinInject()) {
                             Switch(
                                 checked = callSetting.enabled,
                                 onCheckedChange = { enabled ->
-                                    updateCallSetting(callSetting.copy(enabled = enabled))
-                                    if (enabled && !settings.proactiveMessageSetting.enabled) {
-                                        val proactive = settings.proactiveMessageSetting.copy(enabled = true)
-                                        vm.updateSettings(settings.copy(proactiveMessageSetting = proactive))
+                                    val proactive = if (enabled) {
+                                        settings.proactiveMessageSetting.copy(enabled = true)
+                                    } else {
+                                        settings.proactiveMessageSetting
+                                    }
+                                    vm.updateSettings(
+                                        settings.copy(
+                                            proactiveMessageSetting = proactive,
+                                            assistants = settings.assistants.map { assistant ->
+                                                if (assistant.id == currentAssistant.id) {
+                                                    assistant.copy(
+                                                        proactiveCallSetting = callSetting.copy(enabled = enabled),
+                                                    )
+                                                } else {
+                                                    assistant
+                                                }
+                                            },
+                                        ),
+                                    )
+                                    if (enabled) {
                                         ProactiveMessageService.scheduleNext(context, proactive)
                                     }
                                 },
