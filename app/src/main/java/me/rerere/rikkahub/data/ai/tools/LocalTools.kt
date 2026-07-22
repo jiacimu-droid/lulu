@@ -379,25 +379,37 @@ class LocalTools(private val context: Context) {
                     ?: error("content is required")
                 require(content.isNotBlank()) { "content is blank" }
                 val now = ZonedDateTime.now()
-                val cihaiSaved = runCatching {
+                val entry = CihaiEntry(
+                    assistantId = assistantId,
+                    kind = CihaiEntryKind.DIARY,
+                    title = params["title"]?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "角色日记" },
+                    content = content,
+                    emotion = params["mood"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+                    createdAt = now.toInstant().toEpochMilli(),
+                )
+                val saved = runCatching {
                     val koin = GlobalContext.get()
-                    koin.get<CihaiService>().addEntry(
-                        CihaiEntry(
+                    koin.get<CihaiService>().addEntry(entry)
+                    CompanionDigitalLifeActivityService(koin.get<CompanionStore>()).execute(
+                        CompanionDigitalActivityRequest(
                             assistantId = assistantId,
-                            kind = CihaiEntryKind.DIARY,
-                            title = params["title"]?.jsonPrimitive?.contentOrNull.orEmpty().ifBlank { "角色日记" },
-                            content = content,
-                            emotion = params["mood"]?.jsonPrimitive?.contentOrNull.orEmpty(),
-                            createdAt = now.toInstant().toEpochMilli(),
-                        )
+                            kind = CompanionDigitalActivityKind.PRIVATE_JOURNAL,
+                            title = entry.title,
+                            summary = "已写入一篇可查询的角色私人日记。",
+                            evidenceReference = "cihai_diary:" + entry.id,
+                            details = content,
+                            requestedAt = entry.createdAt,
+                        ),
                     )
-                }.isSuccess
+                }.getOrNull()
+                val success = saved?.status == CompanionLifeEventStatus.COMPLETED
                 listOf(
                     UIMessagePart.Text(
                         buildJsonObject {
-                            put("success", cihaiSaved)
-                            put("cihai_saved", cihaiSaved)
-                            put("message", "Cihai diary saved")
+                            put("success", success)
+                            put("cihai_saved", success)
+                            put("life_event_id", saved?.id.orEmpty())
+                            put("message", if (success) "Cihai diary and digital-life record saved" else "Diary persistence failed")
                         }.toString()
                     )
                 )
