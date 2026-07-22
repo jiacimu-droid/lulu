@@ -210,6 +210,8 @@ private val RESCHEDULE_MARKERS = setOf(
 data class CompanionTurnMutation(
     val assistantId: String,
     val state: CompanionState? = null,
+    val explainableState: CompanionExplainableState? = null,
+    val lifeAnchor: CompanionLifeAnchor? = null,
     val privateImpression: CompanionPrivateImpression? = null,
     val alwaysOnAnchors: List<CompanionAlwaysOnAnchor> = emptyList(),
     val cancelAlwaysOnAnchorIds: List<String> = emptyList(),
@@ -546,16 +548,35 @@ fun reduceCompanionRuntimeState(
         ?.takeIf { candidate -> candidate.updatedAt >= existing.state.updatedAt }
         ?.copy(updatedAt = maxOf(mutation.state.updatedAt, mutation.nowMillis))
         ?: existing.state
+    val nextExplainableState = mutation.explainableState
+        ?.takeIf { candidate -> candidate.updatedAt >= existing.explainableState.updatedAt }
+        ?.normalizedExplainableState()
+        ?: existing.explainableState
+    val nextLifeAnchor = reduceCompanionLifeAnchor(
+        current = existing.lifeAnchor,
+        incoming = mutation.lifeAnchor,
+        nowMillis = mutation.nowMillis,
+    )
     val nextContinuity = mutation.continuity
         ?.takeIf { candidate -> candidate.updatedAt >= existing.continuity.updatedAt }
         ?.let { candidate ->
             candidate.copy(updatedAt = maxOf(candidate.updatedAt, mutation.nowMillis))
         }
         ?: existing.continuity
-    val nextInteractionTimeline = reduceCompanionInteractionTimeline(
+    val reducedInteractionTimeline = reduceCompanionInteractionTimeline(
         current = existing.interactionTimeline,
         events = mutation.interactionEvents,
     )
+    val nextInteractionTimeline = if (nextLifeAnchor != existing.lifeAnchor) {
+        reducedInteractionTimeline.copy(
+            lastLifeAnchorUpdatedAt = maxOf(
+                reducedInteractionTimeline.lastLifeAnchorUpdatedAt ?: Long.MIN_VALUE,
+                mutation.nowMillis,
+            ),
+        )
+    } else {
+        reducedInteractionTimeline
+    }
     val nextStateHistory = if (
         mutation.state != null &&
         nextState.hasVisibleStateContent() &&
@@ -571,6 +592,8 @@ fun reduceCompanionRuntimeState(
     val updatedSnapshot = existing.copy(
         state = nextState,
         stateHistory = nextStateHistory,
+        explainableState = nextExplainableState,
+        lifeAnchor = nextLifeAnchor,
         neuroState = nextNeuroState,
         privateImpression = nextPrivateImpression,
         alwaysOnAnchors = nextAlwaysOnAnchors,
