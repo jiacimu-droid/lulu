@@ -146,6 +146,7 @@ import me.rerere.rikkahub.data.service.MemoryExtractionDirection
 import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.service.buildAffectiveMemoryExtractionPlan
 import me.rerere.rikkahub.data.service.buildSelectedConversationBranchId
+import me.rerere.rikkahub.data.service.firstSelectedBranchMutationSequence
 import me.rerere.rikkahub.data.service.classifySemanticMemoryExtraction
 import me.rerere.rikkahub.data.service.buildDeterministicMemoryCandidates
 import me.rerere.rikkahub.data.service.buildCompanionPrivateImpression
@@ -1732,6 +1733,9 @@ class ChatService(
                         assistantId = assistant.id.toString(),
                         conversationId = conversation.id.toString(),
                         includeSavedMemories = includeSavedMemories,
+                        selectedBranchIdAtSequence = { sequence ->
+                            buildSelectedConversationBranchId(conversation.messageNodes, sequence)
+                        },
                     )
                     val plan = buildAffectiveMemoryExtractionPlan(
                         messageNodes = conversation.messageNodes,
@@ -1765,6 +1769,9 @@ class ChatService(
                         assistantId = assistant.id.toString(),
                         conversationId = conversation.id.toString(),
                         includeSavedMemories = includeSavedMemories,
+                        selectedBranchIdAtSequence = { sequence ->
+                            buildSelectedConversationBranchId(conversation.messageNodes, sequence)
+                        },
                     )
                     val batchNodeIds = plan.turns.map { it.nodeId }
                     if (!processedAfter.containsAll(batchNodeIds)) {
@@ -1823,6 +1830,9 @@ class ChatService(
                     assistantId = assistant.id.toString(),
                     conversationId = conversationId.toString(),
                     includeSavedMemories = includeSavedMemorySources,
+                    selectedBranchIdAtSequence = { sequence ->
+                        buildSelectedConversationBranchId(conversation.messageNodes, sequence)
+                    },
                 )
                 val plan = buildAffectiveMemoryExtractionPlan(
                     messageNodes = conversation.messageNodes,
@@ -1839,12 +1849,18 @@ class ChatService(
                 val messageNodePositions = conversation.messageNodes
                     .mapIndexed { index, node -> node.id.toString() to index + 1 }
                     .toMap()
+                val batchStartSequence = batchNodeIds.mapNotNull(messageNodePositions::get).minOrNull() ?: 0
+                val batchEndSequence = batchNodeIds.mapNotNull(messageNodePositions::get).maxOrNull() ?: 0
+                val batchBranchId = buildSelectedConversationBranchId(
+                    conversation.messageNodes,
+                    batchEndSequence,
+                )
                 var extractionBatch = memoryBankService.beginExtractionBatch(
                     assistantId = assistant.id.toString(),
                     conversationId = conversationId.toString(),
-                    branchId = buildSelectedConversationBranchId(conversation.messageNodes),
-                    batchStartSequence = batchNodeIds.mapNotNull(messageNodePositions::get).minOrNull() ?: 0,
-                    batchEndSequence = batchNodeIds.mapNotNull(messageNodePositions::get).maxOrNull() ?: 0,
+                    branchId = batchBranchId,
+                    batchStartSequence = batchStartSequence,
+                    batchEndSequence = batchEndSequence,
                     sourceNodeIds = batchNodeIds,
                     sourceStartedAt = plan.turns.minOfOrNull { it.createdAtMillis } ?: 0L,
                     sourceEndedAt = plan.turns.maxOfOrNull { it.createdAtMillis } ?: 0L,
@@ -1872,9 +1888,9 @@ class ChatService(
                             extractionBatch = memoryBankService.beginExtractionBatch(
                                 assistantId = assistant.id.toString(),
                                 conversationId = conversationId.toString(),
-                                branchId = buildSelectedConversationBranchId(conversation.messageNodes),
-                                batchStartSequence = batchNodeIds.mapNotNull(messageNodePositions::get).minOrNull() ?: 0,
-                                batchEndSequence = batchNodeIds.mapNotNull(messageNodePositions::get).maxOrNull() ?: 0,
+                                branchId = batchBranchId,
+                                batchStartSequence = batchStartSequence,
+                                batchEndSequence = batchEndSequence,
                                 sourceNodeIds = batchNodeIds,
                                 sourceStartedAt = plan.turns.minOfOrNull { it.createdAtMillis } ?: 0L,
                                 sourceEndedAt = plan.turns.maxOfOrNull { it.createdAtMillis } ?: 0L,
@@ -2849,6 +2865,41 @@ class ChatService(
         }
     }
 
+    private suspend fun invalidateMemoryExtractionAfterSelectedPathMutation(
+        conversationId: Uuid,
+        before: Conversation,
+        after: Conversation,
+        reason: String,
+    ) {
+        val affectedSequence = firstSelectedBranchMutationSequence(
+            before = before.messageNodes,
+            after = after.messageNodes,
+        ) ?: return
+        val shiftsFollowingSequences = before.messageNodes.size != after.messageNodes.size
+        val fallbackSourceNodeIds = if (shiftsFollowingSequences) {
+            before.messageNodes.drop(affectedSequence - 1).map { it.id.toString() }
+        } else {
+            listOfNotNull(before.messageNodes.getOrNull(affectedSequence - 1)?.id?.toString())
+        }
+        val result = memoryBankService.invalidateExtractionBatches(
+            assistantId = before.assistantId.toString(),
+            conversationId = conversationId.toString(),
+            affectedSequence = affectedSequence,
+            invalidateFollowing = shiftsFollowingSequences,
+            selectedBranchIdAtSequence = { sequence ->
+                buildSelectedConversationBranchId(before.messageNodes, sequence)
+            },
+            fallbackSourceNodeIds = fallbackSourceNodeIds,
+            reason = reason,
+        )
+        Logging.log(
+            TAG,
+            "Invalidated memory extraction after selected-path mutation: " +
+                "conversation=$conversationId sequence=$affectedSequence " +
+                "batches=${result.invalidatedBatchCount} memories=${result.deprecatedMemoryCount}",
+        )
+    }
+
     // ---- 翻译消息 ----
 
     fun translateMessage(
@@ -2946,7 +2997,14 @@ class ChatService(
 
         if (!edited) return
 
-        saveConversation(conversationId, currentConversation.copy(messageNodes = updatedNodes))
+        val updatedConversation = currentConversation.copy(messageNodes = updatedNodes)
+        saveConversation(conversationId, updatedConversation)
+        invalidateMemoryExtractionAfterSelectedPathMutation(
+            conversationId = conversationId,
+            before = currentConversation,
+            after = updatedConversation,
+            reason = "source_message_edited",
+        )
     }
 
     suspend fun forkConversationAtMessage(
@@ -3012,7 +3070,14 @@ class ChatService(
             }
         }
 
-        saveConversation(conversationId, currentConversation.copy(messageNodes = updatedNodes))
+        val updatedConversation = currentConversation.copy(messageNodes = updatedNodes)
+        saveConversation(conversationId, updatedConversation)
+        invalidateMemoryExtractionAfterSelectedPathMutation(
+            conversationId = conversationId,
+            before = currentConversation,
+            after = updatedConversation,
+            reason = "selected_branch_changed",
+        )
     }
 
     suspend fun deleteMessage(
@@ -3031,6 +3096,12 @@ class ChatService(
         }
 
         saveConversation(conversationId, updatedConversation)
+        invalidateMemoryExtractionAfterSelectedPathMutation(
+            conversationId = conversationId,
+            before = currentConversation,
+            after = updatedConversation,
+            reason = "source_message_deleted",
+        )
     }
 
     suspend fun deleteMessage(
