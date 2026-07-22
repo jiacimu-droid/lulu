@@ -552,6 +552,20 @@ private fun CommitmentCard(
             }
             Text(commitment.promise, style = MaterialTheme.typography.bodyMedium)
             Text(
+                text = "承诺者：${commitment.promisorId} · 对象：${commitment.beneficiary}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            commitment.schedule.frequency.takeIf(String::isNotBlank)?.let { frequency ->
+                Text("频率：$frequency", style = MaterialTheme.typography.bodySmall)
+            }
+            commitment.schedule.condition.takeIf(String::isNotBlank)?.let { condition ->
+                Text("条件：$condition", style = MaterialTheme.typography.bodySmall)
+            }
+            commitment.executionMethod.takeIf(String::isNotBlank)?.let { method ->
+                Text("执行方式：$method", style = MaterialTheme.typography.bodySmall)
+            }
+            Text(
                 text = commitment.dueAt.commitmentScheduleText(now),
                 style = MaterialTheme.typography.bodySmall,
                 color = if (commitment.dueAt <= now && commitment.status != CompanionCommitmentStatus.FULFILLED) {
@@ -578,6 +592,16 @@ private fun CommitmentCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+            if (commitment.history.isNotEmpty()) {
+                Text("履约记录", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                commitment.history.takeLast(4).asReversed().forEach { entry ->
+                    Text(
+                        text = "${formatTime(entry.occurredAt)} · ${entry.toStatus.name} · ${entry.reason}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
@@ -797,6 +821,30 @@ private fun RelationshipOverview(
                     privateImpression.relationshipNarrative.isNotBlank()
             },
         )
+        val declaredFacts = buildList {
+            relationship.knownDuration.takeIf(String::isNotBlank)?.let { add("认识时长：$it") }
+            relationship.stage.takeIf(String::isNotBlank)?.let { add("当前阶段：$it") }
+            relationship.sharedExperiences.takeIf(List<String>::isNotEmpty)
+                ?.let { add("共同经历：${it.joinToString("；")}") }
+            relationship.securityContext.takeIf(String::isNotBlank)?.let { add("安全感：$it") }
+            relationship.attachmentExpression.takeIf(String::isNotBlank)?.let { add("依恋表达：$it") }
+        }
+        if (declaredFacts.isNotEmpty()) {
+            RelationshipTextCard("角色卡中的关系事实", declaredFacts.joinToString("\n"))
+        }
+        val interactionFacts = buildList {
+            relationship.interactionPatterns.takeIf(List<String>::isNotEmpty)
+                ?.let { add("互动习惯：${it.joinToString("；")}") }
+            relationship.declaredBoundaries.takeIf(List<String>::isNotEmpty)
+                ?.let { add("边界：${it.joinToString("；")}") }
+            relationship.potentialTensions.takeIf(List<String>::isNotEmpty)
+                ?.let { add("潜在矛盾：${it.joinToString("；")}") }
+            relationship.lastChangeReason.takeIf(String::isNotBlank)
+                ?.let { add("最近变化：$it（置信度 ${relationship.lastChangeConfidence}）") }
+        }
+        if (interactionFacts.isNotEmpty()) {
+            RelationshipTextCard("相处依据", interactionFacts.joinToString("\n"))
+        }
         RelationshipTextCard(
             eyebrow = "我眼中的你",
             body = portrait,
