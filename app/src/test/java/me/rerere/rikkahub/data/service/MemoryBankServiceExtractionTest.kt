@@ -647,6 +647,13 @@ private class RecordingMemoryBankDAO(
         it.assistantId == assistantId && it.conversationId == conversationId
     }
 
+    override suspend fun getExtractionBatchesByAssistant(
+        assistantId: String,
+    ): List<MemoryExtractionBatchEntity> = extractionBatches.values.filter {
+        it.assistantId == assistantId
+    }
+
+
     override suspend fun updateMemory(memory: MemoryBankEntity) = unsupported()
     override suspend fun deleteMemory(memory: MemoryBankEntity) = unsupported()
     override suspend fun deleteMemoryById(id: Int) = unsupported()
