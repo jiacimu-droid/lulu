@@ -23,10 +23,13 @@ internal fun enforceFinalCompanionContextBudget(
     // messages first only when source-level selection still exceeds the emergency ceiling.
     while (estimateMessagesTokens(bounded) > maxTokens) {
         val latestUser = bounded.indexOfLast { it.role == MessageRole.USER }
-        val removableIndex = bounded.indexOfFirst { index, message ->
-            message.role != MessageRole.SYSTEM && index < latestUser &&
-                bounded.count { it.role != MessageRole.SYSTEM } > MIN_NON_SYSTEM_MESSAGES
-        }
+        val nonSystemCount = bounded.count { it.role != MessageRole.SYSTEM }
+        val removableIndex = bounded.indices.firstOrNull { index ->
+            val message = bounded[index]
+            message.role != MessageRole.SYSTEM &&
+                index < latestUser &&
+                nonSystemCount > MIN_NON_SYSTEM_MESSAGES
+        } ?: -1
         if (removableIndex < 0) break
         bounded = bounded.toMutableList().also { it.removeAt(removableIndex) }
         dropped += 1
