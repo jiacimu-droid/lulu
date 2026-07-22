@@ -46,6 +46,15 @@ data class CompanionFollowUpDraft(
             subjectKey = subjectKey,
             promise = humanText.second,
             dueAt = dueAt,
+            promisorId = assistantId,
+            beneficiary = "user",
+            responsibility = humanText.second,
+            schedule = CompanionCommitmentSchedule(
+                timeDescription = dueAt.toString(),
+                frequency = if (sourceText.hasRecurringResponsibilityIntent()) "持续/按约定重复" else "一次",
+                condition = reason.trim().take(160),
+            ),
+            executionMethod = actionType.name.lowercase(),
             actionPlan = CompanionActionPlan(
                 type = actionType,
                 argumentsJson = argumentsJson,
@@ -159,6 +168,12 @@ internal fun expandExplicitCompanionResponsibilities(
 
 private fun String.containsExplicitResponsibilityIntent(): Boolean =
     EXPLICIT_RESPONSIBILITY_MARKERS.any(::contains)
+
+private fun String.hasRecurringResponsibilityIntent(): Boolean =
+    RECURRING_RESPONSIBILITY_MARKERS.any(::contains)
+
+private val RECURRING_RESPONSIBILITY_MARKERS =
+    listOf("以后", "每天", "每晚", "每早", "长期", "一直", "持续")
 
 private val EXPLICIT_RESPONSIBILITY_MARKERS = listOf(
     "监督",
@@ -957,9 +972,20 @@ fun finishCompanionCommitment(
         changes = transitions,
         nowMillis = cleanResult.completedAt,
     )
-    val updatedCommitment = transitioned.first { it.id == commitmentId }.copy(
+    val transitionedCommitment = transitioned.first { it.id == commitmentId }
+    val updatedHistory = transitionedCommitment.history.toMutableList().also { history ->
+        val lastIndex = history.indexOfLast { entry ->
+            entry.toStatus == transitionedCommitment.status &&
+                entry.occurredAt == cleanResult.completedAt
+        }
+        if (lastIndex >= 0) {
+            history[lastIndex] = history[lastIndex].copy(actionResult = cleanResult)
+        }
+    }
+    val updatedCommitment = transitionedCommitment.copy(
         lastActionResult = cleanResult,
         updatedAt = cleanResult.completedAt,
+        history = updatedHistory,
     )
     val matchingConcerns = snapshot.concerns.filter { concern ->
         concern.assistantId == assistantId &&
