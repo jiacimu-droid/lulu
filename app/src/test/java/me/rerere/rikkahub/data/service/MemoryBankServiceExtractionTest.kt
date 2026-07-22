@@ -594,8 +594,6 @@ class MemoryBankServiceExtractionTest {
 
         assertEquals(listOf(1), result.map { it.id })
     }
-}
-
 
     @Test
     fun `daily archive and covered atomic memories are mutually exclusive in recall`() {
