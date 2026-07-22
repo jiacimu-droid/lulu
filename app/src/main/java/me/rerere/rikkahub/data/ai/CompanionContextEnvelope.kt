@@ -5,13 +5,7 @@ import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.limitContext
 import me.rerere.rikkahub.data.model.Assistant
 
-/**
- * The single bounded hand-off between companion context producers and model generation.
- *
- * Callers may prepend structured SYSTEM messages, but only this assembler decides how
- * much conversational history reaches a model. Mandatory persona and global-world text
- * is measured separately and is never silently truncated.
- */
+/** Single bounded hand-off between context producers and model generation. */
 internal data class CompanionContextEnvelope(
     val messages: List<UIMessage>,
     val droppedHistoryMessages: Int,
@@ -54,17 +48,20 @@ internal fun buildCompanionContextEnvelope(
         .takeIf { it > 0 }
         ?.coerceAtMost(budget.maxHistoryMessages)
         ?: budget.maxHistoryMessages
+
+    val deduplicatedSystemMessages = deduplicateEnvelopeSystemMessages(
+        messages.filter { it.role == MessageRole.SYSTEM },
+    )
     val rollingSummaryMessages = messages.filter { message ->
         message.role != MessageRole.SYSTEM &&
             message.toText().contains("<rolling_summary", ignoreCase = true)
     }
-    val systemMessages = messages.filter { it.role == MessageRole.SYSTEM }
     val allHistory = messages.filter { message ->
         message.role != MessageRole.SYSTEM && message !in rollingSummaryMessages
     }
     var history = allHistory.limitContext(configuredWindow)
 
-    val systemText = systemMessages.joinToString("\n\n") { it.toText() }
+    val systemText = deduplicatedSystemMessages.joinToString("\n\n") { it.toText() }
     val rollingSummaryText = rollingSummaryMessages.joinToString("\n\n") { it.toText() }
     val fixedText = listOf(
         characterCore,
@@ -73,15 +70,10 @@ internal fun buildCompanionContextEnvelope(
         otherMandatoryPrompt,
         systemText,
         rollingSummaryText,
-    )
-        .filter(String::isNotBlank)
-        .joinToString("\n\n")
+    ).filter(String::isNotBlank).joinToString("\n\n")
     val fixedTokens = estimateCompanionPromptTokens(fixedText)
     if (fixedTokens > budget.maxEstimatedInputTokens) {
-        throw CompanionContextOverflowException(
-            estimatedTokens = fixedTokens,
-            allowedTokens = budget.maxEstimatedInputTokens,
-        )
+        throw CompanionContextOverflowException(fixedTokens, budget.maxEstimatedInputTokens)
     }
 
     while (
@@ -90,13 +82,11 @@ internal fun buildCompanionContextEnvelope(
         budget.maxEstimatedInputTokens
     ) {
         history = history.drop(1)
-        while (history.firstOrNull()?.role == MessageRole.TOOL) {
-            history = history.drop(1)
-        }
+        while (history.firstOrNull()?.role == MessageRole.TOOL) history = history.drop(1)
     }
 
     val recentText = history.joinToString("\n\n") { it.toText() }
-    val classified = classifyStructuredSystemContext(systemText)
+    val classified = classifyStructuredSystemContext(deduplicatedSystemMessages)
     val sections = listOf(
         section("角色核心", characterCore, if (characterCore.isBlank()) 0 else 1),
         section("全局世界书", globalLorebook, if (globalLorebook.isBlank()) 0 else 1),
@@ -104,9 +94,7 @@ internal fun buildCompanionContextEnvelope(
         section("最近消息", recentText, history.size),
         section(
             "滚动摘要",
-            listOf(rollingSummaryText, classified.rollingSummary)
-                .filter(String::isNotBlank)
-                .joinToString("\n\n"),
+            listOf(rollingSummaryText, classified.rollingSummary).filter(String::isNotBlank).joinToString("\n\n"),
             rollingSummaryMessages.size + classified.messageCount("rolling"),
         ),
         section("记忆", classified.memory, classified.messageCount("memory")),
@@ -119,9 +107,8 @@ internal fun buildCompanionContextEnvelope(
         ),
     )
     return CompanionContextEnvelope(
-        messages = systemMessages +
-            rollingSummaryMessages.map { UIMessage.system(it.toText()) } +
-            history,
+        messages = deduplicatedSystemMessages +
+            rollingSummaryMessages.map { UIMessage.system(it.toText()) } + history,
         droppedHistoryMessages = (allHistory.size - history.size).coerceAtLeast(0),
         estimatedInputTokens = fixedTokens + estimateCompanionPromptTokens(recentText),
         budget = budget,
@@ -140,23 +127,30 @@ private data class ClassifiedSystemContext(
     fun messageCount(key: String): Int = counts[key] ?: 0
 }
 
-private fun classifyStructuredSystemContext(text: String): ClassifiedSystemContext {
-    if (text.isBlank()) return ClassifiedSystemContext()
-    val blocks = text.split(Regex("(?=<[^>]+>)"))
-    val groups = blocks.groupBy { block ->
-        when {
-            block.contains("<rolling_summary", ignoreCase = true) -> "rolling"
-            block.contains("<lulu_memory", ignoreCase = true) -> "memory"
-            block.contains("commitment", ignoreCase = true) ||
-                block.contains("concern", ignoreCase = true) ||
-                block.contains("承诺") ||
-                block.contains("关注") -> "commitment"
-            block.contains("<companion_runtime", ignoreCase = true) ||
-                block.contains("<companion_private_context", ignoreCase = true) -> "relationship"
+private fun classifyStructuredSystemContext(messages: List<UIMessage>): ClassifiedSystemContext {
+    val groups = mutableMapOf<String, MutableList<String>>()
+    messages.forEach { message ->
+        val text = message.toText().trim()
+        if (text.isBlank()) return@forEach
+        if (text.contains("<companion_runtime", ignoreCase = true)) {
+            val commitmentLines = extractRuntimeCommitmentLines(text)
+            val relationshipText = stripRuntimeCommitmentLines(text)
+            if (relationshipText.isNotBlank()) groups.getOrPut("relationship", ::mutableListOf) += relationshipText
+            if (commitmentLines.isNotBlank()) groups.getOrPut("commitment", ::mutableListOf) += commitmentLines
+            return@forEach
+        }
+        val key = when {
+            text.contains("<rolling_summary", ignoreCase = true) -> "rolling"
+            text.contains("<lulu_memory", ignoreCase = true) -> "memory"
+            text.contains("<companion_private_context", ignoreCase = true) ||
+                text.contains("<private_user_profile", ignoreCase = true) -> "relationship"
+            text.contains("<commitment_context", ignoreCase = true) ||
+                text.contains("<concern_context", ignoreCase = true) -> "commitment"
             else -> "other"
         }
+        groups.getOrPut(key, ::mutableListOf) += text
     }
-    fun content(key: String) = groups[key].orEmpty().joinToString("\n").trim()
+    fun content(key: String) = groups[key].orEmpty().joinToString("\n\n").trim()
     return ClassifiedSystemContext(
         rollingSummary = content("rolling"),
         memory = content("memory"),
@@ -167,6 +161,69 @@ private fun classifyStructuredSystemContext(text: String): ClassifiedSystemConte
     )
 }
 
+private fun extractRuntimeCommitmentLines(text: String): String {
+    val lines = text.lineSequence().toList()
+    val selected = mutableListOf<String>()
+    var capture = false
+    for (line in lines) {
+        val trimmed = line.trim()
+        when {
+            trimmed == "active_concerns:" || trimmed == "active_commitments:" -> {
+                capture = true
+                selected += trimmed
+            }
+            capture && trimmed.startsWith("-") -> selected += trimmed
+            capture -> capture = false
+        }
+    }
+    return selected.joinToString("\n")
+}
+
+private fun stripRuntimeCommitmentLines(text: String): String {
+    val kept = mutableListOf<String>()
+    var skip = false
+    for (line in text.lineSequence()) {
+        val trimmed = line.trim()
+        when {
+            trimmed == "active_concerns:" || trimmed == "active_commitments:" -> skip = true
+            skip && trimmed.startsWith("-") -> Unit
+            else -> {
+                skip = false
+                kept += line
+            }
+        }
+    }
+    return kept.joinToString("\n").trim()
+}
+
+private fun deduplicateEnvelopeSystemMessages(messages: List<UIMessage>): List<UIMessage> {
+    val seenKinds = mutableSetOf<String>()
+    val seenExact = mutableSetOf<String>()
+    val result = mutableListOf<UIMessage>()
+    messages.asReversed().forEach { message ->
+        val text = message.toText().trim()
+        val kind = structuredKind(text)
+        val keep = if (kind != null) seenKinds.add(kind) else seenExact.add(normalizeSystemText(text))
+        if (keep) result += message
+    }
+    return result.asReversed()
+}
+
+private fun structuredKind(text: String): String? = when {
+    text.contains("<companion_runtime", ignoreCase = true) -> "runtime"
+    text.contains("<companion_private_context", ignoreCase = true) -> "private_context"
+    text.contains("<companion_presence_contract", ignoreCase = true) -> "presence_contract"
+    text.contains("<private_user_profile", ignoreCase = true) -> "user_profile"
+    text.contains("<rolling_summary", ignoreCase = true) -> "rolling"
+    text.contains("<lulu_memory", ignoreCase = true) -> "memory"
+    text.contains("<study_state", ignoreCase = true) || text.contains("<study_context", ignoreCase = true) -> "study"
+    text.contains("<time_reminder", ignoreCase = true) -> "time"
+    else -> null
+}
+
+private fun normalizeSystemText(text: String): String = text
+    .lineSequence().map(String::trim).filter(String::isNotBlank).joinToString("\n")
+
 private fun section(label: String, text: String, messageCount: Int) = CompanionContextSection(
     label = label,
     estimatedTokens = estimateCompanionPromptTokens(text),
@@ -175,10 +232,10 @@ private fun section(label: String, text: String, messageCount: Int) = CompanionC
 )
 
 private fun ApiUsageSource.companionContextBudget(): CompanionContextBudget = when (this) {
-    ApiUsageSource.CHAT -> CompanionContextBudget(maxHistoryMessages = 60, maxEstimatedInputTokens = 32_000)
-    ApiUsageSource.PHONE -> CompanionContextBudget(maxHistoryMessages = 30, maxEstimatedInputTokens = 16_000)
-    ApiUsageSource.GAME -> CompanionContextBudget(maxHistoryMessages = 40, maxEstimatedInputTokens = 20_000)
-    ApiUsageSource.OTHER -> CompanionContextBudget(maxHistoryMessages = 36, maxEstimatedInputTokens = 20_000)
+    ApiUsageSource.CHAT -> CompanionContextBudget(maxHistoryMessages = 48, maxEstimatedInputTokens = 18_000)
+    ApiUsageSource.PHONE -> CompanionContextBudget(maxHistoryMessages = 24, maxEstimatedInputTokens = 12_000)
+    ApiUsageSource.GAME -> CompanionContextBudget(maxHistoryMessages = 32, maxEstimatedInputTokens = 15_000)
+    ApiUsageSource.OTHER -> CompanionContextBudget(maxHistoryMessages = 30, maxEstimatedInputTokens = 15_000)
 }
 
 private fun estimateCompanionPromptTokens(text: String): Int =
