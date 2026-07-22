@@ -80,6 +80,11 @@ jobs:
             --tests "*AffectivePrivateImpressionTest" \
             --tests "*MemoryArchiveTest" \
             --tests "*CompanionRuntimeReducerTest" \
+            --tests "*CompanionRelationshipInitializationTest" \
+            --tests "*CompanionCommitmentReducerTest" \
+            --tests "*CompanionResponsibilitySplitterTest" \
+            --tests "*CompanionExplainableStateTest" \
+            --tests "*CompanionPerceptionLegacyStateTest" \
             --tests "*CompanionInteractionTimelineTest" \
             --tests "*CompanionHeartbeatTest" \
             --tests "*MemoryBankContextTest" \
