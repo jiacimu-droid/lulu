@@ -88,6 +88,74 @@ class MemoryBankServiceExtractionTest {
     }
 
     @Test
+    fun `branch aware checkpoint only returns successful batches on selected path`() = runBlocking {
+        val dao = RecordingMemoryBankDAO()
+        val service = MemoryBankService(dao, okHttpClient = null, context = null)
+        val branchA = service.beginExtractionBatch(
+            "assistant-1", "conversation-1", "branch-a", 1, 12,
+            listOf("node-1", "node-12"), 10L, 20L, "model-1",
+        )
+        service.completeExtractionBatch(
+            branchA.batchId,
+            MemoryExtractionBatchStatus.SUCCESS_EMPTY,
+            emptyList(),
+        )
+        val branchB = service.beginExtractionBatch(
+            "assistant-1", "conversation-1", "branch-b", 1, 12,
+            listOf("node-1", "node-12"), 10L, 20L, "model-1",
+        )
+        service.completeExtractionBatch(
+            branchB.batchId,
+            MemoryExtractionBatchStatus.SUCCESS_EMPTY,
+            emptyList(),
+        )
+
+        val processed = service.getProcessedSourceNodeIds(
+            assistantId = "assistant-1",
+            conversationId = "conversation-1",
+            selectedBranchIdAtSequence = { "branch-a" },
+        )
+
+        assertEquals(setOf("node-1", "node-12"), processed)
+        assertEquals(2, dao.extractionBatches.size)
+    }
+
+    @Test
+    fun `selected branch mutation invalidates batch and deprecates generated memories`() = runBlocking {
+        val dao = RecordingMemoryBankDAO()
+        val service = MemoryBankService(dao, okHttpClient = null, context = null)
+        val batch = service.beginExtractionBatch(
+            "assistant-1", "conversation-1", "branch-a", 1, 12,
+            listOf("node-1", "node-12"), 10L, 20L, "model-1",
+        )
+        service.completeExtractionBatch(
+            batch.batchId,
+            MemoryExtractionBatchStatus.SUCCESS_WITH_MEMORIES,
+            listOf(7),
+        )
+
+        val result = service.invalidateExtractionBatches(
+            assistantId = "assistant-1",
+            conversationId = "conversation-1",
+            affectedSequence = 5,
+            invalidateFollowing = false,
+            selectedBranchIdAtSequence = { "branch-a" },
+            fallbackSourceNodeIds = listOf("node-5"),
+            reason = "source_message_edited",
+            now = 300L,
+        )
+
+        assertEquals(1, result.invalidatedBatchCount)
+        assertEquals(1, result.deprecatedMemoryCount)
+        assertEquals(
+            MemoryExtractionBatchStatus.INVALIDATED.name,
+            dao.extractionBatches.getValue(batch.batchId).status,
+        )
+        assertEquals(7, dao.deprecatedUpdates.single().id)
+        assertEquals("source_message_edited", dao.deprecatedUpdates.single().deprecatedReason)
+    }
+
+    @Test
     fun `assistant memory stats include vector states`() = runBlocking {
         val dao = RecordingMemoryBankDAO(
             assistantMemories = listOf(
