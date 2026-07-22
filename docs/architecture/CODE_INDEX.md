@@ -11,17 +11,17 @@
 
 ## 索引状态
 
-- 基准提交：`7f38feb1a0547d57a68039291c94b06853ece0f3`
+- 基准提交：`6695cd9b2ff8dc675f1bde4bd6967695a110ded2`
 - 分支：`master`
-- 已索引文件：1090
-- 已索引代码/文本行：260957
-- 已发现类、接口、对象、函数及 Composable：5260
+- 已索引文件：1091
+- 已索引代码/文本行：261030
+- 已发现类、接口、对象、函数及 Composable：5261
 
 ## 模块概览
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 628 |
+| `app` | 629 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -46,7 +46,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 696 |
+| `.kt` | 697 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -350,7 +350,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/HighlightCodeBlock.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/LatexText.kt`
-- ……另有 243 个文件，见 `code-index.json`
+- ……另有 244 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -381,6 +381,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt`
+- `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnosticsTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/ui/pages/setting/MemoryEmbeddingConfigInputTest.kt`
 - `docs/architecture/MEMORY_PIPELINE.md`
 - `docs/superpowers/plans/2026-06-29-affective-memory-extraction.md`
