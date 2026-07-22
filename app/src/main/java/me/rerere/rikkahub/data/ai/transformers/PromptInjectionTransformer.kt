@@ -75,25 +75,40 @@ internal fun collectInjections(
         .filter { it.enabled && assistant.modeInjectionIds.contains(it.id) }
         .forEach { injections.add(it) }
 
-    // 2. 获取关联的 Lorebook 中被触发的 RegexInjection
-    val enabledLorebooks = lorebooks.filter {
-        it.enabled && (it.globalApply || assistant.lorebookIds.contains(it.id))
-    }
-    if (enabledLorebooks.isNotEmpty()) {
-        // 提取上下文用于匹配（只取非 SYSTEM 消息）
-        val nonSystemMessages = messages.filter { it.role != MessageRole.SYSTEM }
-
-        enabledLorebooks.forEach { lorebook ->
-            lorebook.entries
-                .filter { entry ->
-                    val context = extractContextForMatching(nonSystemMessages, entry.scanDepth)
-                    entry.isTriggered(context)
-                }
-                .forEach { injections.add(it) }
-        }
-    }
+    // 2. Global lorebooks are mandatory persona/world constraints. Only role-mounted
+    // lorebooks are allowed to use conditional keyword/regex matching.
+    injections += collectGlobalLorebookInjections(lorebooks)
+    injections += collectConditionalLorebookInjections(messages, assistant, lorebooks)
 
     return injections
+}
+
+internal fun collectGlobalLorebookInjections(
+    lorebooks: List<Lorebook>,
+): List<PromptInjection.RegexInjection> = lorebooks
+    .asSequence()
+    .filter { it.enabled && it.globalApply }
+    .flatMap { it.entries.asSequence() }
+    .filter { it.enabled }
+    .distinctBy { it.id }
+    .toList()
+
+internal fun collectConditionalLorebookInjections(
+    messages: List<UIMessage>,
+    assistant: Assistant,
+    lorebooks: List<Lorebook>,
+): List<PromptInjection.RegexInjection> {
+    val nonSystemMessages = messages.filter { it.role != MessageRole.SYSTEM }
+    return lorebooks
+        .asSequence()
+        .filter { it.enabled && !it.globalApply && assistant.lorebookIds.contains(it.id) }
+        .flatMap { lorebook -> lorebook.entries.asSequence() }
+        .filter { entry ->
+            val context = extractContextForMatching(nonSystemMessages, entry.scanDepth)
+            entry.isTriggered(context)
+        }
+        .distinctBy { it.id }
+        .toList()
 }
 
 internal fun buildPromptInjectionPlannerContext(
