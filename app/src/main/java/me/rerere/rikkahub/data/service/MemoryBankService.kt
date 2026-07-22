@@ -630,7 +630,8 @@ class MemoryBankService(
                     memory.occurredAt != null && memory.occurredAt > 0L -> memory.occurredAt
                     else -> memory.createdAt.takeIf { it > 0L } ?: sourceAt
                 }
-                val updated = memory.copy(                    sourceMessageAt = sourceAt,
+                val updated = memory.copy(
+                    sourceMessageAt = sourceAt,
                     occurredAt = occurredAt,
                     occurredAtInferred = legacyExtractionTimeWasUsed || memory.occurredAt == null,
                     memoryCreatedAt = memory.memoryCreatedAt.takeIf { it > 0L }
@@ -1217,7 +1218,8 @@ internal fun selectMemoryRecallItems(
     val expansionCandidates = memories
         .filter { it.content.isNotBlank() && !it.deprecated }
     return direct
-        .expandGraphMemories(expansionCandidates, graphEdges, maxRelatedItems = 2, nowMillis = nowMillis)        .expandRelatedMemories(expansionCandidates, maxRelatedItems = 1)
+        .expandGraphMemories(expansionCandidates, graphEdges, maxRelatedItems = 2, nowMillis = nowMillis)
+        .expandRelatedMemories(expansionCandidates, maxRelatedItems = 1)
         .distinctBy { it.recallDistinctKey() }
         .withoutArchiveSourceOverlap()
 }
@@ -1712,11 +1714,13 @@ internal fun buildMissingDailyMemoryArchives(
                 relatedMemoryIdsJson = JsonInstant.encodeToString(
                     ListSerializer(String.serializer()),
                     selected.map { it.id.toString() },
-                ),                sourceMemoryIdsJson = JsonInstant.encodeToString(
+                ),
+                sourceMemoryIdsJson = JsonInstant.encodeToString(
                     ListSerializer(String.serializer()),
                     selected.map { it.id.toString() },
                 ),
-                assistantId = key.first,                sourceMessageAt = selected.mapNotNull { it.sourceMessageAt }.maxOrNull(),
+                assistantId = key.first,
+                sourceMessageAt = selected.mapNotNull { it.sourceMessageAt }.maxOrNull(),
                 occurredAt = selected.maxOf { it.occurredAt ?: it.createdAt },
                 occurredAtInferred = true,
                 memoryCreatedAt = nowMillis,
@@ -1774,11 +1778,13 @@ internal fun buildMissingMonthlyMemoryArchives(
                 relatedMemoryIdsJson = JsonInstant.encodeToString(
                     ListSerializer(String.serializer()),
                     selected.map { it.id.toString() },
-                ),                sourceMemoryIdsJson = JsonInstant.encodeToString(
+                ),
+                sourceMemoryIdsJson = JsonInstant.encodeToString(
                     ListSerializer(String.serializer()),
                     selected.map { it.id.toString() },
                 ),
-                assistantId = key.first,                sourceMessageAt = selected.mapNotNull { it.sourceMessageAt }.maxOrNull(),
+                assistantId = key.first,
+                sourceMessageAt = selected.mapNotNull { it.sourceMessageAt }.maxOrNull(),
                 occurredAt = selected.maxOf { it.occurredAt ?: it.createdAt },
                 occurredAtInferred = true,
                 memoryCreatedAt = nowMillis,
