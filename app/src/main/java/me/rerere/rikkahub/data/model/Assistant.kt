@@ -28,6 +28,8 @@ data class Assistant(
     val contextMessageSize: Int = 60,
     /** Number of stable message nodes required before this role summarizes a memory batch. 0 disables automatic extraction. */
     val memoryExtractionInterval: Int = 20,
+    /** Number of newest logical messages kept out of long-term memory extraction. */
+    val memoryExtractionProtectedRecentCount: Int = 10,
     val streamOutput: Boolean = true,
     val autoPlayVoice: Boolean = false,
     val ttsVoiceId: String = "",
