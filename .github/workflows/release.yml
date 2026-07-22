@@ -80,6 +80,7 @@ jobs:
             --tests "*AffectivePrivateImpressionTest" \
             --tests "*MemoryArchiveTest" \
             --tests "*CompanionRuntimeReducerTest" \
+            --tests "*CompanionInteractionTimelineTest" \
             --tests "*MemoryBankContextTest" \
             --tests "*MemoryBankServiceExtractionTest" \
             --tests "*AILoggingManagerTest" \
