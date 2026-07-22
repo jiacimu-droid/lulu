@@ -809,6 +809,12 @@ class MemoryBankService(
         memoryBankDAO.getExtractionBatches(assistantId, conversationId)
     }
 
+    suspend fun getExtractionBatchesForAssistant(
+        assistantId: String,
+    ): List<MemoryExtractionBatchEntity> = withContext(Dispatchers.IO) {
+        memoryBankDAO.getExtractionBatchesByAssistant(assistantId)
+    }
+
     suspend fun invalidateExtractionBatches(
         assistantId: String,
         conversationId: String,
