@@ -580,7 +580,8 @@ class MemoryBankServiceExtractionTest {
         assertEquals("assistant-1", dao.lastAssistantKeywordTypeSearch?.assistantId)
     }
 
-    @fun `search memories keeps assistant filter without keyword or type`() = runBlocking {
+    @Test
+    fun `search memories keeps assistant filter without keyword or type`() = runBlocking {
         val dao = RecordingMemoryBankDAO(
             assistantMemories = listOf(
                 MemoryBankEntity(id = 1, assistantId = "assistant-1", content = "one"),
