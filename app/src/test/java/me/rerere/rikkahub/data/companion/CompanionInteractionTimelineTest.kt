@@ -74,4 +74,78 @@ class CompanionInteractionTimelineTest {
         assertNull(reduced.lastOutboundAt)
         assertNull(reduced.lastUserActivityAt)
     }
+
+    @Test
+    fun `opening a notification updates the matching outbound contact`() {
+        val delivered = reduceCompanionInteractionTimeline(
+            current = CompanionInteractionTimeline(),
+            events = listOf(
+                CompanionInteractionEvent(
+                    kind = CompanionInteractionEventKind.OUTBOUND_DELIVERED,
+                    occurredAt = 100L,
+                    contactId = "out-1",
+                ),
+            ),
+        )
+
+        val opened = reduceCompanionInteractionTimeline(
+            current = delivered,
+            events = listOf(
+                CompanionInteractionEvent(
+                    kind = CompanionInteractionEventKind.OUTBOUND_OPENED,
+                    occurredAt = 150L,
+                    contactId = "out-1",
+                ),
+            ),
+        )
+
+        assertEquals(150L, opened.lastOpenedAt)
+        assertEquals(150L, opened.outboundContacts.single().openedAt)
+        assertEquals(CompanionOutboundStatus.OPENED, opened.outboundContacts.single().status)
+    }
+
+    @Test
+    fun `completion reply resolves latest reminder without requiring a contact id`() {
+        val delivered = reduceCompanionInteractionTimeline(
+            current = CompanionInteractionTimeline(),
+            events = listOf(
+                CompanionInteractionEvent(
+                    kind = CompanionInteractionEventKind.OUTBOUND_DELIVERED,
+                    occurredAt = 100L,
+                    contactId = "reminder-1",
+                ),
+            ),
+        )
+
+        val completed = reduceCompanionInteractionTimeline(
+            current = delivered,
+            events = userReplyInteractionEvents("已经做完了", 200L),
+        )
+
+        assertEquals(CompanionOutboundStatus.REMINDER_COMPLETED, completed.outboundContacts.single().status)
+        assertEquals("user_reported_completion", completed.outboundContacts.single().result)
+        assertEquals(200L, completed.outboundContacts.single().resolvedAt)
+    }
+
+    @Test
+    fun `explicit topic change closes the latest outbound without penalty`() {
+        val delivered = reduceCompanionInteractionTimeline(
+            current = CompanionInteractionTimeline(),
+            events = listOf(
+                CompanionInteractionEvent(
+                    kind = CompanionInteractionEventKind.OUTBOUND_DELIVERED,
+                    occurredAt = 100L,
+                    contactId = "out-1",
+                ),
+            ),
+        )
+
+        val changed = reduceCompanionInteractionTimeline(
+            current = delivered,
+            events = userReplyInteractionEvents("换个话题吧", 200L),
+        )
+
+        assertEquals(CompanionOutboundStatus.TOPIC_CHANGED, changed.outboundContacts.single().status)
+        assertEquals("user_changed_topic", changed.outboundContacts.single().result)
+    }
 }
