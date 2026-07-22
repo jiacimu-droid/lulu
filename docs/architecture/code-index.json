@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-22T19:58:43.386090+00:00",
-  "commit": "1e8a21737ff8ee15c76539033ac95e7bf4cc0d91",
+  "generatedAt": "2026-07-22T20:01:48.840433+00:00",
+  "commit": "64ab4487338a68be0149f04911f5673b74581b30",
   "branch": "master",
   "summary": {
     "files": 1098,
-    "lines": 261515,
+    "lines": 261516,
     "symbols": 5294,
     "byModule": {
       "app": 636,
@@ -5674,7 +5674,7 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/FinalCompanionContextBudget.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 95,
+      "lines": 96,
       "package": "me.rerere.rikkahub.data.ai",
       "categories": [
         "AI与上下文"
@@ -5693,27 +5693,27 @@
         {
           "name": "deduplicateFinalSystemSnapshots",
           "kind": "function",
-          "line": 46
+          "line": 47
         },
         {
           "name": "finalSnapshotKind",
           "kind": "function",
-          "line": 67
+          "line": 68
         },
         {
           "name": "normalizeSystemText",
           "kind": "function",
-          "line": 80
+          "line": 81
         },
         {
           "name": "estimateMessagesTokens",
           "kind": "function",
-          "line": 83
+          "line": 84
         },
         {
           "name": "finalCompanionInputBudget",
           "kind": "function",
-          "line": 88
+          "line": 89
         }
       ]
     },
