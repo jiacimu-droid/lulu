@@ -1,6 +1,9 @@
 package me.rerere.rikkahub.data.service
 
 import me.rerere.rikkahub.data.companion.CompanionInteractionTimeline
+import me.rerere.rikkahub.data.companion.CompanionInteractionEventKind
+import me.rerere.rikkahub.data.companion.CompanionOutboundContact
+import me.rerere.rikkahub.data.companion.CompanionOutboundStatus
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -36,5 +39,30 @@ class CompanionHeartbeatTest {
         assertTrue(decision.minutesSinceUserActivity > 120L)
         assertTrue(decision.shouldRunDeepPerception)
         assertEquals("meaningful_silence", decision.reason)
+    }
+
+    @Test
+    fun `stale delivered contact becomes unanswered without requesting a model`() {
+        val decision = CompanionHeartbeatEvaluator.evaluate(
+            snapshot = CompanionSnapshot.empty("assistant-a").copy(
+                interactionTimeline = CompanionInteractionTimeline(
+                    lastUserActivityAt = 9_900_000L,
+                    outboundContacts = listOf(
+                        CompanionOutboundContact(
+                            id = "out-1",
+                            status = CompanionOutboundStatus.DELIVERED,
+                            generatedAt = 1_000_000L,
+                            deliveredAt = 1_000_000L,
+                        ),
+                    ),
+                ),
+            ),
+            nowMillis = 10_000_000L,
+        )
+
+        assertFalse(decision.shouldRunDeepPerception)
+        assertEquals(1, decision.lifecycleEvents.size)
+        assertEquals(CompanionInteractionEventKind.OUTBOUND_UNANSWERED, decision.lifecycleEvents.single().kind)
+        assertEquals("out-1", decision.lifecycleEvents.single().contactId)
     }
 }
