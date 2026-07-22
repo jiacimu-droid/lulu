@@ -215,11 +215,6 @@ fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
             "reliability=${snapshot.relationship.reliability} tension=${snapshot.relationship.unresolvedTension}",
     )
     appendLine(snapshot.relationship.toBehaviorContract())
-    appendLine(
-        "digital_neuro dopamine=${snapshot.neuroState.dopamine} serotonin=${snapshot.neuroState.serotonin} " +
-            "cortisol=${snapshot.neuroState.cortisol} oxytocin=${snapshot.neuroState.oxytocin} " +
-            "focus=${snapshot.neuroState.norepinephrine} energy=${snapshot.neuroState.energy}",
-    )
     buildCompanionCurrentLifeThread(snapshot, nowMillis)
         .takeIf(String::isNotBlank)
         ?.let(::appendLine)
