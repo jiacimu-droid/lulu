@@ -3,7 +3,7 @@ package me.rerere.rikkahub.data.companion
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
-const val CURRENT_COMPANION_SCHEMA_VERSION = 6
+const val CURRENT_COMPANION_SCHEMA_VERSION = 7
 
 @Serializable
 data class CompanionPersistedState(
@@ -29,6 +29,8 @@ data class CompanionSnapshot(
     val commitments: List<CompanionCommitment> = emptyList(),
     /** Last cross-modal exchange, kept small so a new chat or call can resume naturally. */
     val continuity: CompanionContinuity = CompanionContinuity(),
+    /** Evidence-backed interaction clocks. Outbound activity never overwrites user activity. */
+    val interactionTimeline: CompanionInteractionTimeline = CompanionInteractionTimeline(),
     val updatedAt: Long = 0L,
 ) {
     companion object {
@@ -50,6 +52,75 @@ enum class CompanionInteractionModality {
     CHAT,
     VOICE_CALL,
     PROACTIVE,
+}
+
+@Serializable
+data class CompanionInteractionTimeline(
+    val lastUserActivityAt: Long? = null,
+    val lastUserReplyAt: Long? = null,
+    val lastOrdinaryAssistantAt: Long? = null,
+    val lastOutboundAt: Long? = null,
+    val lastOpenedAt: Long? = null,
+    val lastLifeAnchorUpdatedAt: Long? = null,
+    val outboundContacts: List<CompanionOutboundContact> = emptyList(),
+)
+
+@Serializable
+data class CompanionOutboundContact(
+    val id: String,
+    val conversationId: String? = null,
+    val sourceMessageId: String? = null,
+    val status: CompanionOutboundStatus = CompanionOutboundStatus.GENERATED,
+    val generatedAt: Long,
+    val sentAt: Long? = null,
+    val deliveredAt: Long? = null,
+    val openedAt: Long? = null,
+    val resolvedAt: Long? = null,
+    val result: String? = null,
+)
+
+@Serializable
+enum class CompanionOutboundStatus {
+    GENERATED,
+    SENT,
+    DELIVERED,
+    OPENED,
+    UNANSWERED,
+    REPLIED,
+    USER_BUSY,
+    TOPIC_CHANGED,
+    DECLINED,
+    REMINDER_COMPLETED,
+    FAILED,
+    CANCELLED,
+}
+
+data class CompanionInteractionEvent(
+    val kind: CompanionInteractionEventKind,
+    val occurredAt: Long,
+    val contactId: String? = null,
+    val conversationId: String? = null,
+    val sourceMessageId: String? = null,
+    val detail: String? = null,
+)
+
+enum class CompanionInteractionEventKind {
+    USER_ACTIVITY,
+    USER_REPLY,
+    ORDINARY_ASSISTANT,
+    OUTBOUND_GENERATED,
+    OUTBOUND_SENT,
+    OUTBOUND_DELIVERED,
+    OUTBOUND_OPENED,
+    OUTBOUND_UNANSWERED,
+    OUTBOUND_REPLIED,
+    USER_BUSY,
+    TOPIC_CHANGED,
+    DECLINED,
+    REMINDER_COMPLETED,
+    OUTBOUND_FAILED,
+    OUTBOUND_CANCELLED,
+    LIFE_ANCHOR_UPDATED,
 }
 
 /**
