@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-22T21:06:31.876218+00:00",
-  "commit": "956ecced04485e756b935dc6dbb08aef697f5f94",
+  "generatedAt": "2026-07-22T21:11:33.162156+00:00",
+  "commit": "0b5b34836f4493e2c04653363922d35875cd3e4d",
   "branch": "master",
   "summary": {
     "files": 1100,
-    "lines": 261570,
-    "symbols": 5299,
+    "lines": 261587,
+    "symbols": 5300,
     "byModule": {
       "app": 638,
       "web-ui": 131,
@@ -12973,7 +12973,7 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 427,
+      "lines": 444,
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "记忆"
@@ -13012,117 +13012,122 @@
         {
           "name": "toEntity",
           "kind": "function",
-          "line": 96
+          "line": 107
         },
         {
-          "name": "calibrateImportance",
-          "kind": "function",
-          "line": 143
-        },
-        {
-          "name": "shouldSkipMemoryBankWrite",
+          "name": "buildProgrammaticMemoryTitle",
           "kind": "function",
           "line": 154
         },
         {
+          "name": "calibrateImportance",
+          "kind": "function",
+          "line": 173
+        },
+        {
+          "name": "shouldSkipMemoryBankWrite",
+          "kind": "function",
+          "line": 184
+        },
+        {
           "name": "isDurableMemoryCandidate",
           "kind": "function",
-          "line": 161
+          "line": 191
         },
         {
           "name": "normalizedMemoryIdentity",
           "kind": "function",
-          "line": 180
+          "line": 208
         },
         {
           "name": "buildDeterministicMemoryCandidates",
           "kind": "function",
-          "line": 183
+          "line": 211
         },
         {
           "name": "buildDeterministicMemoryCandidatesFromNodes",
           "kind": "function",
-          "line": 199
+          "line": 227
         },
         {
           "name": "toDeterministicMemoryCandidate",
           "kind": "function",
-          "line": 207
+          "line": 235
         },
         {
           "name": "AffectiveMemoryExtractor",
           "kind": "object",
-          "line": 247
+          "line": 261
         },
         {
           "name": "buildExtractionPrompt",
           "kind": "function",
-          "line": 249
+          "line": 263
         },
         {
           "name": "parseExtractionResult",
           "kind": "function",
-          "line": 284
+          "line": 296
         },
         {
           "name": "decodeExtractionCandidates",
           "kind": "function",
-          "line": 298
+          "line": 315
         },
         {
           "name": "repairMemoryExtractionJsonOnce",
           "kind": "function",
-          "line": 307
+          "line": 324
         },
         {
           "name": "isTransientMemoryExtractionFailure",
           "kind": "function",
-          "line": 313
+          "line": 330
         },
         {
           "name": "retryTransientMemoryExtraction",
           "kind": "function",
-          "line": 323
+          "line": 340
         },
         {
           "name": "sourceTimeLabel",
           "kind": "function",
-          "line": 344
+          "line": 361
         },
         {
           "name": "hasAffectiveSummary",
           "kind": "function",
-          "line": 353
+          "line": 370
         },
         {
           "name": "toDisplayMemoryContent",
           "kind": "function",
-          "line": 360
+          "line": 376
         },
         {
           "name": "toEmbeddingMemoryText",
           "kind": "function",
-          "line": 368
+          "line": 384
         },
         {
           "name": "firstPersonSummary",
           "kind": "function",
-          "line": 380
+          "line": 395
         },
         {
           "name": "looksLikeRawToolOrTraceDump",
           "kind": "function",
-          "line": 390
+          "line": 405
         },
         {
           "name": "looksLikeVocabularyDrill",
           "kind": "function",
-          "line": 398
+          "line": 414
         },
         {
           "name": "extractJsonPayload",
           "kind": "function",
-          "line": 406
+          "line": 422
         }
       ]
     },
