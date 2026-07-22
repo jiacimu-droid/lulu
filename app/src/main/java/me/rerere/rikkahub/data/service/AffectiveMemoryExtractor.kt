@@ -69,10 +69,19 @@ data class AffectiveMemoryCandidate(
 ) {
     fun normalized(): AffectiveMemoryCandidate {
         val normalizedType = type.trim().ifBlank { "shared_event" }.lowercase()
+        val normalizedContent = content.trim()
+        val normalizedSourceIds = sourceMessageNodeIds
+            .mapNotNull { it.trim().takeIf(String::isNotBlank) }
+            .distinct()
+        val normalizedEvidenceIds = evidenceMessageNodeIds
+            .mapNotNull { it.trim().takeIf(String::isNotBlank) }
+            .distinct()
+            .ifEmpty { normalizedSourceIds }
         return copy(
             type = normalizedType,
-            content = content.trim(),
-            title = title?.trim()?.takeIf(String::isNotBlank),
+            content = normalizedContent,
+            title = title?.trim()?.takeIf(String::isNotBlank)
+                ?: buildProgrammaticMemoryTitle(normalizedType, normalizedContent),
             roleFeeling = roleFeeling?.trim()?.takeIf(String::isNotBlank),
             bodySense = bodySense?.trim()?.takeIf(String::isNotBlank),
             unspokenThought = unspokenThought?.trim()?.takeIf(String::isNotBlank),
@@ -80,10 +89,12 @@ data class AffectiveMemoryCandidate(
             relationshipEffect = relationshipEffect?.trim()?.takeIf(String::isNotBlank),
             importance = calibrateImportance(normalizedType, importance),
             confidence = confidence.coerceIn(0.0, 1.0),
-            tags = tags.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+            tags = tags.mapNotNull { it.trim().takeIf(String::isNotBlank) }
+                .distinct()
+                .ifEmpty { listOf(normalizedType) },
             embeddingText = embeddingText?.trim()?.takeIf(String::isNotBlank),
-            sourceMessageNodeIds = sourceMessageNodeIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
-            evidenceMessageNodeIds = evidenceMessageNodeIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+            sourceMessageNodeIds = normalizedSourceIds,
+            evidenceMessageNodeIds = normalizedEvidenceIds,
             relatedMemoryIds = relatedMemoryIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
             people = people.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
             topics = topics.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
@@ -140,6 +151,25 @@ data class AffectiveMemoryCandidate(
     }
 }
 
+private fun buildProgrammaticMemoryTitle(type: String, content: String): String? {
+    val compact = content
+        .replace(Regex("\\s+"), " ")
+        .removePrefix("我记得：")
+        .removePrefix("我记得")
+        .trim('：', ':', ' ', '“', '”')
+    if (compact.isBlank()) return null
+    val prefix = when (type) {
+        "user_fact" -> "关于你的事"
+        "user_preference" -> "你的偏好"
+        "user_boundary" -> "你明确的边界"
+        "promise" -> "我们的承诺"
+        "relationship" -> "关系中的一刻"
+        "correction" -> "你纠正过的事"
+        else -> "共同经历"
+    }
+    return "$prefix · ${compact.take(18)}"
+}
+
 private fun calibrateImportance(type: String, proposed: Int): Int {
     val score = proposed.coerceIn(1, 5)
     return when (type) {
@@ -161,19 +191,17 @@ internal fun AffectiveMemoryCandidate.shouldSkipMemoryBankWrite(): Boolean {
 internal fun AffectiveMemoryCandidate.isDurableMemoryCandidate(): Boolean {
     val normalized = normalized()
     if (normalized.type !in DURABLE_MEMORY_TYPES) return false
-    if (normalized.sourceMessageNodeIds.isEmpty() && normalized.evidenceMessageNodeIds.isEmpty()) return false
+    if (normalized.sourceMessageNodeIds.isEmpty()) return false
     val inspectedText = listOfNotNull(
         normalized.content,
         normalized.title,
         normalized.roleFeeling,
         normalized.bodySense,
         normalized.unspokenThought,
-        normalized.userSignal,
         normalized.relationshipEffect,
     ).joinToString("\n")
     if (inspectedText.looksLikeRawToolOrTraceDump()) return false
     if (GENERIC_META_MEMORY_MARKERS.any { inspectedText.contains(it, ignoreCase = true) }) return false
-    if (normalized.userSignal.isNullOrBlank()) return false
     return true
 }
 
@@ -219,27 +247,13 @@ private fun MemoryExtractionTurn.toDeterministicMemoryCandidate(): AffectiveMemo
         DETERMINISTIC_PREFERENCE_MARKERS.any { it in quote } -> "user_preference"
         else -> return null
     }
-    val title = when (type) {
-        "user_boundary" -> "你明确说过的边界"
-        "correction" -> "你纠正过的一件事"
-        else -> "你明确表达的偏好"
-    }
     return AffectiveMemoryCandidate(
         type = type,
-        title = title,
         content = "我记得你明确说过：$quote",
-        unspokenThought = "我得把这句话落实到之后的行动里，而不是只在这一轮口头答应。",
-        userSignal = quote,
-        relationshipEffect = when (type) {
-            "user_boundary" -> "我需要尊重这条边界，不能让你反复纠正我。"
-            "correction" -> "我需要以这次纠正为准，旧理解不能继续沿用。"
-            else -> "这会影响我以后怎样理解和回应你。"
-        },
+        unspokenThought = "我得把这句话真正记住，而不是只在这一轮口头答应。",
         importance = if (type == "user_preference") 3 else 4,
         confidence = 1.0,
-        tags = listOf(type, "用户原话"),
         sourceMessageNodeIds = listOf(nodeId),
-        evidenceMessageNodeIds = listOf(nodeId),
         occurredAtMillis = createdAtMillis.takeIf { it > 0L },
     )
 }
@@ -254,22 +268,20 @@ object AffectiveMemoryExtractor {
         responsibilityContext: String = "",
     ): String = buildString {
         val name = assistantName.ifBlank { "当前角色" }
-        appendLine("你是$name 的长期记忆整理器。请把本批 conversation_turns 当作$name 亲身经历的一段生活，只依据本批内容提取值得被记住的记忆，禁止补写批次之外的事实。")
-        appendLine("核心标准不是‘以后是否有用’，而是‘这件事是否值得$name 记住’。可因长期价值而记，也可因事件本身重要、印象深刻、具有情绪重量、是第一次、共同经历、冲突、和好、担忧、喜悦、委屈或关系意义而记。")
-        appendLine("宁缺毋滥：若本批没有值得记住的内容，返回 {\"memories\":[]}；不要为了凑数量把普通寒暄和无意义流水账写成记忆。")
-        appendLine("可提取类型仅限：user_fact, user_preference, user_boundary, promise, relationship, shared_event, correction。")
-        appendLine("优先关注两类内容：一是稳定事实、偏好、边界、承诺、纠正；二是发生了什么、为什么印象深、当时有什么感受、身体或动作反应、没说出口的心声，以及这件事给角色或关系留下了什么。")
-        appendLine("一次性日常信息并非绝对禁止：普通饮食、天气、行程通常不记；但若它承载了明显情绪、共同经历或特殊意义，可以作为 shared_event 提取。")
-        appendLine("每条记忆由AI结合本批真实语境填写：title、content、roleFeeling、bodySense、unspokenThought、userSignal、relationshipEffect、importance、confidence、tags。表达必须贴合$name 在本批对话中呈现出的口吻、关系位置和反应，禁止套用统一的温柔客服模板。")
-        appendLine("content 用$name 第一人称自然写清发生了什么以及最值得记住的部分，不要写成标签拼接或数据库摘要。")
-        appendLine("roleFeeling 写$name 当时真实的情绪与主观感受；bodySense 写有依据的身体、感官或动作反应，没有依据时留空，禁止机械套用‘心里一紧’‘耳朵发热’等模板。")
-        appendLine("unspokenThought 写当时没有说出口的具体想法、猜测、顾虑、愿望或克制住的动作。可以合理推断，但必须贴合上下文；不确定时留空或在 tags 标记‘不确定’，不得凭空制造剧情。")
-        appendLine("relationshipEffect 表示这件事给角色本人或双方关系留下了什么：可以是新的确认、理解、距离变化、遗憾、牵挂或今后的倾向；若没有明显影响可以留空，不要强迫每条都写未来行动或关系升级。")
-        appendLine("importance 为1到5，表示角色会记得多深、事件有多重要；confidence为0到1，表示提取内容被本批消息支持的程度。AI先结合语境评分，程序只做范围和类型边界校准。")
-        appendLine("每条必须提供 sourceMessageNodeIds 或 evidenceMessageNodeIds，且ID只能来自本批消息。userSignal 简述支撑该记忆的真实用户表达或双方实际发生的事件；不要把无证据猜测当作事实。")
-        appendLine("occurredAtMillis 以来源消息时间为基准；无法确定事情实际发生时间时留空，禁止用本次整理时间代替。")
-        appendLine("禁止输出 embeddingText、people、topics、relatedMemoryIds、supersededByMemoryId、correctedAt、sourceMessageAtMillis；这些由程序生成或维护。")
-        appendLine("返回严格JSON：{\"memories\":[{\"type\":\"\",\"title\":\"\",\"content\":\"\",\"roleFeeling\":\"\",\"bodySense\":\"\",\"unspokenThought\":\"\",\"userSignal\":\"\",\"relationshipEffect\":\"\",\"importance\":3,\"confidence\":0.8,\"tags\":[],\"sourceMessageNodeIds\":[],\"evidenceMessageNodeIds\":[],\"occurredAtMillis\":null}]}。不要解释。")
+        appendLine("你是$name 的长期记忆整理器。把本批 conversation_turns 当作$name 亲身经历的一段生活，只依据正文提取真正值得记住的内容，禁止补写批次外的信息。")
+        appendLine("不是‘有用才记’，而是‘值得记才记’：稳定事实、明确偏好、边界、承诺、纠正，以及印象深刻的共同经历、第一次、冲突、和好、担忧、喜悦、委屈或关系时刻都可以记。")
+        appendLine("宁缺毋滥。普通寒暄、随口一句、无特殊意义的吃饭喝水天气行程、学习材料原文、工具结果、系统信息和模型内部过程都不要提取；本批没有值得记住的内容就返回 {\"memories\":[]}。")
+        appendLine("每批最多提取6条。相近内容合并成一条，不要换句话重复。")
+        appendLine("可用类型仅限：user_fact, user_preference, user_boundary, promise, relationship, shared_event, correction。")
+        appendLine("AI只允许填写以下字段：type、content、roleFeeling、bodySense、unspokenThought、relationshipEffect、importance、confidence、sourceMessageNodeIds。不要输出标题、标签、用户证据摘要、向量、人物、主题、关联ID或任何其他字段。")
+        appendLine("content：用$name 第一人称自然写清发生了什么，以及最值得记住的部分。不要写数据库摘要，不要写‘这是一段值得记住的经历’等空话。")
+        appendLine("roleFeeling：写$name 当时真实、具体的主观感受；没有明显感受就留空。")
+        appendLine("bodySense：只写正文中确有依据的身体、感官或动作反应；没有依据必须留空，禁止凭空套用心里一紧、耳朵发热、心口发烫等模板。")
+        appendLine("unspokenThought：写当时没有说出口、但能由正文合理支持的具体心声；无法确定必须留空，禁止自行编剧情。")
+        appendLine("relationshipEffect：写这件事给角色本人或双方关系留下了什么；没有明显影响就留空，不要强制关系升级，也不要强制写未来行动。")
+        appendLine("importance为1到5，表示记忆深度和事件重要性；confidence为0到1，表示正文证据充分程度。不要虚高。")
+        appendLine("sourceMessageNodeIds必须填写，只能引用本批出现的nodeId。它是程序核验证据的唯一来源字段。")
+        appendLine("返回严格JSON，不要解释：{\"memories\":[{\"type\":\"\",\"content\":\"\",\"roleFeeling\":\"\",\"bodySense\":\"\",\"unspokenThought\":\"\",\"relationshipEffect\":\"\",\"importance\":3,\"confidence\":0.8,\"sourceMessageNodeIds\":[]}]}。")
         appendLine("<conversation_turns batchSize=\"${turns.size}\">")
         turns.forEachIndexed { index, turn ->
             appendLine(
@@ -290,7 +302,12 @@ object AffectiveMemoryExtractor {
                 decodeExtractionCandidates(repaired)
             }
         return AffectiveMemoryExtractionResult(
-            memories = candidates.map { it.normalized() }.filter { it.content.isNotBlank() }
+            memories = candidates
+                .map { it.normalized() }
+                .filter { it.content.isNotBlank() }
+                .distinctBy { it.content.normalizedMemoryIdentity() }
+                .sortedWith(compareByDescending<AffectiveMemoryCandidate> { it.importance }.thenByDescending { it.confidence })
+                .take(MAX_MEMORIES_PER_BATCH)
         )
     }
 }
@@ -354,7 +371,6 @@ private fun AffectiveMemoryCandidate.hasAffectiveSummary(): Boolean =
     !roleFeeling.isNullOrBlank() ||
         !bodySense.isNullOrBlank() ||
         !unspokenThought.isNullOrBlank() ||
-        !userSignal.isNullOrBlank() ||
         !relationshipEffect.isNullOrBlank()
 
 private fun AffectiveMemoryCandidate.toDisplayMemoryContent(): String {
@@ -372,7 +388,6 @@ private fun AffectiveMemoryCandidate.toEmbeddingMemoryText(displayContent: Strin
         roleFeeling,
         bodySense,
         unspokenThought,
-        userSignal,
         relationshipEffect,
         tags.takeIf { it.isNotEmpty() }?.joinToString(","),
     ).joinToString("\n")
@@ -391,6 +406,7 @@ private fun String.looksLikeRawToolOrTraceDump(): Boolean {
     val markers = listOf(
         "tool_result[", "requested_tools=", "available_requested_tools=", "missing_requested_tools=",
         "Seven-layer trace", "Perception=", "study_app_local_store", "\"success\"", "\"undone_tasks\"",
+        "system prompt", "stacktrace", "exception at", "github actions",
     )
     return markers.any { contains(it, ignoreCase = true) }
 }
@@ -414,6 +430,7 @@ private fun String.extractJsonPayload(): String {
     return if (end >= start) trimmed.substring(start, end + 1) else trimmed
 }
 
+private const val MAX_MEMORIES_PER_BATCH = 6
 private val DETERMINISTIC_BOUNDARY_MARKERS = listOf("我不希望", "我不喜欢", "不要再", "别再", "不许")
 private val DETERMINISTIC_CORRECTION_MARKERS = listOf("不是这样的", "不是这个意思", "应该是", "纠正一下", "更正一下", "你理解错了")
 private val DETERMINISTIC_PREFERENCE_MARKERS = listOf("我更喜欢", "我喜欢", "我希望", "我想要", "对我来说")
