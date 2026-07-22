@@ -1117,11 +1117,14 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                         it.takeLast(assistant.contextMessageSize)
                     } else it
                 } ?: emptyList()
-                val minutesSinceLastChat = historyMessages.lastOrNull()
-                    ?.createdAt
-                    ?.toInstant(TimeZone.currentSystemDefault())
-                    ?.toEpochMilliseconds()
+                val interactionSnapshot = companionRuntime.snapshot(assistant.id.toString())
+                val minutesSinceLastChat = interactionSnapshot.interactionTimeline.lastUserActivityAt
                     ?.let { ((System.currentTimeMillis() - it) / 60_000L).coerceAtLeast(0L) }
+                    ?: historyMessages.lastOrNull { it.role == MessageRole.USER }
+                        ?.createdAt
+                        ?.toInstant(TimeZone.currentSystemDefault())
+                        ?.toEpochMilliseconds()
+                        ?.let { ((System.currentTimeMillis() - it) / 60_000L).coerceAtLeast(0L) }
                 val latestUserMessageAt = historyMessages
                     .lastOrNull { it.role == MessageRole.USER }
                     ?.createdAt
@@ -1248,6 +1251,36 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                         )
                         executingCommitment = null
                         scheduleNextDurableCommitment()
+                        stopSelf()
+                        return@launch
+                    }
+                }
+                if (!isTargetedTrigger) {
+                    val heartbeat = CompanionHeartbeatEvaluator.evaluate(
+                        snapshot = companionRuntime.snapshot(assistant.id.toString()),
+                        nowMillis = nowMillis,
+                    )
+                    companionRuntime.applyTurn(
+                        CompanionTurnMutation(
+                            assistantId = assistant.id.toString(),
+                            interactionEvents = listOf(
+                                CompanionInteractionEvent(
+                                    kind = CompanionInteractionEventKind.LOCAL_HEARTBEAT,
+                                    occurredAt = nowMillis,
+                                    detail = heartbeat.reason,
+                                ),
+                            ),
+                            nowMillis = nowMillis,
+                        ),
+                    )
+                    if (!heartbeat.shouldRunDeepPerception) {
+                        Log.d(TAG, "Local heartbeat completed without model call: ${heartbeat.reason}")
+                        ProactiveMessageService.scheduleNext(
+                            context = this@ProactiveMessageTriggerService,
+                            settings = settings,
+                            minutesSinceLastChat = heartbeat.minutesSinceUserActivity,
+                            assistantId = assistantUuid,
+                        )
                         stopSelf()
                         return@launch
                     }
