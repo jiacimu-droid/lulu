@@ -11,17 +11,17 @@
 
 ## 索引状态
 
-- 基准提交：`ac12b3f27b0aec5b1bed89bba363b726ffa14927`
+- 基准提交：`ee599daf4b353b1e97093ff7d80c8d4fc737f224`
 - 分支：`master`
-- 已索引文件：1093
-- 已索引代码/文本行：261209
-- 已发现类、接口、对象、函数及 Composable：5268
+- 已索引文件：1098
+- 已索引代码/文本行：261462
+- 已发现类、接口、对象、函数及 Composable：5294
 
 ## 模块概览
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 630 |
+| `app` | 636 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -34,8 +34,8 @@
 | `.agents` | 10 |
 | `website` | 10 |
 | `highlight` | 9 |
-| `.github` | 7 |
 | `web` | 7 |
+| `.github` | 6 |
 | `.claude` | 5 |
 | `locale-tui` | 4 |
 | `study-plans` | 4 |
@@ -46,7 +46,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 698 |
+| `.kt` | 704 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -57,7 +57,7 @@
 | `.kts` | 11 |
 | `.js` | 9 |
 | `.html` | 7 |
-| `.yml` | 6 |
+| `.yml` | 5 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -108,7 +108,7 @@
 - `ai/src/test/java/me/rerere/ai/provider/providers/ClaudeProviderPromptCacheTest.kt`
 - `ai/src/test/java/me/rerere/ai/provider/providers/GoogleProviderMessageTest.kt`
 - `ai/src/test/java/me/rerere/ai/provider/providers/OpenAIImageTransportTest.kt`
-- ……另有 89 个文件，见 `code-index.json`
+- ……另有 95 个文件，见 `code-index.json`
 
 ### 主动代理
 
@@ -249,7 +249,6 @@
 
 ### 构建与发布
 
-- `.github/workflows/apply-memory-diagnostics-ui.yml`
 - `.github/workflows/code-index.yml`
 - `.github/workflows/deploy-website.yml`
 - `.github/workflows/release.yml`
@@ -355,7 +354,6 @@
 
 ### 记忆
 
-- `.github/workflows/apply-memory-diagnostics-ui.yml`
 - `app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt`
@@ -395,7 +393,7 @@
 - `plugins/supabase_memory/README.md`
 - `plugins/supabase_memory/main.js`
 - `plugins/supabase_memory/manifest.json`
-- ……另有 1 个文件，见 `code-index.json`
+- `plugins/supabase_memory/supabase_schema.sql`
 
 ## 关键符号快速入口
 

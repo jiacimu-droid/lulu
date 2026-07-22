@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-22T17:56:30.722257+00:00",
-  "commit": "ac12b3f27b0aec5b1bed89bba363b726ffa14927",
+  "generatedAt": "2026-07-22T19:30:53.528562+00:00",
+  "commit": "ee599daf4b353b1e97093ff7d80c8d4fc737f224",
   "branch": "master",
   "summary": {
-    "files": 1093,
-    "lines": 261209,
-    "symbols": 5268,
+    "files": 1098,
+    "lines": 261462,
+    "symbols": 5294,
     "byModule": {
-      "app": 630,
+      "app": 636,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -21,8 +21,8 @@
       ".agents": 10,
       "website": 10,
       "highlight": 9,
-      ".github": 7,
       "web": 7,
+      ".github": 6,
       ".claude": 5,
       "locale-tui": 4,
       "study-plans": 4,
@@ -30,7 +30,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 698,
+      ".kt": 704,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -41,7 +41,7 @@
       ".kts": 11,
       ".js": 9,
       ".html": 7,
-      ".yml": 6,
+      ".yml": 5,
       ".css": 4,
       ".yaml": 3,
       ".properties": 3,
@@ -135,8 +135,11 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/WeatherTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ZipFilesTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/Base64ImageToLocalFileTransformer.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionContextDedupTransformer.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionFinalBudgetTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionLifeClaimOutputTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformer.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionRuntimeCompactTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionTransformerPipeline.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/DocumentAsPromptTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
@@ -169,11 +172,14 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptVM.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/AILoggingManagerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/ai/FinalCompanionContextBudgetTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/tools/CompanionGameToolTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/tools/HumanLikeToolPromptTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/tools/ToolUtilsTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionContextDedupTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionLifeClaimOutputTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformerTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionRuntimeCompactTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionTransformerPipelineTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
@@ -351,7 +357,6 @@
       "app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt"
     ],
     "构建与发布": [
-      ".github/workflows/apply-memory-diagnostics-ui.yml",
       ".github/workflows/code-index.yml",
       ".github/workflows/deploy-website.yml",
       ".github/workflows/release.yml",
@@ -704,7 +709,6 @@
       "web-ui/app/components/ui/ui-avatar.tsx"
     ],
     "记忆": [
-      ".github/workflows/apply-memory-diagnostics-ui.yml",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt",
       "app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt",
@@ -754,6 +758,11 @@
       "imports": 58
     },
     {
+      "from": "me.rerere.rikkahub.data.ai.transformers",
+      "to": "me.rerere.ai.ui.UIMessage",
+      "imports": 24
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.ai",
       "to": "me.rerere.rikkahub.ui.components.ui",
       "imports": 24
@@ -766,11 +775,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.ui.UIMessagePart",
-      "imports": 19
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.ui.UIMessage",
       "imports": 19
     },
     {
@@ -834,6 +838,16 @@
       "imports": 15
     },
     {
+      "from": "me.rerere.rikkahub.data.ai.transformers",
+      "to": "me.rerere.ai.core.MessageRole",
+      "imports": 14
+    },
+    {
+      "from": "me.rerere.rikkahub.data.ai.transformers",
+      "to": "me.rerere.ai.ui.UIMessagePart",
+      "imports": 14
+    },
+    {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 14
@@ -854,19 +868,9 @@
       "imports": 14
     },
     {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.ui.UIMessagePart",
-      "imports": 13
-    },
-    {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 13
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.core.MessageRole",
-      "imports": 12
     },
     {
       "from": "me.rerere.rikkahub.ui.components.message",
@@ -999,6 +1003,11 @@
       "imports": 7
     },
     {
+      "from": "me.rerere.rikkahub.data.ai",
+      "to": "me.rerere.ai.ui.UIMessage",
+      "imports": 7
+    },
+    {
       "from": "me.rerere.rikkahub.data.db",
       "to": "me.rerere.rikkahub.data.db.dao",
       "imports": 7
@@ -1041,11 +1050,6 @@
     {
       "from": "me.rerere.ai.provider.providers.openai",
       "to": "me.rerere.ai.provider.ProviderSetting",
-      "imports": 6
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai",
-      "to": "me.rerere.ai.ui.UIMessage",
       "imports": 6
     },
     {
@@ -1913,18 +1917,6 @@
       "symbols": []
     },
     {
-      "path": ".github/workflows/apply-memory-diagnostics-ui.yml",
-      "module": ".github",
-      "extension": ".yml",
-      "lines": 58,
-      "package": null,
-      "categories": [
-        "记忆",
-        "构建与发布"
-      ],
-      "symbols": []
-    },
-    {
       "path": ".github/workflows/code-index.yml",
       "module": ".github",
       "extension": ".yml",
@@ -1950,7 +1942,7 @@
       "path": ".github/workflows/release.yml",
       "module": ".github",
       "extension": ".yml",
-      "lines": 307,
+      "lines": 141,
       "package": null,
       "categories": [
         "构建与发布"
@@ -4529,7 +4521,7 @@
       "path": "app/build.gradle.kts",
       "module": "app",
       "extension": ".kts",
-      "lines": 318,
+      "lines": 321,
       "package": null,
       "categories": [
         "构建与发布"
@@ -5570,7 +5562,7 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 187,
+      "lines": 287,
       "package": "me.rerere.rikkahub.data.ai",
       "categories": [
         "AI与上下文"
@@ -5579,62 +5571,102 @@
         {
           "name": "CompanionContextEnvelope",
           "kind": "class",
-          "line": 15
+          "line": 9
         },
         {
           "name": "CompanionContextBudget",
           "kind": "class",
-          "line": 23
+          "line": 17
         },
         {
           "name": "CompanionContextSection",
           "kind": "class",
-          "line": 28
+          "line": 22
         },
         {
           "name": "CompanionContextOverflowException",
           "kind": "class",
-          "line": 35
+          "line": 29
         },
         {
           "name": "buildCompanionContextEnvelope",
           "kind": "function",
-          "line": 43
+          "line": 37
         },
         {
           "name": "ClassifiedSystemContext",
           "kind": "class",
-          "line": 132
+          "line": 130
         },
         {
           "name": "messageCount",
           "kind": "function",
-          "line": 140
+          "line": 138
         },
         {
           "name": "classifyStructuredSystemContext",
           "kind": "function",
-          "line": 143
+          "line": 141
         },
         {
           "name": "content",
           "kind": "function",
-          "line": 159
+          "line": 164
+        },
+        {
+          "name": "extractRuntimeCommitmentLines",
+          "kind": "function",
+          "line": 175
+        },
+        {
+          "name": "stripRuntimeCommitmentLines",
+          "kind": "function",
+          "line": 193
+        },
+        {
+          "name": "deduplicateEnvelopeSystemMessages",
+          "kind": "function",
+          "line": 210
+        },
+        {
+          "name": "collapseAdjacentDuplicateHistory",
+          "kind": "function",
+          "line": 231
+        },
+        {
+          "name": "isRollingSummaryText",
+          "kind": "function",
+          "line": 244
+        },
+        {
+          "name": "structuredKind",
+          "kind": "function",
+          "line": 251
+        },
+        {
+          "name": "normalizeSystemText",
+          "kind": "function",
+          "line": 263
+        },
+        {
+          "name": "normalizeConversationText",
+          "kind": "function",
+          "line": 266
         },
         {
           "name": "section",
           "kind": "function",
-          "line": 170
+          "line": 270
         },
         {
           "name": "companionContextBudget",
           "kind": "function",
-          "line": 177
+          "line": 277
         },
         {
           "name": "estimateCompanionPromptTokens",
           "kind": "function",
-          "line": 184
+          "line": 284
         }
       ]
     },
@@ -5642,7 +5674,7 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/FinalCompanionContextBudget.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 121,
+      "lines": 92,
       "package": "me.rerere.rikkahub.data.ai",
       "categories": [
         "AI与上下文"
@@ -5651,37 +5683,37 @@
         {
           "name": "FinalCompanionContextResult",
           "kind": "class",
-          "line": 13
+          "line": 7
         },
         {
           "name": "enforceFinalCompanionContextBudget",
           "kind": "function",
-          "line": 20
+          "line": 14
         },
         {
-          "name": "deduplicateSystemMessages",
+          "name": "deduplicateFinalSystemSnapshots",
           "kind": "function",
-          "line": 74
+          "line": 43
         },
         {
-          "name": "systemCharLimit",
+          "name": "finalSnapshotKind",
           "kind": "function",
-          "line": 83
+          "line": 64
         },
         {
-          "name": "compactText",
+          "name": "normalizeSystemText",
           "kind": "function",
-          "line": 95
+          "line": 77
         },
         {
           "name": "estimateMessagesTokens",
           "kind": "function",
-          "line": 104
+          "line": 80
         },
         {
           "name": "finalCompanionInputBudget",
           "kind": "function",
-          "line": 110
+          "line": 85
         }
       ]
     },
@@ -6849,6 +6881,70 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionContextDedupTransformer.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 89,
+      "package": "me.rerere.rikkahub.data.ai.transformers",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "CompanionContextDedupTransformer",
+          "kind": "object",
+          "line": 15
+        },
+        {
+          "name": "transform",
+          "kind": "function",
+          "line": 16
+        },
+        {
+          "name": "deduplicateTransientCompanionContext",
+          "kind": "function",
+          "line": 22
+        },
+        {
+          "name": "TransientContextKind",
+          "kind": "class",
+          "line": 56
+        },
+        {
+          "name": "transientContextKind",
+          "kind": "function",
+          "line": 67
+        },
+        {
+          "name": "normalizedSystemBlockKey",
+          "kind": "function",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionFinalBudgetTransformer.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 16,
+      "package": "me.rerere.rikkahub.data.ai.transformers",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "CompanionFinalBudgetTransformer",
+          "kind": "object",
+          "line": 8
+        },
+        {
+          "name": "transform",
+          "kind": "function",
+          "line": 9
+        }
+      ]
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionLifeClaimOutputTransformer.kt",
       "module": "app",
       "extension": ".kt",
@@ -6909,7 +7005,7 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformer.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 62,
+      "lines": 47,
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -6938,10 +7034,57 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionRuntimeCompactTransformer.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 143,
+      "package": "me.rerere.rikkahub.data.ai.transformers",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "CompanionRuntimeCompactTransformer",
+          "kind": "object",
+          "line": 12
+        },
+        {
+          "name": "transform",
+          "kind": "function",
+          "line": 13
+        },
+        {
+          "name": "compactCompanionRuntimeMessages",
+          "kind": "function",
+          "line": 19
+        },
+        {
+          "name": "compactRuntime",
+          "kind": "function",
+          "line": 43
+        },
+        {
+          "name": "compactListItem",
+          "kind": "function",
+          "line": 105
+        },
+        {
+          "name": "compactOrdinaryLine",
+          "kind": "function",
+          "line": 118
+        },
+        {
+          "name": "maxItems",
+          "kind": "function",
+          "line": 126
+        }
+      ]
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionTransformerPipeline.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 23,
+      "lines": 31,
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -6950,7 +7093,7 @@
         {
           "name": "withRequiredAssistantPromptContext",
           "kind": "function",
-          "line": 22
+          "line": 30
         }
       ]
     },
@@ -19861,7 +20004,7 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTranslation.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 291,
+      "lines": 279,
       "package": "me.rerere.rikkahub.ui.components.message",
       "categories": [
         "界面"
@@ -19870,7 +20013,7 @@
         {
           "name": "LanguageSelectionDialog",
           "kind": "composable",
-          "line": 56
+          "line": 57
         },
         {
           "name": "getLanguageDisplayName",
@@ -19880,7 +20023,7 @@
         {
           "name": "CollapsibleTranslationText",
           "kind": "composable",
-          "line": 173
+          "line": 167
         }
       ]
     },
@@ -29898,6 +30041,23 @@
       ]
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/ai/FinalCompanionContextBudgetTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 52,
+      "package": "me.rerere.rikkahub.data.ai",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "FinalCompanionContextBudgetTest",
+          "kind": "class",
+          "line": 8
+        }
+      ]
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/ai/tools/CompanionGameToolTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -29959,6 +30119,23 @@
       ]
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionContextDedupTransformerTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 61,
+      "package": "me.rerere.rikkahub.data.ai.transformers",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "CompanionContextDedupTransformerTest",
+          "kind": "class",
+          "line": 8
+        }
+      ]
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionLifeClaimOutputTransformerTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -29979,7 +30156,7 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformerTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 69,
+      "lines": 68,
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -29989,6 +30166,23 @@
           "name": "CompanionPresenceContractTransformerTest",
           "kind": "class",
           "line": 10
+        }
+      ]
+    },
+    {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionRuntimeCompactTransformerTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 62,
+      "package": "me.rerere.rikkahub.data.ai.transformers",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "CompanionRuntimeCompactTransformerTest",
+          "kind": "class",
+          "line": 9
         }
       ]
     },
