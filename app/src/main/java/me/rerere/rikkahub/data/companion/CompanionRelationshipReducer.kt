@@ -32,6 +32,11 @@ object CompanionRelationshipReducer {
                 if (key in appliedKeys) return@forEach
 
                 relationship = relationship.copy(
+                    stage = event.stageAfter?.trim()?.takeIf(String::isNotBlank) ?: relationship.stage,
+                    lastChangeReason = event.reason.trim().ifBlank { event.evidence.trim() }.take(240),
+                    lastChangeConfidence = event.confidence.coerceIn(0f, 1f),
+                    lastEvidenceIds = event.evidenceIds.map(String::trim)
+                        .filter(String::isNotBlank).distinct().takeLast(20),
                     trust = (relationship.trust + event.trustDelta).normalizedDimension(),
                     closeness = (relationship.closeness + event.closenessDelta).normalizedDimension(),
                     reliability = (relationship.reliability + event.reliabilityDelta).normalizedDimension(),
