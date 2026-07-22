@@ -97,6 +97,7 @@ jobs:
             --tests "*LuluStatusDialogTest" \
             --tests "*StudyRulesTest" \
             --tests "*CompanionLifeEventFactoryTest" \
+            --tests "*CompanionDigitalActivitiesTest" \
             --tests "*LuluExpressionOutputTransformerTest" \
             --tests "*CompanionPresenceContractTransformerTest" 2>&1 | tee ci-logs/regression-tests.log
 
