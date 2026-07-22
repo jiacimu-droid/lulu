@@ -300,6 +300,10 @@ private fun CompanionSnapshot.merge(other: CompanionSnapshot): CompanionSnapshot
         continuity
     },
     interactionTimeline = interactionTimeline.merge(other.interactionTimeline),
+    favorites = (favorites + other.favorites)
+        .groupBy { it.assistantId to it.messageId }
+        .values
+        .map { duplicates -> duplicates.maxBy { it.createdAt } },
     updatedAt = maxOf(updatedAt, other.updatedAt),
 )
 
@@ -401,6 +405,19 @@ private fun CompanionSnapshot.normalized(): CompanionSnapshot = copy(
                 .thenByDescending { it.lastUpdatedAt },
         )
         .take(MAX_CONCERNS_PER_ASSISTANT),
+    favorites = favorites
+        .filter { favorite ->
+            favorite.assistantId == assistantId &&
+                favorite.id.isNotBlank() &&
+                favorite.messageId.isNotBlank() &&
+                favorite.reason.isNotBlank() &&
+                favorite.feeling.isNotBlank()
+        }
+        .groupBy { it.assistantId to it.messageId }
+        .values
+        .map { duplicates -> duplicates.maxBy { it.createdAt } }
+        .sortedByDescending { it.createdAt }
+        .take(MAX_FAVORITES_PER_ASSISTANT),
     commitments = commitments
         .filter { it.assistantId == assistantId && it.id.isNotBlank() }
         .mergeSemanticCommitmentDuplicates()
@@ -595,6 +612,7 @@ private const val MAX_COMMITMENTS_PER_ASSISTANT = 300
 private const val MAX_ALWAYS_ON_ANCHORS_PER_ASSISTANT = 48
 private const val MAX_STATE_HISTORY_PER_ASSISTANT = 160
 private const val MAX_OUTBOUND_CONTACTS_PER_ASSISTANT = 80
+private const val MAX_FAVORITES_PER_ASSISTANT = 300
 private const val MAX_RELATIONSHIP_HISTORY_PER_ASSISTANT = 160
 private const val MAX_LIFE_EVENTS_PER_ASSISTANT = 300
 private const val MAX_GOALS_PER_ASSISTANT = 24
