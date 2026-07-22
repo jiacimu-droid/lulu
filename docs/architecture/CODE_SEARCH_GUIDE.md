@@ -9,6 +9,7 @@
 | 角色模型与世界书 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | `Assistant.memoryExtractionInterval` 为角色级用户设置（新角色默认 20，0 关闭自动提取）；`lorebookIds`；`Lorebook.globalApply`；`RegexInjection.constantActive`；触发匹配函数 |
 | 会话与分支 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | `Conversation.messageNodes`、当前选择分支、`MessageNode.selectIndex` 与消息时间 |
 | 记忆服务 | `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt` | 记忆搜索、保存、向量化、维护、纠正、归档、checkpoint 相关逻辑 |
+| 记忆触发与执行 | `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 普通聊天/通话后的自动提取、历史重整、模型调用、三态结果判定和 checkpoint 推进 |
 | 每日定时任务 | `app/src/main/java/me/rerere/rikkahub/data/service/DailySummaryService.kt` | `daily_cron` 调度与插件事件；注意它不等同于记忆系统的派生 daily summary |
 | 主动消息 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 主动判断、生成和发送的主要服务；下一阶段需拆出实际调用链 |
 
