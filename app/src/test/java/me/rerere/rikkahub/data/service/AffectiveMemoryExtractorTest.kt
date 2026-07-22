@@ -1,5 +1,7 @@
 package me.rerere.rikkahub.data.service
 
+import kotlinx.coroutines.runBlocking
+import java.io.IOException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
