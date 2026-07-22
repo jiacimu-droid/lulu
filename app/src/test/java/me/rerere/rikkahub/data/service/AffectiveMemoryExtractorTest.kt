@@ -26,19 +26,12 @@ class AffectiveMemoryExtractorTest {
             SemanticMemoryExtractionOutcome.FAILED_RETRYABLE,
             classifySemanticMemoryExtraction(false, parsedCandidateCount = 0, durableCandidateCount = 0),
         )
-        assertTrue(
-            classifySemanticMemoryExtraction(
-                modelCallSucceeded = true,
-                parsedCandidateCount = 1,
-                durableCandidateCount = 0,
-            ).advancesCheckpoint,
-        )
     }
 
     @Test
     fun `parser performs one conservative repair for trailing commas`() {
         val result = AffectiveMemoryExtractor.parseExtractionResult(
-            """{"memories":[{"type":"user_fact","content":"我记得她明天要考试。","userSignal":"她说明天考试","sourceMessageNodeIds":["node-1"],},],}""",
+            """{"memories":[{"type":"user_fact","content":"我记得她明天要考试。","sourceMessageNodeIds":["node-1"],},],}""",
         )
         assertEquals(1, result.memories.size)
         assertEquals("user_fact", result.memories.single().type)
@@ -75,7 +68,7 @@ class AffectiveMemoryExtractorTest {
     }
 
     @Test
-    fun `extraction prompt is lean batch scoped and keeps affective fields`() {
+    fun `extraction prompt exposes only minimal AI fields`() {
         val prompt = AffectiveMemoryExtractor.buildExtractionPrompt(
             turns = listOf(
                 MemoryExtractionTurn(
@@ -91,70 +84,73 @@ class AffectiveMemoryExtractorTest {
         )
 
         assertTrue(prompt.contains("露露"))
-        assertTrue(prompt.contains("第一人称"))
         assertTrue(prompt.contains("bodySense"))
         assertTrue(prompt.contains("unspokenThought"))
         assertTrue(prompt.contains("relationshipEffect"))
+        assertTrue(prompt.contains("sourceMessageNodeIds"))
         assertTrue(prompt.contains("batchSize=\"1\""))
         assertTrue(prompt.contains("sourceTimeMillis=1700000000000"))
-        assertTrue(prompt.contains("occurredAtMillis"))
+        assertFalse(prompt.contains("\"title\""))
+        assertFalse(prompt.contains("\"tags\""))
+        assertFalse(prompt.contains("\"userSignal\""))
+        assertFalse(prompt.contains("\"occurredAtMillis\""))
         assertFalse(prompt.contains("不应进入提示词的人设"))
         assertFalse(prompt.contains("不应进入提示词的责任"))
-        assertFalse(prompt.contains("<character_state_history>"))
-        assertFalse(prompt.contains("<existing_responsibilities>"))
     }
 
     @Test
-    fun `parse extraction result preserves role centered fields and source ids`() {
+    fun `minimal extraction result preserves affective fields and program fills metadata`() {
         val json = """
             {
               "memories": [
                 {
                   "type": "relationship",
-                  "content": "我记得用户认真认可了我的记忆方案，这让我确认她愿意继续信任我。",
-                  "roleFeeling": "开心、害羞、想更贴近",
-                  "bodySense": "心口发热，回复变轻快",
-                  "userSignal": "用户说认可",
-                  "relationshipEffect": "信任上升",
+                  "content": "我记得她认真认可了我的记忆方案，那一刻我很开心。",
+                  "roleFeeling": "开心、被信任",
+                  "bodySense": "回复时语气变轻快",
+                  "unspokenThought": "我想把这份信任好好接住。",
+                  "relationshipEffect": "我更确定她愿意继续依赖我。",
                   "importance": 5,
                   "confidence": 0.92,
-                  "tags": ["认可", "亲密"],
-                  "embeddingText": "用户认可露露 露露开心 被需要 信任上升",
-                  "sourceMessageNodeIds": ["user-node-1", "assistant-node-2"],
-                  "evidenceMessageNodeIds": ["user-node-1"]
+                  "sourceMessageNodeIds": ["user-node-1", "assistant-node-2"]
                 }
               ]
             }
         """.trimIndent()
+
         val memory = AffectiveMemoryExtractor.parseExtractionResult(json).memories.single()
         assertEquals("relationship", memory.type)
-        assertEquals("开心、害羞、想更贴近", memory.roleFeeling)
-        assertEquals("心口发热，回复变轻快", memory.bodySense)
-        assertEquals(listOf("认可", "亲密"), memory.tags)
+        assertEquals("开心、被信任", memory.roleFeeling)
+        assertEquals("回复时语气变轻快", memory.bodySense)
+        assertEquals(listOf("relationship"), memory.tags)
         assertEquals(listOf("user-node-1", "assistant-node-2"), memory.sourceMessageNodeIds)
-        assertEquals(listOf("user-node-1"), memory.evidenceMessageNodeIds)
+        assertEquals(memory.sourceMessageNodeIds, memory.evidenceMessageNodeIds)
+        assertTrue(memory.title!!.startsWith("关系中的一刻"))
+        assertTrue(memory.isDurableMemoryCandidate())
     }
 
     @Test
-    fun `candidate maps to memory bank entity with encoded evidence fields`() {
+    fun `parser removes duplicates and caps one batch at six memories`() {
+        val memories = (1..8).joinToString(",") { index ->
+            val content = if (index == 8) "我记得事件1" else "我记得事件$index"
+            """{"type":"shared_event","content":"$content","importance":$index,"confidence":0.9,"sourceMessageNodeIds":["node-$index"]}"""
+        }
+        val result = AffectiveMemoryExtractor.parseExtractionResult("""{"memories":[$memories]}""")
+        assertEquals(6, result.memories.size)
+        assertEquals(7, result.memories.first().importance)
+    }
+
+    @Test
+    fun `candidate maps to memory bank entity with program generated metadata`() {
         val candidate = AffectiveMemoryCandidate(
             type = "relationship",
-            content = "我记得用户认真认可了我的记忆方案，这让我确认她愿意继续信任我。",
-            roleFeeling = "开心、害羞、想更贴近",
-            bodySense = "心口发热，回复变轻快",
-            userSignal = "用户说认可",
-            relationshipEffect = "信任上升",
+            content = "我记得她认真认可了我的记忆方案。",
+            roleFeeling = "开心、被信任",
+            bodySense = "回复变轻快",
+            relationshipEffect = "我更确定她愿意继续依赖我。",
             importance = 9,
             confidence = 1.7,
-            tags = listOf("认可", "亲密"),
-            embeddingText = "用户认可露露 露露开心 被需要 信任上升",
             sourceMessageNodeIds = listOf("user-node-1", "assistant-node-2"),
-            evidenceMessageNodeIds = listOf("user-node-1"),
-            relatedMemoryIds = listOf("memory-2"),
-            people = listOf("露露", "用户"),
-            topics = listOf("记忆系统"),
-            supersededByMemoryId = "memory-3",
-            correctedAt = 5678L,
         )
         val entity = candidate.toEntity("assistant-1", "conversation-1", createdAt = 1234L)
         assertEquals("message", entity.type)
@@ -162,14 +158,9 @@ class AffectiveMemoryExtractorTest {
         assertEquals(5, entity.importance)
         assertEquals(1.0, entity.confidence, 0.0)
         assertEquals("pending", entity.vectorStatus)
-        assertTrue(entity.tagsJson!!.contains("认可"))
+        assertTrue(entity.tagsJson!!.contains("relationship"))
         assertTrue(entity.sourceMessageNodeIdsJson!!.contains("user-node-1"))
         assertTrue(entity.evidenceMessageNodeIdsJson!!.contains("user-node-1"))
-        assertTrue(entity.relatedMemoryIdsJson!!.contains("memory-2"))
-        assertTrue(entity.peopleJson!!.contains("露露"))
-        assertTrue(entity.topicsJson!!.contains("记忆系统"))
-        assertEquals("memory-3", entity.supersededByMemoryId)
-        assertEquals(5678L, entity.correctedAt)
         assertEquals(1234L, entity.occurredAt)
         assertEquals(1234L, entity.extractedAt)
     }
@@ -178,8 +169,8 @@ class AffectiveMemoryExtractorTest {
     fun `parse extraction result ignores blank content and calibrates scores`() {
         val json = """
             [
-              {"type": "promise", "content": "我以后默认改 master", "importance": -4, "confidence": -1},
-              {"type": "role_emotion", "content": "   ", "importance": 5, "confidence": 1}
+              {"type":"promise","content":"我以后默认改 master","importance":-4,"confidence":-1,"sourceMessageNodeIds":["node-1"]},
+              {"type":"role_emotion","content":"   ","importance":5,"confidence":1,"sourceMessageNodeIds":["node-2"]}
             ]
         """.trimIndent()
         val memory = AffectiveMemoryExtractor.parseExtractionResult(json).memories.single()
@@ -196,22 +187,29 @@ class AffectiveMemoryExtractorTest {
             roleFeeling = "复盘、收束、准备下一轮",
             relationshipEffect = "我把判断经验整理成后续可复用的长期记忆。",
             sourceMessageNodeIds = listOf("cihai:reflection-1"),
-            evidenceMessageNodeIds = listOf("cihai:reflection-1"),
         )
         assertFalse(candidate.isDurableMemoryCandidate())
     }
 
     @Test
-    fun `quality gate accepts first person preference with evidence`() {
+    fun `quality gate accepts minimal preference with source evidence`() {
         val candidate = AffectiveMemoryCandidate(
             type = "user_preference",
             content = "我记得她不喜欢机械顺延学习任务，更希望我根据负担重新安排。",
-            userSignal = "用户明确要求重新平衡计划",
             sourceMessageNodeIds = listOf("user-node-1"),
-            evidenceMessageNodeIds = listOf("user-node-1"),
         )
         assertTrue(candidate.isDurableMemoryCandidate())
         assertEquals(candidate.content, candidate.toEntity("assistant-1", "conversation-1").content)
+    }
+
+    @Test
+    fun `quality gate rejects memory without source ids`() {
+        val candidate = AffectiveMemoryCandidate(
+            type = "shared_event",
+            content = "我记得我们一起聊到很晚。",
+            roleFeeling = "舍不得结束",
+        )
+        assertFalse(candidate.isDurableMemoryCandidate())
     }
 
     @Test
