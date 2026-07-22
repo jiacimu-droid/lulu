@@ -337,6 +337,18 @@ private fun CompanionSnapshot.normalized(): CompanionSnapshot = copy(
         .map { it.normalizedForStorage() },
     relationship = relationship.copy(
         roleLabel = relationship.roleLabel.trim().take(MAX_STATE_TEXT_LENGTH),
+        knownDuration = relationship.knownDuration.cleanCompanionHumanText("").take(MAX_STATE_TEXT_LENGTH),
+        sharedExperiences = relationship.sharedExperiences.cleanImpressionItems(12),
+        stage = relationship.stage.cleanCompanionHumanText("").take(MAX_STATE_TEXT_LENGTH),
+        securityContext = relationship.securityContext.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_ITEM_LENGTH),
+        attachmentExpression = relationship.attachmentExpression.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_ITEM_LENGTH),
+        interactionPatterns = relationship.interactionPatterns.cleanImpressionItems(12),
+        declaredBoundaries = relationship.declaredBoundaries.cleanImpressionItems(12),
+        potentialTensions = relationship.potentialTensions.cleanImpressionItems(12),
+        initializationEvidence = relationship.initializationEvidence.trim().take(MAX_EVIDENCE_REFERENCE_LENGTH),
+        lastChangeReason = relationship.lastChangeReason.cleanCompanionHumanText("").take(MAX_PRIVATE_IMPRESSION_ITEM_LENGTH),
+        lastChangeConfidence = relationship.lastChangeConfidence.normalizedDimension(),
+        lastEvidenceIds = relationship.lastEvidenceIds.filter(String::isNotBlank).distinct().takeLast(20),
         trust = relationship.trust.normalizedDimension(),
         closeness = relationship.closeness.normalizedDimension(),
         reliability = relationship.reliability.normalizedDimension(),
@@ -512,7 +524,20 @@ private fun List<CompanionConcern>.mergeSemanticConcernDuplicates(): List<Compan
 private fun List<CompanionCommitment>.mergeSemanticCommitmentDuplicates(): List<CompanionCommitment> =
     map { commitment ->
         commitment
-            .copy(subjectKey = normalizeCompanionSubjectKey(commitment.subjectKey))
+            .copy(
+                subjectKey = normalizeCompanionSubjectKey(commitment.subjectKey),
+                promisorId = commitment.promisorId.trim().ifBlank { commitment.assistantId },
+                beneficiary = commitment.beneficiary.trim().ifBlank { "user" },
+                responsibility = commitment.responsibility.cleanCompanionHumanText(commitment.promise).take(500),
+                schedule = commitment.schedule.copy(
+                    timeDescription = commitment.schedule.timeDescription.trim().take(160),
+                    frequency = commitment.schedule.frequency.trim().take(120),
+                    condition = commitment.schedule.condition.cleanCompanionHumanText("").take(240),
+                ),
+                executionMethod = commitment.executionMethod.trim().take(160),
+                history = commitment.history.filter { it.occurredAt >= 0L }
+                    .sortedBy { it.occurredAt }.takeLast(80),
+            )
             .sanitizedHumanFacingText()
     }
         .groupBy { commitment -> commitment.assistantId to commitment.subjectKey }
