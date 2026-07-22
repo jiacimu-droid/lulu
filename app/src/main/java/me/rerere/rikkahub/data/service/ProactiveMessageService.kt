@@ -70,6 +70,7 @@ import me.rerere.rikkahub.data.companion.CompanionContextFact
 import me.rerere.rikkahub.data.companion.CompanionConversationTurn
 import me.rerere.rikkahub.data.companion.CompanionInteractionEvent
 import me.rerere.rikkahub.data.companion.CompanionInteractionEventKind
+import me.rerere.rikkahub.data.companion.CompanionOutboundStatus
 import me.rerere.rikkahub.data.companion.CompanionModelPresence
 import me.rerere.rikkahub.data.companion.CompanionPerceptionInput
 import me.rerere.rikkahub.data.companion.CompanionRuntime
@@ -127,6 +128,7 @@ import kotlin.random.Random
 class ProactiveMessageService : KoinComponent {
     private val studyStore: StudyStore by inject()
     private val cihaiStore: CihaiStore by inject()
+    private val companionRuntime: CompanionRuntime by inject()
 
     companion object {
         const val TAG = "ProactiveMessageService"
@@ -148,6 +150,8 @@ class ProactiveMessageService : KoinComponent {
         internal const val EXTRA_TARGETED_KIND = "targeted_kind"
         internal const val EXTRA_COMMITMENT_ID = "commitment_id"
         internal const val EXTRA_ASSISTANT_ID = "assistant_id"
+        internal const val EXTRA_OUTBOUND_CONTACT_ID = "outbound_contact_id"
+        internal const val EXTRA_PROACTIVE_NOTIFICATION = "proactive_notification"
 
         private fun requestCode(base: Int, identity: String): Int = base xor identity.hashCode()
 
@@ -652,6 +656,29 @@ class ProactiveMessageService : KoinComponent {
         val currentTime = java.lang.System.currentTimeMillis()
         sb.appendLine(me.rerere.rikkahub.service.LocalTimeContextFormatter.format(currentTime))
         sb.appendLine("自主联系原则：角色自己根据近期聊天、长期记忆、承诺、当前时间与真实感知决定是否开口。用户说忙、暂时不能聊天、想休息或需要空间时，要把它理解为降低打扰频率的明确意愿；可以安静等待、做真实的 App 内活动或稍后重新感知，不能用机械问候增加压力。夜间也不要因为静默就联系，除非承诺、安全或新的真实情境足以支持这次行动。")
+        when (
+            companionRuntime.snapshot(assistant.id.toString())
+                .interactionTimeline.outboundContacts
+                .maxByOrNull { it.generatedAt }
+                ?.status
+        ) {
+            CompanionOutboundStatus.USER_BUSY -> {
+                sb.appendLine("最近反馈：用户明确表示忙碌。若本轮没有到期承诺或新事件，应保持安静；确需联系时只发简短陈述，不打电话、不连续追问。")
+            }
+            CompanionOutboundStatus.DECLINED -> {
+                sb.appendLine("最近反馈：用户明确拒绝这类联系。不要换一种方式重复触达；只有用户重新开启话题或必须履行的明确承诺才可继续。")
+            }
+            CompanionOutboundStatus.UNANSWERED -> {
+                sb.appendLine("最近反馈：上一条主动消息暂未收到反馈。不要重复同一问题、不要升级为电话；确有新信息时缩短表达且不要求立即回复。")
+            }
+            CompanionOutboundStatus.TOPIC_CHANGED -> {
+                sb.appendLine("最近反馈：用户已经转移话题。不要重新拉回上一话题或追问旧问题，除非存在尚未完成的明确承诺。")
+            }
+            CompanionOutboundStatus.REMINDER_COMPLETED -> {
+                sb.appendLine("最近反馈：用户已说明提醒事项完成。停止催促和复述结果；只有新的相关事实才值得再次提及。")
+            }
+            else -> Unit
+        }
 
         // Study plan context
         try {
@@ -810,7 +837,8 @@ class ProactiveMessageService : KoinComponent {
         sb.appendLine("- 绝对不要提及任何数据来源、工具使用、传感器数据、位置服务、应用使用统计等技术细节")
         sb.appendLine("- 不要说\"根据xxx\"、\"我注意到xxx数据\"之类暴露信息来源的话")
         sb.appendLine("- 直接以该角色在当前关系中真实会采用的方式开口；不得默认朋友、恋人、照顾者或顺从型关系")
-        sb.appendLine("- 不要使用任何XML标签、思考标记或特殊格式，最终消息只输出纯文本")
+        sb.appendLine("- 对用户可见的正文必须是自然纯文本；允许按系统约定在末尾输出一个 <lulu_presence> 私有状态块，它会在展示前移除。")
+        sb.appendLine("- 正文、简短心声、状态栏、动作/场景和状态变化要在本次生成一起给出：正文放在私有状态块之前；心声、状态栏、动作/场景等写入 <lulu_presence>，不要另开第二次完整生成。")
         sb.appendLine("- 时间、电量、健康、位置和应用使用等被动感知已经直接写在上下文里，不要为了重复读取这些信息而调用工具。")
         sb.appendLine("- 工具只用于角色决定主动做出的动作，例如设闹钟、写日历、看摄像头、控制音乐、收藏消息或写正式日记。正式日记只在确有新内容时调用 write_lulu_journal。")
         sb.appendLine("- 涉及时间时必须以“当前本地时间”的 24 小时制为准，00:00-04:59 是凌晨，不能说成下午或中午。")
@@ -1140,7 +1168,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                     companionRuntime.applyTurn(
                         CompanionTurnMutation(
                             assistantId = assistant.id.toString(),
-                            interactionEvents = listOf(
+                            interactionEvents = heartbeat.lifecycleEvents + listOf(
                                 CompanionInteractionEvent(
                                     kind = CompanionInteractionEventKind.LOCAL_HEARTBEAT,
                                     occurredAt = nowMillis,
@@ -1655,16 +1683,42 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                             assistant = assistant,
                             assistantText = replyText,
                             presence = finalPresence,
-                            fallbackInnerThought = autonomousPlan?.innerThought
-                                ?: "我刚刚主动联系了你，现在想看看你会不会回应。",
+                            fallbackInnerThought = autonomousPlan?.innerThought,
                             nowMillis = System.currentTimeMillis(),
                             toolExecutions = completedToolExecutions,
                             evidenceReference = aiMessage.id.toString(),
+                            conversationId = conversationId.toString(),
                         )
                     }.onFailure { error ->
                         Log.w(TAG, "Failed to persist proactive companion state projection", error)
                     }
-                    showProactiveNotification(conversationId, assistant.name.ifBlank { "AI" }, replyText)
+                    showProactiveNotification(
+                        conversationId = conversationId,
+                        assistantId = assistant.id.toString(),
+                        contactId = aiMessage.id.toString(),
+                        senderName = assistant.name.ifBlank { "AI" },
+                        message = replyText,
+                    )
+                    val deliveredAt = System.currentTimeMillis()
+                    runCatching {
+                        companionRuntime.applyTurn(
+                            CompanionTurnMutation(
+                                assistantId = assistant.id.toString(),
+                                interactionEvents = listOf(
+                                    CompanionInteractionEvent(
+                                        kind = CompanionInteractionEventKind.OUTBOUND_DELIVERED,
+                                        occurredAt = deliveredAt,
+                                        contactId = aiMessage.id.toString(),
+                                        conversationId = conversationId.toString(),
+                                        sourceMessageId = aiMessage.id.toString(),
+                                    ),
+                                ),
+                                nowMillis = deliveredAt,
+                            ),
+                        )
+                    }.onFailure { error ->
+                        Log.w(TAG, "Failed to persist proactive notification delivery", error)
+                    }
                 }
 
                 if (commitmentResolvedExternally) {
@@ -1917,6 +1971,7 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
         nowMillis: Long,
         toolExecutions: List<CompanionToolExecution> = emptyList(),
         evidenceReference: String? = null,
+        conversationId: String? = null,
     ) {
         val unifiedState = buildCompanionStateFromTurn(
             previous = companionRuntime.snapshot(assistant.id.toString()).state,
@@ -1948,18 +2003,14 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
                             kind = CompanionInteractionEventKind.OUTBOUND_GENERATED,
                             occurredAt = nowMillis,
                             contactId = contactId,
+                            conversationId = conversationId,
                             sourceMessageId = contactId,
                         ),
                         CompanionInteractionEvent(
                             kind = CompanionInteractionEventKind.OUTBOUND_SENT,
                             occurredAt = nowMillis,
                             contactId = contactId,
-                            sourceMessageId = contactId,
-                        ),
-                        CompanionInteractionEvent(
-                            kind = CompanionInteractionEventKind.OUTBOUND_DELIVERED,
-                            occurredAt = nowMillis,
-                            contactId = contactId,
+                            conversationId = conversationId,
                             sourceMessageId = contactId,
                         ),
                     )
@@ -2106,12 +2157,17 @@ class ProactiveMessageTriggerService : android.app.Service(), KoinComponent {
 
     private fun showProactiveNotification(
         conversationId: kotlin.uuid.Uuid,
+        assistantId: String,
+        contactId: String,
         senderName: String,
         message: String
     ) {
         val intent = Intent(this, RouteActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             putExtra("conversationId", conversationId.toString())
+            putExtra(ProactiveMessageService.EXTRA_ASSISTANT_ID, assistantId)
+            putExtra(ProactiveMessageService.EXTRA_OUTBOUND_CONTACT_ID, contactId)
+            putExtra(ProactiveMessageService.EXTRA_PROACTIVE_NOTIFICATION, true)
         }
         val pendingIntent = PendingIntent.getActivity(
             this,
