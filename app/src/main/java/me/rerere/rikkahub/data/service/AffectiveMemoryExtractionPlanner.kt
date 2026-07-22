@@ -27,21 +27,22 @@ fun buildAffectiveMemoryExtractionPlan(
     if (extractionInterval <= 0) return null
     val logicalTurns = messageNodes.toMemoryExtractionTurns()
     val stableTurns = logicalTurns.dropLast(MEMORY_EXTRACTION_TAIL_BUFFER)
-    // Only complete, interval-aligned windows are eligible. For example, with 335
-    // logical turns and an interval of 40, turns 321..325 remain pending after the
-    // newest ten are protected, while 281..320 is the newest complete window.
-    val alignedStableTurns = stableTurns.take(
-        (stableTurns.size / extractionInterval) * extractionInterval,
-    )
-    // The interval is the user's exact batch size, not merely a trigger threshold.
-    // Work from the earliest source nodes that have never been checkpointed, so a
-    // retry can repair old partial batches without re-summarising already handled turns.
-    val pendingStableTurns = alignedStableTurns.filterNot { it.nodeId in processedSourceNodeIds }
-    if (pendingStableTurns.size < extractionInterval) return null
+    // The role setting is the exact batch size (20 is only the default). Build standard
+    // contiguous windows before consulting the checkpoint so legacy holes cannot stitch
+    // fragments from two different windows into one extraction request.
+    val completeWindows = stableTurns
+        .chunked(extractionInterval)
+        .filter { window -> window.size == extractionInterval }
+    val pendingWindows = completeWindows.filter { window ->
+        window.any { turn -> turn.nodeId !in processedSourceNodeIds }
+    }
+    if (pendingWindows.isEmpty()) return null
 
+    // A partially checkpointed legacy window is rebuilt as a whole standard batch.
+    // Saved memories keep their source IDs, so the storage layer can de-duplicate them.
     val selectedTurns = when (direction) {
-        MemoryExtractionDirection.OLDEST_FIRST -> pendingStableTurns.take(extractionInterval)
-        MemoryExtractionDirection.RECENT_FIRST -> pendingStableTurns.takeLast(extractionInterval)
+        MemoryExtractionDirection.OLDEST_FIRST -> pendingWindows.first()
+        MemoryExtractionDirection.RECENT_FIRST -> pendingWindows.last()
     }
 
     return AffectiveMemoryExtractionPlan(
