@@ -30,7 +30,6 @@ import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.ai.ui.ToolApprovalState
 import me.rerere.ai.ui.handleMessageChunk
-import me.rerere.ai.ui.limitContext
 import me.rerere.rikkahub.data.ai.transformers.InputMessageTransformer
 import me.rerere.rikkahub.data.ai.transformers.MessageTransformer
 import me.rerere.rikkahub.data.ai.transformers.OutputMessageTransformer
@@ -38,6 +37,8 @@ import me.rerere.rikkahub.data.ai.transformers.onGenerationFinish
 import me.rerere.rikkahub.data.ai.transformers.transforms
 import me.rerere.rikkahub.data.ai.transformers.visualTransforms
 import me.rerere.rikkahub.data.ai.transformers.withRequiredAssistantPromptContext
+import me.rerere.rikkahub.data.ai.transformers.collectConditionalLorebookInjections
+import me.rerere.rikkahub.data.ai.transformers.collectGlobalLorebookInjections
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
@@ -372,7 +373,26 @@ class GenerationHandler(
                 appendLine(skipReplyPrompt)
             }
         }.trim()
-        val limitedMessages = messages.limitContext(assistant.contextMessageSize)
+        val globalLorebookContext = collectGlobalLorebookInjections(settings.lorebooks)
+            .sortedByDescending { it.priority }
+            .joinToString("\n") { it.content.trim() }
+        val roleLorebookContext = collectConditionalLorebookInjections(
+            messages = messages,
+            assistant = assistant,
+            lorebooks = settings.lorebooks,
+        )
+            .sortedByDescending { it.priority }
+            .joinToString("\n") { it.content.trim() }
+        val contextEnvelope = buildCompanionContextEnvelope(
+            assistant = assistant,
+            source = apiUsageSource,
+            messages = messages,
+            characterCore = effectiveSystemPrompt,
+            globalLorebook = globalLorebookContext,
+            roleLorebook = roleLorebookContext,
+            otherMandatoryPrompt = systemExtensions,
+        )
+        val limitedMessages = contextEnvelope.messages
             .compactOldToolOutputsForPrompt()
         val preTransformMessages = buildList {
             val systemParts = buildList {
@@ -406,6 +426,7 @@ class GenerationHandler(
             limitedMessages = limitedMessages,
             preTransformMessages = preTransformMessages,
             internalMessages = internalMessages,
+            contextEnvelope = contextEnvelope,
         )
 
         var messages: List<UIMessage> = messages
@@ -531,6 +552,7 @@ class GenerationHandler(
         limitedMessages: List<UIMessage>,
         preTransformMessages: List<UIMessage>,
         internalMessages: List<UIMessage>,
+        contextEnvelope: CompanionContextEnvelope,
     ): GenerationTokenBreakdown {
         val preTransformText = preTransformMessages.joinToTokenEstimateText()
         val internalText = internalMessages.joinToTokenEstimateText()
@@ -582,7 +604,14 @@ class GenerationHandler(
                 }
             )
         }
-        val sections = listOf(
+        val sections = contextEnvelope.sections.map { section ->
+            GenerationTokenSection(
+                label = section.label,
+                estimatedTokens = section.estimatedTokens,
+                messageCount = section.messageCount,
+                charCount = section.charCount,
+            )
+        } + listOf(
             GenerationTokenSection(
                 label = "人设/基础系统提示词",
                 estimatedTokens = estimateTokens(effectiveSystemPrompt),
