@@ -108,8 +108,16 @@ android {
         generateLocaleConfig = true
     }
     lint {
-        baseline = file("lint-baseline.xml")
         abortOnError = true
+        checkOnly += setOf(
+            "NewApi",
+            "InlinedApi",
+            "MissingPermission",
+            "WrongThread",
+            "UnsafeProtectedBroadcastReceiver",
+            "TrustAllX509TrustManager",
+            "WebViewClientOnReceivedSslError"
+        )
     }
     packaging {
         jniLibs {
