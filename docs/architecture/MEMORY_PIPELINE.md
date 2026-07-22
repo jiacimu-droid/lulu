@@ -8,7 +8,7 @@
 |---|---|---|
 | 自动触发 | `ChatService` 普通聊天和通话完成路径 | 回复落库后异步尝试提取；批次大小读取当前角色的 `memoryExtractionInterval` |
 | 手动整理 | `ChatService.reorganizeAffectiveMemories` | 可整理最近批、继续历史或完整重建；逐会话处理并显示进度 |
-| 批次规划 | `AffectiveMemoryExtractionPlanner.kt` | 先保留最新10条，再按用户配置值切连续完整窗口；历史空洞重建整个标准窗口 |
+| 批次规划 | `AffectiveMemoryExtractionPlanner.kt` | 先按角色的保护数量保留最新消息，再按角色批次值切连续完整窗口；历史空洞重建整个标准窗口 |
 | checkpoint 读取 | `MemoryBankService.getProcessedSourceNodeIds` | 普通提取以当前选中路径上成功批次为准；不同分支不会共用完成状态，旧 checkpoint 仅保留兼容用途 |
 | 确定性提取 | `buildDeterministicMemoryCandidates` | 只处理明确偏好、边界和纠正；它可以先保存，但不能替语义提取宣告批次成功 |
 | 语义提取 | `AffectiveMemoryExtractor` | 模型输出 JSON；解析后校验类型、来源证据、用户信号和耐久性 |
@@ -21,7 +21,7 @@
 
 ## 连续批次规则
 
-设用户配置批次大小为 `B`，保护区为 `T`（当前 `T=10`）：
+设用户配置批次大小为 `B`，最近保护区为 `T`（新角色默认 `B=20`、`T=10`，均可在角色页面调整）：
 
 1. 将当前分支中有效的用户/角色消息映射为逻辑消息。
 2. 去掉最新 `T` 条。
@@ -79,7 +79,6 @@
 下列内容仍属于后续 P1，不能误认为已经实现：
 
 - 记忆管理页读取批次表并展示 App 重启后仍存在的失败重试队列；
-- 角色级保护区设置；
 - 记忆页的失败/空结果/失效批次列表和手动重试；
 - 派生日总结与原子记忆互斥召回。
 
