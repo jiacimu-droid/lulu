@@ -56,6 +56,23 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
+    fun `planner rebuilds an entire configured window when a legacy checkpoint has a hole`() {
+        val conversation = nodes(50)
+        val partiallyProcessed = (1..30).map { idOf(it) }.toSet()
+
+        val plan = buildAffectiveMemoryExtractionPlan(
+            messageNodes = conversation,
+            processedSourceNodeIds = partiallyProcessed,
+            extractionInterval = 20,
+        )
+
+        requireNotNull(plan)
+        assertEquals(20, plan.turns.size)
+        assertEquals(idOf(21), plan.turns.first().nodeId)
+        assertEquals(idOf(40), plan.turns.last().nodeId)
+    }
+
+    @Test
     fun `planner respects a forty message interval after keeping the newest ten`() {
         val conversation = nodes(90)
         val processed = (1..40).map { idOf(it) }.toSet()
@@ -103,16 +120,17 @@ class AffectiveMemoryExtractionPlannerTest {
                 extractionInterval = 20,
             ),
         )
-        assertEquals(
-            "interval",
-            requireNotNull(
-                buildAffectiveMemoryExtractionPlan(
-                    messageNodes = conversation,
-                    processedSourceNodeIds = emptySet(),
-                    extractionInterval = 12,
-                ),
-            ).reason,
+        val customPlan = requireNotNull(
+            buildAffectiveMemoryExtractionPlan(
+                messageNodes = conversation,
+                processedSourceNodeIds = emptySet(),
+                extractionInterval = 12,
+            ),
         )
+        assertEquals("interval", customPlan.reason)
+        assertEquals(12, customPlan.turns.size)
+        assertEquals(idOf(1), customPlan.turns.first().nodeId)
+        assertEquals(idOf(12), customPlan.turns.last().nodeId)
         assertEquals(
             null,
             buildAffectiveMemoryExtractionPlan(
