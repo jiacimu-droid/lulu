@@ -429,7 +429,7 @@ class LocalTools(private val context: Context) {
                         put("feeling", buildJsonObject { put("type", "string") })
                         put("activity_kind", buildJsonObject {
                             put("type", "string")
-                            put("description", "One of: " + CompanionDigitalActivityKind.entries.joinToString(",") { it.name })
+                            put("description", "One of: " + CompanionDigitalActivityKind.values().joinToString(",") { it.name })
                         })
                         put("title", buildJsonObject { put("type", "string") })
                         put("summary", buildJsonObject { put("type", "string") })
