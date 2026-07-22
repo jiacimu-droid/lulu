@@ -66,6 +66,28 @@ class CompanionContextEnvelopeTest {
         assertTrue(envelope.sections.first { it.label == "记忆" }.estimatedTokens > 0)
     }
 
+    @Test
+    fun `rolling summary replaces old raw turns and survives the sliding window`() {
+        val messages = buildList {
+            add(UIMessage.user("<rolling_summary>the first 200 turns</rolling_summary>"))
+            addAll((201..500).map { UIMessage.user("message-$it") })
+        }
+
+        val envelope = buildCompanionContextEnvelope(
+            assistant = Assistant(contextMessageSize = 20),
+            source = ApiUsageSource.CHAT,
+            messages = messages,
+            characterCore = "persona",
+            globalLorebook = "world",
+            roleLorebook = "",
+            otherMandatoryPrompt = "",
+        )
+
+        assertTrue(envelope.messages.first().toText().contains("first 200 turns"))
+        assertEquals(20, envelope.messages.count { !it.toText().contains("<rolling_summary") })
+        assertTrue(envelope.sections.first { it.label == "滚动摘要" }.estimatedTokens > 0)
+    }
+
     @Test(expected = CompanionContextOverflowException::class)
     fun `mandatory global context is never silently truncated`() {
         buildCompanionContextEnvelope(
