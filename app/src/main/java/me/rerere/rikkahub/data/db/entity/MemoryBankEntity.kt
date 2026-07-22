@@ -68,6 +68,10 @@ data class MemoryBankEntity(
     @ColumnInfo("related_memory_ids_json")
     val relatedMemoryIdsJson: String? = null,
 
+    /** Source memory IDs used to derive daily/monthly summaries. */
+    @ColumnInfo("source_memory_ids_json")
+    val sourceMemoryIdsJson: String? = null,
+
     @ColumnInfo("people_json")
     val peopleJson: String? = null,
 
@@ -114,6 +118,18 @@ data class MemoryBankEntity(
     /** Timestamp when the remembered event actually happened. */
     @ColumnInfo("occurred_at")
     val occurredAt: Long? = null,
+
+    /** True when occurredAt is inferred from the source message rather than explicit event time. */
+    @ColumnInfo("occurred_at_inferred", defaultValue = "0")
+    val occurredAtInferred: Boolean = false,
+
+    /** Timestamp when this database record was first created. */
+    @ColumnInfo("memory_created_at", defaultValue = "0")
+    val memoryCreatedAt: Long = 0L,
+
+    /** Timestamp when this database record was last updated. */
+    @ColumnInfo("memory_updated_at", defaultValue = "0")
+    val memoryUpdatedAt: Long = 0L,
 
     /** Timestamp when extraction/backfill wrote the memory. */
     @ColumnInfo("extracted_at", defaultValue = "0")
