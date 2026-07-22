@@ -94,7 +94,7 @@ fun LoggingPaging(
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = "发一条消息后，这里会显示模型、输入/输出 token 和调用状态。",
+                    text = "发一条消息后，这里会显示场景、模型、分层 token 和调用状态；不会保存聊天正文或完整提示词。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -159,7 +159,7 @@ private fun GenerationLogCard(log: AILogging.Generation) {
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = "${log.providerSetting.name} · ${if (log.stream) "流式" else "非流式"} · ${formatTime(log.createdAtMillis)}",
+                        text = "${log.source.label} · ${log.title.ifBlank { "未命名调用" }} · ${log.providerSetting.name} · ${if (log.stream) "流式" else "非流式"} · ${formatTime(log.createdAtMillis)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -234,8 +234,8 @@ private fun GenerationLogCard(log: AILogging.Generation) {
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                DetailLine("聊天消息", "${log.messages.size} 条（变换前）")
-                DetailLine("实际发送消息", "${log.sentMessages.size} 条")
+                DetailLine("聊天消息", "${log.messageCount} 条（变换前，仅保留数量）")
+                DetailLine("实际发送消息", "${log.sentMessageCount} 条（仅保留数量）")
                 DetailLine("工具定义", "${log.params.tools.size} 个（发给模型可选，不等于实际调用）")
                 log.breakdown?.toolNames?.takeIf { it.isNotEmpty() }?.let { toolNames ->
                     DetailLine("工具名", toolNames.take(12).joinToString("、") + if (toolNames.size > 12) " 等 ${toolNames.size} 个" else "")
