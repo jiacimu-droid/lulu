@@ -30,6 +30,40 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
+    fun `batch branch fingerprint stays stable when newer messages are appended`() {
+        val firstThree = nodes(3)
+        val appended = nodes(5)
+
+        assertEquals(
+            buildSelectedConversationBranchId(firstThree, 3),
+            buildSelectedConversationBranchId(appended, 3),
+        )
+        assertNotEquals(
+            buildSelectedConversationBranchId(firstThree),
+            buildSelectedConversationBranchId(appended),
+        )
+    }
+
+    @Test
+    fun `selected path mutation reports first changed sequence`() {
+        val original = nodes(5)
+        val changed = original.toMutableList().also { items ->
+            val node = items[2]
+            items[2] = node.copy(
+                messages = node.messages + UIMessage(
+                    role = node.role,
+                    parts = listOf(UIMessagePart.Text("edited branch")),
+                ),
+                selectIndex = 1,
+            )
+        }
+
+        assertEquals(3, firstSelectedBranchMutationSequence(original, changed))
+        assertEquals(4, firstSelectedBranchMutationSequence(original, original.take(3)))
+        assertEquals(null, firstSelectedBranchMutationSequence(original, original))
+    }
+
+    @Test
     fun `planner waits until twenty stable logical messages remain after keeping newest ten`() {
         val shortConversation = nodes(29)
 
