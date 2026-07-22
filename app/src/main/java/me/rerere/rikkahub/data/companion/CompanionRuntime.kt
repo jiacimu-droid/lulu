@@ -151,7 +151,10 @@ internal fun expandExplicitCompanionResponsibilities(
             families.map { family ->
                 draft.copy(
                     category = family,
-                    subjectKeyOverride = null,
+                    // One explicit request may create several durable duties. Keep the
+                    // family in the persisted identity so semantic normalization cannot
+                    // merge wake, sleep, and study back into a single commitment.
+                    subjectKeyOverride = family,
                     commitmentIdOverride = null,
                 )
             }
