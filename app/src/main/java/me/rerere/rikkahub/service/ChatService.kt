@@ -108,6 +108,9 @@ import me.rerere.rikkahub.data.companion.detectExplicitRecurringResponsibilityCa
 import me.rerere.rikkahub.data.companion.mergeAlwaysOnResponsibilityAnchors
 import me.rerere.rikkahub.data.companion.CompanionContinuity
 import me.rerere.rikkahub.data.companion.CompanionInteractionModality
+import me.rerere.rikkahub.data.companion.CompanionInteractionEvent
+import me.rerere.rikkahub.data.companion.CompanionInteractionEventKind
+import me.rerere.rikkahub.data.companion.userReplyInteractionEvents
 import me.rerere.rikkahub.data.companion.CompanionContextFact
 import me.rerere.rikkahub.data.companion.CompanionConversationTurn
 import me.rerere.rikkahub.data.companion.CompanionFollowUpDraft
@@ -584,6 +587,19 @@ class ChatService(
                     ).toMessageNode(),
                 )
                 saveConversation(conversationId, newConversation)
+                val userActivityAt = System.currentTimeMillis()
+                companionRuntime.applyTurn(
+                    CompanionTurnMutation(
+                        assistantId = assistant.id.toString(),
+                        interactionEvents = userReplyInteractionEvents(
+                            text = processedContent
+                                .filterIsInstance<UIMessagePart.Text>()
+                                .joinToString("\n") { it.text },
+                            occurredAt = userActivityAt,
+                        ),
+                        nowMillis = userActivityAt,
+                    ),
+                )
 
                 // 触发 message_sent 事件钩子
                 try {
@@ -758,6 +774,19 @@ class ChatService(
                         lastAssistantText = reply.take(800),
                         updatedAt = nowMillis,
                     ),
+                    interactionEvents = buildList {
+                        if (!visibleUserText.isNullOrBlank()) {
+                            addAll(userReplyInteractionEvents(visibleUserText, nowMillis))
+                        }
+                        add(
+                            CompanionInteractionEvent(
+                                kind = CompanionInteractionEventKind.ORDINARY_ASSISTANT,
+                                occurredAt = nowMillis,
+                                conversationId = conversationId.toString(),
+                                sourceMessageId = replyMessage.id.toString(),
+                            ),
+                        )
+                    },
                     nowMillis = nowMillis,
                 ),
             )
@@ -1410,6 +1439,17 @@ class ChatService(
                             lastUserText = lastUserText.take(800),
                             lastAssistantText = lastAssistantText.take(800),
                             updatedAt = nowMillis,
+                        ),
+                        interactionEvents = listOf(
+                            CompanionInteractionEvent(
+                                kind = CompanionInteractionEventKind.ORDINARY_ASSISTANT,
+                                occurredAt = nowMillis,
+                                conversationId = conversationId.toString(),
+                                sourceMessageId = finalConversation.currentMessages
+                                    .lastOrNull { it.role == MessageRole.ASSISTANT }
+                                    ?.id
+                                    ?.toString(),
+                            ),
                         ),
                         nowMillis = nowMillis,
                     ),
