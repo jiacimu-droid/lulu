@@ -56,6 +56,7 @@ enum class CompanionInteractionModality {
 
 @Serializable
 data class CompanionInteractionTimeline(
+    val lastHeartbeatAt: Long? = null,
     val lastUserActivityAt: Long? = null,
     val lastUserReplyAt: Long? = null,
     val lastOrdinaryAssistantAt: Long? = null,
@@ -105,6 +106,7 @@ data class CompanionInteractionEvent(
 )
 
 enum class CompanionInteractionEventKind {
+    LOCAL_HEARTBEAT,
     USER_ACTIVITY,
     USER_REPLY,
     ORDINARY_ASSISTANT,
