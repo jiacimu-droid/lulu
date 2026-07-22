@@ -122,7 +122,16 @@ class MemoryBankServiceExtractionTest {
 
     @Test
     fun `selected branch mutation invalidates batch and deprecates generated memories`() = runBlocking {
-        val dao = RecordingMemoryBankDAO()
+        val dao = RecordingMemoryBankDAO(
+            assistantMemories = listOf(
+                MemoryBankEntity(
+                    id = 8,
+                    assistantId = "assistant-1",
+                    conversationId = "conversation-1",
+                    sourceMessageNodeIdsJson = """["node-5"]""",
+                ),
+            ),
+        )
         val service = MemoryBankService(dao, okHttpClient = null, context = null)
         val batch = service.beginExtractionBatch(
             "assistant-1", "conversation-1", "branch-a", 1, 12,
@@ -146,13 +155,13 @@ class MemoryBankServiceExtractionTest {
         )
 
         assertEquals(1, result.invalidatedBatchCount)
-        assertEquals(1, result.deprecatedMemoryCount)
+        assertEquals(2, result.deprecatedMemoryCount)
         assertEquals(
             MemoryExtractionBatchStatus.INVALIDATED.name,
             dao.extractionBatches.getValue(batch.batchId).status,
         )
-        assertEquals(7, dao.deprecatedUpdates.single().id)
-        assertEquals("source_message_edited", dao.deprecatedUpdates.single().deprecatedReason)
+        assertEquals(setOf(7, 8), dao.deprecatedUpdates.map { it.id }.toSet())
+        assertTrue(dao.deprecatedUpdates.all { it.deprecatedReason == "source_message_edited" })
     }
 
     @Test
