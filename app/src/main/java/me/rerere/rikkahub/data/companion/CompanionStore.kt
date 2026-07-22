@@ -174,7 +174,7 @@ class CompanionStore(
             val remaining = snapshot.relationshipHistory.filterNot { it.id == eventId }
             val rebuilt = CompanionRelationshipReducer.apply(
                 assistantId = assistantId,
-                current = CompanionRelationshipState(),
+                current = snapshot.relationship.declaredBaselineForRebuild(),
                 appliedEventIds = emptySet(),
                 events = remaining,
                 nowMillis = System.currentTimeMillis(),
@@ -184,6 +184,31 @@ class CompanionStore(
                 relationshipHistory = remaining,
             )
         }
+    }
+
+    private fun CompanionRelationshipState.declaredBaselineForRebuild(): CompanionRelationshipState {
+        val dimensions = when (roleLabel) {
+            "伴侣" -> listOf(0.70f, 0.75f, 0.60f, 0.55f, 0f)
+            "恋人" -> listOf(0.65f, 0.70f, 0.55f, 0.50f, 0f)
+            "家人" -> listOf(0.65f, 0.60f, 0.60f, 0.55f, 0f)
+            "挚友" -> listOf(0.62f, 0.58f, 0.55f, 0.55f, 0f)
+            "朋友" -> listOf(0.55f, 0.35f, 0.52f, 0.52f, 0f)
+            "敌对关系" -> listOf(0.15f, 0.05f, 0.30f, 0.55f, 0.65f)
+            "竞争关系" -> listOf(0.35f, 0.15f, 0.45f, 0.55f, 0.40f)
+            else -> listOf(0.5f, 0f, 0.5f, 0.5f, 0f)
+        }
+        return copy(
+            trust = dimensions[0],
+            closeness = dimensions[1],
+            reliability = dimensions[2],
+            boundaryConfidence = dimensions[3],
+            unresolvedTension = dimensions[4],
+            lastChangeReason = "",
+            lastChangeConfidence = 0f,
+            lastEvidenceIds = emptyList(),
+            lastMeaningfulInteractionAt = null,
+            updatedAt = 0L,
+        )
     }
 
     private fun CompanionPrivateImpression.dismissCurrentProfileEvidence(): CompanionPrivateImpression = copy(
