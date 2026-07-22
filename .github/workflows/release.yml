@@ -163,6 +163,30 @@ jobs:
             gh release create "$tag" apk-artifacts/*.apk --title "$title" --notes "$notes"
           fi
 
+      - name: Report successful chatops build
+        if: success() && github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = "https://github.com/" + context.repo.owner + "/" + context.repo.repo +
+              "/actions/runs/" + context.runId
+            const tag = "signed-build-" + context.runNumber
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                "✅ Lulu 最新 master 已完成最终验收。",
+                "",
+                "- 提交：\`" + context.sha.slice(0, 7) + "\`",
+                "- 回归测试：通过",
+                "- Android Lint：通过",
+                "- 签名 APK：已构建并发布",
+                "- Release：\`" + tag + "\`",
+                "- 运行：" + runUrl
+              ].join("\\n")
+            })
+
       - name: Upload failure logs
         if: failure()
         uses: actions/upload-artifact@v4
