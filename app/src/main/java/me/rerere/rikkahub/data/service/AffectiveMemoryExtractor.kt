@@ -26,6 +26,23 @@ data class AffectiveMemoryExtractionResult(
     val memories: List<AffectiveMemoryCandidate> = emptyList(),
 )
 
+internal enum class SemanticMemoryExtractionOutcome(val advancesCheckpoint: Boolean) {
+    SUCCESS_WITH_MEMORIES(true),
+    SUCCESS_EMPTY(true),
+    FAILED_RETRYABLE(false),
+}
+
+internal fun classifySemanticMemoryExtraction(
+    modelCallSucceeded: Boolean,
+    parsedCandidateCount: Int,
+    durableCandidateCount: Int,
+): SemanticMemoryExtractionOutcome = when {
+    !modelCallSucceeded -> SemanticMemoryExtractionOutcome.FAILED_RETRYABLE
+    parsedCandidateCount == 0 -> SemanticMemoryExtractionOutcome.SUCCESS_EMPTY
+    durableCandidateCount > 0 -> SemanticMemoryExtractionOutcome.SUCCESS_WITH_MEMORIES
+    else -> SemanticMemoryExtractionOutcome.FAILED_RETRYABLE
+}
+
 @Serializable
 data class AffectiveMemoryCandidate(
     @SerialName("type")
