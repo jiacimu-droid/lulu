@@ -1,17 +1,17 @@
 package me.rerere.rikkahub.data.service
 
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.jsonObject
+import me.rerere.rikkahub.data.companion.CompanionStateHistoryEntry
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
 import me.rerere.rikkahub.utils.JsonInstant
-import me.rerere.rikkahub.data.companion.CompanionStateHistoryEntry
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Serializable
 data class MemoryExtractionTurn(
@@ -38,9 +38,8 @@ internal fun classifySemanticMemoryExtraction(
     durableCandidateCount: Int,
 ): SemanticMemoryExtractionOutcome = when {
     !modelCallSucceeded -> SemanticMemoryExtractionOutcome.FAILED_RETRYABLE
-    parsedCandidateCount == 0 -> SemanticMemoryExtractionOutcome.SUCCESS_EMPTY
     durableCandidateCount > 0 -> SemanticMemoryExtractionOutcome.SUCCESS_WITH_MEMORIES
-    else -> SemanticMemoryExtractionOutcome.FAILED_RETRYABLE
+    else -> SemanticMemoryExtractionOutcome.SUCCESS_EMPTY
 }
 
 @Serializable
@@ -65,33 +64,34 @@ data class AffectiveMemoryCandidate(
     val topics: List<String> = emptyList(),
     val supersededByMemoryId: String? = null,
     val correctedAt: Long? = null,
-    /** The time the source conversation happened, distinct from the time we repaired it. */
     val occurredAtMillis: Long? = null,
-    /** The exact timestamp of the source message; populated from local data, not trusted to the model. */
     val sourceMessageAtMillis: Long? = null,
 ) {
-    fun normalized(): AffectiveMemoryCandidate = copy(
-        type = type.trim().ifBlank { "event" },
-        content = content.trim(),
-        title = title?.trim()?.takeIf { it.isNotBlank() },
-        roleFeeling = roleFeeling?.trim()?.takeIf { it.isNotBlank() },
-        bodySense = bodySense?.trim()?.takeIf { it.isNotBlank() },
-        unspokenThought = unspokenThought?.trim()?.takeIf { it.isNotBlank() },
-        userSignal = userSignal?.trim()?.takeIf { it.isNotBlank() },
-        relationshipEffect = relationshipEffect?.trim()?.takeIf { it.isNotBlank() },
-        importance = importance.coerceIn(1, 5),
-        confidence = confidence.coerceIn(0.0, 1.0),
-        tags = tags.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
-        embeddingText = embeddingText?.trim()?.takeIf { it.isNotBlank() },
-        sourceMessageNodeIds = sourceMessageNodeIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
-        evidenceMessageNodeIds = evidenceMessageNodeIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
-        relatedMemoryIds = relatedMemoryIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
-        people = people.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
-        topics = topics.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
-        supersededByMemoryId = supersededByMemoryId?.trim()?.takeIf { it.isNotBlank() },
-        occurredAtMillis = occurredAtMillis?.takeIf { it > 0L },
-        sourceMessageAtMillis = sourceMessageAtMillis?.takeIf { it > 0L },
-    )
+    fun normalized(): AffectiveMemoryCandidate {
+        val normalizedType = type.trim().ifBlank { "shared_event" }.lowercase()
+        return copy(
+            type = normalizedType,
+            content = content.trim(),
+            title = title?.trim()?.takeIf(String::isNotBlank),
+            roleFeeling = roleFeeling?.trim()?.takeIf(String::isNotBlank),
+            bodySense = bodySense?.trim()?.takeIf(String::isNotBlank),
+            unspokenThought = unspokenThought?.trim()?.takeIf(String::isNotBlank),
+            userSignal = userSignal?.trim()?.takeIf(String::isNotBlank),
+            relationshipEffect = relationshipEffect?.trim()?.takeIf(String::isNotBlank),
+            importance = calibrateImportance(normalizedType, importance),
+            confidence = confidence.coerceIn(0.0, 1.0),
+            tags = tags.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+            embeddingText = embeddingText?.trim()?.takeIf(String::isNotBlank),
+            sourceMessageNodeIds = sourceMessageNodeIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+            evidenceMessageNodeIds = evidenceMessageNodeIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+            relatedMemoryIds = relatedMemoryIds.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+            people = people.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+            topics = topics.mapNotNull { it.trim().takeIf(String::isNotBlank) }.distinct(),
+            supersededByMemoryId = supersededByMemoryId?.trim()?.takeIf(String::isNotBlank),
+            occurredAtMillis = occurredAtMillis?.takeIf { it > 0L },
+            sourceMessageAtMillis = sourceMessageAtMillis?.takeIf { it > 0L },
+        )
+    }
 
     fun toEntity(
         assistantId: String?,
@@ -100,9 +100,11 @@ data class AffectiveMemoryCandidate(
     ): MemoryBankEntity {
         val normalized = normalized()
         val displayContent = normalized.toDisplayMemoryContent()
-        val embeddingText = normalized.embeddingText
+        val vectorText = normalized.embeddingText
             ?.takeUnless { it.looksLikeRawToolOrTraceDump() }
             ?: normalized.toEmbeddingMemoryText(displayContent)
+        val sourceTime = normalized.sourceMessageAtMillis
+        val occurredTime = normalized.occurredAtMillis ?: sourceTime ?: createdAt
         return MemoryBankEntity(
             content = displayContent,
             type = "message",
@@ -116,7 +118,7 @@ data class AffectiveMemoryCandidate(
             importance = normalized.importance,
             confidence = normalized.confidence,
             tagsJson = JsonInstant.encodeToString(normalized.tags),
-            embeddingText = embeddingText,
+            embeddingText = vectorText,
             sourceMessageNodeIdsJson = JsonInstant.encodeToString(normalized.sourceMessageNodeIds),
             evidenceMessageNodeIdsJson = JsonInstant.encodeToString(normalized.evidenceMessageNodeIds),
             relatedMemoryIdsJson = JsonInstant.encodeToString(normalized.relatedMemoryIds),
@@ -126,14 +128,26 @@ data class AffectiveMemoryCandidate(
             correctedAt = normalized.correctedAt,
             assistantId = assistantId,
             conversationId = conversationId,
-            sourceMessageAt = normalized.sourceMessageAtMillis,            occurredAt = normalized.occurredAtMillis ?: normalized.sourceMessageAtMillis ?: createdAt,
+            sourceMessageAt = sourceTime,
+            occurredAt = occurredTime,
             occurredAtInferred = normalized.occurredAtMillis == null,
             memoryCreatedAt = createdAt,
             memoryUpdatedAt = createdAt,
             extractedAt = createdAt,
-            createdAt = normalized.occurredAtMillis ?: normalized.sourceMessageAtMillis ?: createdAt,
+            createdAt = occurredTime,
             vectorStatus = "pending",
         )
+    }
+}
+
+private fun calibrateImportance(type: String, proposed: Int): Int {
+    val score = proposed.coerceIn(1, 5)
+    return when (type) {
+        "user_boundary", "correction", "promise" -> score.coerceAtLeast(4)
+        "user_preference" -> score.coerceIn(2, 4)
+        "user_fact" -> score.coerceIn(1, 4)
+        "relationship", "shared_event" -> score.coerceIn(2, 5)
+        else -> score
     }
 }
 
@@ -146,7 +160,7 @@ internal fun AffectiveMemoryCandidate.shouldSkipMemoryBankWrite(): Boolean {
 
 internal fun AffectiveMemoryCandidate.isDurableMemoryCandidate(): Boolean {
     val normalized = normalized()
-    if (normalized.type.lowercase() !in DURABLE_MEMORY_TYPES) return false
+    if (normalized.type !in DURABLE_MEMORY_TYPES) return false
     if (normalized.sourceMessageNodeIds.isEmpty() && normalized.evidenceMessageNodeIds.isEmpty()) return false
     val inspectedText = listOfNotNull(
         normalized.content,
@@ -156,7 +170,6 @@ internal fun AffectiveMemoryCandidate.isDurableMemoryCandidate(): Boolean {
         normalized.unspokenThought,
         normalized.userSignal,
         normalized.relationshipEffect,
-        normalized.embeddingText,
     ).joinToString("\n")
     if (inspectedText.looksLikeRawToolOrTraceDump()) return false
     if (GENERIC_META_MEMORY_MARKERS.any { inspectedText.contains(it, ignoreCase = true) }) return false
@@ -173,12 +186,11 @@ internal fun buildDeterministicMemoryCandidates(
 ): List<AffectiveMemoryCandidate> {
     if (limit <= 0) return emptyList()
     val identities = mutableSetOf<String>()
-    return turns
-        .asReversed()
+    return turns.asReversed()
         .asSequence()
         .filter { it.role.equals("user", ignoreCase = true) }
-        .mapNotNull { turn -> turn.toDeterministicMemoryCandidate() }
-        .filter { candidate -> identities.add(candidate.content.normalizedMemoryIdentity()) }
+        .mapNotNull { it.toDeterministicMemoryCandidate() }
+        .filter { identities.add(it.content.normalizedMemoryIdentity()) }
         .take(limit)
         .toList()
         .reversed()
@@ -212,27 +224,127 @@ private fun MemoryExtractionTurn.toDeterministicMemoryCandidate(): AffectiveMemo
         "correction" -> "你纠正过的一件事"
         else -> "你明确表达的偏好"
     }
-    val relationshipEffect = when (type) {
-        "user_boundary" -> "我需要尊重这条边界，不能让你反复纠正我。"
-        "correction" -> "我需要以这次纠正为准，旧理解不能继续沿用。"
-        else -> "这会影响我以后怎样理解这件事，并以符合自身人设和关系位置的方式回应你。"
-    }
     return AffectiveMemoryCandidate(
         type = type,
         title = title,
-        content = "我记得你明确说过：“$quote”",
+        content = "我记得你明确说过：$quote",
         unspokenThought = "我得把这句话落实到之后的行动里，而不是只在这一轮口头答应。",
         userSignal = quote,
-        relationshipEffect = relationshipEffect,
+        relationshipEffect = when (type) {
+            "user_boundary" -> "我需要尊重这条边界，不能让你反复纠正我。"
+            "correction" -> "我需要以这次纠正为准，旧理解不能继续沿用。"
+            else -> "这会影响我以后怎样理解和回应你。"
+        },
         importance = if (type == "user_preference") 3 else 4,
         confidence = 1.0,
         tags = listOf(type, "用户原话"),
-        embeddingText = quote,
         sourceMessageNodeIds = listOf(nodeId),
         evidenceMessageNodeIds = listOf(nodeId),
-        topics = listOf(title),
         occurredAtMillis = createdAtMillis.takeIf { it > 0L },
     )
+}
+
+object AffectiveMemoryExtractor {
+    @Suppress("UNUSED_PARAMETER")
+    fun buildExtractionPrompt(
+        turns: List<MemoryExtractionTurn>,
+        assistantName: String = "当前角色",
+        assistantPersona: String = "",
+        stateHistory: List<CompanionStateHistoryEntry> = emptyList(),
+        responsibilityContext: String = "",
+    ): String = buildString {
+        val name = assistantName.ifBlank { "当前角色" }
+        appendLine("你是$name 的长期记忆整理器。只依据本批 conversation_turns 提取记忆，禁止使用或补写批次之外的信息。")
+        appendLine("宁缺毋滥：没有会影响未来交流、照顾、承诺履行或关系连续性的内容，就返回 {\"memories\":[]}。不要为了凑数量提取日常流水账。")
+        appendLine("可提取类型仅限：user_fact, user_preference, user_boundary, promise, relationship, shared_event, correction。")
+        appendLine("优先提取：稳定事实与偏好、明确边界、承诺及结果、用户纠正、具有长期意义的共同事件、已有充分证据的关系变化。")
+        appendLine("禁止提取：普通寒暄、一次性饮食天气、重复工具结果、单词表、学习材料原文、无证据猜测、模型自造的人设或动作。")
+        appendLine("每条记忆应由AI贴合本批真实语境填写：title、content、roleFeeling、bodySense、unspokenThought、userSignal、relationshipEffect、importance、confidence、tags。")
+        appendLine("content、roleFeeling、bodySense、unspokenThought、relationshipEffect 必须使用$name 第一人称。bodySense 没有自然依据时留空，禁止机械套用心里一紧、耳朵发热等模板。")
+        appendLine("unspokenThought 应写当时未说出口的具体判断、顾虑或意图；只能从本批对话推断，无法确定时留空或在 tags 标记不确定。")
+        appendLine("relationshipEffect 写这件事以后会怎样影响我的理解、回应或行动；不是每条都必须造成关系升级。")
+        appendLine("importance 为1到5，confidence为0到1；结合语境判断。程序会做边界校准，但不要虚高。")
+        appendLine("每条必须提供 sourceMessageNodeIds 或 evidenceMessageNodeIds，并且这些ID只能来自本批消息。userSignal 必须简述真实用户证据。")
+        appendLine("occurredAtMillis 以来源消息时间为准；不能确定具体事件时间时留空。禁止用整理时间代替发生时间。")
+        appendLine("返回严格JSON：{\"memories\":[{\"type\":\"\",\"title\":\"\",\"content\":\"\",\"roleFeeling\":\"\",\"bodySense\":\"\",\"unspokenThought\":\"\",\"userSignal\":\"\",\"relationshipEffect\":\"\",\"importance\":3,\"confidence\":0.8,\"tags\":[],\"sourceMessageNodeIds\":[],\"evidenceMessageNodeIds\":[],\"occurredAtMillis\":null}]}。不要解释。")
+        appendLine("<conversation_turns batchSize=\"${turns.size}\">")
+        turns.forEachIndexed { index, turn ->
+            appendLine(
+                "[batchIndex=${index + 1}][nodeId=${turn.nodeId}]" +
+                    "[sourceTimeMillis=${turn.createdAtMillis}]" +
+                    "[sourceLocalTime=${turn.sourceTimeLabel()}] ${turn.role}: ${turn.text.trim()}"
+            )
+        }
+        append("</conversation_turns>")
+    }
+
+    fun parseExtractionResult(rawText: String): AffectiveMemoryExtractionResult {
+        val jsonText = rawText.extractJsonPayload()
+        val candidates = runCatching { decodeExtractionCandidates(jsonText) }
+            .getOrElse { originalError ->
+                val repaired = jsonText.repairMemoryExtractionJsonOnce()
+                if (repaired == jsonText) throw originalError
+                decodeExtractionCandidates(repaired)
+            }
+        return AffectiveMemoryExtractionResult(
+            memories = candidates.map { it.normalized() }.filter { it.content.isNotBlank() }
+        )
+    }
+}
+
+private fun decodeExtractionCandidates(jsonText: String): List<AffectiveMemoryCandidate> {
+    val root = JsonInstant.parseToJsonElement(jsonText)
+    return if (root is JsonArray) {
+        JsonInstant.decodeFromString(ListSerializer(AffectiveMemoryCandidate.serializer()), jsonText)
+    } else {
+        JsonInstant.decodeFromString<AffectiveMemoryExtractionResult>(root.jsonObject.toString()).memories
+    }
+}
+
+private fun String.repairMemoryExtractionJsonOnce(): String = this
+    .replace("\uFEFF", "")
+    .replace("\u200B", "")
+    .replace(Regex(",\\s*([}\\]])"), "$1")
+    .trim()
+
+internal fun isTransientMemoryExtractionFailure(error: Throwable): Boolean =
+    generateSequence(error as Throwable?) { it.cause }
+        .take(8)
+        .any { cause ->
+            cause is java.io.IOException ||
+                TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS.any {
+                    cause::class.simpleName.orEmpty().contains(it, ignoreCase = true)
+                }
+        }
+
+internal suspend fun <T> retryTransientMemoryExtraction(
+    maxAttempts: Int = 3,
+    baseDelayMillis: Long = 500L,
+    onRetry: suspend (failedAttempt: Int, error: Throwable) -> Unit = { _, _ -> },
+    block: suspend (attempt: Int) -> T,
+): T {
+    val boundedAttempts = maxAttempts.coerceAtLeast(1)
+    var attempt = 1
+    while (true) {
+        try {
+            return block(attempt)
+        } catch (error: Throwable) {
+            if (error is kotlinx.coroutines.CancellationException) throw error
+            if (attempt >= boundedAttempts || !isTransientMemoryExtractionFailure(error)) throw error
+            onRetry(attempt, error)
+            if (baseDelayMillis > 0L) kotlinx.coroutines.delay(baseDelayMillis * attempt)
+            attempt += 1
+        }
+    }
+}
+
+private fun MemoryExtractionTurn.sourceTimeLabel(): String {
+    if (createdAtMillis <= 0L) return "unknown"
+    return runCatching {
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
+            Instant.ofEpochMilli(createdAtMillis).atZone(ZoneId.systemDefault())
+        )
+    }.getOrDefault("unknown")
 }
 
 private fun AffectiveMemoryCandidate.hasAffectiveSummary(): Boolean =
@@ -252,42 +364,30 @@ private fun AffectiveMemoryCandidate.toDisplayMemoryContent(): String {
 
 private fun AffectiveMemoryCandidate.toEmbeddingMemoryText(displayContent: String): String =
     listOfNotNull(
+        title,
         displayContent,
-        roleFeeling?.let { "roleFeeling=$it" },
-        bodySense?.let { "bodySense=$it" },
-        unspokenThought?.let { "unspokenThought=$it" },
-        userSignal?.let { "userSignal=$it" },
-        relationshipEffect?.let { "relationshipEffect=$it" },
-        tags.takeIf { it.isNotEmpty() }?.joinToString(prefix = "tags=", separator = ","),
+        roleFeeling,
+        bodySense,
+        unspokenThought,
+        userSignal,
+        relationshipEffect,
+        tags.takeIf { it.isNotEmpty() }?.joinToString(","),
     ).joinToString("\n")
 
 private fun firstPersonSummary(content: String): String {
     val compact = content.trim()
         .lineSequence()
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
+        .map(String::trim)
+        .filter(String::isNotBlank)
         .joinToString(" ")
         .replace(Regex("\\s+"), " ")
-    if (compact.hasFirstPersonVoice()) return compact
-    return "我记得：$compact"
-}
-
-private fun String.hasFirstPersonVoice(): Boolean {
-    val compact = trimStart()
-    return FIRST_PERSON_PREFIXES.any { prefix -> compact.startsWith(prefix, ignoreCase = true) }
+    return if (FIRST_PERSON_PREFIXES.any { compact.startsWith(it, ignoreCase = true) }) compact else "我记得：$compact"
 }
 
 private fun String.looksLikeRawToolOrTraceDump(): Boolean {
     val markers = listOf(
-        "tool_result[",
-        "requested_tools=",
-        "available_requested_tools=",
-        "missing_requested_tools=",
-        "Seven-layer trace",
-        "Perception=",
-        "study_app_local_store",
-        "\"success\"",
-        "\"undone_tasks\"",
+        "tool_result[", "requested_tools=", "available_requested_tools=", "missing_requested_tools=",
+        "Seven-layer trace", "Perception=", "study_app_local_store", "\"success\"", "\"undone_tasks\"",
     )
     return markers.any { contains(it, ignoreCase = true) }
 }
@@ -300,236 +400,25 @@ private fun String.looksLikeVocabularyDrill(): Boolean {
     return uniqueRatio > 0.75 && !hasSentencePunctuation
 }
 
-private val DETERMINISTIC_BOUNDARY_MARKERS = listOf(
-    "我不希望",
-    "我不喜欢",
-    "不要再",
-    "别再",
-    "不许",
-)
-
-private val DETERMINISTIC_CORRECTION_MARKERS = listOf(
-    "不是这样的",
-    "不是这个意思",
-    "应该是",
-    "纠正一下",
-    "更正一下",
-    "你理解错了",
-)
-
-private val DETERMINISTIC_PREFERENCE_MARKERS = listOf(
-    "我更喜欢",
-    "我喜欢",
-    "我希望",
-    "我想要",
-    "对我来说",
-)
-
-object AffectiveMemoryExtractor {
-    fun buildExtractionPrompt(
-        turns: List<MemoryExtractionTurn>,
-        assistantName: String = "当前角色",
-        assistantPersona: String = "",
-        stateHistory: List<CompanionStateHistoryEntry> = emptyList(),
-        responsibilityContext: String = "",
-    ): String = buildString {
-        val name = assistantName.ifBlank { "当前角色" }
-        appendLine("你是$name 的记忆整理器。只提取值得以后想起的候选记忆。")
-        if (assistantPersona.isNotBlank()) {
-            appendLine("角色设定摘要：$assistantPersona")
-        }
-        appendLine("只保存以后召回仍有价值的新事实：稳定用户事实、用户偏好、用户边界、明确承诺及结果、有用户证据的关系变化、高情绪共同事件、用户纠正。")
-        appendLine("content 必须是$name 第一人称的自然完整记忆，不要拼接字段标签，也不要粘贴工具 JSON、学习计划原文、单词表、长列表或完整 observation。")
-        appendLine("所有 content、roleFeeling、bodySense、unspokenThought、relationshipEffect、embeddingText 都必须代入$name，用第一人称“我”来总结；不要写成“${name}觉得”“角色认为”“助手记录”这类旁白或第三人称。")
-        appendLine("如果原文只是英文单词、工具结果、日程 JSON 或流水账，除非能提炼出用户偏好/承诺/关系变化/角色心声，否则不要写入 memories。")
-        appendLine("unspokenThought 必须贴合$name 的人设、语言习惯和关系位置；不要写成旁白腔、客服腔或通用模板。")
-        appendLine("unspokenThought 要尽量具体：写$name 当时的猜测、顾虑、符合人设但没有说出口的意图、想做但暂时压住的动作、对用户真实状态的判断。不要默认亲密动作，也不要只写“很担心”这类空泛短句。")
-        appendLine("当 type=relationship 时，用这条候选同时提供可展示的关系档案增量：title 是$name 给当前关系起的简短名字；content 只写有证据的具体关系事件；roleFeeling 用$name 第一人称写“我们现在是什么关系”的自然段；unspokenThought 写$name 眼中的用户画像，并明确区分事实、主观看法和不确定猜测；relationshipEffect 写$name 因此学会怎样与用户相处。")
-        appendLine("关系档案必须服从角色设定：冷淡、傲娇、理性、朋友或恋人都应保持自己的口吻和距离，禁止统一写成温柔客服或默认恋爱关系。没有足够证据时不要创建 relationship 候选。普通寒暄、聊天次数和沉默时长不能单独证明关系升级。")
-        appendLine("如果确有未说开的冲突，在 tags 加入“未解”；如果只是推测，在 tags 加入“不确定”。已经说开或修复时不要继续沿用旧的未解判断。")
-        appendLine("返回 JSON，格式为 {\"memories\":[...]}。不要输出解释。")
-        appendLine("每条字段：type, content, roleFeeling, bodySense, unspokenThought, userSignal, relationshipEffect, importance, confidence, tags, embeddingText, sourceMessageNodeIds, evidenceMessageNodeIds, relatedMemoryIds, people, topics, supersededByMemoryId, correctedAt, occurredAtMillis。")
-        appendLine("type 只能使用 user_fact, user_preference, user_boundary, promise, relationship, shared_event, correction。")
-        appendLine("每条必须提供 sourceMessageNodeIds 或 evidenceMessageNodeIds，并用 userSignal 简述用户原话或真实工具结果证据；无新事实时返回空 memories。")
-        appendLine("时间必须以每条 conversation_turn 的 sourceTime 为基准：‘今天/昨天/三天前’都相对于该消息发送时间，而不是本次整理时间。occurredAtMillis 写事情实际发生时间；无法确定时留空，程序会回退到来源消息时间。禁止把整理时间当成发生时间。")
-        if (responsibilityContext.isNotBlank()) {
-            appendLine("<existing_responsibilities>")
-            appendLine(responsibilityContext.take(5_000))
-            appendLine("这些是角色正在承担的责任，只用于避免遗忘、重复或矛盾；不要把责任本身改写成 private impression，也不要在用户没有新增或纠正时重复提取。")
-            appendLine("</existing_responsibilities>")
-        }
-        val visibleStateHistory = stateHistory.filter { entry -> entry.toExtractionContext().isNotBlank() }
-        if (visibleStateHistory.isNotEmpty()) {
-            appendLine("<character_state_history>")
-            appendLine("以下是角色当时真实保存的状态栏与没说出口内容，只用于理解语境和补充第一人称感受；仍然必须用 conversation_turns 里的消息节点作为事实证据。")
-            visibleStateHistory.takeLast(60).forEach { entry ->
-                appendLine("[${entry.recordedAt}] ${entry.toExtractionContext()}")
-            }
-            appendLine("</character_state_history>")
-        }
-        appendLine("<conversation_turns>")
-        turns.forEach { turn ->
-            appendLine("[${turn.nodeId}][sourceTimeMillis=${turn.createdAtMillis}][sourceLocalTime=${turn.sourceTimeLabel()}] ${turn.role}: ${turn.text.trim()}")
-        }
-        append("</conversation_turns>")
-    }
-
-    fun parseExtractionResult(rawText: String): AffectiveMemoryExtractionResult {
-        val jsonText = rawText.extractJsonPayload()
-        val candidates = runCatching { decodeExtractionCandidates(jsonText) }
-            .getOrElse { originalError ->
-                val repaired = jsonText.repairMemoryExtractionJsonOnce()
-                if (repaired == jsonText) throw originalError
-                decodeExtractionCandidates(repaired)
-            }
-        return AffectiveMemoryExtractionResult(
-            memories = candidates
-                .map { it.normalized() }
-                .filter { it.content.isNotBlank() }
-        )
-    }
-}
-
-private fun decodeExtractionCandidates(jsonText: String): List<AffectiveMemoryCandidate> {
-    val root = JsonInstant.parseToJsonElement(jsonText)
-    return if (root is JsonArray) {
-        JsonInstant.decodeFromString(ListSerializer(AffectiveMemoryCandidate.serializer()), jsonText)
-    } else {
-        JsonInstant.decodeFromString<AffectiveMemoryExtractionResult>(root.jsonObject.toString()).memories
-    }
-}
-
-/**
- * Perform one conservative, deterministic repair pass. It only removes invisible prefix
- * characters and trailing commas; it never invents memory fields or rewrites user text.
- */
-private fun String.repairMemoryExtractionJsonOnce(): String = this
-    .replace("\uFEFF", "")
-    .replace("\u200B", "")
-    .replace(Regex(",\\s*([}\\]])"), "$1")
-    .trim()
-
-internal fun isTransientMemoryExtractionFailure(error: Throwable): Boolean =
-    generateSequence(error as Throwable?) { current -> current.cause }
-        .take(8)
-        .any { cause ->
-            cause is java.io.IOException ||
-                cause::class.simpleName.orEmpty().let { name ->
-                    TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS.any { marker ->
-                        name.contains(marker, ignoreCase = true)
-                    }
-                }
-        }
-
-internal suspend fun <T> retryTransientMemoryExtraction(
-    maxAttempts: Int = 3,
-    baseDelayMillis: Long = 500L,
-    onRetry: suspend (failedAttempt: Int, error: Throwable) -> Unit = { _, _ -> },
-    block: suspend (attempt: Int) -> T,
-): T {
-    val boundedAttempts = maxAttempts.coerceAtLeast(1)
-    var attempt = 1
-    while (true) {
-        try {
-            return block(attempt)
-        } catch (error: Throwable) {
-            if (error is kotlinx.coroutines.CancellationException) throw error
-            if (attempt >= boundedAttempts || !isTransientMemoryExtractionFailure(error)) throw error
-            onRetry(attempt, error)
-            if (baseDelayMillis > 0L) {
-                kotlinx.coroutines.delay(baseDelayMillis * attempt)
-            }
-            attempt += 1
-        }
-    }
-}
-
-private val TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS = listOf(
-    "timeout",
-    "connect",
-    "rateLimit",
-    "tooManyRequests",
-    "serviceUnavailable",
-)
-
-private fun MemoryExtractionTurn.sourceTimeLabel(): String {
-    if (createdAtMillis <= 0L) return "unknown"
-    return runCatching {
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
-            Instant.ofEpochMilli(createdAtMillis).atZone(ZoneId.systemDefault()),
-        )
-    }.getOrDefault("unknown")
-}
-
-private fun CompanionStateHistoryEntry.toExtractionContext(): String = buildList {
-    state.statusText.takeIf(String::isNotBlank)?.let { add("状态=$it") }
-    state.mood.takeIf(String::isNotBlank)?.let { add("心情=$it") }
-    state.bodyState.takeIf(String::isNotBlank)?.let { add("身体=$it") }
-    state.mindState.takeIf(String::isNotBlank)?.let { add("精神=$it") }
-    state.activityMode.takeIf(String::isNotBlank)?.let { add("活动=$it") }
-    state.selfScene.takeIf(String::isNotBlank)?.let { add("此刻=$it") }
-    state.innerThought.takeIf(String::isNotBlank)?.let { add("没说出口=$it") }
-}.joinToString("；").take(1_200)
-
-private val DURABLE_MEMORY_TYPES = setOf(
-    "user_fact",
-    "user_preference",
-    "user_boundary",
-    "promise",
-    "relationship",
-    "shared_event",
-    "correction",
-)
-
-private val FIRST_PERSON_PREFIXES = listOf(
-    "我",
-    "咱",
-    "本人",
-    "本小姐",
-    "本少爷",
-    "本官",
-    "本王",
-    "本宫",
-    "在下",
-    "余",
-    "吾",
-    "I ",
-    "I'm ",
-    "I’m ",
-)
-
-private val GENERIC_META_MEMORY_MARKERS = listOf(
-    "cihai_reflection",
-    "我记得这件事。当时感觉",
-    "复盘、收束、准备下一轮",
-    "后续可复用的长期记忆",
-    "感知世界包",
-    "意义评估",
-    "动态判断",
-    "状态生成",
-    "辞海记忆架构",
-    "七层架构",
-    "下一轮判断",
-    "我完成了沉淀",
-    "我整理了记忆",
-    "以后可以参考",
-    "等待下一次",
-)
-
 private fun String.extractJsonPayload(): String {
     val trimmed = trim()
     if (trimmed.startsWith("{") || trimmed.startsWith("[")) return trimmed
-
     val fenced = Regex("```(?:json)?\\s*([\\s\\S]*?)```")
-        .find(trimmed)
-        ?.groupValues
-        ?.getOrNull(1)
-        ?.trim()
+        .find(trimmed)?.groupValues?.getOrNull(1)?.trim()
     if (!fenced.isNullOrBlank()) return fenced
-
-    val objectStart = trimmed.indexOf('{')
-    val arrayStart = trimmed.indexOf('[')
-    val start = listOf(objectStart, arrayStart).filter { it >= 0 }.minOrNull() ?: return trimmed
+    val start = listOf(trimmed.indexOf('{'), trimmed.indexOf('[')).filter { it >= 0 }.minOrNull() ?: return trimmed
     val end = maxOf(trimmed.lastIndexOf('}'), trimmed.lastIndexOf(']'))
     return if (end >= start) trimmed.substring(start, end + 1) else trimmed
 }
+
+private val DETERMINISTIC_BOUNDARY_MARKERS = listOf("我不希望", "我不喜欢", "不要再", "别再", "不许")
+private val DETERMINISTIC_CORRECTION_MARKERS = listOf("不是这样的", "不是这个意思", "应该是", "纠正一下", "更正一下", "你理解错了")
+private val DETERMINISTIC_PREFERENCE_MARKERS = listOf("我更喜欢", "我喜欢", "我希望", "我想要", "对我来说")
+private val TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS = listOf("timeout", "connect", "rateLimit", "tooManyRequests", "serviceUnavailable")
+private val DURABLE_MEMORY_TYPES = setOf("user_fact", "user_preference", "user_boundary", "promise", "relationship", "shared_event", "correction")
+private val FIRST_PERSON_PREFIXES = listOf("我", "咱", "本人", "本小姐", "本少爷", "本官", "本王", "本宫", "在下", "余", "吾", "I ", "I'm ", "I’m ")
+private val GENERIC_META_MEMORY_MARKERS = listOf(
+    "cihai_reflection", "我记得这件事。当时感觉", "复盘、收束、准备下一轮", "后续可复用的长期记忆",
+    "感知世界包", "意义评估", "动态判断", "状态生成", "辞海记忆架构", "七层架构",
+    "下一轮判断", "我完成了沉淀", "我整理了记忆", "以后可以参考", "等待下一次",
+)
