@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-22T17:52:11.261187+00:00",
-  "commit": "0349224a83217dffdbbca7d8bbd5a30cbe79ce10",
+  "generatedAt": "2026-07-22T17:52:28.691803+00:00",
+  "commit": "dcf54a3fd301d8d94ee445f1988777367f939d70",
   "branch": "master",
   "summary": {
-    "files": 1091,
-    "lines": 261030,
+    "files": 1092,
+    "lines": 261083,
     "symbols": 5261,
     "byModule": {
       "app": 629,
@@ -21,8 +21,8 @@
       ".agents": 10,
       "website": 10,
       "highlight": 9,
+      ".github": 7,
       "web": 7,
-      ".github": 6,
       ".claude": 5,
       "locale-tui": 4,
       "study-plans": 4,
@@ -41,7 +41,7 @@
       ".kts": 11,
       ".js": 9,
       ".html": 7,
-      ".yml": 5,
+      ".yml": 6,
       ".css": 4,
       ".yaml": 3,
       ".properties": 3,
@@ -350,6 +350,7 @@
       "app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt"
     ],
     "构建与发布": [
+      ".github/workflows/apply-memory-diagnostics-ui.yml",
       ".github/workflows/code-index.yml",
       ".github/workflows/deploy-website.yml",
       ".github/workflows/release.yml",
@@ -702,6 +703,7 @@
       "web-ui/app/components/ui/ui-avatar.tsx"
     ],
     "记忆": [
+      ".github/workflows/apply-memory-diagnostics-ui.yml",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt",
       "app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt",
@@ -1907,6 +1909,18 @@
       "lines": 27,
       "package": null,
       "categories": [],
+      "symbols": []
+    },
+    {
+      "path": ".github/workflows/apply-memory-diagnostics-ui.yml",
+      "module": ".github",
+      "extension": ".yml",
+      "lines": 53,
+      "package": null,
+      "categories": [
+        "记忆",
+        "构建与发布"
+      ],
       "symbols": []
     },
     {

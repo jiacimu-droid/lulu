@@ -11,10 +11,10 @@
 
 ## 索引状态
 
-- 基准提交：`0349224a83217dffdbbca7d8bbd5a30cbe79ce10`
+- 基准提交：`dcf54a3fd301d8d94ee445f1988777367f939d70`
 - 分支：`master`
-- 已索引文件：1091
-- 已索引代码/文本行：261030
+- 已索引文件：1092
+- 已索引代码/文本行：261083
 - 已发现类、接口、对象、函数及 Composable：5261
 
 ## 模块概览
@@ -34,8 +34,8 @@
 | `.agents` | 10 |
 | `website` | 10 |
 | `highlight` | 9 |
+| `.github` | 7 |
 | `web` | 7 |
-| `.github` | 6 |
 | `.claude` | 5 |
 | `locale-tui` | 4 |
 | `study-plans` | 4 |
@@ -57,7 +57,7 @@
 | `.kts` | 11 |
 | `.js` | 9 |
 | `.html` | 7 |
-| `.yml` | 5 |
+| `.yml` | 6 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -249,6 +249,7 @@
 
 ### 构建与发布
 
+- `.github/workflows/apply-memory-diagnostics-ui.yml`
 - `.github/workflows/code-index.yml`
 - `.github/workflows/deploy-website.yml`
 - `.github/workflows/release.yml`
@@ -354,6 +355,7 @@
 
 ### 记忆
 
+- `.github/workflows/apply-memory-diagnostics-ui.yml`
 - `app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt`
@@ -393,7 +395,7 @@
 - `plugins/supabase_memory/README.md`
 - `plugins/supabase_memory/main.js`
 - `plugins/supabase_memory/manifest.json`
-- `plugins/supabase_memory/supabase_schema.sql`
+- ……另有 1 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 
