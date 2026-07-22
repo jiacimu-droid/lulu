@@ -18,6 +18,8 @@ import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.companion.CompanionTurnMutation
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
+import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchEntity
+import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.buildCompanionPrivateImpression
@@ -26,6 +28,15 @@ import me.rerere.rikkahub.data.service.buildRelationshipEventsFromMemoryCandidat
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.service.MemoryReorganizationMode
 import kotlin.uuid.Uuid
+
+data class MemoryBatchOverview(
+    val conversationId: String,
+    val successfulThrough: Int,
+    val nextBatchStart: Int,
+    val stableRegionEnd: Int,
+    val remainingMessageCount: Int,
+    val batches: List<MemoryExtractionBatchEntity>,
+)
 
 class MemoryBankVM(
     private val memoryBankService: MemoryBankService,
@@ -57,6 +68,9 @@ class MemoryBankVM(
 
     private val _stats = MutableStateFlow(MemoryBankService.MemoryStats())
     val stats: StateFlow<MemoryBankService.MemoryStats> = _stats.asStateFlow()
+
+    private val _batchOverviews = MutableStateFlow<List<MemoryBatchOverview>>(emptyList())
+    val batchOverviews: StateFlow<List<MemoryBatchOverview>> = _batchOverviews.asStateFlow()
 
     private val _maintenanceMessage = MutableStateFlow<String?>(null)
     val maintenanceMessage: StateFlow<String?> = _maintenanceMessage.asStateFlow()
@@ -113,6 +127,47 @@ class MemoryBankVM(
             limit = 100,
             assistantId = assistantId,
         )
+
+        _batchOverviews.value = buildBatchOverviews(currentSettings, assistantId)
+    }
+
+    private suspend fun buildBatchOverviews(
+        currentSettings: Settings,
+        assistantId: String?,
+    ): List<MemoryBatchOverview> {
+        val assistant = currentSettings.assistants.firstOrNull { it.id.toString() == assistantId }
+            ?: return emptyList()
+        val batchSize = assistant.memoryExtractionInterval.coerceAtLeast(1)
+        val protectedRecent = assistant.memoryExtractionProtectedRecentCount.coerceAtLeast(0)
+        val batches = memoryBankService.getExtractionBatchesForAssistant(assistant.id.toString())
+        return conversationRepository.getRecentConversations(assistant.id, limit = 1000)
+            .mapNotNull { conversation ->
+                val conversationId = conversation.id.toString()
+                val conversationBatches = batches.filter { it.conversationId == conversationId }
+                val stableRegionEnd = (
+                    (conversation.messageNodes.size - protectedRecent).coerceAtLeast(0) / batchSize
+                    ) * batchSize
+                val successfulThrough = conversationBatches
+                    .filter {
+                        it.status == MemoryExtractionBatchStatus.SUCCESS_WITH_MEMORIES.name ||
+                            it.status == MemoryExtractionBatchStatus.SUCCESS_EMPTY.name
+                    }
+                    .maxOfOrNull { it.batchEndSequence }
+                    ?.coerceAtMost(stableRegionEnd)
+                    ?: 0
+                if (stableRegionEnd == 0 && conversationBatches.isEmpty()) {
+                    null
+                } else {
+                    MemoryBatchOverview(
+                        conversationId = conversationId,
+                        successfulThrough = successfulThrough,
+                        nextBatchStart = successfulThrough + 1,
+                        stableRegionEnd = stableRegionEnd,
+                        remainingMessageCount = (stableRegionEnd - successfulThrough).coerceAtLeast(0),
+                        batches = conversationBatches.sortedBy { it.batchStartSequence },
+                    )
+                }
+            }
     }
 
     fun repairMemoriesFromHistory() = reorganizeMemories(MemoryReorganizationMode.RECENT_BATCH)
@@ -120,6 +175,27 @@ class MemoryBankVM(
     fun continueHistoricalMemoryRepair() = reorganizeMemories(MemoryReorganizationMode.CONTINUE_HISTORY)
 
     fun rebuildAllHistoricalMemories() = reorganizeMemories(MemoryReorganizationMode.FULL_REBUILD)
+
+    fun retryExtractionBatch(batchId: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                memoryBankService.resetExtractionBatchForManualRetry(batchId)
+                chatService.retryHistoricalMemoryExtraction(
+                    assistantId = _selectedAssistantId.value,
+                    mode = MemoryReorganizationMode.CONTINUE_HISTORY,
+                ).join()
+                _maintenanceMessage.value = chatService.memoryReorganizationProgress.value.message
+                refreshMemoryData(settingsStore.settingsFlow.first())
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                _maintenanceMessage.value = "重试失败，请稍后再试"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
 
     private fun reorganizeMemories(mode: MemoryReorganizationMode) {
         viewModelScope.launch {
