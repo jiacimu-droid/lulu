@@ -666,12 +666,40 @@ class MemoryBankService(
         )
     }
 
-    /** Lets an explicit user repair retry a conversation that older versions marked too early. */
+    /** Clears branch progress and stale generated memories before an explicit full rebuild. */
     suspend fun resetExtractionCheckpoint(
         assistantId: String,
         conversationId: String,
+        now: Long = System.currentTimeMillis(),
     ) = withContext(Dispatchers.IO) {
         memoryBankDAO.deleteExtractionCheckpoint(assistantId, conversationId)
+        val batches = memoryBankDAO.getExtractionBatches(assistantId, conversationId)
+        val generatedMemoryIds = batches
+            .flatMap { batch ->
+                runCatching {
+                    JsonInstant.decodeFromString<List<Int>>(batch.generatedMemoryIdsJson)
+                }.getOrDefault(emptyList())
+            }
+            .distinct()
+        generatedMemoryIds.forEach { memoryId ->
+            memoryBankDAO.markMemoryDeprecated(
+                id = memoryId,
+                deprecatedReason = "manual_full_rebuild",
+                supersededByMemoryId = null,
+                correctedAt = now,
+            )
+        }
+        batches.forEach { batch ->
+            memoryBankDAO.upsertExtractionBatch(
+                batch.copy(
+                    status = MemoryExtractionBatchStatus.INVALIDATED.name,
+                    lastError = "manual_full_rebuild",
+                    generatedMemoryIdsJson = "[]",
+                    updatedAt = now,
+                    completedAt = null,
+                ),
+            )
+        }
     }
 
     suspend fun beginExtractionBatch(
@@ -832,8 +860,21 @@ class MemoryBankService(
                     JsonInstant.decodeFromString<List<Int>>(batch.generatedMemoryIdsJson)
                 }.getOrDefault(emptyList())
             }
-            .distinct()
-        generatedMemoryIds.forEach { memoryId ->
+        val legacySourceMemoryIds = memoryBankDAO.getMemoriesByAssistant(assistantId)
+            .asSequence()
+            .filter { memory ->
+                memory.conversationId == conversationId &&
+                    !memory.deprecated &&
+                    (
+                        memory.sourceMessageNodeIdsJson.decodeMemoryNodeIds() +
+                            memory.evidenceMessageNodeIdsJson.decodeMemoryNodeIds()
+                        ).any(invalidatedSourceNodeIds::contains)
+            }
+            .map { it.id }
+            .filter { it > 0 }
+            .toList()
+        val invalidatedMemoryIds = (generatedMemoryIds + legacySourceMemoryIds).distinct()
+        invalidatedMemoryIds.forEach { memoryId ->
             memoryBankDAO.markMemoryDeprecated(
                 id = memoryId,
                 deprecatedReason = reason.take(MAX_MEMORY_EXTRACTION_ERROR_LENGTH),
@@ -854,7 +895,7 @@ class MemoryBankService(
         }
         MemoryExtractionInvalidationResult(
             invalidatedBatchCount = invalidated.size,
-            deprecatedMemoryCount = generatedMemoryIds.size,
+            deprecatedMemoryCount = invalidatedMemoryIds.size,
         )
     }
 
