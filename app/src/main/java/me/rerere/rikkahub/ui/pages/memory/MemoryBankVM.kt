@@ -23,6 +23,7 @@ import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.buildCompanionPrivateImpression
+import me.rerere.rikkahub.data.service.buildSelectedConversationBranchId
 import me.rerere.rikkahub.data.service.buildDeterministicMemoryCandidatesFromNodes
 import me.rerere.rikkahub.data.service.buildRelationshipEventsFromMemoryCandidates
 import me.rerere.rikkahub.service.ChatService
@@ -149,8 +150,14 @@ class MemoryBankVM(
                     ) * batchSize
                 val successfulThrough = conversationBatches
                     .filter {
-                        it.status == MemoryExtractionBatchStatus.SUCCESS_WITH_MEMORIES.name ||
-                            it.status == MemoryExtractionBatchStatus.SUCCESS_EMPTY.name
+                        (
+                            it.status == MemoryExtractionBatchStatus.SUCCESS_WITH_MEMORIES.name ||
+                                it.status == MemoryExtractionBatchStatus.SUCCESS_EMPTY.name
+                            ) &&
+                            it.branchId == buildSelectedConversationBranchId(
+                                conversation.messageNodes,
+                                it.batchEndSequence,
+                            )
                     }
                     .maxOfOrNull { it.batchEndSequence }
                     ?.coerceAtMost(stableRegionEnd)
