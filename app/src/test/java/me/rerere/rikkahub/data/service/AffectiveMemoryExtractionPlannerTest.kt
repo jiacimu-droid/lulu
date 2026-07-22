@@ -32,7 +32,7 @@ class AffectiveMemoryExtractionPlannerTest {
     @Test
     fun `batch branch fingerprint stays stable when newer messages are appended`() {
         val firstThree = nodes(3)
-        val appended = nodes(5)
+        val appended = firstThree + nodes(2)
 
         assertEquals(
             buildSelectedConversationBranchId(firstThree, 3),
