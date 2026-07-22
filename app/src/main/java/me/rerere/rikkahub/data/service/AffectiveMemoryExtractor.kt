@@ -374,12 +374,12 @@ object AffectiveMemoryExtractor {
 
     fun parseExtractionResult(rawText: String): AffectiveMemoryExtractionResult {
         val jsonText = rawText.extractJsonPayload()
-        val root = JsonInstant.parseToJsonElement(jsonText)
-        val candidates = if (root is JsonArray) {
-            JsonInstant.decodeFromString(ListSerializer(AffectiveMemoryCandidate.serializer()), jsonText)
-        } else {
-            JsonInstant.decodeFromString<AffectiveMemoryExtractionResult>(root.jsonObject.toString()).memories
-        }
+        val candidates = runCatching { decodeExtractionCandidates(jsonText) }
+            .getOrElse { originalError ->
+                val repaired = jsonText.repairMemoryExtractionJsonOnce()
+                if (repaired == jsonText) throw originalError
+                decodeExtractionCandidates(repaired)
+            }
         return AffectiveMemoryExtractionResult(
             memories = candidates
                 .map { it.normalized() }
@@ -387,6 +387,68 @@ object AffectiveMemoryExtractor {
         )
     }
 }
+
+private fun decodeExtractionCandidates(jsonText: String): List<AffectiveMemoryCandidate> {
+    val root = JsonInstant.parseToJsonElement(jsonText)
+    return if (root is JsonArray) {
+        JsonInstant.decodeFromString(ListSerializer(AffectiveMemoryCandidate.serializer()), jsonText)
+    } else {
+        JsonInstant.decodeFromString<AffectiveMemoryExtractionResult>(root.jsonObject.toString()).memories
+    }
+}
+
+/**
+ * Perform one conservative, deterministic repair pass. It only removes invisible prefix
+ * characters and trailing commas; it never invents memory fields or rewrites user text.
+ */
+private fun String.repairMemoryExtractionJsonOnce(): String = this
+    .replace("\uFEFF", "")
+    .replace("\u200B", "")
+    .replace(Regex(",\\s*([}\\]])"), "$1")
+    .trim()
+
+internal fun isTransientMemoryExtractionFailure(error: Throwable): Boolean =
+    generateSequence(error as Throwable?) { current -> current.cause }
+        .take(8)
+        .any { cause ->
+            cause is java.io.IOException ||
+                cause::class.simpleName.orEmpty().let { name ->
+                    TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS.any { marker ->
+                        name.contains(marker, ignoreCase = true)
+                    }
+                }
+        }
+
+internal suspend fun <T> retryTransientMemoryExtraction(
+    maxAttempts: Int = 3,
+    baseDelayMillis: Long = 500L,
+    onRetry: suspend (failedAttempt: Int, error: Throwable) -> Unit = { _, _ -> },
+    block: suspend (attempt: Int) -> T,
+): T {
+    val boundedAttempts = maxAttempts.coerceAtLeast(1)
+    var attempt = 1
+    while (true) {
+        try {
+            return block(attempt)
+        } catch (error: Throwable) {
+            if (error is kotlinx.coroutines.CancellationException) throw error
+            if (attempt >= boundedAttempts || !isTransientMemoryExtractionFailure(error)) throw error
+            onRetry(attempt, error)
+            if (baseDelayMillis > 0L) {
+                kotlinx.coroutines.delay(baseDelayMillis * attempt)
+            }
+            attempt += 1
+        }
+    }
+}
+
+private val TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS = listOf(
+    "timeout",
+    "connect",
+    "rateLimit",
+    "tooManyRequests",
+    "serviceUnavailable",
+)
 
 private fun MemoryExtractionTurn.sourceTimeLabel(): String {
     if (createdAtMillis <= 0L) return "unknown"
