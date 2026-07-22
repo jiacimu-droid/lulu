@@ -7,6 +7,48 @@ import org.junit.Test
 
 class AffectiveMemoryExtractorTest {
     @Test
+    fun `semantic extraction outcome keeps invalid non-empty output retryable`() {
+        assertEquals(
+            SemanticMemoryExtractionOutcome.SUCCESS_WITH_MEMORIES,
+            classifySemanticMemoryExtraction(
+                modelCallSucceeded = true,
+                parsedCandidateCount = 2,
+                durableCandidateCount = 1,
+            ),
+        )
+        assertEquals(
+            SemanticMemoryExtractionOutcome.SUCCESS_EMPTY,
+            classifySemanticMemoryExtraction(
+                modelCallSucceeded = true,
+                parsedCandidateCount = 0,
+                durableCandidateCount = 0,
+            ),
+        )
+        assertEquals(
+            SemanticMemoryExtractionOutcome.FAILED_RETRYABLE,
+            classifySemanticMemoryExtraction(
+                modelCallSucceeded = true,
+                parsedCandidateCount = 2,
+                durableCandidateCount = 0,
+            ),
+        )
+        assertEquals(
+            SemanticMemoryExtractionOutcome.FAILED_RETRYABLE,
+            classifySemanticMemoryExtraction(
+                modelCallSucceeded = false,
+                parsedCandidateCount = 0,
+                durableCandidateCount = 0,
+            ),
+        )
+        assertFalse(
+            classifySemanticMemoryExtraction(
+                modelCallSucceeded = true,
+                parsedCandidateCount = 1,
+                durableCandidateCount = 0,
+            ).advancesCheckpoint,
+        )
+    }
+    @Test
     fun `extraction prompt requires first person in-character memory summaries`() {
         val prompt = AffectiveMemoryExtractor.buildExtractionPrompt(
             turns = listOf(
