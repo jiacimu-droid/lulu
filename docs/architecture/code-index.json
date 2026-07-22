@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-22T17:45:34.148097+00:00",
-  "commit": "dfb0edab0da456604e2bca0574ea42f5bb22f7cb",
+  "generatedAt": "2026-07-22T17:48:40.747565+00:00",
+  "commit": "7f38feb1a0547d57a68039291c94b06853ece0f3",
   "branch": "master",
   "summary": {
-    "files": 1089,
-    "lines": 260863,
-    "symbols": 5257,
+    "files": 1090,
+    "lines": 260957,
+    "symbols": 5260,
     "byModule": {
-      "app": 627,
+      "app": 628,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -30,7 +30,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 695,
+      ".kt": 696,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -593,6 +593,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/log/LogPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
@@ -716,6 +717,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/service/MemoryVector.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt",
       "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemoryTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
@@ -952,6 +954,11 @@
       "imports": 8
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.memory",
+      "to": "me.rerere.rikkahub.data.db.entity",
+      "imports": 8
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ai",
       "imports": 8
@@ -1064,11 +1071,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.chat",
       "to": "me.rerere.rikkahub.R",
-      "imports": 6
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.memory",
-      "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 6
     },
     {
@@ -25685,6 +25687,34 @@
           "name": "embeddingModels",
           "kind": "function",
           "line": 402
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 94,
+      "package": "me.rerere.rikkahub.ui.pages.memory",
+      "categories": [
+        "记忆",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "MemoryTriggerDiagnostic",
+          "kind": "class",
+          "line": 12
+        },
+        {
+          "name": "MemoryTriggerState",
+          "kind": "class",
+          "line": 29
+        },
+        {
+          "name": "buildMemoryTriggerDiagnostic",
+          "kind": "function",
+          "line": 36
         }
       ]
     },

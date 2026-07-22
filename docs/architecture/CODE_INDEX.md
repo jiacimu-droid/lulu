@@ -11,17 +11,17 @@
 
 ## 索引状态
 
-- 基准提交：`dfb0edab0da456604e2bca0574ea42f5bb22f7cb`
+- 基准提交：`7f38feb1a0547d57a68039291c94b06853ece0f3`
 - 分支：`master`
-- 已索引文件：1089
-- 已索引代码/文本行：260863
-- 已发现类、接口、对象、函数及 Composable：5257
+- 已索引文件：1090
+- 已索引代码/文本行：260957
+- 已发现类、接口、对象、函数及 Composable：5260
 
 ## 模块概览
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 627 |
+| `app` | 628 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -46,7 +46,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 695 |
+| `.kt` | 696 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -350,7 +350,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/HighlightCodeBlock.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/LatexText.kt`
-- ……另有 242 个文件，见 `code-index.json`
+- ……另有 243 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -370,6 +370,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/service/MemoryVector.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt`
+- `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemoryTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt`
