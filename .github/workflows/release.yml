@@ -25,12 +25,32 @@ jobs:
   build:
     if: ${{ github.event_name != 'issue_comment' || github.event.comment.body == '/build-lulu' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Report chatops build start
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = "https://github.com/" + context.repo.owner + "/" + context.repo.repo +
+              "/actions/runs/" + context.runId
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                "🔄 Lulu 最终验收已开始。",
+                "",
+                "- 提交：\`" + context.sha.slice(0, 7) + "\`",
+                "- 运行：" + runUrl
+              ].join("\\n")
+            })
 
       - name: Set up JDK
         uses: actions/setup-java@v4
