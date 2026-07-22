@@ -395,6 +395,7 @@ private fun CompanionPrivateImpression.normalizedForStorage(): CompanionPrivateI
 private fun CompanionInteractionTimeline.merge(
     other: CompanionInteractionTimeline,
 ): CompanionInteractionTimeline = CompanionInteractionTimeline(
+    lastHeartbeatAt = maxNullable(lastHeartbeatAt, other.lastHeartbeatAt),
     lastUserActivityAt = maxNullable(lastUserActivityAt, other.lastUserActivityAt),
     lastUserReplyAt = maxNullable(lastUserReplyAt, other.lastUserReplyAt),
     lastOrdinaryAssistantAt = maxNullable(lastOrdinaryAssistantAt, other.lastOrdinaryAssistantAt),
