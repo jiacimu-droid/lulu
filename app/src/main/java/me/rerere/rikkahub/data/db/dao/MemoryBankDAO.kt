@@ -54,6 +54,17 @@ interface MemoryBankDAO {
         conversationId: String,
     ): List<MemoryExtractionBatchEntity>
 
+    @Query(
+        """
+        SELECT * FROM memory_extraction_batch
+        WHERE assistant_id = :assistantId
+        ORDER BY conversation_id ASC, batch_start_sequence ASC, created_at ASC
+        """,
+    )
+    suspend fun getExtractionBatchesByAssistant(
+        assistantId: String,
+    ): List<MemoryExtractionBatchEntity>
+
     @Query("DELETE FROM memory_extraction_checkpoint WHERE assistant_id = :assistantId AND conversation_id = :conversationId")
     suspend fun deleteExtractionCheckpoint(assistantId: String, conversationId: String)
 
