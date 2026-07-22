@@ -162,6 +162,7 @@ data class CompanionTurnMutation(
     val acceptedCommitments: List<CompanionCommitment> = emptyList(),
     val relationshipEvents: List<CompanionRelationshipEvent> = emptyList(),
     val continuity: CompanionContinuity? = null,
+    val interactionEvents: List<CompanionInteractionEvent> = emptyList(),
     val nowMillis: Long,
 )
 
@@ -494,6 +495,10 @@ fun reduceCompanionRuntimeState(
             candidate.copy(updatedAt = maxOf(candidate.updatedAt, mutation.nowMillis))
         }
         ?: existing.continuity
+    val nextInteractionTimeline = reduceCompanionInteractionTimeline(
+        current = existing.interactionTimeline,
+        events = mutation.interactionEvents,
+    )
     val nextStateHistory = if (
         mutation.state != null &&
         nextState.hasVisibleStateContent() &&
@@ -529,6 +534,7 @@ fun reduceCompanionRuntimeState(
             nowMillis = mutation.nowMillis,
         ),
         continuity = nextContinuity,
+        interactionTimeline = nextInteractionTimeline,
         updatedAt = maxOf(existing.updatedAt, mutation.nowMillis),
     )
     return current.withUpdatedSnapshot(
@@ -536,6 +542,137 @@ fun reduceCompanionRuntimeState(
         appliedRelationshipEventIds = relationshipReduction.appliedEventIds,
     )
 }
+
+internal fun reduceCompanionInteractionTimeline(
+    current: CompanionInteractionTimeline,
+    events: List<CompanionInteractionEvent>,
+): CompanionInteractionTimeline = events
+    .sortedBy(CompanionInteractionEvent::occurredAt)
+    .fold(current) { timeline, event -> timeline.applyInteractionEvent(event) }
+    .let { timeline ->
+        timeline.copy(
+            outboundContacts = timeline.outboundContacts
+                .sortedByDescending(CompanionOutboundContact::generatedAt)
+                .take(MAX_OUTBOUND_CONTACT_HISTORY),
+        )
+    }
+
+private fun CompanionInteractionTimeline.applyInteractionEvent(
+    event: CompanionInteractionEvent,
+): CompanionInteractionTimeline {
+    val matchingId = event.contactId ?: event.sourceMessageId
+    fun updateContact(status: CompanionOutboundStatus): List<CompanionOutboundContact> {
+        if (matchingId.isNullOrBlank()) return outboundContacts
+        val existing = outboundContacts.firstOrNull { it.id == matchingId }
+        val base = existing ?: CompanionOutboundContact(
+            id = matchingId,
+            conversationId = event.conversationId,
+            sourceMessageId = event.sourceMessageId,
+            generatedAt = event.occurredAt,
+        )
+        val updated = base.copy(
+            conversationId = event.conversationId ?: base.conversationId,
+            sourceMessageId = event.sourceMessageId ?: base.sourceMessageId,
+            status = status,
+            sentAt = if (status >= CompanionOutboundStatus.SENT) base.sentAt ?: event.occurredAt else base.sentAt,
+            deliveredAt = if (status >= CompanionOutboundStatus.DELIVERED) base.deliveredAt ?: event.occurredAt else base.deliveredAt,
+            openedAt = if (status == CompanionOutboundStatus.OPENED) event.occurredAt else base.openedAt,
+            resolvedAt = if (status.isTerminalOutboundStatus()) event.occurredAt else base.resolvedAt,
+            result = event.detail ?: base.result,
+        )
+        return outboundContacts.filterNot { it.id == matchingId } + updated
+    }
+    fun resolveLatest(status: CompanionOutboundStatus): List<CompanionOutboundContact> {
+        val latest = outboundContacts
+            .filterNot { it.status.isTerminalOutboundStatus() }
+            .maxByOrNull(CompanionOutboundContact::generatedAt)
+            ?: return outboundContacts
+        return outboundContacts.map { contact ->
+            if (contact.id == latest.id) contact.copy(
+                status = status,
+                resolvedAt = event.occurredAt,
+                result = event.detail ?: contact.result,
+            ) else contact
+        }
+    }
+    return when (event.kind) {
+        CompanionInteractionEventKind.USER_ACTIVITY -> copy(lastUserActivityAt = event.occurredAt)
+        CompanionInteractionEventKind.USER_REPLY -> copy(
+            lastUserActivityAt = event.occurredAt,
+            lastUserReplyAt = event.occurredAt,
+        )
+        CompanionInteractionEventKind.ORDINARY_ASSISTANT -> copy(lastOrdinaryAssistantAt = event.occurredAt)
+        CompanionInteractionEventKind.OUTBOUND_GENERATED -> copy(
+            outboundContacts = updateContact(CompanionOutboundStatus.GENERATED),
+        )
+        CompanionInteractionEventKind.OUTBOUND_SENT -> copy(
+            lastOutboundAt = event.occurredAt,
+            outboundContacts = updateContact(CompanionOutboundStatus.SENT),
+        )
+        CompanionInteractionEventKind.OUTBOUND_DELIVERED -> copy(
+            lastOutboundAt = event.occurredAt,
+            outboundContacts = updateContact(CompanionOutboundStatus.DELIVERED),
+        )
+        CompanionInteractionEventKind.OUTBOUND_OPENED -> copy(
+            lastOpenedAt = event.occurredAt,
+            outboundContacts = updateContact(CompanionOutboundStatus.OPENED),
+        )
+        CompanionInteractionEventKind.OUTBOUND_UNANSWERED ->
+            copy(outboundContacts = updateContact(CompanionOutboundStatus.UNANSWERED))
+        CompanionInteractionEventKind.OUTBOUND_REPLIED ->
+            copy(outboundContacts = resolveLatest(CompanionOutboundStatus.REPLIED))
+        CompanionInteractionEventKind.USER_BUSY ->
+            copy(outboundContacts = resolveLatest(CompanionOutboundStatus.USER_BUSY))
+        CompanionInteractionEventKind.TOPIC_CHANGED ->
+            copy(outboundContacts = resolveLatest(CompanionOutboundStatus.TOPIC_CHANGED))
+        CompanionInteractionEventKind.DECLINED ->
+            copy(outboundContacts = resolveLatest(CompanionOutboundStatus.DECLINED))
+        CompanionInteractionEventKind.REMINDER_COMPLETED ->
+            copy(outboundContacts = updateContact(CompanionOutboundStatus.REMINDER_COMPLETED))
+        CompanionInteractionEventKind.OUTBOUND_FAILED ->
+            copy(outboundContacts = updateContact(CompanionOutboundStatus.FAILED))
+        CompanionInteractionEventKind.OUTBOUND_CANCELLED ->
+            copy(outboundContacts = updateContact(CompanionOutboundStatus.CANCELLED))
+        CompanionInteractionEventKind.LIFE_ANCHOR_UPDATED ->
+            copy(lastLifeAnchorUpdatedAt = event.occurredAt)
+    }
+}
+
+private fun CompanionOutboundStatus.isTerminalOutboundStatus(): Boolean = when (this) {
+    CompanionOutboundStatus.GENERATED,
+    CompanionOutboundStatus.SENT,
+    CompanionOutboundStatus.DELIVERED,
+    CompanionOutboundStatus.OPENED,
+    CompanionOutboundStatus.UNANSWERED -> false
+    CompanionOutboundStatus.REPLIED,
+    CompanionOutboundStatus.USER_BUSY,
+    CompanionOutboundStatus.TOPIC_CHANGED,
+    CompanionOutboundStatus.DECLINED,
+    CompanionOutboundStatus.REMINDER_COMPLETED,
+    CompanionOutboundStatus.FAILED,
+    CompanionOutboundStatus.CANCELLED -> true
+}
+
+internal fun userReplyInteractionEvents(
+    text: String,
+    occurredAt: Long,
+): List<CompanionInteractionEvent> = buildList {
+    add(CompanionInteractionEvent(CompanionInteractionEventKind.USER_REPLY, occurredAt))
+    val normalized = text.trim().lowercase()
+    add(
+        when {
+            BUSY_REPLY_MARKERS.any(normalized::contains) ->
+                CompanionInteractionEvent(CompanionInteractionEventKind.USER_BUSY, occurredAt, detail = "user_busy")
+            DECLINE_REPLY_MARKERS.any(normalized::contains) ->
+                CompanionInteractionEvent(CompanionInteractionEventKind.DECLINED, occurredAt, detail = "user_declined")
+            else -> CompanionInteractionEvent(CompanionInteractionEventKind.OUTBOUND_REPLIED, occurredAt)
+        },
+    )
+}
+
+private val BUSY_REPLY_MARKERS = setOf("在忙", "忙着", "没空", "稍后", "等会", "晚点", "busy", "later")
+private val DECLINE_REPLY_MARKERS = setOf("别发", "别问", "不想聊", "不要提醒", "拒绝", "stop", "leave me alone")
+private const val MAX_OUTBOUND_CONTACT_HISTORY = 80
 
 private fun CompanionState.hasVisibleStateContent(): Boolean = listOf(
     statusText,
