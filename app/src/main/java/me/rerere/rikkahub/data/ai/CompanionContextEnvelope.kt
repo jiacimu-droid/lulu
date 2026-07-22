@@ -49,27 +49,35 @@ internal fun buildCompanionContextEnvelope(
         ?.coerceAtMost(budget.maxHistoryMessages)
         ?: budget.maxHistoryMessages
 
+    // A rolling summary can arrive as either a persisted chat message or an injected
+    // SYSTEM snapshot. Only the newest copy is useful; sending both wastes tokens and
+    // can make the model treat the same old event as two independent facts.
+    val latestRollingSummary = messages
+        .asReversed()
+        .firstOrNull { it.toText().isRollingSummaryText() }
+        ?.toText()
+        ?.trim()
+        .orEmpty()
+
     val deduplicatedSystemMessages = deduplicateEnvelopeSystemMessages(
-        messages.filter { it.role == MessageRole.SYSTEM },
+        messages.filter { message ->
+            message.role == MessageRole.SYSTEM && !message.toText().isRollingSummaryText()
+        },
     )
-    val rollingSummaryMessages = messages.filter { message ->
-        message.role != MessageRole.SYSTEM &&
-            message.toText().contains("<rolling_summary", ignoreCase = true)
+    val allHistoryBeforeDedup = messages.filter { message ->
+        message.role != MessageRole.SYSTEM && !message.toText().isRollingSummaryText()
     }
-    val allHistory = messages.filter { message ->
-        message.role != MessageRole.SYSTEM && message !in rollingSummaryMessages
-    }
+    val allHistory = collapseAdjacentDuplicateHistory(allHistoryBeforeDedup)
     var history = allHistory.limitContext(configuredWindow)
 
     val systemText = deduplicatedSystemMessages.joinToString("\n\n") { it.toText() }
-    val rollingSummaryText = rollingSummaryMessages.joinToString("\n\n") { it.toText() }
     val fixedText = listOf(
         characterCore,
         globalLorebook,
         roleLorebook,
         otherMandatoryPrompt,
         systemText,
-        rollingSummaryText,
+        latestRollingSummary,
     ).filter(String::isNotBlank).joinToString("\n\n")
     val fixedTokens = estimateCompanionPromptTokens(fixedText)
     if (fixedTokens > budget.maxEstimatedInputTokens) {
@@ -92,11 +100,7 @@ internal fun buildCompanionContextEnvelope(
         section("全局世界书", globalLorebook, if (globalLorebook.isBlank()) 0 else 1),
         section("角色世界书", roleLorebook, if (roleLorebook.isBlank()) 0 else 1),
         section("最近消息", recentText, history.size),
-        section(
-            "滚动摘要",
-            listOf(rollingSummaryText, classified.rollingSummary).filter(String::isNotBlank).joinToString("\n\n"),
-            rollingSummaryMessages.size + classified.messageCount("rolling"),
-        ),
+        section("滚动摘要", latestRollingSummary, if (latestRollingSummary.isBlank()) 0 else 1),
         section("记忆", classified.memory, classified.messageCount("memory")),
         section("关系/状态", classified.relationshipState, classified.messageCount("relationship")),
         section("承诺/关注", classified.commitmentConcern, classified.messageCount("commitment")),
@@ -106,10 +110,17 @@ internal fun buildCompanionContextEnvelope(
             classified.messageCount("other"),
         ),
     )
+    val summaryMessage = latestRollingSummary
+        .takeIf(String::isNotBlank)
+        ?.let(UIMessage::system)
     return CompanionContextEnvelope(
-        messages = deduplicatedSystemMessages +
-            rollingSummaryMessages.map { UIMessage.system(it.toText()) } + history,
-        droppedHistoryMessages = (allHistory.size - history.size).coerceAtLeast(0),
+        messages = buildList {
+            addAll(deduplicatedSystemMessages)
+            if (summaryMessage != null) add(summaryMessage)
+            addAll(history)
+        },
+        droppedHistoryMessages =
+            (allHistoryBeforeDedup.size - history.size).coerceAtLeast(0),
         estimatedInputTokens = fixedTokens + estimateCompanionPromptTokens(recentText),
         budget = budget,
         sections = sections,
@@ -209,6 +220,34 @@ private fun deduplicateEnvelopeSystemMessages(messages: List<UIMessage>): List<U
     return result.asReversed()
 }
 
+/**
+ * Collapses only adjacent, byte-equivalent conversational duplicates.
+ *
+ * We deliberately do not remove repeated ideas from distant turns: a user repeating a
+ * request can be meaningful. Adjacent identical copies, however, are transport/UI retry
+ * artefacts and should never consume model context twice. TOOL messages are left intact
+ * because their ordering and multiplicity can be required by provider protocols.
+ */
+private fun collapseAdjacentDuplicateHistory(messages: List<UIMessage>): List<UIMessage> {
+    if (messages.size < 2) return messages
+    val result = ArrayList<UIMessage>(messages.size)
+    messages.forEach { message ->
+        val previous = result.lastOrNull()
+        val duplicate = message.role != MessageRole.TOOL &&
+            previous?.role == message.role &&
+            normalizeConversationText(previous.toText()) == normalizeConversationText(message.toText())
+        if (!duplicate) result += message
+    }
+    return result
+}
+
+private fun String.isRollingSummaryText(): Boolean {
+    val normalized = trim()
+    return normalized.contains("<rolling_summary", ignoreCase = true) ||
+        normalized.startsWith("滚动摘要：") ||
+        normalized.startsWith("rolling summary:", ignoreCase = true)
+}
+
 private fun structuredKind(text: String): String? = when {
     text.contains("<companion_runtime", ignoreCase = true) -> "runtime"
     text.contains("<companion_private_context", ignoreCase = true) -> "private_context"
@@ -223,6 +262,10 @@ private fun structuredKind(text: String): String? = when {
 
 private fun normalizeSystemText(text: String): String = text
     .lineSequence().map(String::trim).filter(String::isNotBlank).joinToString("\n")
+
+private fun normalizeConversationText(text: String): String = text
+    .replace("\r\n", "\n")
+    .trim()
 
 private fun section(label: String, text: String, messageCount: Int) = CompanionContextSection(
     label = label,
