@@ -42,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -138,6 +139,11 @@ import me.rerere.rikkahub.ui.pages.translator.TranslatorPage
 import me.rerere.rikkahub.ui.pages.voicecall.VoiceCallHistoryPage
 import me.rerere.rikkahub.ui.pages.voicecall.VoiceCallPage
 import me.rerere.rikkahub.data.voicecall.ProactiveCallManager
+import me.rerere.rikkahub.data.companion.CompanionInteractionEvent
+import me.rerere.rikkahub.data.companion.CompanionInteractionEventKind
+import me.rerere.rikkahub.data.companion.CompanionRuntime
+import me.rerere.rikkahub.data.companion.CompanionTurnMutation
+import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.ui.pages.webview.WebViewPage
 import me.rerere.rikkahub.ui.pages.worldbook.WorldbookPage
 import me.rerere.rikkahub.ui.theme.LocalDarkMode
@@ -146,6 +152,7 @@ import me.rerere.rikkahub.utils.CrashHandler
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.inject
 import org.koin.compose.koinInject
+import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
 private const val TAG = "RouteActivity"
@@ -154,6 +161,7 @@ class RouteActivity : ComponentActivity() {
     private val highlighter by inject<Highlighter>()
     private val okHttpClient by inject<OkHttpClient>()
     private val settingsStore by inject<SettingsStore>()
+    private val companionRuntime by inject<CompanionRuntime>()
     private var navStack: MutableList<NavKey>? = null
 
     // Volume key listener registry — last registered handler wins
@@ -176,6 +184,7 @@ class RouteActivity : ComponentActivity() {
         enableEdgeToEdge()
         disableNavigationBarContrast()
         super.onCreate(savedInstanceState)
+        recordProactiveNotificationOpen(intent)
 
         if (intent?.action == ProactiveCallManager.ACTION_INCOMING_CALL) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -254,6 +263,7 @@ class RouteActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        recordProactiveNotificationOpen(intent)
         navStack?.let { stack ->
             if (navigateProactiveCall(intent, stack)) return
         }
@@ -280,6 +290,34 @@ class RouteActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun recordProactiveNotificationOpen(intent: Intent?) {
+        if (intent?.getBooleanExtra(ProactiveMessageService.EXTRA_PROACTIVE_NOTIFICATION, false) != true) return
+        val assistantId = intent.getStringExtra(ProactiveMessageService.EXTRA_ASSISTANT_ID)
+            ?.takeIf(String::isNotBlank)
+            ?: return
+        val contactId = intent.getStringExtra(ProactiveMessageService.EXTRA_OUTBOUND_CONTACT_ID)
+            ?.takeIf(String::isNotBlank)
+            ?: return
+        intent.removeExtra(ProactiveMessageService.EXTRA_PROACTIVE_NOTIFICATION)
+        val openedAt = System.currentTimeMillis()
+        lifecycleScope.launch {
+            companionRuntime.applyTurn(
+                CompanionTurnMutation(
+                    assistantId = assistantId,
+                    interactionEvents = listOf(
+                        CompanionInteractionEvent(
+                            kind = CompanionInteractionEventKind.OUTBOUND_OPENED,
+                            occurredAt = openedAt,
+                            contactId = contactId,
+                            sourceMessageId = contactId,
+                        ),
+                    ),
+                    nowMillis = openedAt,
+                ),
+            )
         }
     }
 
