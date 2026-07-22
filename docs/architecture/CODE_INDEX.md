@@ -11,17 +11,17 @@
 
 ## 索引状态
 
-- 基准提交：`ba7372d8e4888c05af35e160a416abcd59a95ae9`
+- 基准提交：`a30dba8291723f0068fca89bf23ff66da838fcca`
 - 分支：`master`
-- 已索引文件：1098
-- 已索引代码/文本行：261379
-- 已发现类、接口、对象、函数及 Composable：5293
+- 已索引文件：1099
+- 已索引代码/文本行：261439
+- 已发现类、接口、对象、函数及 Composable：5294
 
 ## 模块概览
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 636 |
+| `app` | 637 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -46,7 +46,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 704 |
+| `.kt` | 705 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -108,7 +108,7 @@
 - `ai/src/test/java/me/rerere/ai/provider/providers/ClaudeProviderPromptCacheTest.kt`
 - `ai/src/test/java/me/rerere/ai/provider/providers/GoogleProviderMessageTest.kt`
 - `ai/src/test/java/me/rerere/ai/provider/providers/OpenAIImageTransportTest.kt`
-- ……另有 95 个文件，见 `code-index.json`
+- ……另有 96 个文件，见 `code-index.json`
 
 ### 主动代理
 
@@ -375,6 +375,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractorTest.kt`
+- `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryPromptPhilosophyTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryArchiveTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankContextTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankServiceExtractionTest.kt`
@@ -393,7 +394,7 @@
 - `plugins/supabase_memory/README.md`
 - `plugins/supabase_memory/main.js`
 - `plugins/supabase_memory/manifest.json`
-- `plugins/supabase_memory/supabase_schema.sql`
+- ……另有 1 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 
