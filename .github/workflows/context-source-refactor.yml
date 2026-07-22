@@ -90,8 +90,10 @@ jobs:
           continuity.updatedAt > 0L &&
               (continuity.lastUserText.isNotBlank() || continuity.lastAssistantText.isNotBlank()) &&
               !recentTurns.any { turn ->
-                  turn.content.contains(continuity.lastUserText.take(120), ignoreCase = true) ||
-                      turn.content.contains(continuity.lastAssistantText.take(120), ignoreCase = true)
+                  val userSnippet = continuity.lastUserText.take(120)
+                  val assistantSnippet = continuity.lastAssistantText.take(120)
+                  (userSnippet.isNotBlank() && turn.content.contains(userSnippet, ignoreCase = true)) ||
+                      (assistantSnippet.isNotBlank() && turn.content.contains(assistantSnippet, ignoreCase = true))
               }
       }?.let { continuity ->
           appendLine("cross_modal_continuity modality=${continuity.modality.name} at=${continuity.updatedAt}")
@@ -144,3 +146,5 @@ jobs:
           git commit -m 'refactor: reduce duplicated companion prompt context [skip ci]'
           git pull --rebase origin master
           git push origin HEAD:master
+
+# rerun marker: complete source refactor v2
