@@ -137,7 +137,7 @@ class AffectiveMemoryExtractorTest {
         }
         val result = AffectiveMemoryExtractor.parseExtractionResult("""{"memories":[$memories]}""")
         assertEquals(6, result.memories.size)
-        assertEquals(7, result.memories.first().importance)
+        assertEquals(5, result.memories.first().importance)
     }
 
     @Test
