@@ -47,8 +47,8 @@ private fun compactRuntime(text: String, recentConversation: String): String {
     var skipContinuity = false
 
     text.lineSequence().forEach { raw ->
-        val line = raw.trimEnd()
-        val trimmed = line.trim()
+        val trimmed = raw.trimEnd().trim()
+        val isListSection = section?.let(LIST_SECTIONS::contains) == true
         when {
             trimmed.startsWith("cross_modal_continuity") -> {
                 section = "continuity"
@@ -73,13 +73,13 @@ private fun compactRuntime(text: String, recentConversation: String): String {
                 sectionItems = 0
                 output += trimmed
             }
-            section in LIST_SECTIONS && trimmed.startsWith("-") -> {
+            isListSection && trimmed.startsWith("-") -> {
                 if (sectionItems < maxItems(section)) {
                     output += compactListItem(section, trimmed)
                     sectionItems += 1
                 }
             }
-            section in LIST_SECTIONS && !trimmed.startsWith("-") -> {
+            isListSection && !trimmed.startsWith("-") -> {
                 section = null
                 output += compactOrdinaryLine(trimmed)
             }
