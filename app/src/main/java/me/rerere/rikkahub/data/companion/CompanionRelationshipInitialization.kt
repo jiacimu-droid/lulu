@@ -16,11 +16,11 @@ internal fun initializeCompanionRelationshipFromCharacterCard(
     val declaration = characterCard.relationshipDeclaration() ?: return current
     return current.copy(
         roleLabel = current.roleLabel.ifBlank { declaration.label },
-        trust = maxOf(current.trust, declaration.trust),
-        closeness = maxOf(current.closeness, declaration.closeness),
-        reliability = maxOf(current.reliability, declaration.reliability),
-        boundaryConfidence = maxOf(current.boundaryConfidence, declaration.boundaryConfidence),
-        unresolvedTension = maxOf(current.unresolvedTension, declaration.tension),
+        trust = declaration.trust,
+        closeness = declaration.closeness,
+        reliability = declaration.reliability,
+        boundaryConfidence = declaration.boundaryConfidence,
+        unresolvedTension = declaration.tension,
         updatedAt = nowMillis,
     )
 }
