@@ -55,6 +55,8 @@ import me.rerere.hugeicons.stroke.Refresh01
 import me.rerere.hugeicons.stroke.Search01
 import me.rerere.hugeicons.stroke.Tools
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
+import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchEntity
+import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.ui.components.ui.Select
@@ -81,6 +83,7 @@ fun MemoryBankPage(
     val settings by vm.settings.collectAsStateWithLifecycle()
     val maintenanceMessage by vm.maintenanceMessage.collectAsStateWithLifecycle()
     val reorganizationProgress by vm.reorganizationProgress.collectAsStateWithLifecycle()
+    val batchOverviews by vm.batchOverviews.collectAsStateWithLifecycle()
     val embeddingModels = remember(settings.providers) { vm.embeddingModels(settings) }
     val assistantLabels = remember(assistantIds, settings.assistants) {
         buildMemoryAssistantLabels(assistantIds, settings.assistants)
@@ -223,6 +226,63 @@ fun MemoryBankPage(
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+                        }
+                    }
+                }
+            }
+
+            if (batchOverviews.isNotEmpty()) {
+                item {
+                    Text("持久记忆批次", style = MaterialTheme.typography.titleSmall)
+                }
+                items(batchOverviews, key = { it.conversationId }) { overview ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                "对话 ${overview.conversationId.take(8)}…",
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                            Text(
+                                "成功点 ${overview.successfulThrough} · 下一批从 ${overview.nextBatchStart} 开始 · 稳定区到 ${overview.stableRegionEnd} · 剩余 ${overview.remainingMessageCount} 条",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            overview.batches
+                                .filter { it.status != MemoryExtractionBatchStatus.SUCCESS_WITH_MEMORIES.name }
+                                .takeLast(8)
+                                .forEach { batch ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                "${batch.batchStartSequence}～${batch.batchEndSequence} · ${batchStatusLabel(batch)}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                            )
+                                            Text(
+                                                "尝试 ${batch.attemptCount} 次${batch.lastError?.let { " · $it" }.orEmpty()}",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                        if (
+                                            batch.status == MemoryExtractionBatchStatus.FAILED_RETRYABLE.name ||
+                                            batch.status == MemoryExtractionBatchStatus.FAILED_MANUAL_REVIEW.name
+                                        ) {
+                                            TextButton(
+                                                enabled = !loading && !reorganizationProgress.running,
+                                                onClick = { vm.retryExtractionBatch(batch.batchId) },
+                                            ) {
+                                                Text("重试")
+                                            }
+                                        }
+                                    }
+                                }
                         }
                     }
                 }
@@ -968,3 +1028,15 @@ internal fun buildMemoryAssistantLabels(
 }
 
 private fun String.shortAssistantId(): String = take(8)
+
+
+private fun batchStatusLabel(batch: MemoryExtractionBatchEntity): String = when (batch.status) {
+    MemoryExtractionBatchStatus.PENDING.name -> "等待处理"
+    MemoryExtractionBatchStatus.PROCESSING.name -> "处理中"
+    MemoryExtractionBatchStatus.SUCCESS_WITH_MEMORIES.name -> "已生成记忆"
+    MemoryExtractionBatchStatus.SUCCESS_EMPTY.name -> "明确无记忆"
+    MemoryExtractionBatchStatus.FAILED_RETRYABLE.name -> "失败，可重试"
+    MemoryExtractionBatchStatus.FAILED_MANUAL_REVIEW.name -> "需要手动重试"
+    MemoryExtractionBatchStatus.INVALIDATED.name -> "已失效，等待重建"
+    else -> "未知状态"
+}
