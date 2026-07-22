@@ -1,6 +1,9 @@
 package me.rerere.rikkahub.data.service
 
 import me.rerere.rikkahub.data.companion.CompanionConcern
+import me.rerere.rikkahub.data.companion.CompanionInteractionTimeline
+import me.rerere.rikkahub.data.companion.CompanionOutboundContact
+import me.rerere.rikkahub.data.companion.CompanionOutboundStatus
 import me.rerere.rikkahub.data.companion.CompanionRelationshipState
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
@@ -152,6 +155,36 @@ class CompanionAutonomousPulsePlannerTest {
 
         assertEquals(390, plan.delayMinutes)
         assertTrue(plan.reason.contains("targeted_active"))
+    }
+
+    @Test
+    fun `busy feedback lowers interruption frequency without changing relationship`() {
+        val snapshot = CompanionSnapshot.empty("assistant-a").copy(
+            interactionTimeline = CompanionInteractionTimeline(
+                outboundContacts = listOf(
+                    CompanionOutboundContact(
+                        id = "out-1",
+                        status = CompanionOutboundStatus.USER_BUSY,
+                        generatedAt = 100L,
+                        resolvedAt = 200L,
+                    ),
+                ),
+            ),
+        )
+
+        val plan = CompanionAutonomousPulsePlanner.planNext(
+            input = CompanionAutonomousPulseInput(
+                setting = setting.copy(naturalScheduling = true),
+                snapshot = snapshot,
+                minutesSinceLastChat = 180,
+                nowMillis = 1_700_000_000_000L,
+            ),
+        )
+
+        assertTrue(plan.delayMinutes in 180..360)
+        assertTrue(plan.reason.contains("feedback=USER_BUSY"))
+        assertEquals(0f, snapshot.relationship.closeness)
+        assertEquals(0f, snapshot.relationship.unresolvedTension)
     }
 
     @Test
