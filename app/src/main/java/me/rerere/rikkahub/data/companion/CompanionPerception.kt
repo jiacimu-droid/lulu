@@ -262,6 +262,17 @@ fun CompanionPerceptionPacket.toPromptContext(): String = buildString {
             appendLine("unspoken=${thought.take(300)}")
         }
     }
+    snapshot.explainableState.toPromptLines(nowMillis).forEach(::appendLine)
+    snapshot.lifeAnchor
+        ?.takeIf { it.isActiveAt(nowMillis) }
+        ?.let { anchor ->
+            appendLine(
+                "life_anchor activity=${anchor.activity.take(120)} context=${anchor.context.take(120)} " +
+                    "contactability=${anchor.contactability.take(80)} started=${anchor.startedAt} " +
+                    "expected_end=${anchor.expectedEndAt ?: "unknown"} source=${anchor.source.name} " +
+                    "confidence=${anchor.confidence}",
+            )
+        }
     if (activeConcerns.isNotEmpty()) {
         appendLine("active_concerns:")
         activeConcerns.take(8).forEach { concern ->
