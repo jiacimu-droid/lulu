@@ -6,9 +6,29 @@ import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.model.MessageNode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 class AffectiveMemoryExtractionPlannerTest {
+    @Test
+    fun `selected branch fingerprint is stable and changes with selected alternative`() {
+        val original = nodes(3)
+        val branchA = buildSelectedConversationBranchId(original)
+        val changed = original.toMutableList().also { nodes ->
+            val node = nodes[1]
+            nodes[1] = node.copy(
+                messages = node.messages + UIMessage(
+                    role = MessageRole.ASSISTANT,
+                    parts = listOf(UIMessagePart.Text("alternative")),
+                ),
+                selectIndex = 1,
+            )
+        }
+
+        assertEquals(branchA, buildSelectedConversationBranchId(original))
+        assertNotEquals(branchA, buildSelectedConversationBranchId(changed))
+    }
+
     @Test
     fun `planner waits until twenty stable logical messages remain after keeping newest ten`() {
         val shortConversation = nodes(29)
