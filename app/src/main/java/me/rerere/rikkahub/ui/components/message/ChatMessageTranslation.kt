@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,7 +59,7 @@ fun LanguageSelectionDialog(
     onClearTranslation: () -> Unit = {},
     onDismissRequest: () -> Unit
 ) {
-    // 支持的语言列表
+    val displayLocale = LocalConfiguration.current.locales[0]
     val languages = remember {
         listOf(
             Locale.SIMPLIFIED_CHINESE,
@@ -73,7 +74,6 @@ fun LanguageSelectionDialog(
         )
     }
 
-    // 语言名称映射函数，原有的 locale.displayName 方法无法获取 emoji
     @Composable
     fun getLanguageDisplayName(locale: Locale): String {
         return when (locale) {
@@ -86,7 +86,7 @@ fun LanguageSelectionDialog(
             Locale.GERMAN -> stringResource(R.string.language_german)
             Locale.ITALIAN -> stringResource(R.string.language_italian)
             Locale("es", "ES") -> stringResource(R.string.language_spanish)
-            else -> locale.getDisplayLanguage(Locale.getDefault())
+            else -> locale.getDisplayLanguage(displayLocale)
         }
     }
 
@@ -100,23 +100,19 @@ fun LanguageSelectionDialog(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // 标题
             Text(
                 text = stringResource(R.string.translation_language_selection_title),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 语言列表
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(languages) { language ->
                     Card(
-                        onClick = {
-                            onLanguageSelected(language)
-                        },
+                        onClick = { onLanguageSelected(language) },
                         shape = MaterialTheme.shapes.medium
                     ) {
                         Row(
@@ -141,9 +137,7 @@ fun LanguageSelectionDialog(
 
                 item {
                     Card(
-                        onClick = {
-                            onClearTranslation()
-                        },
+                        onClick = onClearTranslation,
                         shape = MaterialTheme.shapes.medium
                     ) {
                         Row(
@@ -184,7 +178,6 @@ fun CollapsibleTranslationText(
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
         )
 
-        // Translation title and collapse button
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -208,7 +201,6 @@ fun CollapsibleTranslationText(
                 )
             }
 
-            // 折叠/展开按钮
             IconButton(
                 onClick = { isCollapsed = !isCollapsed },
                 modifier = Modifier.size(32.dp)
@@ -224,7 +216,6 @@ fun CollapsibleTranslationText(
             }
         }
 
-        // Translation content (collapsible)
         AnimatedVisibility(
             visible = !isCollapsed,
             enter = expandVertically() + fadeIn(),
@@ -239,11 +230,9 @@ fun CollapsibleTranslationText(
                 ),
                 shape = MaterialTheme.shapes.medium
             ) {
-                // Check if it's loading state
                 val isTranslating = content == stringResource(R.string.translating)
 
                 if (isTranslating) {
-                    // Show loading animation for translation
                     Row(
                         modifier = Modifier
                             .padding(12.dp)
@@ -276,7 +265,6 @@ fun CollapsibleTranslationText(
                         )
                     }
                 } else {
-                    // Show normal translation content
                     MarkdownBlock(
                         content = content,
                         onClickCitation = onClickCitation,
