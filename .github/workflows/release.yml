@@ -56,10 +56,16 @@ jobs:
           keyPassword=lulu-release-password
           EOF
 
-      - name: Run unit tests
+      - name: Build signed release APK
         run: |
           mkdir -p ci-logs
           chmod +x ./gradlew
+          set -o pipefail
+          ./gradlew --no-daemon --no-build-cache assembleRelease -x uploadCrashlyticsMappingFileRelease 2>&1 | tee ci-logs/build.log
+
+      - name: Run unit tests
+        run: |
+          mkdir -p ci-logs
           set -o pipefail
           ./gradlew --no-daemon --no-build-cache :app:testDebugUnitTest 2>&1 | tee ci-logs/tests.log
 
@@ -69,12 +75,6 @@ jobs:
           mkdir -p ci-logs
           set -o pipefail
           ./gradlew --no-daemon --no-build-cache :app:lintRelease 2>&1 | tee ci-logs/lint.log
-
-      - name: Build signed release APK
-        run: |
-          mkdir -p ci-logs
-          set -o pipefail
-          ./gradlew --no-daemon --no-build-cache assembleRelease -x uploadCrashlyticsMappingFileRelease 2>&1 | tee ci-logs/build.log
 
       - name: Collect APK
         run: |
