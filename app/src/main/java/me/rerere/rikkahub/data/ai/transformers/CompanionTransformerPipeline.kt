@@ -1,7 +1,7 @@
 package me.rerere.rikkahub.data.ai.transformers
 
 internal val companionInputTransformers: List<InputMessageTransformer> = listOf(
-    // First pass removes transient snapshots accidentally retained by previous turns.
+    // Remove transient snapshots accidentally retained by previous turns.
     CompanionContextDedupTransformer,
     TimeReminderTransformer,
     PromptInjectionTransformer,
@@ -11,9 +11,12 @@ internal val companionInputTransformers: List<InputMessageTransformer> = listOf(
     DocumentAsPromptTransformer,
     OcrTransformer,
     VoiceMessageTransformer,
-    // Final pass makes the freshly generated snapshot win and removes exact
-    // duplicate system/world-book blocks introduced through multiple paths.
+    // Compact the newly generated runtime by semantic fields, then keep only the
+    // newest snapshot of every transient context kind.
+    CompanionRuntimeCompactTransformer,
     CompanionContextDedupTransformer,
+    // Emergency ceiling only; source filtering and deduplication do the real work.
+    CompanionFinalBudgetTransformer,
 )
 
 internal val companionOutputTransformers: List<OutputMessageTransformer> = listOf(
