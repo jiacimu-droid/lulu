@@ -4,6 +4,7 @@ import me.rerere.ai.core.MessageRole
 import me.rerere.rikkahub.data.model.MessageNode
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import java.security.MessageDigest
 
 const val DEFAULT_MEMORY_EXTRACTION_INTERVAL = 20
 const val MEMORY_EXTRACTION_TAIL_BUFFER = 10
@@ -16,6 +17,16 @@ data class AffectiveMemoryExtractionPlan(
 enum class MemoryExtractionDirection {
     OLDEST_FIRST,
     RECENT_FIRST,
+}
+
+internal fun buildSelectedConversationBranchId(messageNodes: List<MessageNode>): String {
+    val selectedPath = messageNodes.mapNotNull { node ->
+        runCatching { "${node.id}:${node.currentMessage.id}" }.getOrNull()
+    }.joinToString("|")
+    val digest = MessageDigest.getInstance("SHA-256")
+        .digest(selectedPath.toByteArray(Charsets.UTF_8))
+        .joinToString("") { byte -> "%02x".format(byte) }
+    return "selected:${digest.take(24)}"
 }
 
 fun buildAffectiveMemoryExtractionPlan(
