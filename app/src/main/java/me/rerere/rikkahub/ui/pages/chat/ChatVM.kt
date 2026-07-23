@@ -37,7 +37,7 @@ import me.rerere.rikkahub.data.model.NodeFavoriteTarget
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.repository.FavoriteRepository
 import me.rerere.rikkahub.service.ChatError
-import me.rerere.rikkahub.service.ChatService
+import me.rerere.rikkahub.service.CompanionChatPort
 import me.rerere.rikkahub.ui.hooks.writeStringPreference
 import me.rerere.rikkahub.ui.hooks.ChatInputState
 import java.util.Locale
@@ -50,7 +50,7 @@ class ChatVM(
     private val context: Application,
     private val settingsStore: SettingsStore,
     private val conversationRepo: ConversationRepository,
-    private val chatService: ChatService,
+    private val chatService: CompanionChatPort,
     private val analytics: FirebaseAnalytics,
     private val filesManager: FilesManager,
     private val favoriteRepository: FavoriteRepository,
