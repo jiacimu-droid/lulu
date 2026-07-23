@@ -272,7 +272,7 @@ object AffectiveMemoryExtractor {
         appendLine("用户与当前角色是两个独立主体。必须先根据每条消息的 role 和正文判断‘谁做了什么’，再转换叙述视角；不能因为要求角色第一人称，就把用户做过、经历过、决定过或感受到的事情改写成角色本人做过或经历过。")
         appendLine("不是‘有用才记’，而是‘值得记才记’：稳定事实、明确偏好、边界、承诺、纠正，以及印象深刻的共同经历、第一次、冲突、和好、担忧、喜悦、委屈或关系时刻都可以记。")
         appendLine("宁缺毋滥。普通寒暄、随口一句、无特殊意义的吃饭喝水天气行程、学习材料原文、工具结果、系统信息和模型内部过程都不要提取；本批没有值得记住的内容就返回 {\"memories\":[]}。")
-        appendLine("每批最多提取6条。相近内容合并成一条，不要换句话重复。")
+        appendLine("每批最多提取6条。同一件事只能形成一条记忆；如果多个候选引用相同消息证据且意思接近，必须合并后只输出信息最完整的一条，禁止换句话重复。")
         appendLine("可用类型仅限：user_fact, user_preference, user_boundary, promise, relationship, shared_event, correction。")
         appendLine("AI只允许填写以下字段：type、content、roleFeeling、bodySense、unspokenThought、relationshipEffect、importance、confidence、sourceMessageNodeIds。不要输出标题、标签、用户证据摘要、向量、人物、主题、关联ID或任何其他字段。")
         appendLine("content：以当前角色作为叙述者，用当前角色的第一人称自然写清发生了什么以及最值得记住的部分；这里的‘我’始终只代表当前角色。用户做的事仍然属于用户，角色做的事才属于角色。")
@@ -304,14 +304,84 @@ object AffectiveMemoryExtractor {
                 decodeExtractionCandidates(repaired)
             }
         return AffectiveMemoryExtractionResult(
-            memories = candidates
-                .map { it.normalized() }
-                .filter { it.content.isNotBlank() }
-                .distinctBy { it.content.normalizedMemoryIdentity() }
-                .sortedWith(compareByDescending<AffectiveMemoryCandidate> { it.importance }.thenByDescending { it.confidence })
+            memories = deduplicateMemoryCandidates(candidates)
                 .take(MAX_MEMORIES_PER_BATCH)
         )
     }
+}
+
+internal fun deduplicateMemoryCandidates(
+    candidates: List<AffectiveMemoryCandidate>,
+): List<AffectiveMemoryCandidate> {
+    val ranked = candidates
+        .map { it.normalized() }
+        .filter { it.content.isNotBlank() }
+        .sortedWith(
+            compareByDescending<AffectiveMemoryCandidate> { it.importance }
+                .thenByDescending { it.confidence }
+                .thenByDescending { it.memoryDetailScore() }
+        )
+    val selected = mutableListOf<AffectiveMemoryCandidate>()
+    ranked.forEach { candidate ->
+        val duplicateIndex = selected.indexOfFirst { existing -> existing.isSameMemoryAs(candidate) }
+        if (duplicateIndex < 0) {
+            selected += candidate
+        } else {
+            selected[duplicateIndex] = selected[duplicateIndex].mergeDuplicateEvidence(candidate)
+        }
+    }
+    return selected.sortedWith(
+        compareByDescending<AffectiveMemoryCandidate> { it.importance }
+            .thenByDescending { it.confidence }
+            .thenByDescending { it.memoryDetailScore() }
+    )
+}
+
+private fun AffectiveMemoryCandidate.isSameMemoryAs(other: AffectiveMemoryCandidate): Boolean {
+    if (content.normalizedMemoryIdentity() == other.content.normalizedMemoryIdentity()) return true
+    if (type != other.type) return false
+    val evidence = (sourceMessageNodeIds + evidenceMessageNodeIds).toSet()
+    val otherEvidence = (other.sourceMessageNodeIds + other.evidenceMessageNodeIds).toSet()
+    if (evidence.isEmpty() || otherEvidence.isEmpty() || evidence.intersect(otherEvidence).isEmpty()) return false
+    return memoryTextSimilarity(content, other.content) >= MEMORY_TEXT_DUPLICATE_THRESHOLD
+}
+
+private fun AffectiveMemoryCandidate.mergeDuplicateEvidence(
+    other: AffectiveMemoryCandidate,
+): AffectiveMemoryCandidate = copy(
+    sourceMessageNodeIds = (sourceMessageNodeIds + other.sourceMessageNodeIds).distinct(),
+    evidenceMessageNodeIds = (evidenceMessageNodeIds + other.evidenceMessageNodeIds).distinct(),
+    relatedMemoryIds = (relatedMemoryIds + other.relatedMemoryIds).distinct(),
+    people = (people + other.people).distinct(),
+    topics = (topics + other.topics).distinct(),
+    tags = (tags + other.tags).distinct(),
+)
+
+private fun AffectiveMemoryCandidate.memoryDetailScore(): Int = listOfNotNull(
+    content,
+    roleFeeling,
+    bodySense,
+    unspokenThought,
+    relationshipEffect,
+).sumOf { it.length }
+
+private fun memoryTextSimilarity(left: String, right: String): Double {
+    val leftParts = left.memoryCharacterBigrams()
+    val rightParts = right.memoryCharacterBigrams()
+    if (leftParts.isEmpty() || rightParts.isEmpty()) return 0.0
+    val intersection = leftParts.intersect(rightParts).size.toDouble()
+    val union = (leftParts + rightParts).size.toDouble()
+    return if (union == 0.0) 0.0 else intersection / union
+}
+
+private fun String.memoryCharacterBigrams(): Set<String> {
+    val compact = normalizedMemoryIdentity()
+        .removePrefix("我记得")
+        .removePrefix("我知道")
+        .removePrefix("我看到")
+        .removePrefix("我听到")
+    if (compact.length < 2) return setOf(compact).filter(String::isNotBlank).toSet()
+    return compact.windowed(2).toSet()
 }
 
 private fun decodeExtractionCandidates(jsonText: String): List<AffectiveMemoryCandidate> {
@@ -421,26 +491,4 @@ private fun String.looksLikeVocabularyDrill(): Boolean {
     return uniqueRatio > 0.75 && !hasSentencePunctuation
 }
 
-private fun String.extractJsonPayload(): String {
-    val trimmed = trim()
-    if (trimmed.startsWith("{") || trimmed.startsWith("[")) return trimmed
-    val fenced = Regex("```(?:json)?\\s*([\\s\\S]*?)```")
-        .find(trimmed)?.groupValues?.getOrNull(1)?.trim()
-    if (!fenced.isNullOrBlank()) return fenced
-    val start = listOf(trimmed.indexOf('{'), trimmed.indexOf('[')).filter { it >= 0 }.minOrNull() ?: return trimmed
-    val end = maxOf(trimmed.lastIndexOf('}'), trimmed.lastIndexOf(']'))
-    return if (end >= start) trimmed.substring(start, end + 1) else trimmed
-}
-
-private const val MAX_MEMORIES_PER_BATCH = 6
-private val DETERMINISTIC_BOUNDARY_MARKERS = listOf("我不希望", "我不喜欢", "不要再", "别再", "不许")
-private val DETERMINISTIC_CORRECTION_MARKERS = listOf("不是这样的", "不是这个意思", "应该是", "纠正一下", "更正一下", "你理解错了")
-private val DETERMINISTIC_PREFERENCE_MARKERS = listOf("我更喜欢", "我喜欢", "我希望", "我想要", "对我来说")
-private val TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS = listOf("timeout", "connect", "rateLimit", "tooManyRequests", "serviceUnavailable")
-private val DURABLE_MEMORY_TYPES = setOf("user_fact", "user_preference", "user_boundary", "promise", "relationship", "shared_event", "correction")
-private val FIRST_PERSON_PREFIXES = listOf("我", "咱", "本人", "本小姐", "本少爷", "本官", "本王", "本宫", "在下", "余", "吾", "I ", "I'm ", "I’m ")
-private val GENERIC_META_MEMORY_MARKERS = listOf(
-    "cihai_reflection", "我记得这件事。当时感觉", "复盘、收束、准备下一轮", "后续可复用的长期记忆",
-    "感知世界包", "意义评估", "动态判断", "状态生成", "辞海记忆架构", "七层架构",
-    "下一轮判断", "我完成了沉淀", "我整理了记忆", "以后可以参考", "等待下一次",
-)
+private const val MEMORY_TEXT_DUPLICATE_THRESHOLD = 0.58
