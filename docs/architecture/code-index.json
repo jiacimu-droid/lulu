@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T10:13:46.429730+00:00",
-  "commit": "8c205ba7e7ec2bb1e3c3d4c8bee63bf83d0c006a",
+  "generatedAt": "2026-07-23T11:27:48.285437+00:00",
+  "commit": "d18cc9cc91839d4f2a7e87f5dbec3837bcd28d35",
   "branch": "master",
-  "sourceFingerprint": "6e06dbffe8b0b9afd450c71e18b53a6c987ee7491763561993e8fa68f4090a4c",
+  "sourceFingerprint": "1c22b38485fe094a7b950d7443000b8f614004ff2a7ecb25c078eadd3d25e6fc",
   "summary": {
-    "files": 1103,
-    "lines": 262232,
-    "symbols": 5317,
-    "productionCodeFiles": 780,
+    "files": 1104,
+    "lines": 262440,
+    "symbols": 5333,
+    "productionCodeFiles": 781,
     "testFiles": 128,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 33,
     "byModule": {
-      "app": 640,
+      "app": 641,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 708,
+      ".kt": 709,
       ".tsx": 74,
       ".java": 64,
       ".md": 59,
@@ -68,7 +68,7 @@
       "界面": 284,
       "记忆": 42
     },
-    "resolvedImportEdges": 1866
+    "resolvedImportEdges": 1867
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -9136,6 +9136,7 @@
       "localImports": [],
       "resolvedImports": [],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt"
       ]
@@ -13986,6 +13987,108 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 208,
+      "sha256": "10f9bff6581bc471071765d009bd5077e0f1fe33685c2ff1af3fffbd20d54d5b",
+      "package": "me.rerere.rikkahub.data.companion",
+      "categories": [],
+      "symbols": [
+        {
+          "name": "CompanionTurnEngine",
+          "kind": "class",
+          "line": 15
+        },
+        {
+          "name": "execute",
+          "kind": "function",
+          "line": 16
+        },
+        {
+          "name": "stage",
+          "kind": "function",
+          "line": 28
+        },
+        {
+          "name": "elapsedMillis",
+          "kind": "function",
+          "line": 98
+        },
+        {
+          "name": "CompanionTurnEntryPoint",
+          "kind": "class",
+          "line": 102
+        },
+        {
+          "name": "CompanionTurnStage",
+          "kind": "class",
+          "line": 109
+        },
+        {
+          "name": "CompanionTurnStageStatus",
+          "kind": "class",
+          "line": 118
+        },
+        {
+          "name": "CompanionTurnRequest",
+          "kind": "class",
+          "line": 123
+        },
+        {
+          "name": "CompanionTurnStageRecord",
+          "kind": "class",
+          "line": 134
+        },
+        {
+          "name": "CompanionTurnPersistenceInput",
+          "kind": "class",
+          "line": 142
+        },
+        {
+          "name": "CompanionTurnMaintenanceInput",
+          "kind": "class",
+          "line": 150
+        },
+        {
+          "name": "CompanionTurnResult",
+          "kind": "class",
+          "line": 159
+        },
+        {
+          "name": "CompanionNeutralEvent",
+          "kind": "class",
+          "line": 175
+        },
+        {
+          "name": "CompanionNeutralEventStatus",
+          "kind": "class",
+          "line": 187
+        },
+        {
+          "name": "CompanionEventActor",
+          "kind": "class",
+          "line": 195
+        },
+        {
+          "name": "CompanionResponsibility",
+          "kind": "class",
+          "line": 202
+        }
+      ],
+      "localImportCount": 1,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.ai.PerformanceMonitor"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/PerformanceMonitor.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionWakePolicy.kt",
@@ -67437,6 +67540,13 @@
         "line": 14
       }
     ],
+    "me.rerere.rikkahub.data.companion.CompanionEventActor": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 195
+      }
+    ],
     "me.rerere.rikkahub.data.companion.CompanionExplainableState": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionExplainableState.kt",
@@ -67612,6 +67722,20 @@
         "line": 156
       }
     ],
+    "me.rerere.rikkahub.data.companion.CompanionNeutralEvent": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 175
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionNeutralEventStatus": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 187
+      }
+    ],
     "me.rerere.rikkahub.data.companion.CompanionOutboundContact": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
@@ -67738,6 +67862,13 @@
         "line": 354
       }
     ],
+    "me.rerere.rikkahub.data.companion.CompanionResponsibility": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 202
+      }
+    ],
     "me.rerere.rikkahub.data.companion.CompanionResponsibilityAnchorDraft": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt",
@@ -67829,6 +67960,27 @@
         "line": 14
       }
     ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnEngine": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 15
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnEntryPoint": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 102
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnMaintenanceInput": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 150
+      }
+    ],
     "me.rerere.rikkahub.data.companion.CompanionTurnMutation": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
@@ -67836,11 +67988,53 @@
         "line": 228
       }
     ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnPersistenceInput": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 142
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnRequest": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 123
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnResult": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 159
+      }
+    ],
     "me.rerere.rikkahub.data.companion.CompanionTurnRole": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
         "kind": "class",
         "line": 44
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnStage": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 109
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnStageRecord": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 134
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnStageStatus": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "class",
+        "line": 118
       }
     ],
     "me.rerere.rikkahub.data.companion.Complete": [
@@ -68452,6 +68646,13 @@
         "line": 452
       }
     ],
+    "me.rerere.rikkahub.data.companion.elapsedMillis": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "function",
+        "line": 98
+      }
+    ],
     "me.rerere.rikkahub.data.companion.empty": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
@@ -68485,6 +68686,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
         "line": 134
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "function",
+        "line": 16
       }
     ],
     "me.rerere.rikkahub.data.companion.expandExplicitCompanionResponsibilities": [
@@ -69192,6 +69398,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 73
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.stage": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
+        "kind": "function",
+        "line": 28
       }
     ],
     "me.rerere.rikkahub.data.companion.substringAfterAny": [
