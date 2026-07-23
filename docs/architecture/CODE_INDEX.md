@@ -12,19 +12,19 @@
 
 ## 索引状态
 
-- 基准提交：`8c76d103afdb338cf973908d04d725105c291c7e`
+- 基准提交：`6296d057ba80636bb575084e54ca2f66985e6d11`
 - 分支：`master`
-- 源码指纹：`4836fbfbb8d5fb1c…`
-- 已索引文件：1108
-- 已索引代码/文本行：262918
-- 已发现类、接口、对象、函数及 Composable：5414
+- 源码指纹：`f6ead14a0279407f…`
+- 已索引文件：1109
+- 已索引代码/文本行：262972
+- 已发现类、接口、对象、函数及 Composable：5418
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
 | 生产代码文件 | 784 |
-| 测试文件 | 129 |
+| 测试文件 | 130 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
 | TODO/FIXME/HACK/XXX | 33 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 645 |
+| `app` | 646 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 713 |
+| `.kt` | 714 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 59 |
@@ -273,6 +273,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoritePage.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoriteVM.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivitiesTest.kt`
+- `app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivityWiringTest.kt`
 - `plugins/example/weather/main.js`
 - `plugins/example/weather/manifest.json`
 - `plugins/moments/main.js`
@@ -292,8 +293,7 @@
 - `plugins/橘市商业街/manifest.json`
 - `plugins/橘市商业街/supabase_schema.sql`
 - `plugins/橘市商业街/ui/index.html`
-- `plugins/番茄钟/main.js`
-- ……另有 5 个文件，见 `code-index.json`
+- ……另有 6 个文件，见 `code-index.json`
 
 ### 学习监督
 
@@ -533,7 +533,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：1875
-- 可检索完整符号：4831
+- 可检索完整符号：4835
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|

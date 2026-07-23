@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:55:14.225122+00:00",
-  "commit": "8c76d103afdb338cf973908d04d725105c291c7e",
+  "generatedAt": "2026-07-23T11:55:48.741586+00:00",
+  "commit": "6296d057ba80636bb575084e54ca2f66985e6d11",
   "branch": "master",
-  "sourceFingerprint": "4836fbfbb8d5fb1ced0fd0fca84a47016ed75a220c91f19b66927abb1f631674",
+  "sourceFingerprint": "f6ead14a0279407f0d62b252186cfed3146da99b2873ec77b16030018a5a0fd1",
   "summary": {
-    "files": 1108,
-    "lines": 262918,
-    "symbols": 5414,
+    "files": 1109,
+    "lines": 262972,
+    "symbols": 5418,
     "productionCodeFiles": 784,
-    "testFiles": 129,
+    "testFiles": 130,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 33,
     "byModule": {
-      "app": 645,
+      "app": 646,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 713,
+      ".kt": 714,
       ".tsx": 74,
       ".java": 64,
       ".md": 59,
@@ -58,7 +58,7 @@
       "AI与上下文": 137,
       "主动代理": 24,
       "关系与承诺": 17,
-      "娱乐与数字生活": 35,
+      "娱乐与数字生活": 36,
       "学习监督": 15,
       "工具": 6,
       "插件": 44,
@@ -1327,6 +1327,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoritePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoriteVM.kt",
       "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivitiesTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivityWiringTest.kt",
       "plugins/example/weather/main.js",
       "plugins/example/weather/manifest.json",
       "plugins/moments/main.js",
@@ -45350,6 +45351,46 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivityWiringTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 54,
+      "sha256": "878d8f779ed123b6ead0fb1f2534302d751252c6a091333d3850f677aa35c3f1",
+      "package": "me.rerere.rikkahub.data.companion",
+      "categories": [
+        "娱乐与数字生活"
+      ],
+      "symbols": [
+        {
+          "name": "CompanionDigitalActivityWiringTest",
+          "kind": "class",
+          "line": 8
+        },
+        {
+          "name": "everyRegisteredActivityHasExactlyOneUsableExecutor",
+          "kind": "function",
+          "line": 12
+        },
+        {
+          "name": "everyUsesModelActivityIsBackedByAModelCapableExecutor",
+          "kind": "function",
+          "line": 20
+        },
+        {
+          "name": "evidenceBoundActivitiesRejectClaimsWithoutARealReference",
+          "kind": "function",
+          "line": 35
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionExplainableStateTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -68070,6 +68111,13 @@
         "line": 110
       }
     ],
+    "me.rerere.rikkahub.data.companion.CompanionDigitalActivityWiringTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivityWiringTest.kt",
+        "kind": "class",
+        "line": 8
+      }
+    ],
     "me.rerere.rikkahub.data.companion.CompanionDigitalLifeActivityService": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
@@ -69251,6 +69299,27 @@
         "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivitiesTest.kt",
         "kind": "function",
         "line": 11
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.everyRegisteredActivityHasExactlyOneUsableExecutor": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivityWiringTest.kt",
+        "kind": "function",
+        "line": 12
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.everyUsesModelActivityIsBackedByAModelCapableExecutor": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivityWiringTest.kt",
+        "kind": "function",
+        "line": 20
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.evidenceBoundActivitiesRejectClaimsWithoutARealReference": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivityWiringTest.kt",
+        "kind": "function",
+        "line": 35
       }
     ],
     "me.rerere.rikkahub.data.companion.execute": [
