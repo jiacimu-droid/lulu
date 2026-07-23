@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`88c4771970713465a949369de85ec30e30c72156`
+- 基准提交：`75897c683ec871180114c8f3762d7685d7af85f9`
 - 分支：`master`
-- 源码指纹：`c4bd304e3c082a23…`
-- 已索引文件：1116
-- 已索引代码/文本行：263680
+- 源码指纹：`06baf73b5d6b2a6c…`
+- 已索引文件：1117
+- 已索引代码/文本行：263793
 - 已发现类、接口、对象、函数及 Composable：5451
 
 ## 仓库健康信号
@@ -144,8 +144,8 @@
 | `plugins` | 25 |
 | `docs` | 24 |
 | `common` | 21 |
+| `.github` | 11 |
 | `.agents` | 10 |
-| `.github` | 10 |
 | `root` | 10 |
 | `website` | 10 |
 | `highlight` | 9 |
@@ -169,7 +169,7 @@
 | `.xml` | 37 |
 | `.pro` | 15 |
 | `.kts` | 11 |
-| `.yml` | 9 |
+| `.yml` | 10 |
 | `.js` | 9 |
 | `.html` | 7 |
 | `.css` | 4 |
@@ -399,6 +399,7 @@
 - `.github/workflows/inspect-memory-pipeline.yml`
 - `.github/workflows/one-time-bubble-split-v3.yml`
 - `.github/workflows/one-time-bubble-split-v4.yml`
+- `.github/workflows/one-time-chat-call-tool.yml`
 - `.github/workflows/one-time-chat-cleanup-v2.yml`
 - `.github/workflows/release.yml`
 - `ai/build.gradle.kts`
