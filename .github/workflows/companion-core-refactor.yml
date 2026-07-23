@@ -96,30 +96,55 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run focused tests and release Kotlin compilation
+      - name: Compile release Kotlin first
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set +e
-          ./gradlew \
-            :app:testDebugUnitTest \
-            :app:compileReleaseKotlin \
-            --no-daemon \
-            --stacktrace > /tmp/gradle.log 2>&1
+          ./gradlew :app:compileReleaseKotlin --no-daemon --stacktrace > /tmp/compile.log 2>&1
           status=$?
-          cat /tmp/gradle.log
           if [ "$status" -ne 0 ]; then
             {
-              echo '❌ Companion refactor failed Kotlin/tests validation; no changes were pushed to master.'
+              echo '❌ Companion refactor failed Release Kotlin compilation; no changes were pushed to master.'
               echo
               echo '```text'
-              tail -n 180 /tmp/gradle.log
+              grep -E '(^e: |^w: |Compilation error|Execution failed for task|What went wrong|BUILD FAILED|Unresolved reference|Argument type mismatch|Cannot infer|Type mismatch)' /tmp/compile.log | tail -n 120
+              echo
+              echo '--- tail ---'
+              tail -n 50 /tmp/compile.log
               echo '```'
             } > /tmp/compile-comment.md
+            cat /tmp/compile-comment.md
             gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/compile-comment.md
             exit "$status"
           fi
+          tail -n 40 /tmp/compile.log
+
+      - name: Run focused unit tests
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace > /tmp/tests.log 2>&1
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            {
+              echo '❌ Companion refactor passed Release compilation but failed unit tests; no changes were pushed to master.'
+              echo
+              echo '```text'
+              grep -E '(^[A-Za-z0-9_.]+ > .*FAILED$|AssertionError|expected:<|but was:<|There were failing tests|Execution failed for task|BUILD FAILED)' /tmp/tests.log | tail -n 120
+              echo
+              echo '--- tail ---'
+              tail -n 50 /tmp/tests.log
+              echo '```'
+            } > /tmp/test-comment.md
+            cat /tmp/test-comment.md
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/test-comment.md
+            exit "$status"
+          fi
+          tail -n 40 /tmp/tests.log
 
       - name: Commit verified changes directly to master
         shell: bash
