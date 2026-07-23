@@ -1,0 +1,301 @@
+name: Remove reply suggestions once
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/remove-reply-suggestions-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    if: "!contains(github.event.head_commit.message, '[suggestion-removal-done]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Remove reply suggestion pipeline and tighten commitments
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+
+          def read(path):
+              p = root / path
+              return p.read_text(encoding='utf-8-sig')
+
+          def write(path, text):
+              p = root / path
+              p.write_text(text, encoding='utf-8', newline='\n')
+
+          def remove_braced_declaration(text, marker):
+              """Remove a Kotlin function/composable declaration containing marker."""
+              pos = text.find(marker)
+              if pos < 0:
+                  return text, False
+              line_start = text.rfind('\n', 0, pos) + 1
+              # Include annotations immediately above the declaration.
+              start = line_start
+              while start > 0:
+                  prev_end = start - 1
+                  prev_start = text.rfind('\n', 0, prev_end) + 1
+                  prev = text[prev_start:prev_end].strip()
+                  if prev.startswith('@'):
+                      start = prev_start
+                  else:
+                      break
+              brace = text.find('{', pos)
+              if brace < 0:
+                  return text, False
+              depth = 0
+              in_string = False
+              triple = False
+              escaped = False
+              i = brace
+              while i < len(text):
+                  if text.startswith('"""', i) and not escaped:
+                      triple = not triple
+                      i += 3
+                      continue
+                  ch = text[i]
+                  if not triple:
+                      if ch == '"' and not escaped:
+                          in_string = not in_string
+                      if not in_string:
+                          if ch == '{': depth += 1
+                          elif ch == '}':
+                              depth -= 1
+                              if depth == 0:
+                                  end = i + 1
+                                  while end < len(text) and text[end] in ' \t': end += 1
+                                  if end < len(text) and text[end] == '\r': end += 1
+                                  if end < len(text) and text[end] == '\n': end += 1
+                                  return text[:start] + text[end:], True
+                      escaped = (ch == '\\' and not escaped)
+                      if ch != '\\': escaped = False
+                  i += 1
+              raise RuntimeError(f'Unbalanced declaration for {marker}')
+
+          def remove_argument_block(text, argument_name):
+              # Removes a named lambda argument: argumentName = { ... },
+              pattern = re.compile(r'(?m)^\s*' + re.escape(argument_name) + r'\s*=\s*\{')
+              while True:
+                  m = pattern.search(text)
+                  if not m:
+                      return text
+                  brace = text.find('{', m.start())
+                  depth = 0
+                  i = brace
+                  in_string = False
+                  escaped = False
+                  while i < len(text):
+                      ch = text[i]
+                      if ch == '"' and not escaped:
+                          in_string = not in_string
+                      if not in_string:
+                          if ch == '{': depth += 1
+                          elif ch == '}':
+                              depth -= 1
+                              if depth == 0:
+                                  end = i + 1
+                                  while end < len(text) and text[end] in ' \t': end += 1
+                                  if end < len(text) and text[end] == ',': end += 1
+                                  while end < len(text) and text[end] in ' \t': end += 1
+                                  if end < len(text) and text[end] == '\r': end += 1
+                                  if end < len(text) and text[end] == '\n': end += 1
+                                  text = text[:m.start()] + text[end:]
+                                  break
+                      escaped = (ch == '\\' and not escaped)
+                      if ch != '\\': escaped = False
+                      i += 1
+                  else:
+                      raise RuntimeError(f'Unbalanced argument {argument_name}')
+
+          # 1) Conversation storage: remove generated suggestions from the domain model.
+          path = 'app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt'
+          text = read(path)
+          text = re.sub(r'(?m)^\s*val chatSuggestions: List<String> = emptyList\(\),\s*\n', '', text)
+          write(path, text)
+
+          # 2) ViewModel: remove public suggestion generation entry.
+          path = 'app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt'
+          text = read(path)
+          text, _ = remove_braced_declaration(text, 'fun generateSuggestion(')
+          write(path, text)
+
+          # 3) Chat page: remove suggestion click plumbing but keep the page itself.
+          path = 'app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt'
+          text = read(path)
+          text = remove_argument_block(text, 'onClickSuggestion')
+          write(path, text)
+
+          # 4) Chat list: remove parameters, render branch, component, and now-unused suggestion imports.
+          path = 'app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt'
+          text = read(path)
+          text = re.sub(r'(?m)^\s*onClickSuggestion: \(String\) -> Unit = \{\},\s*\n', '', text)
+          text = re.sub(r'(?m)^\s*onClickSuggestion: \(String\) -> Unit,\s*\n', '', text)
+          text = re.sub(r'(?m)^\s*onClickSuggestion = onClickSuggestion,\s*\n', '', text)
+          text = re.sub(
+              r'(?ms)^\s*// Suggestion\s*\n\s*if \(conversation\.chatSuggestions\.isNotEmpty\(\) && !captureProgress\) \{.*?^\s*\}\s*\n',
+              '', text,
+          )
+          text, _ = remove_braced_declaration(text, 'private fun ChatSuggestionsRow(')
+          # Imports used only by the deleted row. Keep any import still referenced elsewhere.
+          for imp, token in [
+              ('androidx.compose.foundation.background', '.background('),
+              ('androidx.compose.foundation.lazy.LazyRow', 'LazyRow('),
+              ('androidx.compose.foundation.lazy.items', 'items('),
+              ('androidx.compose.foundation.shape.RoundedCornerShape', 'RoundedCornerShape('),
+          ]:
+              if token not in text:
+                  text = re.sub(r'(?m)^import ' + re.escape(imp) + r'\s*\n', '', text)
+          write(path, text)
+
+          # 5) Chat service: remove every invocation and the generator function itself.
+          path = 'app/src/main/java/me/rerere/rikkahub/service/ChatService.kt'
+          text = read(path)
+          # Standalone launch block around generateSuggestion.
+          text = re.sub(
+              r'(?ms)^\s*launchWithConversationReference\(conversationId\) \{\s*generateSuggestion\(conversationId, finalConversation\)\s*\}\s*\n',
+              '', text,
+          )
+          text = re.sub(r'(?m)^\s*appScope\.launch \{ generateSuggestion\([^\n]+\) \}\s*\n', '', text)
+          text = re.sub(r'(?m)^\s*generateSuggestion\([^\n]+\)\s*\n', '', text)
+          # Remove declaration regardless of visibility/suspend modifier.
+          for marker in ['fun generateSuggestion(', 'suspend fun generateSuggestion(']:
+              while marker in text:
+                  new_text, changed = remove_braced_declaration(text, marker)
+                  if not changed: break
+                  text = new_text
+          # Long-term responsibility hard gate. A one-off meal check remains a short follow-up,
+          # and only explicit recurring/ongoing language can create an always-on anchor.
+          old = '''        val responsibilityUpserts = plan.responsibilityAnchorUpserts.mapNotNull { draft ->
+              draft.toAlwaysOnAnchorOrNull('''
+          if old in text:
+              text = text.replace(
+                  old,
+                  '''        val latestUserTextForResponsibility = messages
+              .lastOrNull { it.role == MessageRole.USER }
+              ?.toText()
+              .orEmpty()
+          val responsibilityUpserts = if (latestUserTextForResponsibility.hasExplicitLongTermCadence()) {
+              plan.responsibilityAnchorUpserts.mapNotNull { draft ->
+                  draft.toAlwaysOnAnchorOrNull(''',
+                  1,
+              )
+              # Close the new if/else after the existing mapNotNull block.
+              anchor = '                nowMillis = nowMillis,\n            )\n        }\n        if (responsibilityUpserts.isNotEmpty()'
+              replacement = '                nowMillis = nowMillis,\n                  )\n              }\n          } else {\n              emptyList()\n          }\n          if (responsibilityUpserts.isNotEmpty()'
+              if anchor not in text:
+                  raise RuntimeError('Could not close long-term responsibility gate')
+              text = text.replace(anchor, replacement, 1)
+          else:
+              raise RuntimeError('Could not find responsibilityUpserts block')
+
+          helper = '''
+          private fun String.hasExplicitLongTermCadence(): Boolean {
+              val compact = lowercase().replace(" ", "")
+              return LONG_TERM_RESPONSIBILITY_MARKERS.any { marker -> marker in compact }
+          }
+
+          private val LONG_TERM_RESPONSIBILITY_MARKERS = listOf(
+              "每天", "每日", "天天", "每早", "每晚", "每个早上", "每个中午", "每个晚上",
+              "每周", "每月", "长期", "一直", "以后都", "从今以后", "固定时间", "定期",
+              "持续监督", "持续提醒", "长期监督", "长期提醒", "养成习惯", "每次都",
+          )
+          '''
+          insert_at = text.rfind('\n}')
+          if insert_at < 0:
+              raise RuntimeError('Could not append long-term helper')
+          text = text[:insert_at] + '\n' + helper + text[insert_at:]
+          write(path, text)
+
+          # 6) Preferences/settings and settings UI: remove suggestion prompt/model/config fields.
+          # Keep deserialization tolerant of old backups by relying on ignoreUnknownKeys.
+          for p in root.rglob('*'):
+              if not p.is_file() or p.suffix not in {'.kt', '.xml'}:
+                  continue
+              rel = p.as_posix()
+              if rel.endswith('ChatService.kt') or rel.endswith('ChatList.kt') or rel.endswith('ChatPage.kt') or rel.endswith('ChatVM.kt') or rel.endswith('Conversation.kt'):
+                  continue
+              raw = p.read_text(encoding='utf-8-sig')
+              original = raw
+              if p.suffix == '.kt':
+                  # Whole prompt constant.
+                  if 'DEFAULT_SUGGESTION_PROMPT' in raw:
+                      while 'DEFAULT_SUGGESTION_PROMPT' in raw:
+                          pos = raw.find('DEFAULT_SUGGESTION_PROMPT')
+                          line_start = raw.rfind('\n', 0, pos) + 1
+                          # Triple-quoted constant.
+                          triple_start = raw.find('"""', pos)
+                          triple_end = raw.find('"""', triple_start + 3) if triple_start >= 0 else -1
+                          if triple_start >= 0 and triple_end >= 0:
+                              end = triple_end + 3
+                              trim = raw.find('.trimIndent()', end)
+                              if trim >= 0 and trim - end < 80:
+                                  end = trim + len('.trimIndent()')
+                              while end < len(raw) and raw[end] in ' \t\r\n': end += 1
+                              raw = raw[:line_start] + raw[end:]
+                          else:
+                              # Property/reference line fallback.
+                              raw = re.sub(r'(?m)^.*DEFAULT_SUGGESTION_PROMPT.*\n?', '', raw, count=1)
+                  # Data properties and named arguments.
+                  raw = re.sub(r'(?mi)^\s*(val|var)\s+\w*suggestion\w*\s*:[^\n]+\n', '', raw)
+                  raw = re.sub(r'(?mi)^\s*\w*suggestion\w*\s*=\s*[^,\n]+,?\s*\n', '', raw)
+                  # UI blocks whose declaration/call title clearly references suggestions.
+                  for marker in ['SuggestionModel', 'SuggestionPrompt', 'suggestionModel', 'suggestionPrompt']:
+                      # Do not delete arbitrary containing functions; remove simple setting call blocks only.
+                      raw = re.sub(r'(?ms)^\s*[^\n{]*' + marker + r'[^\n{]*\{.*?^\s*\}\s*\n', '', raw)
+              else:
+                  raw = re.sub(r'(?mi)^\s*<string[^>]+name="[^"]*suggestion[^"]*"[^>]*>.*?</string>\s*\n?', '', raw)
+                  raw = re.sub(r'(?mi)^\s*<string[^>]*>[^<]*(回复建议|聊天建议)[^<]*</string>\s*\n?', '', raw)
+              if raw != original:
+                  p.write_text(raw, encoding='utf-8', newline='\n')
+
+          # 7) Input/keyboard layout: remove vertical gaps and avoid stacking navigation bar inset on IME.
+          path = 'app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt'
+          text = read(path)
+          text = text.replace('                .imePadding()\n                .navigationBarsPadding()\n                .padding(horizontal = 8.dp),\n            verticalArrangement = Arrangement.spacedBy(8.dp)',
+                              '                .imePadding()\n                .padding(horizontal = 8.dp),\n            verticalArrangement = Arrangement.spacedBy(0.dp)')
+          write(path, text)
+
+          # Fail fast if executable suggestion pipeline references remain.
+          residual = []
+          for p in root.rglob('*.kt'):
+              rel = p.as_posix()
+              if '/build/' in rel or '/test/' in rel or '/androidTest/' in rel:
+                  continue
+              data = p.read_text(encoding='utf-8-sig')
+              for token in ('generateSuggestion(', 'chatSuggestions', 'DEFAULT_SUGGESTION_PROMPT'):
+                  if token in data:
+                      residual.append(f'{rel}: {token}')
+          if residual:
+              raise RuntimeError('Reply suggestion pipeline remains:\n' + '\n'.join(residual))
+
+      - name: Compile Android
+        run: ./gradlew :app:compileDebugKotlin --no-daemon --stacktrace
+
+      - name: Commit refactor
+        shell: bash
+        run: |
+          rm -f .github/workflows/remove-reply-suggestions-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor: remove reply suggestions and separate long-term commitments [suggestion-removal-done]"
+          git push origin master
