@@ -70,7 +70,7 @@ private fun pcm16MonoToWav(pcm: ByteArray, sampleRate: Int): ByteArray {
     header.put("WAVE".toByteArray(Charsets.US_ASCII))
     header.put("fmt ".toByteArray(Charsets.US_ASCII))
     header.putInt(16)
-    header.putShort(1)
+    header.putShort(1.toShort())
     header.putShort(PCM_CHANNELS.toShort())
     header.putInt(sampleRate)
     header.putInt(byteRate)
@@ -89,7 +89,7 @@ private fun pruneInlineVoiceCache(directory: File) {
         ?.filter(File::isFile)
         ?.sortedByDescending(File::lastModified)
         ?.drop(MAX_INLINE_VOICE_FILES)
-        ?.forEach(File::delete)
+        ?.forEach { file -> file.delete() }
 }
 
 private const val DEFAULT_PCM_SAMPLE_RATE = 24_000
