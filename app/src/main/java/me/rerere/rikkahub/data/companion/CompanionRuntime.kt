@@ -21,7 +21,7 @@ data class CompanionFollowUpDraft(
 ) {
     fun toConcern(nowMillis: Long): CompanionConcern {
         val subjectKey = stableSubjectKey()
-        val humanText = humanFacingConcernText()
+        val humanText = neutralResponsibilityText()
         return CompanionConcern(
             id = stableId("concern", subjectKey),
             assistantId = assistantId,
@@ -38,7 +38,7 @@ data class CompanionFollowUpDraft(
 
     fun toCommitment(nowMillis: Long): CompanionCommitment {
         val subjectKey = stableSubjectKey()
-        val humanText = humanFacingConcernText()
+        val humanText = neutralResponsibilityText()
         return CompanionCommitment(
             id = commitmentIdOverride?.trim()?.takeIf(String::isNotBlank)
                 ?: stableId("commitment", subjectKey),
@@ -83,18 +83,19 @@ data class CompanionFollowUpDraft(
         return "$prefix:${UUID.nameUUIDFromBytes(evidence.toByteArray(StandardCharsets.UTF_8))}"
     }
 
-    private fun humanFacingConcernText(): Pair<String, String> = when (category.family()) {
-        "wake" -> "记着叫你起床" to "到点叫醒你，并继续确认你已经醒来。"
-        "sleep" -> "留意你的休息" to "在起床时间之前提醒你早点休息。"
-        "study" -> "记着你的学习安排" to "按你现在的状态继续跟进学习节奏。"
-        "health" -> "还在留意你的身体" to "过一会儿再确认你有没有好一点。"
-        "meal" -> "记着你还要吃饭" to "到合适的时候确认你有没有好好吃饭。"
-        "time" -> "记着这件有时间要求的事" to "在约定时间继续提醒和确认。"
+    private fun neutralResponsibilityText(): Pair<String, String> = when (category.family()) {
+        "wake" -> "起床监督" to "按约定时间执行叫醒并核验完成状态"
+        "sleep" -> "睡眠监督" to "按约定条件执行休息提醒并记录结果"
+        "study" -> "学习监督" to "按当前计划执行学习跟进并记录状态"
+        "health" -> "健康跟进" to "按约定时间核验身体状态"
+        "meal" -> "用餐跟进" to "按约定时间核验用餐状态"
+        "time" -> "定时事项" to "在约定时间执行对应提醒或动作"
         else -> {
-            val event = sourceText.trim().take(120).ifBlank { "还有一件事放在心上" }
-            event to "之后再回来确认这件事的进展。"
+            val family = category.family().ifBlank { "follow_up" }
+            "待跟进事项:$family" to "执行待跟进事项:$family"
         }
     }
+
 }
 
 fun reconcileCompanionFollowUpDrafts(

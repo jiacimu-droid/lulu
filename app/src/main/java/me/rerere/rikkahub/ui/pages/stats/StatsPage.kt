@@ -109,7 +109,7 @@ private fun CacheMonitorContent(stats: AppStats) {
     }
 
     val records = remember(stats.cacheRecords) {
-        stats.cacheRecords.take(MaxVisibleCacheRecords)
+        stats.cacheRecords.visibleCacheRecords()
     }
     val promptTokens = stats.cacheRecords
         .sumOf(ApiUsageRecord::promptTokens)
@@ -204,7 +204,7 @@ private fun CacheMonitorContent(stats: AppStats) {
         } else {
             items(
                 items = records,
-                key = ApiUsageRecord::id,
+                key = { it.stableCacheRecordKey() },
             ) { record ->
                 CacheRecordCard(record)
             }
@@ -426,5 +426,10 @@ private fun Float.formatPercent(): String = "%.1f".format(this)
 
 private fun Long.asShortTime(): String =
     java.text.SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(java.util.Date(this))
+
+internal fun List<ApiUsageRecord>.visibleCacheRecords(): List<ApiUsageRecord> =
+    take(MaxVisibleCacheRecords)
+
+internal fun ApiUsageRecord.stableCacheRecordKey(): String = id
 
 private const val MaxVisibleCacheRecords = 15

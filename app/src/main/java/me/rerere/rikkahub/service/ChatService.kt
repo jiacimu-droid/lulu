@@ -354,9 +354,11 @@ class ChatService(
     private val pluginLoader: PluginLoader,
     private val companionRuntime: CompanionRuntime,
 ) {
-    // 统一会话管理
-    private val sessions = ConcurrentHashMap<Uuid, ConversationSession>()
-    private val _sessionsVersion = MutableStateFlow(0L)
+    // 会话生命周期由独立注册表管理，ChatService 只保留兼容入口。
+    private val sessionRegistry = ConversationSessionRegistry(
+        appScope = appScope,
+        settingsStore = settingsStore,
+    )
 
     // 错误状态
     private val _errors = MutableStateFlow<List<ChatError>>(emptyList())
@@ -426,8 +428,7 @@ class ChatService(
         runOnMainThread {
             ProcessLifecycleOwner.get().lifecycle.removeObserver(lifecycleObserver)
         }
-        sessions.values.forEach { it.cleanup() }
-        sessions.clear()
+        sessionRegistry.cleanup()
     }
 
     // ---- Session 管理 ----
@@ -440,89 +441,36 @@ class ChatService(
         }
     }
 
-    private fun getOrCreateSession(conversationId: Uuid): ConversationSession {
-        return sessions.computeIfAbsent(conversationId) { id ->
-            val settings = settingsStore.settingsFlow.value
-            ConversationSession(
-                id = id,
-                initial = Conversation.ofId(
-                    id = id,
-                    assistantId = settings.getCurrentAssistant().id
-                ),
-                scope = appScope,
-                onIdle = { removeSession(it) }
-            ).also {
-                _sessionsVersion.value++
-                Log.i(TAG, "createSession: $id (total: ${sessions.size + 1})")
-            }
-        }
-    }
-
-    private fun removeSession(conversationId: Uuid) {
-        val session = sessions[conversationId] ?: return
-        if (session.isInUse) {
-            Log.d(TAG, "removeSession: skipped $conversationId (still in use)")
-            return
-        }
-        if (sessions.remove(conversationId, session)) {
-            session.cleanup()
-            _sessionsVersion.value++
-            Log.i(TAG, "removeSession: $conversationId (remaining: ${sessions.size})")
-        }
-    }
+    private fun getOrCreateSession(conversationId: Uuid): ConversationSession =
+        sessionRegistry.getOrCreate(conversationId)
 
     // ---- 引用管理 ----
 
     fun addConversationReference(conversationId: Uuid) {
-        getOrCreateSession(conversationId).acquire()
+        sessionRegistry.acquire(conversationId)
     }
 
     fun removeConversationReference(conversationId: Uuid) {
-        sessions[conversationId]?.release()
+        sessionRegistry.release(conversationId)
     }
 
     private fun launchWithConversationReference(
         conversationId: Uuid,
-        block: suspend () -> Unit
-    ): Job = appScope.launch {
-        addConversationReference(conversationId)
-        try {
-            block()
-        } finally {
-            removeConversationReference(conversationId)
-        }
-    }
+        block: suspend () -> Unit,
+    ): Job = sessionRegistry.launchWithReference(conversationId, block)
 
     // ---- 对话状态访问 ----
 
-    fun getConversationFlow(conversationId: Uuid): StateFlow<Conversation> {
-        return getOrCreateSession(conversationId).state
-    }
+    fun getConversationFlow(conversationId: Uuid): StateFlow<Conversation> =
+        sessionRegistry.conversationFlow(conversationId)
 
-    fun getGenerationJobStateFlow(conversationId: Uuid): Flow<Job?> {
-        val session = sessions[conversationId] ?: return flowOf(null)
-        return session.generationJob
-    }
+    fun getGenerationJobStateFlow(conversationId: Uuid): Flow<Job?> =
+        sessionRegistry.generationJobFlow(conversationId)
 
-    fun getProcessingStatusFlow(conversationId: Uuid): StateFlow<String?> {
-        val session = sessions[conversationId] ?: return MutableStateFlow(null)
-        return session.processingStatus
-    }
+    fun getProcessingStatusFlow(conversationId: Uuid): StateFlow<String?> =
+        sessionRegistry.processingStatusFlow(conversationId)
 
-    fun getConversationJobs(): Flow<Map<Uuid, Job?>> {
-        return _sessionsVersion.flatMapLatest {
-            val currentSessions = sessions.values.toList()
-            if (currentSessions.isEmpty()) {
-                flowOf(emptyMap())
-            } else {
-                combine(currentSessions.map { s ->
-                    s.generationJob.map { job -> s.id to job }
-                }) { pairs ->
-                    pairs.filter { it.second != null }.toMap()
-                }
-            }
-        }
-    }
+    fun getConversationJobs(): Flow<Map<Uuid, Job?>> = sessionRegistry.activeJobs()
 
     // ---- 初始化对话 ----
 
@@ -2627,10 +2575,10 @@ class ChatService(
             val model = settings.findModelById(settings.suggestionModelId) ?: return
             val provider = model.findProvider(settings.providers) ?: return
 
-            sessions[conversationId]?.let { session ->
+            getConversationFlow(conversationId).value.let { currentConversation ->
                 updateConversation(
                     conversationId,
-                    session.state.value.copy(chatSuggestions = emptyList())
+                    currentConversation.copy(chatSuggestions = emptyList())
                 )
             }
 
@@ -2655,7 +2603,7 @@ class ChatService(
                     ?.filter { it.isNotBlank() } ?: emptyList()
 
             val latestConversation = conversationRepo.getConversationById(conversationId)
-                ?: sessions[conversationId]?.state?.value
+                ?: getConversationFlow(conversationId).value
                 ?: conversation
             saveConversation(
                 conversationId,
@@ -3231,7 +3179,7 @@ class ChatService(
 
     // 停止当前会话生成任务（不清理会话缓存）
     suspend fun stopGeneration(conversationId: Uuid) {
-        val job = sessions[conversationId]?.getJob() ?: return
+        val job = sessionRegistry.currentGenerationJob(conversationId) ?: return
         job.cancel()
         runCatching { job.join() }
 
