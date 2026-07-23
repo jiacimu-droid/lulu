@@ -1,6 +1,6 @@
 # Suggestion chain remnants
 
-Generated from commit: 8430e50c66c804d49a12442b2a561ee1def4fa86
+Generated from commit: 08572aa19d34908209183faa2360a5412dc1bfa9
 
 app/schemas/me.rerere.rikkahub.data.db.AppDatabase/22.json:49:"fieldPath": "chatSuggestions",
 app/schemas/me.rerere.rikkahub.data.db.AppDatabase/9.json:56:"fieldPath": "chatSuggestions",
@@ -22,12 +22,31 @@ app/schemas/me.rerere.rikkahub.data.db.AppDatabase/25.json:49:"fieldPath": "chat
 app/schemas/me.rerere.rikkahub.data.db.AppDatabase/26.json:49:"fieldPath": "chatSuggestions",
 app/schemas/me.rerere.rikkahub.data.db.AppDatabase/23.json:49:"fieldPath": "chatSuggestions",
 app/schemas/me.rerere.rikkahub.data.db.AppDatabase/16.json:56:"fieldPath": "chatSuggestions",
+app/src/main/res/values-ja/strings.xml:741:<string name="setting_model_page_suggestion_model">チャット提案モデル</string>
+app/src/main/res/values-ja/strings.xml:742:<string name="setting_model_page_suggestion_model_desc">会話の提案を生成するためのモデル、高速で安価なモデルを推奨</string>
+app/src/main/res/values-ja/strings.xml:743:<string name="setting_model_page_suggestion_prompt_vars">変数: 会話内容: {content}, 言語: {locale}</string>
+app/src/main/res/values-ko-rKR/strings.xml:741:<string name="setting_model_page_suggestion_model">채팅 제안 모델</string>
+app/src/main/res/values-ko-rKR/strings.xml:742:<string name="setting_model_page_suggestion_model_desc">대화 제안 생성에 사용되는 모델. 빠르고 저렴한 모델 사용을 권장합니다</string>
+app/src/main/res/values-ko-rKR/strings.xml:743:<string name="setting_model_page_suggestion_prompt_vars">변수: 대화 내용: {content}, 언어: {locale}</string>
+app/src/main/res/values-zh/strings.xml:743:<string name="setting_model_page_suggestion_model">聊天建议模型</string>
+app/src/main/res/values-zh/strings.xml:744:<string name="setting_model_page_suggestion_model_desc">用于生成对话建议的模型, 推荐使用快速且便宜的模型</string>
+app/src/main/res/values-zh/strings.xml:745:<string name="setting_model_page_suggestion_prompt_vars">变量: 对话内容: {content}, 语言: {locale}</string>
+app/src/main/res/values/strings.xml:766:<string name="setting_model_page_suggestion_model">聊天建议模型</string>
+app/src/main/res/values/strings.xml:767:<string name="setting_model_page_suggestion_model_desc">用于生成对话建议，推荐使用速度快、价格低的模型</string>
+app/src/main/res/values/strings.xml:768:<string name="setting_model_page_suggestion_prompt_vars">变量：对话内容：{content}，语言：{locale}</string>
+app/src/main/res/values-zh-rTW/strings.xml:741:<string name="setting_model_page_suggestion_model">聊天建議模型</string>
+app/src/main/res/values-zh-rTW/strings.xml:742:<string name="setting_model_page_suggestion_model_desc">用於生成對話建議的模型, 推薦使用快速且便宜的模型</string>
+app/src/main/res/values-zh-rTW/strings.xml:743:<string name="setting_model_page_suggestion_prompt_vars">變數: 對話內容: {content}, 語言: {locale}</string>
+app/src/main/res/values-ru/strings.xml:741:<string name="setting_model_page_suggestion_model">Модель предложений чата</string>
+app/src/main/res/values-ru/strings.xml:742:<string name="setting_model_page_suggestion_model_desc">Модель, используемая для генерации предложений в диалоге, рекомендуется использовать быстрые и недорогие модели</string>
+app/src/main/res/values-ru/strings.xml:743:<string name="setting_model_page_suggestion_prompt_vars">Переменные: Содержание разговора: {content}, Язык: {locale}</string>
 app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt:68:suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation)
 app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt:128:override suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation) =
 app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt:129:chatService.generateSuggestion(conversationId, conversation)
 app/src/main/java/me/rerere/rikkahub/web/routes/ConversationDiff.kt:18:chatSuggestions != current.chatSuggestions ||
 app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt:155:val chatSuggestions: List<String>,
 app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt:276:chatSuggestions = chatSuggestions,
+app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt:785:Text(stringResource(R.string.setting_model_page_suggestion_prompt_vars))
 app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt:300:fun generateSuggestion(conversation: Conversation) {
 app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt:302:chatService.generateSuggestion(_conversationId, conversation)
 app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:30:import me.rerere.rikkahub.data.ai.prompts.DEFAULT_SUGGESTION_PROMPT
@@ -47,12 +66,24 @@ app/src/main/java/me/rerere/rikkahub/data/db/entity/ConversationEntity.kt:22:val
 app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt:14:content = "我记得她不喜欢自动生成建议回复。",
 app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt:21:content = "我知道她不需要系统自动生成对话建议。",
 app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt:32:assertTrue(result.single().content.contains("自动生成对话建议"))
+web-ui/app/routes/conversations.tsx:71:const EMPTY_SUGGESTIONS: string[] = [];
 web-ui/app/routes/conversations.tsx:733:const chatSuggestions = detail?.chatSuggestions ?? EMPTY_SUGGESTIONS;
+web-ui/app/routes/conversations.tsx:743:const showSuggestions =
 web-ui/app/routes/conversations.tsx:744:Boolean(activeId) && !detailLoading && !detailError && chatSuggestions.length > 0;
 web-ui/app/routes/conversations.tsx:745:const displaySuggestions = showSuggestions ? chatSuggestions : EMPTY_SUGGESTIONS;
+web-ui/app/routes/conversations.tsx:853:const handleClickSuggestion = React.useCallback(
+web-ui/app/routes/conversations.tsx:1019:suggestions={displaySuggestions}
+web-ui/app/routes/conversations.tsx:1020:onSuggestionClick={handleClickSuggestion}
 web-ui/app/types/dto.ts:67:chatSuggestions: string[];
 web-ui/app/types/conversation.ts:23:chatSuggestions: string[];
+web-ui/app/components/input/chat-input.tsx:56:onSuggestionClick?: (suggestion: string) => void;
+web-ui/app/components/input/chat-input.tsx:191:onSuggestionClick,
+web-ui/app/components/input/chat-input.tsx:367:onSuggestionClick?.(suggestion);
+web-ui/app/components/input/chat-input.tsx:373:[canUseQuickMessage, error, onSuggestionClick],
 .github/workflows/code-index.yml:44:r"generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|"
 .github/workflows/code-index.yml:45:r"suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|"
-.github/workflows/code-index.yml:46:r"SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议"
+.github/workflows/code-index.yml:46:r"SUGGESTION_MODEL|SUGGESTION_PROMPT|EMPTY_SUGGESTIONS|"
+.github/workflows/code-index.yml:47:r"displaySuggestions|showSuggestions|handleClickSuggestion|"
+.github/workflows/code-index.yml:48:r"onSuggestionClick|SuggestionChip|suggestion-row|suggestion-chip|"
+.github/workflows/code-index.yml:49:r"建议回复|自动生成对话建议",
 .github/workflows/scan-suggestion-remnants.yml:34:'generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议' \
