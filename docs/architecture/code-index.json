@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:28:07.937895+00:00",
-  "commit": "582de9f2b250fc4eb077c1b89af8ea0f7b390b25",
+  "generatedAt": "2026-07-23T17:29:15.516366+00:00",
+  "commit": "6ed858e1774b18c8f9dc7e3fefa83839fc6be690",
   "branch": "master",
-  "sourceFingerprint": "85b7ba2e95b43455cb3ce184d9a483345a20a628b9530d5a4fa5a68294ed1cb0",
+  "sourceFingerprint": "f9061ca1dd457c4a0f4289a1792809cdd15bb2ea1b99946d05905637b5f581a9",
   "summary": {
     "files": 1113,
-    "lines": 263353,
+    "lines": 263357,
     "symbols": 5454,
     "productionCodeFiles": 788,
     "testFiles": 132,
@@ -11234,8 +11234,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 341,
-      "sha256": "08607fa5725924584ec6237c7cb4fff1db1863b5e06ddecd0713d2c9b2445641",
+      "lines": 345,
+      "sha256": "1756a1fc2b91a051997866795d566423e6580ec0a42d5e93ffcd4c9d2ece242e",
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -11254,67 +11254,67 @@
         {
           "name": "onGenerationFinish",
           "kind": "function",
-          "line": 28
+          "line": 30
         },
         {
           "name": "sanitizeLuluAssistantExpressionMessages",
           "kind": "function",
-          "line": 34
+          "line": 38
         },
         {
           "name": "splitLuluAssistantExpressionMessages",
           "kind": "function",
-          "line": 41
+          "line": 45
         },
         {
           "name": "SanitizedLuluMessage",
           "kind": "class",
-          "line": 78
+          "line": 82
         },
         {
           "name": "sanitizeLuluTextParts",
           "kind": "function",
-          "line": 83
+          "line": 87
         },
         {
           "name": "attachTrailingLuluPresence",
           "kind": "function",
-          "line": 107
+          "line": 111
         },
         {
           "name": "extractLuluPresenceMetadata",
           "kind": "function",
-          "line": 126
+          "line": 130
         },
         {
           "name": "luluPresenceMetadata",
           "kind": "function",
-          "line": 152
+          "line": 156
         },
         {
           "name": "normalizeLuluPresenceKey",
           "kind": "function",
-          "line": 165
+          "line": 169
         },
         {
           "name": "companionModelPresence",
           "kind": "function",
-          "line": 181
+          "line": 185
         },
         {
           "name": "toCompanionModelPresence",
           "kind": "function",
-          "line": 202
+          "line": 206
         },
         {
           "name": "sanitizeLuluVisibleExpression",
           "kind": "function",
-          "line": 272
+          "line": 276
         },
         {
           "name": "splitCompanionExpressionBubbles",
           "kind": "function",
-          "line": 323
+          "line": 327
         }
       ],
       "localImportCount": 6,
@@ -67441,7 +67441,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "class",
-        "line": 78
+        "line": 82
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.StudyStateTransformer": [
@@ -67549,7 +67549,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 107
+        "line": 111
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.batteryLevel": [
@@ -67668,7 +67668,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 181
+        "line": 185
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.completedInlineVoiceMessage": [
@@ -67752,7 +67752,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 126
+        "line": 130
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.findSafeInsertIndex": [
@@ -67806,7 +67806,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 152
+        "line": 156
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.matchesVisibleSegment": [
@@ -67827,7 +67827,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 165
+        "line": 169
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.normalizedSystemBlockKey": [
@@ -67851,7 +67851,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 28
+        "line": 30
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ThinkTagTransformer.kt",
@@ -67957,21 +67957,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 34
+        "line": 38
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.sanitizeLuluTextParts": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 83
+        "line": 87
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 272
+        "line": 276
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.sanitizeUnsupportedCompanionLifeClaims": [
@@ -68013,14 +68013,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 323
+        "line": 327
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.splitLuluAssistantExpressionMessages": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 41
+        "line": 45
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.supportClaim": [
@@ -68034,7 +68034,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
-        "line": 202
+        "line": 206
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.toDateString": [
