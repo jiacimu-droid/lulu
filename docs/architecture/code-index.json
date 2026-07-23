@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:38:03.323287+00:00",
-  "commit": "8b87eda29ffa22d5dc37d67d366725aba5887f32",
+  "generatedAt": "2026-07-23T17:38:26.071781+00:00",
+  "commit": "1ac4568aa67a92b9bd8c6f5ed89d6e826d739c85",
   "branch": "master",
-  "sourceFingerprint": "4c57e788f5e8db5934a2d776e05c549fe801c3cc37319999ea1b68ccb5f7a31f",
+  "sourceFingerprint": "1dbc2f0d5d3c6c108979e61d8e912e8198606edcd5a36f8a9f5beaf87e4d90a1",
   "summary": {
-    "files": 1115,
-    "lines": 263663,
-    "symbols": 5469,
+    "files": 1116,
+    "lines": 263741,
+    "symbols": 5471,
     "productionCodeFiles": 789,
-    "testFiles": 133,
+    "testFiles": 134,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 654,
+      "app": 655,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 722,
+      ".kt": 723,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -55,7 +55,7 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 140,
+      "AI与上下文": 141,
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
@@ -68,7 +68,7 @@
       "界面": 284,
       "记忆": 43
     },
-    "resolvedImportEdges": 1938
+    "resolvedImportEdges": 1939
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 125,
+        "importedByCount": 126,
         "todoMarkers": 0
       },
       {
@@ -1267,6 +1267,7 @@
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionRuntimeCompactTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionTransformerPipelineTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformerTest.kt",
@@ -1957,6 +1958,11 @@
       "imports": 17
     },
     {
+      "from": "me.rerere.rikkahub.data.ai.transformers",
+      "to": "me.rerere.ai.ui.UIMessagePart",
+      "imports": 16
+    },
+    {
       "from": "me.rerere.rikkahub.di",
       "to": "me.rerere.rikkahub.data.db.migrations",
       "imports": 16
@@ -1984,11 +1990,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai.transformers",
       "to": "me.rerere.ai.core.MessageRole",
-      "imports": 15
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 15
     },
     {
@@ -6006,6 +6007,7 @@
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionContextDedupTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionRuntimeCompactTransformerTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/TimeReminderTransformerTest.kt",
@@ -45503,6 +45505,40 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformerTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 78,
+      "sha256": "043db80267c0cdf9882c04958bf24452abaef53b9c43e58ab11e3d5d1c6c5eb0",
+      "package": "me.rerere.rikkahub.data.ai.transformers",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "InlineVoiceMessageTransformerTest",
+          "kind": "class",
+          "line": 8
+        },
+        {
+          "name": "toVisibleLabels",
+          "kind": "function",
+          "line": 71
+        }
+      ],
+      "localImportCount": 1,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [
+        "me.rerere.ai.ui.UIMessagePart"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformerTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -67521,6 +67557,13 @@
         "line": 14
       }
     ],
+    "me.rerere.rikkahub.data.ai.transformers.InlineVoiceMessageTransformerTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformerTest.kt",
+        "kind": "class",
+        "line": 8
+      }
+    ],
     "me.rerere.rikkahub.data.ai.transformers.InlineVoiceRequest": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
@@ -68278,6 +68321,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PlaceholderTransformer.kt",
         "kind": "function",
         "line": 121
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.transformers.toVisibleLabels": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformerTest.kt",
+        "kind": "function",
+        "line": 71
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.transform": [
