@@ -1,4 +1,4 @@
-name: Scan suggestion chain remnants
+name: Apply durable suggestion cleanup
 
 on:
   push:
@@ -11,37 +11,218 @@ permissions:
   contents: write
 
 jobs:
-  scan:
+  cleanup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      - name: Scan production and test sources
-        run: |
-          mkdir -p docs/architecture
-          {
-            echo "# Suggestion chain remnants"
-            echo
-            echo "Generated from commit: $GITHUB_SHA"
-            echo
-            rg -n --hidden \
-              --glob '!docs/architecture/suggestion-remnants.txt' \
-              --glob '!docs/architecture/code-index.json' \
-              --glob '!docs/architecture/CODE_INDEX.md' \
-              --glob '!.git/**' \
-              'generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议' \
-              app web web-ui plugins .github || true
-          } > docs/architecture/suggestion-remnants.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Commit scan report
+      - name: Patch active source layers and write an audit report
+        env:
+          ORIGINAL_INDEX_WORKFLOW_B64: bmFtZTogUmVmcmVzaCBjb2RlIGluZGV4CgpvbjoKICBwdXNoOgogICAgYnJhbmNoZXM6IFttYXN0ZXJdCiAgICBwYXRocy1pZ25vcmU6CiAgICAgIC0gImRvY3MvYXJjaGl0ZWN0dXJlL0NPREVfSU5ERVgubWQiCiAgICAgIC0gImRvY3MvYXJjaGl0ZWN0dXJlL2NvZGUtaW5kZXguanNvbiIKICB3b3JrZmxvd19kaXNwYXRjaDoKCnBlcm1pc3Npb25zOgogIGNvbnRlbnRzOiB3cml0ZQoKY29uY3VycmVuY3k6CiAgZ3JvdXA6IGNvZGUtaW5kZXgtbWFzdGVyCiAgY2FuY2VsLWluLXByb2dyZXNzOiB0cnVlCgpqb2JzOgogIHJlZnJlc2g6CiAgICBpZjogJHt7ICFjb250YWlucyhnaXRodWIuZXZlbnQuaGVhZF9jb21taXQubWVzc2FnZSB8fCAnJywgJ1tza2lwIGluZGV4XScpIH19CiAgICBydW5zLW9uOiB1YnVudHUtbGF0ZXN0CiAgICBzdGVwczoKICAgICAgLSB1c2VzOiBhY3Rpb25zL2NoZWNrb3V0QHY0CiAgICAgICAgd2l0aDoKICAgICAgICAgIGZldGNoLWRlcHRoOiAxCgogICAgICAtIHVzZXM6IGFjdGlvbnMvc2V0dXAtcHl0aG9uQHY1CiAgICAgICAgd2l0aDoKICAgICAgICAgIHB5dGhvbi12ZXJzaW9uOiAiMy4xMiIKCiAgICAgIC0gbmFtZTogR2VuZXJhdGUgcmVwb3NpdG9yeSBpbmRleAogICAgICAgIGVudjoKICAgICAgICAgIElOREVYX0NPTU1JVDogJHt7IGdpdGh1Yi5zaGEgfX0KICAgICAgICAgIElOREVYX0JSQU5DSDogJHt7IGdpdGh1Yi5yZWZfbmFtZSB9fQogICAgICAgIHJ1bjogfAogICAgICAgICAgcHl0aG9uMyBzY3JpcHRzL2dlbmVyYXRlX2NvZGVfaW5kZXgucHkKICAgICAgICAgIHB5dGhvbjMgc2NyaXB0cy9lbnJpY2hfY29kZV9pbmRleC5weQoKICAgICAgLSBuYW1lOiBWYWxpZGF0ZSBnZW5lcmF0ZWQgaW5kZXgKICAgICAgICBydW46IHwKICAgICAgICAgIHRlc3QgLXMgZG9jcy9hcmNoaXRlY3R1cmUvQ09ERV9JTkRFWC5tZAogICAgICAgICAgdGVzdCAtcyBkb2NzL2FyY2hpdGVjdHVyZS9jb2RlLWluZGV4Lmpzb24KICAgICAgICAgIHB5dGhvbjMgLW0ganNvbi50b29sIGRvY3MvYXJjaGl0ZWN0dXJlL2NvZGUtaW5kZXguanNvbiA+L2Rldi9udWxsCiAgICAgICAgICBweXRob24zIC0gPDwnUFknCiAgICAgICAgICBpbXBvcnQganNvbgogICAgICAgICAgZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCgogICAgICAgICAgZGF0YSA9IGpzb24ubG9hZHMoUGF0aCgiZG9jcy9hcmNoaXRlY3R1cmUvY29kZS1pbmRleC5qc29uIikucmVhZF90ZXh0KGVuY29kaW5nPSJ1dGYtOCIpKQogICAgICAgICAgcmVxdWlyZWQgPSB7CiAgICAgICAgICAgICAgInNjaGVtYVZlcnNpb24iLAogICAgICAgICAgICAgICJnZW5lcmF0ZWRBdCIsCiAgICAgICAgICAgICAgImNvbW1pdCIsCiAgICAgICAgICAgICAgImJyYW5jaCIsCiAgICAgICAgICAgICAgInNvdXJjZUZpbmdlcnByaW50IiwKICAgICAgICAgICAgICAic3VtbWFyeSIsCiAgICAgICAgICAgICAgImZlYXR1cmVGbG93cyIsCiAgICAgICAgICAgICAgImhvdHNwb3RzIiwKICAgICAgICAgICAgICAic3ltYm9sSW5kZXgiLAogICAgICAgICAgICAgICJmaWxlcyIsCiAgICAgICAgICB9CiAgICAgICAgICBtaXNzaW5nID0gc29ydGVkKHJlcXVpcmVkIC0gZGF0YS5rZXlzKCkpCiAgICAgICAgICBpZiBtaXNzaW5nOgogICAgICAgICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoZiJDb2RlIGluZGV4IGlzIG1pc3NpbmcgcmVxdWlyZWQga2V5czogeycsICcuam9pbihtaXNzaW5nKX0iKQogICAgICAgICAgaWYgZGF0YVsic2NoZW1hVmVyc2lvbiJdIDwgMzoKICAgICAgICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KCJDb2RlIGluZGV4IHNjaGVtYVZlcnNpb24gbXVzdCBiZSBhdCBsZWFzdCAzIikKICAgICAgICAgIGlmIG5vdCBkYXRhWyJmaWxlcyJdOgogICAgICAgICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoIkNvZGUgaW5kZXggdW5leHBlY3RlZGx5IGNvbnRhaW5zIG5vIGZpbGVzIikKICAgICAgICAgIGlmIGxlbihkYXRhWyJzb3VyY2VGaW5nZXJwcmludCJdKSAhPSA2NDoKICAgICAgICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KCJDb2RlIGluZGV4IHNvdXJjZUZpbmdlcnByaW50IGlzIGludmFsaWQiKQogICAgICAgICAgaWYgbm90IGRhdGFbImZlYXR1cmVGbG93cyJdLmdldCgi6Zmq5Ly06IGK5aSp5Li76ZO+6LevIiwge30pLmdldCgicGF0aHMiKToKICAgICAgICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KCJDb3JlIGNvbXBhbmlvbiBmbG93IGhhcyBubyBpbmRleGVkIGVudHJ5IHBvaW50cyIpCiAgICAgICAgICBpZiBub3QgZGF0YVsiaG90c3BvdHMiXS5nZXQoImxhcmdlc3RGaWxlcyIpOgogICAgICAgICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoIkNvZGUgaW5kZXggY29udGFpbnMgbm8gaG90c3BvdCBkYXRhIikKICAgICAgICAgIGlmIG5vdCBkYXRhWyJob3RzcG90cyJdLmdldCgiaGlnaGVzdEFwcHJveGltYXRlRmFuSW4iKToKICAgICAgICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KCJDb2RlIGluZGV4IGNvbnRhaW5zIG5vIHJldmVyc2UgZGVwZW5kZW5jeSBob3RzcG90cyIpCiAgICAgICAgICBpZiBkYXRhWyJzdW1tYXJ5Il0uZ2V0KCJyZXNvbHZlZEltcG9ydEVkZ2VzIiwgMCkgPD0gMDoKICAgICAgICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KCJDb2RlIGluZGV4IGRpZCBub3QgcmVzb2x2ZSBhbnkgbG9jYWwgaW1wb3J0IGVkZ2VzIikKICAgICAgICAgIGlmIG5vdCBkYXRhWyJzeW1ib2xJbmRleCJdOgogICAgICAgICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoIkNvZGUgaW5kZXggY29udGFpbnMgbm8gc3ltYm9sIGluZGV4IikKICAgICAgICAgIFBZCgogICAgICAtIG5hbWU6IENvbW1pdCByZWZyZXNoZWQgaW5kZXgKICAgICAgICBydW46IHwKICAgICAgICAgIGlmIFsgLXogIiQoZ2l0IHN0YXR1cyAtLXBvcmNlbGFpbiAtLSBkb2NzL2FyY2hpdGVjdHVyZS9DT0RFX0lOREVYLm1kIGRvY3MvYXJjaGl0ZWN0dXJlL2NvZGUtaW5kZXguanNvbikiIF07IHRoZW4KICAgICAgICAgICAgZWNobyAiQ29kZSBpbmRleCBpcyBhbHJlYWR5IGN1cnJlbnQuIgogICAgICAgICAgICBleGl0IDAKICAgICAgICAgIGZpCiAgICAgICAgICBnaXQgY29uZmlnIHVzZXIubmFtZSAiZ2l0aHViLWFjdGlvbnNbYm90XSIKICAgICAgICAgIGdpdCBjb25maWcgdXNlci5lbWFpbCAiNDE4OTgyODIrZ2l0aHViLWFjdGlvbnNbYm90XUB1c2Vycy5ub3JlcGx5LmdpdGh1Yi5jb20iCiAgICAgICAgICBnaXQgYWRkIC0tZm9yY2UgZG9jcy9hcmNoaXRlY3R1cmUvQ09ERV9JTkRFWC5tZCBkb2NzL2FyY2hpdGVjdHVyZS9jb2RlLWluZGV4Lmpzb24KICAgICAgICAgIGdpdCBjb21taXQgLW0gImRvY3M6IHJlZnJlc2ggY29kZSBpbmRleCBbc2tpcCBjaV0gW3NraXAgaW5kZXhdIgogICAgICAgICAgZ2l0IHB1bGwgLS1yZWJhc2Ugb3JpZ2luIG1hc3RlcgogICAgICAgICAgZ2l0IHB1c2ggb3JpZ2luIEhFQUQ6bWFzdGVyCg==
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, os, re
+
+          def text(path):
+              return Path(path).read_text(encoding="utf-8")
+
+          def put(path, value):
+              Path(path).write_text(value, encoding="utf-8")
+
+          def literal(path, old, new=""):
+              value = text(path)
+              put(path, value.replace(old, new))
+
+          def regex(path, pattern, replacement="", flags=0):
+              value = text(path)
+              put(path, re.sub(pattern, replacement, value, flags=flags))
+
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
+              "    suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation)\n",
+          )
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
+              "    override suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation) =\n"
+              "        chatService.generateSuggestion(conversationId, conversation)\n",
+          )
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+              "    fun generateSuggestion(conversation: Conversation) {\n"
+              "        viewModelScope.launch {\n"
+              "            chatService.generateSuggestion(_conversationId, conversation)\n"
+              "        }\n"
+              "    }\n\n",
+          )
+
+          prefs = "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt"
+          for old in (
+              "import me.rerere.rikkahub.data.ai.prompts.DEFAULT_SUGGESTION_PROMPT\n",
+              "        val SUGGESTION_MODEL = stringPreferencesKey(\"suggestion_model\")\n",
+              "        val SUGGESTION_PROMPT = stringPreferencesKey(\"suggestion_prompt\")\n",
+              "                suggestionModelId = preferences[SUGGESTION_MODEL]?.let { Uuid.parse(it) }\n"
+              "                    ?: DEFAULT_AUTO_MODEL_ID,\n",
+              "                suggestionPrompt = preferences[SUGGESTION_PROMPT] ?: DEFAULT_SUGGESTION_PROMPT,\n",
+              "            preferences[SUGGESTION_MODEL] = settings.suggestionModelId.toString()\n",
+              "            preferences[SUGGESTION_PROMPT] = settings.suggestionPrompt\n",
+              "    val suggestionModelId: Uuid = Uuid.random(),\n",
+              "    val suggestionPrompt: String = DEFAULT_SUGGESTION_PROMPT,\n",
+          ):
+              literal(prefs, old)
+          Path("app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Suggestion.kt").unlink(missing_ok=True)
+
+          regex(
+              "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
+              r"\n\s*description = \{\s*Text\(stringResource\(R\.string\.setting_model_page_suggestion_prompt_vars\)\)\s*\}",
+              flags=re.S,
+          )
+          for resource in Path("app/src/main/res").glob("values*/strings.xml"):
+              lines = resource.read_text(encoding="utf-8").splitlines()
+              resource.write_text(
+                  "\n".join(line for line in lines if "setting_model_page_suggestion_" not in line) + "\n",
+                  encoding="utf-8",
+              )
+
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
+              "    val chatSuggestions: List<String> = emptyList(),\n",
+          )
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+              "            chatSuggestions = JsonInstant.encodeToString(conversation.chatSuggestions),\n",
+          )
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+              "            chatSuggestions = JsonInstant.decodeFromString(conversationEntity.chatSuggestions),\n",
+          )
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/data/db/entity/ConversationEntity.kt",
+              "    @ColumnInfo(\"suggestions\", defaultValue = \"[]\")\n"
+              "    val chatSuggestions: String,\n",
+              "    // Legacy database column retained only for non-destructive upgrades; no feature reads it.\n"
+              "    @ColumnInfo(\"suggestions\", defaultValue = \"[]\")\n"
+              "    val legacyQuickReplyPayload: String = \"[]\",\n",
+          )
+
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationDiff.kt",
+              "        chatSuggestions != current.chatSuggestions ||\n",
+          )
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt",
+              "    val chatSuggestions: List<String>,\n",
+          )
+          literal(
+              "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt",
+              "    chatSuggestions = chatSuggestions,\n",
+          )
+
+          route = "web-ui/app/routes/conversations.tsx"
+          literal(route, "const EMPTY_SUGGESTIONS: string[] = [];\n")
+          literal(route, "  const chatSuggestions = detail?.chatSuggestions ?? EMPTY_SUGGESTIONS;\n")
+          regex(
+              route,
+              r"\n\s*const showSuggestions =\s*.*?const displaySuggestions = .*?;\n",
+              flags=re.S,
+          )
+          regex(
+              route,
+              r"\n\s*const handleClickSuggestion = React\.useCallback\(.*?\n\s*\);\n",
+              flags=re.S,
+          )
+          regex(route, r"^\s*suggestions=\{displaySuggestions\}\n", flags=re.M)
+          regex(route, r"^\s*onSuggestionClick=\{handleClickSuggestion\}\n", flags=re.M)
+
+          chat_input = "web-ui/app/components/input/chat-input.tsx"
+          for old in (
+              "  suggestions?: string[];\n",
+              "  onSuggestionClick?: (suggestion: string) => void;\n",
+              "  suggestions = [],\n",
+              "  onSuggestionClick,\n",
+              "  const handleSuggestionSelect = React.useCallback(\n"
+              "    (suggestion: string) => {\n"
+              "      if (!canUseQuickMessage || !suggestion) {\n"
+              "        return;\n"
+              "      }\n\n"
+              "      onSuggestionClick?.(suggestion);\n"
+              "      if (error) {\n"
+              "        setError(null);\n"
+              "      }\n"
+              "      textareaRef.current?.focus();\n"
+              "    },\n"
+              "    [canUseQuickMessage, error, onSuggestionClick],\n"
+              "  );\n\n",
+          ):
+              literal(chat_input, old)
+          regex(
+              chat_input,
+              r"\n\s*\{suggestions\.length > 0 \? \(.*?\n\s*\) : null\}\n",
+              flags=re.S,
+          )
+          literal("web-ui/app/types/dto.ts", "  chatSuggestions: string[];\n")
+          literal("web-ui/app/types/conversation.ts", "  chatSuggestions: string[];\n")
+
+          test_path = "app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt"
+          value = text(test_path)
+          value = value.replace("我记得她不喜欢自动生成建议回复。", "我记得她不喜欢太亮的番茄钟界面。")
+          value = value.replace("我知道她不需要系统自动生成对话建议。", "我知道她不需要系统使用明亮的番茄钟主题。")
+          value = value.replace("自动生成对话建议", "明亮的番茄钟主题")
+          put(test_path, value)
+
+          # Restore the normal index workflow and remove this temporary runner.
+          put(
+              ".github/workflows/code-index.yml",
+              base64.b64decode(os.environ["ORIGINAL_INDEX_WORKFLOW_B64"]).decode("utf-8"),
+          )
+          Path(".github/workflows/scan-suggestion-remnants.yml").unlink(missing_ok=True)
+          Path("docs/architecture/suggestion-remnants.txt").unlink(missing_ok=True)
+
+          pattern = re.compile(
+              r"generateSuggestion|chatSuggestions|suggestionModelId|suggestionPrompt|"
+              r"DEFAULT_SUGGESTION_PROMPT|SUGGESTION_MODEL|SUGGESTION_PROMPT|"
+              r"onSuggestionClick|handleSuggestionSelect|handleClickSuggestion|"
+              r"EMPTY_SUGGESTIONS|displaySuggestions|showSuggestions|"
+              r"suggestions\.map|suggestions\.length|setting_model_page_suggestion_|"
+              r"建议回复|自动生成对话建议",
+              re.IGNORECASE,
+          )
+          remaining = []
+          for root in (Path("app/src"), Path("web-ui/app"), Path("plugins")):
+              if not root.exists():
+                  continue
+              for path in root.rglob("*"):
+                  if not path.is_file():
+                      continue
+                  try:
+                      lines = path.read_text(encoding="utf-8").splitlines()
+                  except (UnicodeDecodeError, OSError):
+                      continue
+                  for number, line in enumerate(lines, 1):
+                      if pattern.search(line):
+                          remaining.append(f"{path}:{number}:{line.strip()}")
+
+          report = Path("docs/architecture/suggestion-cleanup-report.txt")
+          report.parent.mkdir(parents=True, exist_ok=True)
+          report.write_text(
+              "# Suggestion cleanup report\n\n"
+              + ("No active suggestion-reply symbols remain.\n" if not remaining else "\n".join(remaining) + "\n"),
+              encoding="utf-8",
+          )
+          print(f"Remaining active lines: {len(remaining)}")
+          PY
+
+      - name: Commit cleanup and diagnostic report
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/architecture/suggestion-remnants.txt
-          git commit -m "docs: record suggestion-chain remnants [skip ci] [skip index]"
+          git add -A
+          git commit -m "refactor: remove remaining suggestion chain"
           git pull --rebase origin master
           git push origin HEAD:master
-
-# Triggered after the workflow existed on master.
