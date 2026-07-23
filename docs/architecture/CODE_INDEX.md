@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`56c5a22015da4f45d08259cad501f099a877859f`
+- 基准提交：`1904360ff17ad9cbcb6d705f413abc299df600d8`
 - 分支：`master`
-- 源码指纹：`f7a46adcc2c9c07a…`
-- 已索引文件：1111
-- 已索引代码/文本行：263189
+- 源码指纹：`00848b9bcd683b48…`
+- 已索引文件：1112
+- 已索引代码/文本行：263367
 - 已发现类、接口、对象、函数及 Composable：5451
 
 ## 仓库健康信号
@@ -149,8 +149,8 @@
 | `website` | 10 |
 | `highlight` | 9 |
 | `web` | 7 |
+| `.github` | 6 |
 | `.claude` | 5 |
-| `.github` | 5 |
 | `locale-tui` | 4 |
 | `study-plans` | 4 |
 | `money-lab` | 3 |
@@ -171,7 +171,7 @@
 | `.kts` | 11 |
 | `.js` | 9 |
 | `.html` | 7 |
-| `.yml` | 4 |
+| `.yml` | 5 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -395,6 +395,7 @@
 ### 构建与发布
 
 - `.github/workflows/code-index.yml`
+- `.github/workflows/one-time-chat-cleanup-v2.yml`
 - `.github/workflows/release.yml`
 - `ai/build.gradle.kts`
 - `app/baselineprofile/build.gradle.kts`
