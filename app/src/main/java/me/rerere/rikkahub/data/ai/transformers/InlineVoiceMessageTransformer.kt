@@ -25,7 +25,6 @@ private val INLINE_VOICE_MATCH_IGNORED_REGEX =
 
 private data class InlineVoiceRequest(
     val partIndex: Int,
-    val id: String,
     val requestedText: String,
     val voiceMessage: UIMessagePart.VoiceMessage,
 )
@@ -47,37 +46,51 @@ internal suspend fun materializeAndPromoteInlineVoiceMessages(
 private fun materializeAndPromoteInlineVoiceMessages(
     context: Context,
     messages: List<UIMessage>,
-): List<UIMessage> {
-    return messages.map { message ->
-        if (message.role == MessageRole.ASSISTANT) {
-            message.copy(parts = message.parts.materializeAndPromoteInlineVoiceParts(context))
-        } else {
-            message
-        }
+): List<UIMessage> = messages.map { message ->
+    if (message.role == MessageRole.ASSISTANT) {
+        message.copy(parts = message.parts.materializeAndPromoteInlineVoiceParts(context))
+    } else {
+        message
     }
 }
 
 internal fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
     context: Context,
 ): List<UIMessagePart> {
-    val requests = mutableListOf<InlineVoiceRequest>()
-    forEachIndexed { index, part ->
-        val tool = part as? UIMessagePart.Tool ?: return@forEachIndexed
-        if (tool.toolName != TTS_TOOL_NAME || !tool.isExecuted) return@forEachIndexed
+    val materializedParts = map { part ->
+        val tool = part as? UIMessagePart.Tool ?: return@map part
+        if (tool.toolName != TTS_TOOL_NAME || !tool.isExecuted) return@map part
+        if (tool.output.any { outputPart ->
+                outputPart is UIMessagePart.VoiceMessage && outputPart.url.isNotBlank()
+            }) {
+            return@map part
+        }
         val requestedText = tool.requestedInlineVoiceText()?.takeIf(String::isNotBlank)
-            ?: return@forEachIndexed
+            ?: return@map part
         val cacheKey = "${tool.toolCallId}|$requestedText"
+        val scheduled = synthesizedVoiceCache[cacheKey]
+            ?: scheduleInlineVoiceMessage(context, requestedText).also { voice ->
+                synthesizedVoiceCache[cacheKey] = voice
+                pruneSynthesizedVoiceCache()
+            }
+        tool.copy(output = tool.output + scheduled)
+    }
+    return materializedParts.promoteMaterializedInlineVoiceParts()
+}
+
+/** Pure ordering transformation used by regression tests and persisted-message rendering. */
+internal fun List<UIMessagePart>.promoteMaterializedInlineVoiceParts(): List<UIMessagePart> {
+    val requests = mapIndexedNotNull { index, part ->
+        val tool = part as? UIMessagePart.Tool ?: return@mapIndexedNotNull null
+        if (tool.toolName != TTS_TOOL_NAME || !tool.isExecuted) return@mapIndexedNotNull null
+        val requestedText = tool.requestedInlineVoiceText()?.takeIf(String::isNotBlank)
+            ?: return@mapIndexedNotNull null
         val voiceMessage = tool.output
             .filterIsInstance<UIMessagePart.VoiceMessage>()
             .firstOrNull { voice -> voice.url.isNotBlank() }
-            ?: synthesizedVoiceCache[cacheKey]
-            ?: scheduleInlineVoiceMessage(context, requestedText).also { scheduled ->
-                synthesizedVoiceCache[cacheKey] = scheduled
-                pruneSynthesizedVoiceCache()
-            }
-        requests += InlineVoiceRequest(
+            ?: return@mapIndexedNotNull null
+        InlineVoiceRequest(
             partIndex = index,
-            id = tool.toolCallId.ifBlank { "tts-$index" },
             requestedText = requestedText,
             voiceMessage = voiceMessage.copy(
                 transcript = voiceMessage.transcript.ifBlank { requestedText },
