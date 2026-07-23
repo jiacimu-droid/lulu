@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:36:11.300839+00:00",
-  "commit": "3a4cac411f3dbb1ed2a171203e00ca7febb2ac6c",
+  "generatedAt": "2026-07-23T17:38:03.323287+00:00",
+  "commit": "8b87eda29ffa22d5dc37d67d366725aba5887f32",
   "branch": "master",
-  "sourceFingerprint": "84a4a25e90cb93f84f5a58b6a179a8c11ce41e89d8cb905cd91c9c9711228103",
+  "sourceFingerprint": "4c57e788f5e8db5934a2d776e05c549fe801c3cc37319999ea1b68ccb5f7a31f",
   "summary": {
     "files": 1115,
-    "lines": 263650,
-    "symbols": 5468,
+    "lines": 263663,
+    "symbols": 5469,
     "productionCodeFiles": 789,
     "testFiles": 133,
     "largeProductionFiles": 42,
@@ -11239,8 +11239,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 177,
-      "sha256": "9a569eca884a96631ebc5b02d6e4e6f0b262ca3d712b7a69bb44ba9855ed7bed",
+      "lines": 190,
+      "sha256": "cba2fa68cb7dfccd1610fad357509a342bafa8becd05bcdebcd0f44494fd7d4b",
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -11254,47 +11254,52 @@
         {
           "name": "promoteInlineVoiceMessages",
           "kind": "function",
-          "line": 37
+          "line": 36
         },
         {
           "name": "materializeAndPromoteInlineVoiceMessages",
           "kind": "function",
-          "line": 42
+          "line": 41
         },
         {
           "name": "materializeAndPromoteInlineVoiceMessages",
           "kind": "function",
-          "line": 47
+          "line": 46
         },
         {
           "name": "materializeAndPromoteInlineVoiceParts",
           "kind": "function",
-          "line": 60
+          "line": 57
+        },
+        {
+          "name": "promoteMaterializedInlineVoiceParts",
+          "kind": "function",
+          "line": 82
         },
         {
           "name": "pruneSynthesizedVoiceCache",
           "kind": "function",
-          "line": 136
+          "line": 149
         },
         {
           "name": "requestedInlineVoiceText",
           "kind": "function",
-          "line": 143
+          "line": 156
         },
         {
           "name": "toInlineVoiceSegments",
           "kind": "function",
-          "line": 151
+          "line": 164
         },
         {
           "name": "matchesVisibleSegment",
           "kind": "function",
-          "line": 166
+          "line": 179
         },
         {
           "name": "inlineVoiceMatchKey",
           "kind": "function",
-          "line": 176
+          "line": 189
         }
       ],
       "localImportCount": 5,
@@ -67969,7 +67974,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 176
+        "line": 189
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.instantOf": [
@@ -67990,26 +67995,26 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 166
+        "line": 179
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.materializeAndPromoteInlineVoiceMessages": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 42
+        "line": 41
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 47
+        "line": 46
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.materializeAndPromoteInlineVoiceParts": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 60
+        "line": 57
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.maxItems": [
@@ -68104,14 +68109,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 37
+        "line": 36
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.transformers.promoteMaterializedInlineVoiceParts": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
+        "kind": "function",
+        "line": 82
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.pruneSynthesizedVoiceCache": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 136
+        "line": 149
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.readDocumentContent": [
@@ -68132,7 +68144,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 143
+        "line": 156
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.resolveRelativePath": [
@@ -68251,7 +68263,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 151
+        "line": 164
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.toLocalDateOrToday": [
