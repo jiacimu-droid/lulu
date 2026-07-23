@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:29:13.826373+00:00",
-  "commit": "006b882673fc3dac3c4dc7c248212f4769716edb",
+  "generatedAt": "2026-07-23T11:30:04.461219+00:00",
+  "commit": "467f873ac748f1d88fe2ad853e45290456fe9c2b",
   "branch": "master",
-  "sourceFingerprint": "34a0e2ee95d8927e8eebc2c3bceb4948b839ad29df5413897dfdf78869531544",
+  "sourceFingerprint": "be5dd5c5d8855983ba5da5492d763b7309e43dee8851757875584857bb73f7a2",
   "summary": {
     "files": 1105,
     "lines": 262585,
@@ -68,7 +68,7 @@
       "界面": 284,
       "记忆": 42
     },
-    "resolvedImportEdges": 1872
+    "resolvedImportEdges": 1873
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -26528,7 +26528,8 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt"
+        "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt"
       ]
     },
     {
@@ -34663,7 +34664,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 354,
-      "sha256": "174ef0a504e88bafc1d51dd77bb4aeffcd47d0eab070d827dfae321b6c644ed4",
+      "sha256": "1341b362001e300f61251018e93fdced299afdfb41b073156b19c7c9231f8018",
       "package": "me.rerere.rikkahub.ui.pages.chat",
       "categories": [
         "界面"
@@ -34843,7 +34844,7 @@
         "me.rerere.rikkahub.data.repository.ConversationRepository",
         "me.rerere.rikkahub.data.repository.FavoriteRepository",
         "me.rerere.rikkahub.service.ChatError",
-        "me.rerere.rikkahub.service.ChatService",
+        "me.rerere.rikkahub.service.CompanionChatPort",
         "me.rerere.rikkahub.ui.hooks.ChatInputState",
         "me.rerere.rikkahub.ui.hooks.writeStringPreference"
       ],
@@ -34860,6 +34861,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
         "app/src/main/java/me/rerere/rikkahub/data/repository/FavoriteRepository.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
+        "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/ChatInputState.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/SharedPreferences.kt"
       ],
