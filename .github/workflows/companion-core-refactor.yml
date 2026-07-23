@@ -76,7 +76,7 @@ jobs:
             exit "$status"
           fi
 
-      - name: Repair remaining chat session call sites
+      - name: Repair remaining validation call sites
         shell: python
         run: |
           from pathlib import Path
@@ -138,6 +138,36 @@ jobs:
           if registry.count(anchor) != 1:
               raise RuntimeError(f'current job registry anchor: expected one match, found {registry.count(anchor)}')
           registry_path.write_text(registry.replace(anchor, replacement, 1), encoding='utf-8', newline='\n')
+
+          stats_path = Path('app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt')
+          stats = stats_path.read_text(encoding='utf-8')
+          stats_replacements = [
+              (
+                  'stats.cacheRecords.take(MaxVisibleCacheRecords)',
+                  'stats.cacheRecords.visibleCacheRecords()',
+                  'visible cache record selection',
+              ),
+              (
+                  'key = ApiUsageRecord::id,',
+                  'key = { it.stableCacheRecordKey() },',
+                  'stable cache record key',
+              ),
+          ]
+          for old, new, label in stats_replacements:
+              if stats.count(old) != 1:
+                  raise RuntimeError(f'{label}: expected one match, found {stats.count(old)}')
+              stats = stats.replace(old, new, 1)
+          helper_anchor = 'private const val MaxVisibleCacheRecords = 15\n'
+          helpers = '''internal fun List<ApiUsageRecord>.visibleCacheRecords(): List<ApiUsageRecord> =
+              take(MaxVisibleCacheRecords)
+
+          internal fun ApiUsageRecord.stableCacheRecordKey(): String = id
+
+          private const val MaxVisibleCacheRecords = 15
+          '''
+          if stats.count(helper_anchor) != 1:
+              raise RuntimeError(f'stats helper anchor: expected one match, found {stats.count(helper_anchor)}')
+          stats_path.write_text(stats.replace(helper_anchor, helpers, 1), encoding='utf-8', newline='\n')
 
       - name: Set up Node 20
         uses: actions/setup-node@v4
@@ -234,6 +264,7 @@ jobs:
             app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt \
             app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt \
             app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt \
+            app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt \
             app/src/test/java/me/rerere/rikkahub/data/companion/CompanionNeutralPersistenceTest.kt
           if git diff --cached --quiet; then
             echo 'No changes to commit.'
