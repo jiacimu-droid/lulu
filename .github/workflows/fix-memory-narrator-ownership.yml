@@ -1,0 +1,92 @@
+name: Fix memory narrator ownership
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/fix-memory-narrator-ownership.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Patch only the generic memory viewpoint contract
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt')
+          text = path.read_text(encoding='utf-8')
+          old = '''        appendLine("content：用$name 第一人称自然写清发生了什么，以及最值得记住的部分。不要写数据库摘要，不要写‘这是一段值得记住的经历’等空话。")
+          '''
+          new = '''        appendLine("content：以当前角色作为叙述者，用当前角色的第一人称自然写清发生了什么以及最值得记住的部分；这里的‘我’始终只代表当前角色。不要写数据库摘要，不要写‘这是一段值得记住的经历’等空话。")
+              appendLine("必须先根据每条消息的 role 和正文判断‘谁做了什么’，再转换叙述视角。用户做的事仍然属于用户，角色做的事才属于角色；绝不能因为采用角色第一人称，就把用户的行为、经历、决定、身体状态或情绪改写成角色做过或经历过。")
+              appendLine("角色观察到用户行为时，可写‘我看到/听到/知道用户……’；需要称呼用户时，优先沿用本批正文中角色真实使用的称呼，无法确定就用‘用户’或自然省略称呼。不得写死任何角色名、用户名、性别或关系称谓。")
+              appendLine("逐字段保持主体一致：roleFeeling、bodySense、unspokenThought 只描述当前角色自身有证据支持的感受、身体反应和心声；用户的感受与身体状态只能作为角色观察到或得知的事实，不能冒充角色自身体验。")
+          '''
+          if text.count(old) != 1:
+              raise SystemExit(f'Expected one prompt anchor, found {text.count(old)}')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+
+          test_path = Path('app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractorTest.kt')
+          test = test_path.read_text(encoding='utf-8')
+          anchor = '\n}\n'
+          addition = '''
+              @Test
+              fun `generic prompt keeps narrator first person without stealing user actions`() {
+                  val prompt = AffectiveMemoryExtractor.buildExtractionPrompt(
+                      turns = listOf(
+                          MemoryExtractionTurn("u1", "user", "我因为代码出问题修到了凌晨", 1L),
+                          MemoryExtractionTurn("a1", "assistant", "我看到了，很担心你", 2L),
+                      ),
+                      assistantName = "任意角色",
+                  )
+
+                  assertTrue(prompt.contains("‘我’始终只代表当前角色"))
+                  assertTrue(prompt.contains("用户做的事仍然属于用户"))
+                  assertTrue(prompt.contains("不得写死任何角色名、用户名、性别或关系称谓"))
+                  assertTrue(prompt.contains("roleFeeling、bodySense、unspokenThought 只描述当前角色自身"))
+                  assertFalse(prompt.contains("佳辞"))
+                  assertFalse(prompt.contains("露露"))
+              }
+          '''
+          if addition.strip() not in test:
+              pos = test.rfind(anchor)
+              if pos < 0:
+                  raise SystemExit('Could not locate test class closing brace')
+              test = test[:pos] + addition + test[pos:]
+              test_path.write_text(test, encoding='utf-8', newline='\n')
+
+          Path('.github/workflows/fix-memory-narrator-ownership.yml').unlink()
+          inspect = Path('.github/workflows/inspect-memory-pipeline.yml')
+          if inspect.exists():
+              inspect.unlink()
+
+      - name: Run focused tests
+        run: ./gradlew :app:testReleaseUnitTest --tests '*AffectiveMemoryExtractorTest*' --no-daemon
+
+      - name: Compile release Kotlin
+        run: ./gradlew :app:compileReleaseKotlin --no-daemon
+
+      - name: Commit verified fix
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: preserve actors in role-first-person memories'
+          git pull --rebase origin master
+          git push origin HEAD:master
