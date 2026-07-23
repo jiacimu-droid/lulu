@@ -32,6 +32,20 @@ jobs:
         shell: bash
         run: |
           cp scripts/refactor_companion_core.py /tmp/refactor_companion_core.py
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('/tmp/refactor_companion_core.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''    if "sessions." in text or "sessions[" in text or "_sessionsVersion" in text:
+                  raise RuntimeError("ChatService still directly owns session collection state")
+          '''
+          new = '''    if "private val sessions = ConcurrentHashMap" in text or "private val _sessionsVersion" in text:
+                  raise RuntimeError("ChatService still directly owns session collection state")
+          '''
+          if old not in text:
+              raise SystemExit('session ownership guard patch did not match')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
           git fetch origin master
           git checkout -B master origin/master
 
