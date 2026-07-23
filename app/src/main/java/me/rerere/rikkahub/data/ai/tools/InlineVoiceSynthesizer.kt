@@ -28,10 +28,14 @@ internal fun scheduleInlineVoiceMessage(
     val estimatedDurationMs = estimateVoiceDurationMs(cleanText)
 
     GlobalContext.get().get<AppScope>().launch {
-        synthesizeInlineVoiceToFile(
-            text = cleanText,
-            target = target,
-        )
+        runCatching {
+            synthesizeInlineVoiceToFile(
+                text = cleanText,
+                target = target,
+            )
+        }.onFailure {
+            target.delete()
+        }
     }
 
     return UIMessagePart.VoiceMessage(
