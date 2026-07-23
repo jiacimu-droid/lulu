@@ -76,6 +76,70 @@ jobs:
             exit "$status"
           fi
 
+      - name: Repair remaining chat session call sites
+        shell: python
+        run: |
+          from pathlib import Path
+
+          chat_path = Path('app/src/main/java/me/rerere/rikkahub/service/ChatService.kt')
+          chat = chat_path.read_text(encoding='utf-8')
+
+          replacements = [
+              (
+                  '''            sessions[conversationId]?.let { session ->
+                          updateConversation(
+                              conversationId,
+                              session.state.value.copy(chatSuggestions = emptyList())
+                          )
+                      }
+          ''',
+                  '''            getConversationFlow(conversationId).value.let { currentConversation ->
+                          updateConversation(
+                              conversationId,
+                              currentConversation.copy(chatSuggestions = emptyList())
+                          )
+                      }
+          ''',
+                  'suggestion reset session access',
+              ),
+              (
+                  '''                ?: sessions[conversationId]?.state?.value
+          ''',
+                  '''                ?: getConversationFlow(conversationId).value
+          ''',
+                  'suggestion fallback session access',
+              ),
+              (
+                  '''        val job = sessions[conversationId]?.getJob() ?: return
+          ''',
+                  '''        val job = sessionRegistry.currentGenerationJob(conversationId) ?: return
+          ''',
+                  'stop generation session access',
+              ),
+          ]
+          for old, new, label in replacements:
+              if chat.count(old) != 1:
+                  raise RuntimeError(f'{label}: expected one match, found {chat.count(old)}')
+              chat = chat.replace(old, new, 1)
+          if 'sessions[conversationId]' in chat:
+              raise RuntimeError('ChatService still directly reads sessions by conversation id')
+          chat_path.write_text(chat, encoding='utf-8', newline='\n')
+
+          registry_path = Path('app/src/main/java/me/rerere/rikkahub/service/ConversationSessionRegistry.kt')
+          registry = registry_path.read_text(encoding='utf-8')
+          anchor = '''    fun generationJobFlow(conversationId: Uuid): Flow<Job?> =
+                  sessions[conversationId]?.generationJob ?: flowOf(null)
+          '''
+          replacement = '''    fun generationJobFlow(conversationId: Uuid): Flow<Job?> =
+                  sessions[conversationId]?.generationJob ?: flowOf(null)
+
+              fun currentGenerationJob(conversationId: Uuid): Job? =
+                  sessions[conversationId]?.getJob()
+          '''
+          if registry.count(anchor) != 1:
+              raise RuntimeError(f'current job registry anchor: expected one match, found {registry.count(anchor)}')
+          registry_path.write_text(registry.replace(anchor, replacement, 1), encoding='utf-8', newline='\n')
+
       - name: Set up Node 20
         uses: actions/setup-node@v4
         with:
