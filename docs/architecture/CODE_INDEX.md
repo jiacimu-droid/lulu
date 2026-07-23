@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`0cfff4b2ab8e178c907d1f2b0e4c1a9ba5d0aa14`
+- 基准提交：`c33d2e5caac91b354429782cfdc0e2a42ad048e2`
 - 分支：`master`
-- 源码指纹：`5e282d698366f128…`
-- 已索引文件：1113
-- 已索引代码/文本行：263456
+- 源码指纹：`12e4702fe6cc8931…`
+- 已索引文件：1114
+- 已索引代码/文本行：263546
 - 已发现类、接口、对象、函数及 Composable：5451
 
 ## 仓库健康信号
@@ -148,7 +148,7 @@
 | `root` | 10 |
 | `website` | 10 |
 | `highlight` | 9 |
-| `.github` | 7 |
+| `.github` | 8 |
 | `web` | 7 |
 | `.claude` | 5 |
 | `locale-tui` | 4 |
@@ -170,8 +170,8 @@
 | `.pro` | 15 |
 | `.kts` | 11 |
 | `.js` | 9 |
+| `.yml` | 7 |
 | `.html` | 7 |
-| `.yml` | 6 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -396,6 +396,7 @@
 
 - `.github/workflows/code-index.yml`
 - `.github/workflows/one-time-bubble-split-v3.yml`
+- `.github/workflows/one-time-bubble-split-v4.yml`
 - `.github/workflows/one-time-chat-cleanup-v2.yml`
 - `.github/workflows/release.yml`
 - `ai/build.gradle.kts`
