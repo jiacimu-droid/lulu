@@ -1,198 +1,167 @@
-# Repository Guidelines
+# AGENTS.md — Lulu 仓库 AI 开发规则
 
-本文档面向贡献者及所有代码代理（包括 GPT、Codex 等），概述本仓库的模块结构、开发流程与提交规范，便于快速上手并保持一致的协作质量。
+本文档是本仓库面向 **GPT、Codex 及其他代码代理** 的最高级共享开发规范。所有代码任务开始前必须先读本文件；子目录若存在更具体的 `AGENTS.md`，还需同时遵守。
 
-## Build, Test, and Development Commands
+> 核心原则：优先推进用户要求的真实实现。验证必须与改动规模匹配，不得用重复 CI、无关历史测试或临时工作流浪费用户时间。
 
-使用 Android Studio 或命令行 Gradle：
+## 0. 每次任务的强制开工顺序
+
+1. 阅读本文件。
+2. 阅读 `docs/architecture/CODE_INDEX.md`，从相关产品链路进入，禁止无目的全仓扫描。
+3. 需要精确符号、包名或文件位置时读取 `docs/architecture/code-index.json`。
+4. 大型陪伴系统改动同时阅读 `docs/architecture/COMPANION_REBUILD_PLAN.md`。
+5. 回读当前 `master` 的真实实现、调用方、持久化路径和失败路径；不得只依赖 Issue、旧日志或过去结论。
+6. 将用户要求拆成明确清单，按顺序实现，不得反复审计已经完成的部分。
+
+## 1. 效率优先的修改流程
+
+### 1.1 先改代码，不先造验证基础设施
+
+- 先完成用户要求的实现，不得把大部分时间花在设计 CI、诊断工作流或日志转运。
+- 能直接修改仓库文件时，禁止为任务创建一次性 GitHub Actions 工作流。
+- 只有现有仓库工具无法安全完成修改时才允许临时工作流；使用后必须立即关闭或删除。
+- 禁止为了获取已经存在于构建日志中的错误，再叠加评论、Artifact、脚本和多层诊断流程。
+
+### 1.2 验证范围必须与改动范围匹配
+
+始终采用**最小但有意义**的验证命令：
+
+| 改动类型 | 默认验证 |
+|---|---|
+| 仅 Markdown／文档 | 不编译，检查最终 diff 后直接提交 |
+| `app` 内小型 Kotlin 生产代码 | `./gradlew :app:compileReleaseKotlin --no-daemon` |
+| 单个测试类修改 | 只运行受影响测试类，能不跑全仓就不跑全仓 |
+| 普通 Compose/UI 修改 | 一次聚焦 Kotlin 编译 |
+| 跨模块、构建配置、数据库迁移 | 运行与受影响模块对应的编译或测试 |
+| 阶段完成／正式发布 | `assembleRelease`、Lint、必要回归测试和签名 APK 验收 |
+
+完整 `assembleRelease`、Android Lint 和全仓测试是阶段性或发布验收，不是每次小改的默认门槛。
+
+### 1.3 一次诊断，然后直接修源码
+
+- 编译失败后，先提取第一批可执行错误，必须包含文件名和行号。
+- 直接修复这些错误，然后只重跑同一个聚焦命令一次。
+- 若第二次仍失败，只处理新出现且与本次改动直接相关的错误。
+- 禁止连续多轮改善日志采集，却没有推进源码修改。
+
+### 1.4 无关历史失败不得阻塞当前任务
+
+- 必须区分当前改动引入的失败和仓库原有历史失败。
+- 若生产代码的聚焦编译通过，而全仓测试存在与当前文件无关的既有失败，应提交当前修改，并把测试基线债务单独记录。
+- 一次确认“失败与当前任务无关”后，立即停止把该套件作为本次门槛。
+- 用户未明确扩大范围时，不得顺手修理无关测试或重构无关模块。
+
+### 1.5 提交与汇报
+
+- 最小相关编译通过后，直接提交到用户指定分支。
+- 提交必须聚焦、可回滚，禁止夹带大面积格式化、换行噪声、调试代码或无关改动。
+- `master` 的现有 Signed APK／Release 工作流负责最终签名 APK 验收。
+- 当前 `master` 的 Release 未明确成功前，不得声称“整个工程已经绿了”。
+- 汇报必须明确区分：已经进入 `master`、仅通过局部验证、仍未完成。
+- 仍有主要任务未完成时，不得使用“差不多完成”“基本好了”等误导性说法。
+
+### 1.6 多部分任务
+
+- 保留一份与用户原始要求一一对应的清单。
+- 按顺序完成实现，完成一项就推进下一项，不得反复重查前三项而拖延后续部分。
+- 除非当前改动失败，禁止因为“再保险”重复运行同一验证。
+- 用户时间和实际实现进度优先于仪式化验证。
+
+### 1.7 2026-07-23 效率事故复盘
+
+陪伴核心重构已经通过 Release Kotlin 编译后，仍错误地使用全仓测试作为阻塞门槛。全仓测试包含三十多个无关历史失败，随后又增加诊断工作流和重复运行，消耗大量用户时间，却没有实质推进剩余实现。
+
+今后遇到同类情况，正确流程固定为：
+
+1. 运行聚焦的 Release Kotlin 编译。
+2. 修复真实、具体的源码错误。
+3. 重跑同一个聚焦编译一次。
+4. 编译通过后立即提交。
+5. 将无关测试基线失败单独记录，不阻塞当前任务。
+
+## 2. 产品不可破坏规则：人设、连续性与回归安全
+
+以下规则适用于聊天、电话、主动消息、通知、状态、记忆、工具、游戏、TTS、图像提示等所有角色相关出口：
+
+- **用户人设是最高约束**：角色名、核心人设、关系类型、世界观、语言风格与明确边界由用户定义；运行时状态不得覆盖人设。
+- **零默认性格倾向**：不得默认温柔、亲密、恋爱、顺从、朋友式、撒娇或关心。称呼、情绪、冲突方式、幽默、主动程度和距离感必须来自具体人设及真实关系证据。
+- **所有角色出口一致**：以角色名义展示、朗读、通知或写入记忆的内容必须经过同一套人设和边界约束。
+- **技术错误保持中立**：失败状态使用系统层中立提示，禁止伪装成角色台词。
+- **禁止固定角色兜底**：电话开场、生成失败、游戏回应、主动消息、哄睡和提醒不得内置看似由角色说出的固定句子。
+- **陪伴感不等于温柔措辞**：陪伴感来自连续记忆、稳定立场、真实行动、适时主动、尊重边界、兑现承诺和有证据的共同经历。
+- **事实与想象分离**：只有真实消息、用户资料、已执行工具结果和已记录生活事件可以作为事实；不得声称完成未执行的动作。
+- **用户最新纠正覆盖旧推断**：出现冲突时，以用户最新明确说明为准。
+
+角色相关改动应检查固定默认措辞，例如：`陪伴`、`温柔`、`亲密`、`朋友`、`宝贝`、`主人`、`轻声`、`我在`、`接住`、`照看`。这些词只有在具体人设或用户证据支持时才能作为角色输出。
+
+## 3. 修改安全门
+
+提交功能改动前必须做到：
+
+1. 定位现有行为、调用方、持久化路径和失败路径，避免只修 UI 表面。
+2. 保持改动聚焦，保留已有行为和数据兼容性。
+3. 对新增逻辑补充与范围匹配的测试；不要为了形式覆盖而强行扩大测试范围。
+4. 角色功能至少用差异明显的人设做回归思考：冷淡／严厉、普通朋友、亲密关系、敌对或非人角色。
+5. 构建或测试无法运行时，明确说明未验证项，不能把静态阅读写成“测试通过”。
+6. 提交前检查最终 diff，排除换行噪声、调试代码、提示词泄漏和固定角色话术。
+7. 不得以“改善体验”为由删除、绕过或弱化原本正常功能；存在回归风险时采用可回退的小步实现。
+
+## 4. 仓库索引协议
+
+仓库代码索引用于减少重复扫描并保持跨阶段修改建立在最新调用链上：
+
+1. 每个代码任务必须先读 `docs/architecture/CODE_INDEX.md`。
+2. 需要逐文件符号、指纹和分类时读取 `docs/architecture/code-index.json`。
+3. 索引基准提交落后于当前分支时，大范围设计前运行 `python3 scripts/generate_code_index.py`。
+4. 新增、删除、重命名模块或关键入口时，运行索引生成器，不得手工伪造统计。
+5. `master` 上的 `Refresh code index` 工作流会自动提交最新索引；失败时不能宣称“索引已同步”。
+6. 索引只负责导航，真实行为仍须回读实现、调用方、持久化、测试和失败路径。
+
+## 5. 常用构建与测试命令
 
 ```bash
-./gradlew assembleDebug          # 构建 Debug APK
-./gradlew test                   # 运行所有模块的 JVM 单元测试
-./gradlew connectedDebugAndroidTest  # 运行设备/模拟器上的仪器测试
-./gradlew lint                   # 运行 Android Lint
+./gradlew :app:compileReleaseKotlin --no-daemon  # 小型 app Kotlin 改动的默认检查
+./gradlew assembleDebug                          # 构建 Debug APK
+./gradlew assembleRelease                        # 阶段／发布构建
+./gradlew test                                   # 全仓 JVM 单测，仅在确有必要时运行
+./gradlew connectedDebugAndroidTest              # 设备／模拟器测试
+./gradlew lint                                   # Android Lint，阶段验收使用
 ```
 
 构建应用需要在 `app/` 下提供 `google-services.json`（用于 Firebase）。
 
-## Coding Style & Naming Conventions
+## 6. 编码与测试规范
 
-本仓库使用 `.editorconfig` 统一格式：
+- 使用 `.editorconfig`：Kotlin/Gradle 4 空格，最大行长 120；XML/JSON 2 空格；Markdown/YAML 2 空格。
+- 模块名使用小写目录；Kotlin 类使用 PascalCase；测试类以 `*Test` 结尾。
+- 测试框架以 JUnit/AndroidX Test 为主。
+- 新逻辑应有与风险和改动规模匹配的测试，不以全仓测试作为所有小改的强制门槛。
+- UI 优先复用 `ui/components/`，页面布局参考现有同类页面。
+- 图标使用 `Lucide.XXX`；Toast 使用 `LocalToaster.current`。
 
-- Kotlin/Gradle 脚本：4 空格缩进，最大行长 120。
-- XML/JSON：2 空格缩进。
-- Markdown/YAML：2 空格缩进，允许尾随空格（用于对齐）。
+## 7. 模块结构
 
-命名习惯：模块名为小写目录（如 `ai/`、`tts/`），Kotlin 类遵循 PascalCase，测试类以 `*Test` 结尾。
+- **app**：主应用、UI、ViewModel 和核心业务逻辑。
+- **ai**：OpenAI、Google、Anthropic 等 AI Provider 抽象。
+- **common**：公共工具和扩展。
+- **document**：PDF、DOCX、PPTX 文档处理。
+- **highlight**：代码高亮。
+- **search**：搜索 SDK。
+- **tts**：语音合成 Provider。
+- **web**：Ktor 嵌入式服务和 `web-ui/` 前端静态资源。
 
-## Testing Guidelines
+核心概念：
 
-测试框架以 JUnit/AndroidX Test 为主。未设定强制覆盖率门槛，但新逻辑应配套新增/更新测试。测试文件命名建议：
+- **Assistant**：包含系统提示、模型参数、工具、记忆、转换器和注入配置的独立助手环境。
+- **Conversation**：支持消息分支的持久对话线程。
+- **UIMessage**：平台无关的消息抽象，支持文本、图片、文档、推理、工具调用和流式合并。
+- **MessageNode**：承载备选消息并支持分支选择的节点。
+- **Message Transformer**：发送前和生成后的消息转换流水线。
 
-- 单元测试：`FooTest.kt`
-- 仪器测试：`FooInstrumentedTest.kt` 或 `*Test.kt`
+## 8. 国际化
 
-## Module Structure
-
-- **app**: Main application module with UI, ViewModels, and core logic
-- **ai**: AI SDK abstraction layer for different providers (OpenAI, Google, Anthropic)
-- **common**: Common utilities and extensions
-- **document**: Document parsing module for handling PDF, DOCX, and PPTX files
-- **highlight**: Code syntax highlighting implementation
-- **search**: Search functionality SDK (Exa, Tavily, Zhipu)
-- **tts**: Text-to-speech implementation for different providers
-- **web**: Embedded web server module that provides Ktor server startup function and hosts static frontend build files (
-  built from web-ui/ React project)
-
-## Concepts
-
-- **Assistant**: An assistant configuration with system prompts, model parameters, and conversation isolation. Each
-  assistant maintains its own settings including temperature, context size, custom headers, tools, memory options, regex
-  transformations, and prompt injections. Assistants provide isolated chat environments with specific
-  behaviors and capabilities. (app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt)
-
-- **Conversation**: A persistent conversation thread between the user and an assistant. Each conversation maintains a
-  list of MessageNodes in a tree structure to support message branching, along with metadata like title, creation time,
-  and pin status. Conversations can be truncated at a specific index and maintain chat suggestions. (
-  app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt)
-
-- **UIMessage**: A platform-agnostic message abstraction that encapsulates chat messages with different types of content
-  parts (text, images, documents, reasoning, tool calls/results, etc.). Each message has a role (USER, ASSISTANT,
-  SYSTEM, TOOL), creation timestamp, model ID, token usage information, and optional annotations. UIMessages support
-  streaming updates through chunk merging. (ai/src/main/java/me/rerere/ai/ui/Message.kt)
-
-- **MessageNode**: A container holding one or more UIMessages to implement message branching functionality. Each node
-  maintains a list of alternative messages and tracks which message is currently selected (selectIndex). This enables
-  users to regenerate responses and switch between different conversation branches, creating a tree-like conversation
-  structure. (app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt)
-
-- **Message Transformer**: A pipeline mechanism for transforming messages before sending to AI providers (
-  InputMessageTransformer) or after receiving responses (OutputMessageTransformer). Transformers can modify message
-  content, add metadata, apply templates, handle special tags, convert formats, and perform OCR. Common transformers
-  include:
-  - TemplateTransformer: Apply Pebble templates to user messages with variables like time/date
-  - ThinkTagTransformer: Extract `<think>` tags and convert to reasoning parts
-  - RegexOutputTransformer: Apply regex replacements to assistant responses
-  - DocumentAsPromptTransformer: Convert document attachments to text prompts
-  - Base64ImageToLocalFileTransformer: Convert base64 images to local file references
-  - OcrTransformer: Perform OCR on images to extract text
-
-  Output transformers support `visualTransform()` for UI display during streaming and `onGenerationFinish()` for final
-  processing after generation completes.
-  (app/src/main/java/me/rerere/rikkahub/data/ai/transformers/Transformer.kt)
-
-## Internationalization
-
-- String resources located in `app/src/main/res/values-*/strings.xml`
-- Use `stringResource(R.string.key_name)` in Compose
-- Page-specific strings should use page prefix (e.g., `setting_page_`)
-- If the user does not explicitly request localization, prioritize implementing functionality without considering
-  localization. (e.g `Text("Hello world")`)
-- For `locale-tui` operations, use the `locale-tui-localization` skill.
-
-## Product Invariants: Persona, Continuity, and Regression Safety
-
-以下规则适用于所有角色相关功能（聊天、电话、主动消息、通知、状态、记忆、工具、游戏、TTS、图像提示等），优先级高于局部文案便利：
-
-- **先读规范再改代码**：每个代码任务开始前必须阅读本文件；若子目录存在更具体的 `AGENTS.md`，同时阅读并遵守。
-- **用户人设是最高约束**：角色名、核心人设、关系类型、世界观、语言风格与明确边界由用户定义。运行时状态、关系数值、陪伴目标和场景提示只能在人设内部调节，不能覆盖人设。
-- **零默认性格倾向**：不得默认温柔、亲密、恋爱、顺从、朋友式、撒娇、关心或“轻声陪伴”。称呼、情绪、冲突方式、幽默、主动程度和距离感必须来自具体人设及真实关系证据。
-- **所有角色出口一致**：任何会以角色名义展示、朗读、通知或写入记忆的内容都必须经过同一套人设与边界约束。技术失败使用系统层中立提示，禁止伪装成角色台词。
-- **禁止固定角色兜底**：电话开场、生成失败、游戏回应、主动消息、哄睡、提醒等不得内置看似由角色说出的固定句子。可以使用不冒充角色的系统状态，或在保留人设上下文后重试。
-- **陪伴感不等于温柔措辞**：通过连续记忆、稳定立场、真实行动、适时主动、尊重边界、兑现承诺和有证据的共同经历建立活人感。角色可以冷淡、严厉、矛盾、克制或非人，但必须前后一致。
-- **事实与想象分离**：只有真实消息、用户资料、已执行工具结果和已记录生活事件可以作为事实。不得声称完成未执行的动作，不得用关系分数虚构亲密历史。用户最新纠正始终覆盖旧推断。
-
-### Change Safety Gate
-
-任何功能改进在提交前必须执行：
-
-1. 先定位现有行为、调用方、持久化路径和失败路径，避免只修 UI 表面。
-2. 保持改动聚焦，禁止顺手重写无关模块；保留用户已有行为和数据兼容性。
-3. 新增或更新覆盖正常、失败、取消、重试、空数据和旧数据迁移的测试。
-4. 对角色功能至少用差异明显的多种人设做回归思考：冷淡/严厉、普通朋友、亲密关系、敌对或非人角色。测试不得只使用“温柔伴侣”样例。
-5. 构建或测试不可运行时，必须明确说明未验证项；不能把静态检查写成“测试通过”。
-6. 推送前检查最终 diff，排除大面积换行、格式噪声、调试代码、提示词泄漏与固定角色话术。
-7. 不得以“改善体验”为由删除、绕过或弱化原本正常的功能；发现回归风险时优先采用可回退的小步实现。
-
-角色相关改动建议检索：`陪伴`、`温柔`、`亲密`、`朋友`、`宝贝`、`主人`、`轻声`、`我在`、`接住`、`照看`。出现这些词不一定错误，但必须能由具体人设或用户证据解释，不能成为系统默认。
-
-## Repository Index Protocol
-
-仓库级代码索引用于减少重复扫描，并保证跨阶段修改建立在最新调用链上：
-
-1. 每个代码任务除阅读本文件外，必须先阅读 `docs/architecture/CODE_INDEX.md`；需要精确符号、包名或逐文件定位时读取 `docs/architecture/code-index.json`。
-2. 索引的 `基准提交` 若落后于当前分支，先运行 `python3 scripts/generate_code_index.py`，再进行大范围设计或修改。
-3. 新增、删除、重命名模块或关键入口时，不得手工伪造统计；运行生成器并检查索引 diff。
-4. `master` 上的 `Refresh code index` 工作流会自动提交最新索引；若工作流失败，代码改动不能被描述为“索引已同步”。
-5. 索引只负责导航。真实行为仍须回读实现、调用方、持久化路径、测试和失败路径，不得仅凭文件名推断。
-
-## GPT / Codex / AI Modification Efficiency Rules
-
-以下规则对 GPT、Codex 及所有在 Lulu 仓库工作的代码代理强制生效，目标是避免小改动或已接近完成的任务演变成长时间、重复性的 CI 会话。
-
-### 1. 修改前读取
-
-- 每个修改任务开始前必须阅读本文件。
-- 大范围修改前阅读当前代码索引或相关架构文档。
-- 必须检查当前真实实现和调用点，不得只依赖 Issue 描述或旧失败日志。
-- 必须区分历史失败和当前 `master` 的失败。
-
-### 2. 验证范围必须与改动范围匹配
-
-始终使用最小但有意义的验证命令，不得因为存在更大的测试套件就默认全部运行。
-
-- 仅文档修改：不需要编译。
-- `app` 内小型 Kotlin 生产代码修改：运行 `./gradlew :app:compileReleaseKotlin --no-daemon`。
-- 独立单元测试修改：尽可能只运行受影响的测试类。
-- 不涉及 Release 专属逻辑的 UI 修改：提交前进行一次聚焦 Kotlin 编译即可。
-- 完整 `assembleRelease`、Android Lint 和全仓测试属于阶段／发布验收，不是每次小改的默认门槛。
-
-### 3. 无关历史测试不得阻塞聚焦修改
-
-- 若生产代码的 Release Kotlin 编译成功，而全仓测试存在与当前文件无关的既有失败，应提交本次聚焦修改，并把测试基线债务单独记录。
-- 未证明失败与当前改动有关前，禁止反复重跑相同的全仓失败套件。
-- 一旦确认一次全仓失败与当前任务无关，立即停止把它作为本次任务门槛。
-- 用户未明确扩大范围时，不得在聚焦功能／重构任务中顺手修理无关测试。
-
-### 4. 一次诊断，然后直接修源码
-
-- 失败后提取第一批可执行的编译／测试错误，必须包含文件名和行号。
-- 直接修这些具体错误，然后只重跑同一个聚焦命令一次。
-- 当现有构建日志已经包含错误时，禁止继续叠加诊断工作流、评论、Artifact 和临时脚本。
-- 禁止把多轮时间花在改善日志采集，而不是修复源码。
-
-### 5. 工作流纪律
-
-- 禁止为每个修复创建新的单次 GitHub Actions 工作流。
-- 优先复用现有 Signed APK／Release 工作流和现有 CI。
-- 只有直接仓库工具无法安全完成修改时才允许临时工作流，并须在使用后立即关闭或删除。
-- 未经用户明确同意，临时工作流不得成为 Actions 页面中的永久入口。
-
-### 6. 提交策略
-
-- 先完成用户要求的代码，不得把任务的大部分时间用于设计验证基础设施。
-- 最小相关编译通过后，直接提交到用户指定分支。
-- 提交应聚焦、可回滚。
-- 代码提交后，由现有的 `master` push Release 工作流执行最终签名 APK 验收。
-- 当前 `master` 的 Release 未明确成功前，禁止宣称整个工程已经绿了。
-
-### 7. 多部分任务执行
-
-- 维护用户要求的具体清单。
-- 按顺序完成实现部分，不得反复重新审计已完成内容。
-- 仍有主要部分未完成时，不得描述为“差不多完成”。
-- 汇报时必须区分：已进入 `master`、仅验证过、仍未完成。
-
-### 8. 2026-07-23 效率事故复盘
-
-一次陪伴核心重构已经通过生产 Release Kotlin 编译，但仍因全仓测试被当作阻塞门槛而继续了多轮。该测试套件包含三十多个无关历史失败；额外的诊断工作流和重复运行消耗了大量用户时间，却没有实质推进用户要求的实现。
-
-正确流程应当是：
-
-1. 运行聚焦的 Release Kotlin 编译。
-2. 修复三处真实残留的 `sessions` 调用点。
-3. 重跑同一个聚焦编译。
-4. 编译通过后立即提交。
-5. 把无关测试基线失败单独记录。
-
-今后 Lulu 开发中，用户时间和实际实现进度优先于仪式化验证。验证必须成比例、聚焦，并与当前改动直接相关。
+- 字符串资源位于 `app/src/main/res/values-*/strings.xml`。
+- Compose 使用 `stringResource(R.string.key_name)`。
+- 页面字符串使用页面前缀。
+- 用户未明确要求本地化时，优先完成实际功能，不因补齐全部语言拖延实现。
+- 用户明确要求本地化时，再完整支持目标语言。
