@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T14:45:03.913321+00:00",
-  "commit": "1904360ff17ad9cbcb6d705f413abc299df600d8",
+  "generatedAt": "2026-07-23T14:49:43.735780+00:00",
+  "commit": "0cfff4b2ab8e178c907d1f2b0e4c1a9ba5d0aa14",
   "branch": "master",
-  "sourceFingerprint": "00848b9bcd683b48b9bb2ac714da7e56c7476e7b64f213ba33b28c47e28c2e22",
+  "sourceFingerprint": "5e282d698366f128a1ce66e91f83e3dcdc58a80fd5465a3c897dffceefe0c5a4",
   "summary": {
-    "files": 1112,
-    "lines": 263367,
+    "files": 1113,
+    "lines": 263456,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -27,8 +27,8 @@
       "root": 10,
       "website": 10,
       "highlight": 9,
+      ".github": 7,
       "web": 7,
-      ".github": 6,
       ".claude": 5,
       "locale-tui": 4,
       "study-plans": 4,
@@ -47,7 +47,7 @@
       ".kts": 11,
       ".js": 9,
       ".html": 7,
-      ".yml": 5,
+      ".yml": 6,
       ".css": 4,
       ".yaml": 3,
       ".properties": 3,
@@ -63,7 +63,7 @@
       "工具": 6,
       "插件": 44,
       "数据库": 75,
-      "构建与发布": 14,
+      "构建与发布": 15,
       "电话与语音": 48,
       "界面": 284,
       "记忆": 42
@@ -1506,6 +1506,7 @@
     ],
     "构建与发布": [
       ".github/workflows/code-index.yml",
+      ".github/workflows/one-time-bubble-split-v3.yml",
       ".github/workflows/one-time-chat-cleanup-v2.yml",
       ".github/workflows/release.yml",
       "ai/build.gradle.kts",
@@ -3220,6 +3221,25 @@
       "extension": ".yml",
       "lines": 93,
       "sha256": "1a5221f0bfb4b3e597f69e5343f20cd089c3619517d891807e65ed829e7ccd98",
+      "package": null,
+      "categories": [
+        "构建与发布"
+      ],
+      "symbols": [],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": ".github/workflows/one-time-bubble-split-v3.yml",
+      "module": ".github",
+      "extension": ".yml",
+      "lines": 89,
+      "sha256": "03cd3edb96c82d1cb4e03ac2c35be6fc7ee707c46e54221b8108663524cf03a1",
       "package": null,
       "categories": [
         "构建与发布"
