@@ -7,13 +7,13 @@ import android.os.PowerManager
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import androidx.work.ExistingWorkPolicy
 import kotlinx.coroutines.flow.first
-import me.rerere.rikkahub.data.datastore.getProactiveMessageSetting
 import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.datastore.getProactiveMessageSetting
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import kotlin.uuid.Uuid
@@ -146,7 +146,7 @@ class ProactiveMessageWorker(
                 .build()
 
             WorkManager.getInstance(context).enqueueUniqueWork(
-                TARGETED_UNIQUE_WORK_NAME,
+                spec.uniqueWorkName,
                 ExistingWorkPolicy.REPLACE,
                 workRequest,
             )
@@ -189,7 +189,9 @@ class ProactiveMessageWorker(
     override suspend fun doWork(): Result {
         Log.d(TAG, "ProactiveMessageWorker triggered")
 
-        val settingsStore = org.koin.core.context.GlobalContext.get().get<SettingsStore>()
+        val koin = org.koin.core.context.GlobalContext.get()
+        val settingsStore = koin.get<SettingsStore>()
+        val dispatcher = koin.get<ProactiveTurnDispatcher>()
         val settings = settingsStore.settingsFlow.first()
         val scheduledAssistantId = inputData
             .getString(ProactiveMessageService.EXTRA_ASSISTANT_ID)
@@ -203,38 +205,36 @@ class ProactiveMessageWorker(
             ?: if (isTargeted) return Result.failure() else null
         val proactiveSetting = settings.getProactiveMessageSetting(scheduledAssistantUuid)
 
-        if (!proactiveSetting.enabled && !isTargeted) {
-            Log.d(TAG, "Proactive message disabled, skipping")
-            return Result.success()
-        }
-
-        // Acquire a wake lock for the duration of the work
         val powerManager = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wakeLock = powerManager.newWakeLock(
             PowerManager.PARTIAL_WAKE_LOCK,
             "ProactiveMessage::WorkerWakeLock"
         )
-        wakeLock.acquire(5 * 60 * 1000L) // 5 minutes max
+        wakeLock.acquire(5 * 60 * 1000L)
 
         try {
-            // Delegate to the existing trigger service logic
-            // Start the foreground service which handles the actual AI generation
-            val serviceIntent = android.content.Intent(applicationContext, ProactiveMessageTriggerService::class.java).apply {
-                putExtra(ProactiveMessageService.EXTRA_ASSISTANT_ID, proactiveSetting.assistantId)
-                targetedCommitmentId?.let { putExtra(ProactiveMessageService.EXTRA_COMMITMENT_ID, it) }
+            return when (
+                val dispatch = dispatcher.dispatch(
+                    context = applicationContext,
+                    assistantId = scheduledAssistantId,
+                    commitmentId = targetedCommitmentId,
+                )
+            ) {
+                ProactiveTurnDispatchResult.Disabled -> {
+                    Log.d(TAG, "Proactive message disabled, skipping")
+                    Result.success()
+                }
+                is ProactiveTurnDispatchResult.InvalidTarget -> {
+                    Log.e(TAG, dispatch.reason)
+                    Result.failure()
+                }
+                is ProactiveTurnDispatchResult.Dispatched -> {
+                    if (!dispatch.targeted) {
+                        scheduleNext(applicationContext, proactiveSetting)
+                    }
+                    Result.success()
+                }
             }
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                applicationContext.startForegroundService(serviceIntent)
-            } else {
-                applicationContext.startService(serviceIntent)
-            }
-
-            if (!isTargeted) {
-                scheduleNext(applicationContext, proactiveSetting)
-            }
-
-            return Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "ProactiveMessageWorker failed", e)
             if (!isTargeted) {
