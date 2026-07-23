@@ -1,4 +1,4 @@
-name: Signed APK Build
+name: Lulu APK
 
 on:
   push:
@@ -7,13 +7,19 @@ on:
       - '**/*.md'
       - 'docs/**'
   workflow_dispatch:
+    inputs:
+      release_number:
+        description: '正式发布编号，例如 1、2、3'
+        required: true
+        default: '1'
+        type: string
 
 permissions:
   contents: write
   issues: write
 
 concurrency:
-  group: signed-apk-${{ github.ref }}
+  group: lulu-apk-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -67,52 +73,46 @@ jobs:
           mkdir -p apk-artifacts
           apk="$(find app/build/outputs/apk/release -name '*-release.apk' -print -quit)"
           test -n "$apk"
-          cp "$apk" apk-artifacts/lulu-signed.apk
+          cp "$apk" apk-artifacts/Lulu.apk
 
-      - name: Upload APK artifact
+      - name: Upload temporary APK
         uses: actions/upload-artifact@v4
         with:
-          name: signed-apk-${{ github.run_number }}
-          path: apk-artifacts/lulu-signed.apk
+          name: Lulu-APK-${{ github.sha }}
+          path: apk-artifacts/Lulu.apk
           if-no-files-found: error
+          retention-days: 7
 
-      - name: Publish release
+      - name: Validate release number
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          RELEASE_NUMBER: ${{ inputs.release_number }}
+        run: |
+          [[ "$RELEASE_NUMBER" =~ ^[1-9][0-9]*$ ]] || {
+            echo '发布编号必须是从 1 开始的正整数。'
+            exit 1
+          }
+
+      - name: Publish Lulu release
+        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_NUMBER: ${{ inputs.release_number }}
         run: |
           set -euo pipefail
-          tag="signed-build-${GITHUB_RUN_NUMBER}"
-          gh release create "$tag" apk-artifacts/lulu-signed.apk \
-            --title "Lulu ${tag}" \
-            --notes "Automated signed APK build from ${GITHUB_SHA}."
-
-      - name: Report successful build
-        if: success()
-        continue-on-error: true
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: 25,
-              body: [
-                '✅ Signed APK 编译成功。',
-                '',
-                `- 提交：\`${context.sha.slice(0, 7)}\``,
-                `- Release：\`signed-build-${context.runNumber}\``,
-                `- 运行：https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-              ].join('\n')
-            })
+          tag="lulu-v${RELEASE_NUMBER}"
+          gh release create "$tag" apk-artifacts/Lulu.apk \
+            --title "Lulu v${RELEASE_NUMBER}" \
+            --notes "Lulu v${RELEASE_NUMBER}，构建自 ${GITHUB_SHA}."
 
       - name: Upload failure logs
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-failure-logs-${{ github.run_number }}
+          name: APK-failure-${{ github.sha }}
           path: ci-logs/*.log
           if-no-files-found: ignore
-          retention-days: 14
+          retention-days: 7
 
       - name: Create failure issue
         if: failure()
@@ -131,10 +131,10 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `[CI] Build failed on ${shortSha}`,
+              title: `[CI] APK build failed on ${shortSha}`,
               body: [
                 `<!-- lulu-ci-failure:${context.sha} -->`,
-                '## Lulu 自动构建失败',
+                '## Lulu APK 自动构建失败',
                 '',
                 `- **运行：** https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
                 `- **提交：** ${shortSha}`,
