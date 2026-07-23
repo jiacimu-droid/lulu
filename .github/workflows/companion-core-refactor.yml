@@ -20,7 +20,7 @@ concurrency:
 jobs:
   refactor:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     steps:
       - name: Check out refactor source
         uses: actions/checkout@v4
@@ -76,6 +76,19 @@ jobs:
             exit "$status"
           fi
 
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+          cache-dependency-path: web-ui/pnpm-lock.yaml
+
+      - name: Install web UI dependencies
+        shell: bash
+        run: |
+          npm install --global pnpm@10
+          pnpm --dir web-ui install --frozen-lockfile
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
@@ -103,7 +116,7 @@ jobs:
               echo '❌ Companion refactor failed Kotlin/tests validation; no changes were pushed to master.'
               echo
               echo '```text'
-              tail -n 140 /tmp/gradle.log
+              tail -n 180 /tmp/gradle.log
               echo '```'
             } > /tmp/compile-comment.md
             gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/compile-comment.md
