@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:23:26.017338+00:00",
-  "commit": "47c2e419b4d60942a085c5e06d9b7c1175e9bcfd",
+  "generatedAt": "2026-07-23T17:27:39.762122+00:00",
+  "commit": "02796a610f6dc84a217a827f37f0cb128b9f627b",
   "branch": "master",
-  "sourceFingerprint": "8fad34a6ef618b3a86227bcd055fffb7348e98ab22fdeef2fa58205c60ec557d",
+  "sourceFingerprint": "1836c193b69e5695524ee498f66a1312b1bb586fe0e394eb2fcf49abf895576e",
   "summary": {
-    "files": 1113,
-    "lines": 263511,
-    "symbols": 5457,
-    "productionCodeFiles": 788,
+    "files": 1112,
+    "lines": 263205,
+    "symbols": 5446,
+    "productionCodeFiles": 787,
     "testFiles": 132,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 652,
+      "app": 651,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 720,
+      ".kt": 719,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 285,
+      "界面": 284,
       "记忆": 42
     },
-    "resolvedImportEdges": 1932
+    "resolvedImportEdges": 1928
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 124,
+        "importedByCount": 123,
         "todoMarkers": 0
       },
       {
@@ -1608,7 +1608,6 @@
       "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageReasoning.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTranslation.kt",
-      "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/HighlightCodeBlock.kt",
@@ -2085,16 +2084,6 @@
       "imports": 9
     },
     {
-      "from": "me.rerere.rikkahub.ui.components.message",
-      "to": "me.rerere.ai.ui.UIMessagePart",
-      "imports": 9
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.components.message",
-      "to": "me.rerere.hugeicons.HugeIcons",
-      "imports": 9
-    },
-    {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.data.model.Assistant",
       "imports": 9
@@ -2108,6 +2097,16 @@
       "from": "me.rerere.rikkahub.ui.pages.extensions",
       "to": "me.rerere.rikkahub.ui.components.ui",
       "imports": 9
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.components.message",
+      "to": "me.rerere.ai.ui.UIMessagePart",
+      "imports": 8
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.components.message",
+      "to": "me.rerere.hugeicons.HugeIcons",
+      "imports": 8
     },
     {
       "from": "me.rerere.rikkahub.ui.components.message",
@@ -2585,11 +2584,6 @@
       "imports": 4
     },
     {
-      "from": "me.rerere.rikkahub.ui.components.message",
-      "to": "me.rerere.rikkahub.utils.JsonInstant",
-      "imports": 4
-    },
-    {
       "from": "me.rerere.rikkahub.ui.components.richtext",
       "to": "me.rerere.hugeicons.HugeIcons",
       "imports": 4
@@ -2902,6 +2896,11 @@
     {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.service.CompanionIntent",
+      "imports": 3
+    },
+    {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.service.CompanionIntentDecision",
       "imports": 3
     }
   ],
@@ -5975,7 +5974,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageNerdLine.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageReasoning.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/ChatInputState.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantImporter.kt",
@@ -17053,7 +17051,6 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Emoji.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/UIAvatar.kt"
       ]
@@ -17088,7 +17085,6 @@
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
         "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Emoji.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/UIAvatar.kt"
       ]
@@ -29587,97 +29583,6 @@
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt"
-      ],
-      "importedBy": []
-    },
-    {
-      "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-      "module": "app",
-      "extension": ".kt",
-      "lines": 306,
-      "sha256": "aa132dd9c45804126aa450f9904eddfbad207a3c2342bea0d9961f317635dd23",
-      "package": "me.rerere.rikkahub.ui.components.message",
-      "categories": [
-        "界面"
-      ],
-      "symbols": [
-        {
-          "name": "InlineVoiceRequest",
-          "kind": "class",
-          "line": 61
-        },
-        {
-          "name": "hasVisibleChatContent",
-          "kind": "function",
-          "line": 68
-        },
-        {
-          "name": "withInlineTtsVoiceMessages",
-          "kind": "function",
-          "line": 80
-        },
-        {
-          "name": "isInlineTtsVoiceMessage",
-          "kind": "function",
-          "line": 139
-        },
-        {
-          "name": "toVoiceMessage",
-          "kind": "function",
-          "line": 142
-        },
-        {
-          "name": "inlineTtsRequestText",
-          "kind": "function",
-          "line": 151
-        },
-        {
-          "name": "toVoiceCandidateSegments",
-          "kind": "function",
-          "line": 163
-        },
-        {
-          "name": "toSingleVoiceBubbleText",
-          "kind": "function",
-          "line": 178
-        },
-        {
-          "name": "matchesVisibleSegment",
-          "kind": "function",
-          "line": 181
-        },
-        {
-          "name": "inlineVoiceMatchKey",
-          "kind": "function",
-          "line": 191
-        },
-        {
-          "name": "InlineTtsVoiceMessageBubble",
-          "kind": "composable",
-          "line": 195
-        }
-      ],
-      "localImportCount": 10,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": true,
-      "localImports": [
-        "me.rerere.ai.ui.UIMessagePart",
-        "me.rerere.ai.ui.isEmptyUIMessage",
-        "me.rerere.hugeicons.HugeIcons",
-        "me.rerere.hugeicons.stroke.PauseCircle",
-        "me.rerere.hugeicons.stroke.PlayCircle",
-        "me.rerere.rikkahub.data.event.AppEvent",
-        "me.rerere.rikkahub.data.event.AppEventBus",
-        "me.rerere.rikkahub.ui.context.LocalTTSState",
-        "me.rerere.rikkahub.utils.JsonInstant",
-        "me.rerere.tts.model.PlaybackStatus"
-      ],
-      "resolvedImports": [
-        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/event/AppEvent.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/event/AppEventBus.kt",
-        "speech/src/main/java/me/rerere/tts/model/PlaybackState.kt"
       ],
       "importedBy": []
     },
@@ -56157,7 +56062,6 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/TTSController.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/TTS.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
@@ -84282,20 +84186,6 @@
         "line": 718
       }
     ],
-    "me.rerere.rikkahub.ui.components.message.InlineTtsVoiceMessageBubble": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "composable",
-        "line": 195
-      }
-    ],
-    "me.rerere.rikkahub.ui.components.message.InlineVoiceRequest": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "class",
-        "line": 61
-      }
-    ],
     "me.rerere.rikkahub.ui.components.message.LanguageSelectionDialog": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTranslation.kt",
@@ -84541,32 +84431,11 @@
         "line": 31
       }
     ],
-    "me.rerere.rikkahub.ui.components.message.hasVisibleChatContent": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "function",
-        "line": 68
-      }
-    ],
     "me.rerere.rikkahub.ui.components.message.initialVisibleAssistantBubbleCount": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt",
         "kind": "function",
         "line": 814
-      }
-    ],
-    "me.rerere.rikkahub.ui.components.message.inlineTtsRequestText": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "function",
-        "line": 151
-      }
-    ],
-    "me.rerere.rikkahub.ui.components.message.inlineVoiceMatchKey": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "function",
-        "line": 191
       }
     ],
     "me.rerere.rikkahub.ui.components.message.isFreshMessage": [
@@ -84579,13 +84448,6 @@
     "me.rerere.rikkahub.ui.components.message.isGeneratedSpeakingLine": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
-        "kind": "function",
-        "line": 139
-      }
-    ],
-    "me.rerere.rikkahub.ui.components.message.isInlineTtsVoiceMessage": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
         "kind": "function",
         "line": 139
       }
@@ -84616,13 +84478,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt",
         "kind": "function",
         "line": 400
-      }
-    ],
-    "me.rerere.rikkahub.ui.components.message.matchesVisibleSegment": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "function",
-        "line": 181
       }
     ],
     "me.rerere.rikkahub.ui.components.message.onExpandedChange": [
@@ -84681,39 +84536,11 @@
         "line": 101
       }
     ],
-    "me.rerere.rikkahub.ui.components.message.toSingleVoiceBubbleText": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "function",
-        "line": 178
-      }
-    ],
-    "me.rerere.rikkahub.ui.components.message.toVoiceCandidateSegments": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "function",
-        "line": 163
-      }
-    ],
-    "me.rerere.rikkahub.ui.components.message.toVoiceMessage": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "function",
-        "line": 142
-      }
-    ],
     "me.rerere.rikkahub.ui.components.message.trimNonSpeechMarks": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
         "kind": "function",
         "line": 112
-      }
-    ],
-    "me.rerere.rikkahub.ui.components.message.withInlineTtsVoiceMessages": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/InlineVoiceMessage.kt",
-        "kind": "function",
-        "line": 80
       }
     ],
     "me.rerere.rikkahub.ui.components.nav.BackButton": [
