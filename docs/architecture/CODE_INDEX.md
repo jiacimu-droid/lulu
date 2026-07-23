@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`88236e68a822f820213e01d62e449583594d5b41`
+- 基准提交：`90ebb9d84a0dbf146dbb8779cfbca2a30efedcd5`
 - 分支：`master`
-- 源码指纹：`1fb3ff81a06c023e…`
-- 已索引文件：1106
-- 已索引代码/文本行：262770
-- 已发现类、接口、对象、函数及 Composable：5399
+- 源码指纹：`40696222629c5d05…`
+- 已索引文件：1107
+- 已索引代码/文本行：262831
+- 已发现类、接口、对象、函数及 Composable：5408
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 783 |
+| 生产代码文件 | 784 |
 | 测试文件 | 128 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 643 |
+| `app` | 644 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 711 |
+| `.kt` | 712 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 59 |
@@ -301,6 +301,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt`
+- `app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt`
@@ -532,7 +533,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：1875
-- 可检索完整符号：4820
+- 可检索完整符号：4826
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
