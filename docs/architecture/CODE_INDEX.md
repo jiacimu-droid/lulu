@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`d18cc9cc91839d4f2a7e87f5dbec3837bcd28d35`
+- 基准提交：`c7b6be3ab13a051257299c2c85b3e8229154cf4e`
 - 分支：`master`
-- 源码指纹：`1c22b38485fe094a…`
-- 已索引文件：1104
-- 已索引代码/文本行：262440
-- 已发现类、接口、对象、函数及 Composable：5333
+- 源码指纹：`9133d07df8a9a10e…`
+- 已索引文件：1105
+- 已索引代码/文本行：262574
+- 已发现类、接口、对象、函数及 Composable：5383
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 781 |
+| 生产代码文件 | 782 |
 | 测试文件 | 128 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 641 |
+| `app` | 642 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 709 |
+| `.kt` | 710 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 59 |
@@ -530,12 +530,12 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1867
-- 可检索完整符号：4804
+- 已解析本地导入边：1870
+- 可检索完整符号：4806
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 120 | 812 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 121 | 812 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 96 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 57 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 53 | 62 |
@@ -545,8 +545,8 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 35 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 35 | 50 |
+| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 32 | 148 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 31 | 1032 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 31 | 148 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 30 | 248 |
 | `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 28 | 141 |
 | `app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt` | 26 | 676 |
