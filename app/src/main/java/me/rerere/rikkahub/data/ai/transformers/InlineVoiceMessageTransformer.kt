@@ -1,5 +1,6 @@
 package me.rerere.rikkahub.data.ai.transformers
 
+import android.content.Context
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -8,8 +9,13 @@ import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.ai.tools.synthesizeInlineVoiceMessage
 import me.rerere.rikkahub.utils.JsonInstant
+import org.koin.core.context.GlobalContext
+import java.util.concurrent.ConcurrentHashMap
 
 private const val TTS_TOOL_NAME = "text_to_speech"
+private const val MAX_SYNTHESIZED_VOICE_CACHE = 64
+
+private val synthesizedVoiceCache = ConcurrentHashMap<String, UIMessagePart.VoiceMessage>()
 
 private val INLINE_VOICE_SENTENCE_BOUNDARY_REGEX =
     Regex("(?<=[.!?~～。！？])\\s*|(?<=…)(?=\\s|$)\\s*|\\n+")
@@ -25,20 +31,27 @@ private data class InlineVoiceRequest(
 )
 
 /**
- * Materialize completed text-to-speech tools and move them from the reasoning chain into正文.
- *
- * A requested spoken sentence replaces its matching text sentence at the same conversational
- * position. If the provider omits that sentence from final text, the voice message remains at the
- * original tool position instead of disappearing.
+ * Compatibility entry used by the output transformer during visual and final passes.
+ * A cache prevents the same completed tool call from requesting TTS more than once.
  */
+internal suspend fun promoteInlineVoiceMessages(messages: List<UIMessage>): List<UIMessage> {
+    val context = GlobalContext.get().get<Context>()
+    return materializeAndPromoteInlineVoiceMessages(context, messages)
+}
+
 internal suspend fun materializeAndPromoteInlineVoiceMessages(
     ctx: TransformerContext,
+    messages: List<UIMessage>,
+): List<UIMessage> = materializeAndPromoteInlineVoiceMessages(ctx.context, messages)
+
+private suspend fun materializeAndPromoteInlineVoiceMessages(
+    context: Context,
     messages: List<UIMessage>,
 ): List<UIMessage> {
     val result = ArrayList<UIMessage>(messages.size)
     for (message in messages) {
         result += if (message.role == MessageRole.ASSISTANT) {
-            message.copy(parts = message.parts.materializeAndPromoteInlineVoiceParts(ctx))
+            message.copy(parts = message.parts.materializeAndPromoteInlineVoiceParts(context))
         } else {
             message
         }
@@ -47,7 +60,7 @@ internal suspend fun materializeAndPromoteInlineVoiceMessages(
 }
 
 internal suspend fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
-    ctx: TransformerContext,
+    context: Context,
 ): List<UIMessagePart> {
     val requests = mutableListOf<InlineVoiceRequest>()
     forEachIndexed { index, part ->
@@ -55,10 +68,15 @@ internal suspend fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
         if (tool.toolName != TTS_TOOL_NAME || !tool.isExecuted) return@forEachIndexed
         val requestedText = tool.requestedInlineVoiceText()?.takeIf(String::isNotBlank)
             ?: return@forEachIndexed
+        val cacheKey = "${tool.toolCallId}|$requestedText"
         val voiceMessage = tool.output
             .filterIsInstance<UIMessagePart.VoiceMessage>()
             .firstOrNull { voice -> voice.url.isNotBlank() }
-            ?: synthesizeInlineVoiceMessage(ctx.context, requestedText).getOrNull()
+            ?: synthesizedVoiceCache[cacheKey]
+            ?: synthesizeInlineVoiceMessage(context, requestedText).getOrNull()?.also { synthesized ->
+                synthesizedVoiceCache[cacheKey] = synthesized
+                pruneSynthesizedVoiceCache()
+            }
             ?: return@forEachIndexed
         requests += InlineVoiceRequest(
             partIndex = index,
@@ -116,6 +134,13 @@ internal suspend fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
     }
 
     return result
+}
+
+private fun pruneSynthesizedVoiceCache() {
+    if (synthesizedVoiceCache.size <= MAX_SYNTHESIZED_VOICE_CACHE) return
+    synthesizedVoiceCache.keys
+        .take(synthesizedVoiceCache.size - MAX_SYNTHESIZED_VOICE_CACHE)
+        .forEach(synthesizedVoiceCache::remove)
 }
 
 private fun UIMessagePart.Tool.requestedInlineVoiceText(): String? = runCatching {
