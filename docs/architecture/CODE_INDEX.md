@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`56ad97d06e257cb9961e4dfbdea6b967c0c1b330`
+- 基准提交：`fb88e56b475d10ce6ec54d4843113048ff0e29e6`
 - 分支：`master`
-- 源码指纹：`c84443cc01f03841…`
-- 已索引文件：1118
-- 已索引代码/文本行：263926
+- 源码指纹：`06baf73b5d6b2a6c…`
+- 已索引文件：1117
+- 已索引代码/文本行：263793
 - 已发现类、接口、对象、函数及 Composable：5451
 
 ## 仓库健康信号
@@ -144,7 +144,7 @@
 | `plugins` | 25 |
 | `docs` | 24 |
 | `common` | 21 |
-| `.github` | 12 |
+| `.github` | 11 |
 | `.agents` | 10 |
 | `root` | 10 |
 | `website` | 10 |
@@ -168,8 +168,8 @@
 | `.ts` | 42 |
 | `.xml` | 37 |
 | `.pro` | 15 |
-| `.yml` | 11 |
 | `.kts` | 11 |
+| `.yml` | 10 |
 | `.js` | 9 |
 | `.html` | 7 |
 | `.css` | 4 |
@@ -216,7 +216,6 @@
 
 ### 主动代理
 
-- `.github/workflows/one-time-proactive-call-and-settings-cleanup.yml`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentReducer.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt`
@@ -402,7 +401,6 @@
 - `.github/workflows/one-time-bubble-split-v4.yml`
 - `.github/workflows/one-time-chat-call-tool.yml`
 - `.github/workflows/one-time-chat-cleanup-v2.yml`
-- `.github/workflows/one-time-proactive-call-and-settings-cleanup.yml`
 - `.github/workflows/release.yml`
 - `ai/build.gradle.kts`
 - `app/baselineprofile/build.gradle.kts`

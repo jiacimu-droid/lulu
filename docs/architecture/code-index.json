@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T15:12:15.149362+00:00",
-  "commit": "56ad97d06e257cb9961e4dfbdea6b967c0c1b330",
+  "generatedAt": "2026-07-23T15:17:22.918304+00:00",
+  "commit": "fb88e56b475d10ce6ec54d4843113048ff0e29e6",
   "branch": "master",
-  "sourceFingerprint": "c84443cc01f038417270e07998fa3989a49b7dfdaef210d6b849700614d84886",
+  "sourceFingerprint": "06baf73b5d6b2a6c58704109a9b91bb656cce9d02e4ee3ace3382617089bd9ad",
   "summary": {
-    "files": 1118,
-    "lines": 263926,
+    "files": 1117,
+    "lines": 263793,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -23,7 +23,7 @@
       "plugins": 25,
       "docs": 24,
       "common": 21,
-      ".github": 12,
+      ".github": 11,
       ".agents": 10,
       "root": 10,
       "website": 10,
@@ -44,8 +44,8 @@
       ".ts": 42,
       ".xml": 37,
       ".pro": 15,
-      ".yml": 11,
       ".kts": 11,
+      ".yml": 10,
       ".js": 9,
       ".html": 7,
       ".css": 4,
@@ -56,14 +56,14 @@
     },
     "byCategory": {
       "AI与上下文": 137,
-      "主动代理": 26,
+      "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
       "学习监督": 16,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
-      "构建与发布": 20,
+      "构建与发布": 19,
       "电话与语音": 48,
       "界面": 284,
       "记忆": 44
@@ -1272,7 +1272,6 @@
       "app/src/test/java/me/rerere/rikkahub/service/TitleGenerationTest.kt"
     ],
     "主动代理": [
-      ".github/workflows/one-time-proactive-call-and-settings-cleanup.yml",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentReducer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt",
@@ -1513,7 +1512,6 @@
       ".github/workflows/one-time-bubble-split-v4.yml",
       ".github/workflows/one-time-chat-call-tool.yml",
       ".github/workflows/one-time-chat-cleanup-v2.yml",
-      ".github/workflows/one-time-proactive-call-and-settings-cleanup.yml",
       ".github/workflows/release.yml",
       "ai/build.gradle.kts",
       "app/baselineprofile/build.gradle.kts",
@@ -3347,26 +3345,6 @@
       "sha256": "adb588a530c735e5d8680c57fb7f286f8c402ec979abc1694890e22038bd1e70",
       "package": null,
       "categories": [
-        "构建与发布"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
-      "path": ".github/workflows/one-time-proactive-call-and-settings-cleanup.yml",
-      "module": ".github",
-      "extension": ".yml",
-      "lines": 133,
-      "sha256": "d83ed1a67fd16d771e7eb6c4b017524f0ede157188dc06e60020b67b91794dda",
-      "package": null,
-      "categories": [
-        "主动代理",
         "构建与发布"
       ],
       "symbols": [],
