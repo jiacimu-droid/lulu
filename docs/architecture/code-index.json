@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:37:58.415533+00:00",
-  "commit": "90ebb9d84a0dbf146dbb8779cfbca2a30efedcd5",
+  "generatedAt": "2026-07-23T11:39:44.857801+00:00",
+  "commit": "6c4d022dfdb09ce93769fc2341434801b933134f",
   "branch": "master",
-  "sourceFingerprint": "40696222629c5d054f85f431d4f83b7994f3546a7aaeccf092c03afb3f516458",
+  "sourceFingerprint": "da447afaef892ef89f3d79d64e50c0332c7c8d7582b43cf4890cecdb86c366ed",
   "summary": {
     "files": 1107,
     "lines": 262831,
@@ -22349,7 +22349,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 61,
-      "sha256": "4bb9687265354373ee7fa66ee0bc57201c1ed0332e99a22d9c1fc41daa3c1032",
+      "sha256": "9b59933d3de9e2a25401608f61d7d3e84312bcf041023edc88866f0aae2c1913",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -22396,7 +22396,7 @@
           "line": 59
         },
         {
-          "name": "plannedMinutes",
+          "name": "plannedMinutesOverride",
           "kind": "function",
           "line": 60
         }
@@ -78179,7 +78179,9 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
         "line": 291
-      },
+      }
+    ],
+    "me.rerere.rikkahub.data.study.plannedMinutesOverride": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
