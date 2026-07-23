@@ -1,0 +1,178 @@
+name: One-time chat cleanup v2
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/one-time-chat-cleanup-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Remove suggestions and tighten chat layout
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+
+          def edit(path, fn):
+              p = root / path
+              if not p.exists():
+                  print(f'skip missing: {path}')
+                  return
+              old = p.read_text(encoding='utf-8')
+              new = fn(old)
+              if new != old:
+                  p.write_text(new, encoding='utf-8')
+                  print(f'updated: {path}')
+
+          # Remove the stored suggestion data field.
+          edit('app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt',
+               lambda s: re.sub(r'^\s*val chatSuggestions: List<String> = emptyList\(\),\s*\n', '', s, flags=re.M))
+
+          # Remove suggestion service API and forwarding implementation.
+          edit('app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt',
+               lambda s: re.sub(r'\n\s*(?:override\s+)?suspend fun generateSuggestion\([^\n]*\)(?:\s*=\s*\n?\s*chatService\.generateSuggestion\([^\n]*\))?\s*', '\n', s))
+
+          # Remove VM entry point.
+          edit('app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt',
+               lambda s: re.sub(r'\n\s*fun generateSuggestion\(conversation: Conversation\)\s*\{.*?\n\s*\}\n(?=\s*(?:fun|private|companion|$))', '\n', s, count=1, flags=re.S))
+
+          # Remove generator implementation and resets.
+          def clean_service(s):
+              s = re.sub(r'\n\s*//\s*-+\s*生成建议\s*-+.*?(?=\n\s*//\s*-+)', '\n', s, count=1, flags=re.S)
+              s = re.sub(r'\n\s*(?:private\s+)?suspend fun generateSuggestion\(.*?\n\s*\}', '\n', s, flags=re.S)
+              s = re.sub(r'\n\s*chatSuggestions\s*=\s*emptyList\(\),?', '', s)
+              return s
+          edit('app/src/main/java/me/rerere/rikkahub/service/ChatService.kt', clean_service)
+
+          # Remove click route from ChatPage.
+          edit('app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt',
+               lambda s: re.sub(r'\n\s*onClickSuggestion\s*=\s*\{\s*suggestion\s*->.*?\n\s*\},?', '', s, count=1, flags=re.S))
+
+          # Remove suggestion row, callback plumbing, and composable.
+          def clean_chat_list(s):
+              s = re.sub(r'^\s*onClickSuggestion:\s*\(String\)\s*->\s*Unit(?:\s*=\s*\{\})?,\s*\n', '', s, flags=re.M)
+              s = re.sub(r'^\s*onClickSuggestion\s*=\s*onClickSuggestion,\s*\n', '', s, flags=re.M)
+              s = re.sub(r'\n\s*//\s*Suggestion\s*\n\s*if\s*\(conversation\.chatSuggestions\.isNotEmpty\(\).*?\n\s*\}', '', s, count=1, flags=re.S)
+              s = re.sub(r'\n@Composable\nprivate fun ChatSuggestionsRow\(.*?(?=\n@Composable\n|\Z)', '\n', s, flags=re.S)
+              return s
+          edit('app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt', clean_chat_list)
+
+          # Remove settings and prompt wiring.
+          def clean_prefs(s):
+              s = re.sub(r'^import .*DEFAULT_SUGGESTION_PROMPT.*\n', '', s, flags=re.M)
+              s = re.sub(r'^\s*val SUGGESTION_(?:MODEL|PROMPT)\s*=.*\n', '', s, flags=re.M)
+              s = re.sub(r'^\s*suggestionModelId\s*=.*?(?:,\s*)?\n', '', s, flags=re.M)
+              s = re.sub(r'^\s*suggestionPrompt\s*=.*?(?:,\s*)?\n', '', s, flags=re.M)
+              s = re.sub(r'^\s*preferences\[SUGGESTION_(?:MODEL|PROMPT)\].*\n', '', s, flags=re.M)
+              s = re.sub(r'^\s*val suggestionModelId: Uuid = Uuid\.random\(\),\s*\n', '', s, flags=re.M)
+              s = re.sub(r'^\s*val suggestionPrompt: String = DEFAULT_SUGGESTION_PROMPT,\s*\n', '', s, flags=re.M)
+              return s
+          edit('app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt', clean_prefs)
+
+          def clean_model_page(s):
+              s = re.sub(r'^import .*MessageMultiple01.*\n', '', s, flags=re.M)
+              s = re.sub(r'^import .*DEFAULT_SUGGESTION_PROMPT.*\n', '', s, flags=re.M)
+              s = re.sub(r'^.*ModelSettingSection\.SUGGESTION.*\n', '', s, flags=re.M)
+              s = re.sub(r'^\s*SUGGESTION,\s*\n', '', s, flags=re.M)
+              s = re.sub(r'\n@Composable\nprivate fun DefaultSuggestionModelSetting\(.*?(?=\n@Composable\n|\Z)', '\n', s, flags=re.S)
+              return s
+          edit('app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt', clean_model_page)
+
+          prompt = root / 'app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Suggestion.kt'
+          if prompt.exists():
+              prompt.unlink()
+              print('deleted suggestion prompt')
+
+          # Remove suggestion-only resource strings.
+          for p in (root / 'app/src/main/res').glob('values*/strings.xml'):
+              s = p.read_text(encoding='utf-8')
+              n = re.sub(r'^\s*<string name="[^"]*suggestion[^"]*">.*?</string>\s*\n?', '', s, flags=re.M)
+              if n != s:
+                  p.write_text(n, encoding='utf-8')
+
+          # Remove the extra navigation-bar inset while IME is open.
+          def clean_input(s):
+              s = s.replace('imeVisile', 'imeVisible')
+              s = re.sub(
+                  r'\.imePadding\(\)\s*\n\s*\.navigationBarsPadding\(\)',
+                  '.imePadding()\n                .then(if (imeVisible) Modifier else Modifier.navigationBarsPadding())',
+                  s,
+                  count=1,
+              )
+              return s
+          edit('app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt', clean_input)
+
+          # Make bubbles less fragmented: maximum three, and merge short lead-ins.
+          def clean_splitter(s):
+              s = re.sub(r'val maxBubbles = if \(usesParagraphRhythm\) 4 else 3', 'val maxBubbles = 3', s, count=1)
+              s = s.replace(
+                  '                last == null -> acc += segment\n                segment.length < 5 && last.length + segment.length <= 22 -> acc[acc.lastIndex] = "$last$segment"',
+                  '                last == null -> acc += segment\n                last.visualBubbleLength() <= 8 &&\n                    last.visualBubbleLength() + segment.visualBubbleLength() <= 48 -> {\n                    acc[acc.lastIndex] = "$last\\n$segment"\n                }\n                segment.length < 5 && last.length + segment.length <= 22 -> acc[acc.lastIndex] = "$last$segment"',
+                  1,
+              )
+              s = s.replace(
+                  '    "但", "不过", "可是", "只是", "而且", "所以", "因为",\n',
+                  '    "但", "不过", "可是", "只是", "而且", "所以", "因为",\n    "等等", "等一下", "先等等", "话说回来",\n',
+                  1,
+              )
+              return s
+          edit('app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt', clean_splitter)
+
+          # Remove obsolete suggestion tests.
+          for p in root.rglob('*Suggestion*Test.kt'):
+              p.unlink()
+
+          # Fail clearly if the production route still exists.
+          remaining = []
+          needles = ['generateSuggestion', 'chatSuggestions', 'suggestionModelId', 'suggestionPrompt',
+                     'DEFAULT_SUGGESTION_PROMPT', 'SUGGESTION_MODEL', 'SUGGESTION_PROMPT',
+                     'ModelSettingSection.SUGGESTION', 'ChatSuggestionsRow']
+          for p in root.rglob('*'):
+              if not p.is_file() or '.git' in p.parts or p == Path('.github/workflows/one-time-chat-cleanup-v2.yml'):
+                  continue
+              if p.suffix not in {'.kt', '.kts', '.xml', '.json'}:
+                  continue
+              try:
+                  body = p.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              for needle in needles:
+                  if needle in body:
+                      remaining.append(f'{p}: {needle}')
+          if remaining:
+              raise SystemExit('Suggestion route still remains:\n' + '\n'.join(remaining[:100]))
+
+          Path('.github/workflows/one-time-chat-cleanup-v2.yml').unlink()
+          PY
+
+      - name: Compile Android production sources
+        run: ./gradlew :app:compileReleaseKotlin --no-daemon
+
+      - name: Commit cleanup
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: remove chat suggestions and tighten message layout"
+          git pull --rebase origin master
+          git push origin HEAD:master
