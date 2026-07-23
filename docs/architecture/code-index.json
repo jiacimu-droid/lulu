@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T15:18:01.536935+00:00",
-  "commit": "0118c66df255de1b247115e182e81d96f7df17c7",
+  "generatedAt": "2026-07-23T15:28:58.085139+00:00",
+  "commit": "6f7eeb715d1ede195932de7611b71a9be3de0225",
   "branch": "master",
-  "sourceFingerprint": "a1d8b6df5e6ee7a7536ec68b4eb4c1c5356b234ca6104f460fb79585396405bc",
+  "sourceFingerprint": "b29a5e681f06891379259d3dac21db88d84139e41d82c902af32a106b65c867d",
   "summary": {
     "files": 1113,
-    "lines": 263321,
+    "lines": 263323,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -14586,8 +14586,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 61,
-      "sha256": "4fa74c824f79932722b4d9341af0d1882b45dd566d4108cf9b60a0daa64ec8e6",
+      "lines": 63,
+      "sha256": "a8ee6baca042ecea96f219978921cd32346e5552a68bd73a76b8afbdee712514",
       "package": "me.rerere.rikkahub.data.datastore",
       "categories": [
         "主动代理"
