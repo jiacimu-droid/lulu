@@ -6,6 +6,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
+import me.rerere.rikkahub.data.ai.tools.synthesizeInlineVoiceMessage
 import me.rerere.rikkahub.utils.JsonInstant
 
 private const val TTS_TOOL_NAME = "text_to_speech"
@@ -24,30 +25,42 @@ private data class InlineVoiceRequest(
 )
 
 /**
- * Move completed text-to-speech results out of the tool/reasoning chain and into the visible reply.
+ * Materialize completed text-to-speech tools and move them from the reasoning chain into正文.
  *
  * A requested spoken sentence replaces its matching text sentence at the same conversational
- * position. If a provider does not repeat the requested sentence in the final text, the voice
- * message remains at the original tool position instead of disappearing.
+ * position. If the provider omits that sentence from final text, the voice message remains at the
+ * original tool position instead of disappearing.
  */
-internal fun promoteInlineVoiceMessages(messages: List<UIMessage>): List<UIMessage> =
-    messages.map { message ->
-        if (message.role != MessageRole.ASSISTANT) {
-            message
+internal suspend fun materializeAndPromoteInlineVoiceMessages(
+    ctx: TransformerContext,
+    messages: List<UIMessage>,
+): List<UIMessage> {
+    val result = ArrayList<UIMessage>(messages.size)
+    for (message in messages) {
+        result += if (message.role == MessageRole.ASSISTANT) {
+            message.copy(parts = message.parts.materializeAndPromoteInlineVoiceParts(ctx))
         } else {
-            message.copy(parts = message.parts.promoteInlineVoiceParts())
+            message
         }
     }
+    return result
+}
 
-internal fun List<UIMessagePart>.promoteInlineVoiceParts(): List<UIMessagePart> {
-    val requests = mapIndexedNotNull { index, part ->
-        val tool = part as? UIMessagePart.Tool ?: return@mapIndexedNotNull null
-        val voiceMessage = tool.completedInlineVoiceMessage() ?: return@mapIndexedNotNull null
-        val requestedText = tool.requestedInlineVoiceText()
-            ?.takeIf(String::isNotBlank)
-            ?: voiceMessage.transcript.trim()
-        if (requestedText.isBlank()) return@mapIndexedNotNull null
-        InlineVoiceRequest(
+internal suspend fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
+    ctx: TransformerContext,
+): List<UIMessagePart> {
+    val requests = mutableListOf<InlineVoiceRequest>()
+    forEachIndexed { index, part ->
+        val tool = part as? UIMessagePart.Tool ?: return@forEachIndexed
+        if (tool.toolName != TTS_TOOL_NAME || !tool.isExecuted) return@forEachIndexed
+        val requestedText = tool.requestedInlineVoiceText()?.takeIf(String::isNotBlank)
+            ?: return@forEachIndexed
+        val voiceMessage = tool.output
+            .filterIsInstance<UIMessagePart.VoiceMessage>()
+            .firstOrNull { voice -> voice.url.isNotBlank() }
+            ?: synthesizeInlineVoiceMessage(ctx.context, requestedText).getOrNull()
+            ?: return@forEachIndexed
+        requests += InlineVoiceRequest(
             partIndex = index,
             id = tool.toolCallId.ifBlank { "tts-$index" },
             requestedText = requestedText,
@@ -73,17 +86,18 @@ internal fun List<UIMessagePart>.promoteInlineVoiceParts(): List<UIMessagePart> 
         }
     }
 
+    val requestPartIndexes = requests.mapTo(mutableSetOf()) { it.partIndex }
     val unmatchedByPart = remaining.associateBy(InlineVoiceRequest::partIndex)
     val result = mutableListOf<UIMessagePart>()
 
     forEachIndexed { partIndex, part ->
         when {
-            part is UIMessagePart.Tool && part.toolName == TTS_TOOL_NAME -> {
+            part is UIMessagePart.Tool && partIndex in requestPartIndexes -> {
                 val unmatched = unmatchedByPart[partIndex]
                 if (unmatched != null) {
                     result += unmatched.voiceMessage
                 }
-                // A completed TTS tool is visible as正文, never as a reasoning/tool step.
+                // Completed voice tools are正文 content and must not remain in the reasoning card.
             }
 
             part is UIMessagePart.Text -> {
@@ -102,13 +116,6 @@ internal fun List<UIMessagePart>.promoteInlineVoiceParts(): List<UIMessagePart> 
     }
 
     return result
-}
-
-private fun UIMessagePart.Tool.completedInlineVoiceMessage(): UIMessagePart.VoiceMessage? {
-    if (toolName != TTS_TOOL_NAME || !isExecuted) return null
-    return output.filterIsInstance<UIMessagePart.VoiceMessage>().firstOrNull { voice ->
-        voice.url.isNotBlank()
-    }
 }
 
 private fun UIMessagePart.Tool.requestedInlineVoiceText(): String? = runCatching {
