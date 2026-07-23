@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`6f7eeb715d1ede195932de7611b71a9be3de0225`
+- 基准提交：`2076d393c119c6d37668d9824fb1693c8409db6a`
 - 分支：`master`
-- 源码指纹：`b29a5e681f068913…`
-- 已索引文件：1113
-- 已索引代码/文本行：263323
+- 源码指纹：`aa96cd84d68be2b0…`
+- 已索引文件：1111
+- 已索引代码/文本行：263191
 - 已发现类、接口、对象、函数及 Composable：5451
 
 ## 仓库健康信号
@@ -148,9 +148,9 @@
 | `root` | 10 |
 | `website` | 10 |
 | `highlight` | 9 |
-| `.github` | 7 |
 | `web` | 7 |
 | `.claude` | 5 |
+| `.github` | 5 |
 | `locale-tui` | 4 |
 | `study-plans` | 4 |
 | `money-lab` | 3 |
@@ -171,7 +171,7 @@
 | `.kts` | 11 |
 | `.js` | 9 |
 | `.html` | 7 |
-| `.yml` | 6 |
+| `.yml` | 4 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -395,8 +395,6 @@
 ### 构建与发布
 
 - `.github/workflows/code-index.yml`
-- `.github/workflows/inspect-memory-pipeline.yml`
-- `.github/workflows/one-time-bubble-split-v4.yml`
 - `.github/workflows/release.yml`
 - `ai/build.gradle.kts`
 - `app/baselineprofile/build.gradle.kts`
@@ -480,7 +478,6 @@
 
 ### 记忆
 
-- `.github/workflows/inspect-memory-pipeline.yml`
 - `app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt`
@@ -510,7 +507,8 @@
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt`
-- ……另有 13 个文件，见 `code-index.json`
+- `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnosticsTest.kt`
+- ……另有 12 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 
