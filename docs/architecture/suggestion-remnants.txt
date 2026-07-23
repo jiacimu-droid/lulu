@@ -1,4 +1,58 @@
 # Suggestion chain remnants
 
-Generated from commit: 78f6ecdd450f394e2e3d5e88ed469cbe7b2bc99c
+Generated from commit: 8430e50c66c804d49a12442b2a561ee1def4fa86
 
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/22.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/9.json:56:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/15.json:56:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/19.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/24.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/13.json:56:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/18.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/21.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/10.json:56:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/8.json:61:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/27.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/11.json:56:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/17.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/14.json:56:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/20.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/12.json:56:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/25.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/26.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/23.json:49:"fieldPath": "chatSuggestions",
+app/schemas/me.rerere.rikkahub.data.db.AppDatabase/16.json:56:"fieldPath": "chatSuggestions",
+app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt:68:suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation)
+app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt:128:override suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation) =
+app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt:129:chatService.generateSuggestion(conversationId, conversation)
+app/src/main/java/me/rerere/rikkahub/web/routes/ConversationDiff.kt:18:chatSuggestions != current.chatSuggestions ||
+app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt:155:val chatSuggestions: List<String>,
+app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt:276:chatSuggestions = chatSuggestions,
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt:300:fun generateSuggestion(conversation: Conversation) {
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt:302:chatService.generateSuggestion(_conversationId, conversation)
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:30:import me.rerere.rikkahub.data.ai.prompts.DEFAULT_SUGGESTION_PROMPT
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:92:val SUGGESTION_MODEL = stringPreferencesKey("suggestion_model")
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:100:val SUGGESTION_PROMPT = stringPreferencesKey("suggestion_prompt")
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:225:suggestionModelId = preferences[SUGGESTION_MODEL]?.let { Uuid.parse(it) }
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:234:suggestionPrompt = preferences[SUGGESTION_PROMPT] ?: DEFAULT_SUGGESTION_PROMPT,
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:425:preferences[SUGGESTION_MODEL] = settings.suggestionModelId.toString()
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:437:preferences[SUGGESTION_PROMPT] = settings.suggestionPrompt
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:577:val suggestionModelId: Uuid = Uuid.random(),
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:578:val suggestionPrompt: String = DEFAULT_SUGGESTION_PROMPT,
+app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt:397:chatSuggestions = JsonInstant.encodeToString(conversation.chatSuggestions),
+app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt:414:chatSuggestions = JsonInstant.decodeFromString(conversationEntity.chatSuggestions),
+app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt:21:val chatSuggestions: List<String> = emptyList(),
+app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Suggestion.kt:3:internal val DEFAULT_SUGGESTION_PROMPT = """
+app/src/main/java/me/rerere/rikkahub/data/db/entity/ConversationEntity.kt:22:val chatSuggestions: String,
+app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt:14:content = "我记得她不喜欢自动生成建议回复。",
+app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt:21:content = "我知道她不需要系统自动生成对话建议。",
+app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt:32:assertTrue(result.single().content.contains("自动生成对话建议"))
+web-ui/app/routes/conversations.tsx:733:const chatSuggestions = detail?.chatSuggestions ?? EMPTY_SUGGESTIONS;
+web-ui/app/routes/conversations.tsx:744:Boolean(activeId) && !detailLoading && !detailError && chatSuggestions.length > 0;
+web-ui/app/routes/conversations.tsx:745:const displaySuggestions = showSuggestions ? chatSuggestions : EMPTY_SUGGESTIONS;
+web-ui/app/types/dto.ts:67:chatSuggestions: string[];
+web-ui/app/types/conversation.ts:23:chatSuggestions: string[];
+.github/workflows/code-index.yml:44:r"generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|"
+.github/workflows/code-index.yml:45:r"suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|"
+.github/workflows/code-index.yml:46:r"SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议"
+.github/workflows/scan-suggestion-remnants.yml:34:'generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议' \
