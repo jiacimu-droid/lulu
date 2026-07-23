@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T10:06:10.599044+00:00",
-  "commit": "64139ee3328f0fed1eca6967b450fecfac02dbae",
+  "generatedAt": "2026-07-23T10:13:46.429730+00:00",
+  "commit": "8c205ba7e7ec2bb1e3c3d4c8bee63bf83d0c006a",
   "branch": "master",
-  "sourceFingerprint": "bec67a7d363a5fc9ab8a2166099cbfe5c0e15b308a5f98929e558ffa88a39cf5",
+  "sourceFingerprint": "6e06dbffe8b0b9afd450c71e18b53a6c987ee7491763561993e8fa68f4090a4c",
   "summary": {
     "files": 1103,
-    "lines": 262583,
-    "symbols": 5329,
+    "lines": 262232,
+    "symbols": 5317,
     "productionCodeFiles": 780,
     "testFiles": 128,
     "largeProductionFiles": 42,
@@ -68,7 +68,7 @@
       "界面": 284,
       "记忆": 42
     },
-    "resolvedImportEdges": 1867
+    "resolvedImportEdges": 1866
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -954,17 +954,17 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt",
-        "lines": 50,
-        "symbols": 5,
-        "localImportCount": 0,
-        "importedByCount": 36,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
         "lines": 529,
         "symbols": 39,
+        "localImportCount": 0,
+        "importedByCount": 35,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt",
+        "lines": 50,
+        "symbols": 5,
         "localImportCount": 0,
         "importedByCount": 35,
         "todoMarkers": 0
@@ -39983,8 +39983,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 781,
-      "sha256": "993b55c52d6f386a4a9591149996c325ead81846dc76f715dcfe579a9744141e",
+      "lines": 430,
+      "sha256": "bfb18b21eafba8620b554bffc4d346be4e870c5b80b38af6156a032b225dacdd",
       "package": "me.rerere.rikkahub.ui.pages.stats",
       "categories": [
         "界面"
@@ -39993,147 +39993,78 @@
         {
           "name": "StatsPage",
           "kind": "composable",
-          "line": 75
+          "line": 50
         },
         {
           "name": "CacheMonitorContent",
           "kind": "composable",
-          "line": 115
+          "line": 103
+        },
+        {
+          "name": "CacheSourceSummaryCard",
+          "kind": "composable",
+          "line": 216
+        },
+        {
+          "name": "CacheRecordCard",
+          "kind": "composable",
+          "line": 241
         },
         {
           "name": "DurationMonitorContent",
           "kind": "composable",
-          "line": 133
+          "line": 293
+        },
+        {
+          "name": "MetricLine",
+          "kind": "composable",
+          "line": 369
         },
         {
           "name": "TimingSummary",
           "kind": "class",
-          "line": 206
+          "line": 384
         },
         {
           "name": "buildTimingSummaries",
           "kind": "function",
-          "line": 215
-        },
-        {
-          "name": "CacheStatsCard",
-          "kind": "composable",
-          "line": 235
-        },
-        {
-          "name": "CacheSourceSummaryRow",
-          "kind": "composable",
-          "line": 335
-        },
-        {
-          "name": "CacheRecordsCard",
-          "kind": "composable",
-          "line": 365
-        },
-        {
-          "name": "visibleCacheRecords",
-          "kind": "function",
-          "line": 413
-        },
-        {
-          "name": "stableCacheRecordKey",
-          "kind": "function",
-          "line": 416
-        },
-        {
-          "name": "CacheRecordRow",
-          "kind": "composable",
-          "line": 419
-        },
-        {
-          "name": "CachePill",
-          "kind": "composable",
-          "line": 463
-        },
-        {
-          "name": "CacheMetric",
-          "kind": "composable",
-          "line": 481
-        },
-        {
-          "name": "HeatmapCard",
-          "kind": "composable",
-          "line": 500
-        },
-        {
-          "name": "ChatHeatmap",
-          "kind": "composable",
-          "line": 539
-        },
-        {
-          "name": "HeatmapCell",
-          "kind": "composable",
-          "line": 656
-        },
-        {
-          "name": "StatsGrid",
-          "kind": "composable",
-          "line": 671
-        },
-        {
-          "name": "StatCard",
-          "kind": "composable",
-          "line": 728
-        },
-        {
-          "name": "formatCount",
-          "kind": "function",
-          "line": 758
+          "line": 393
         },
         {
           "name": "formatTokens",
           "kind": "function",
-          "line": 764
+          "line": 418
         },
         {
           "name": "formatPercent",
           "kind": "function",
-          "line": 771
+          "line": 425
         },
         {
           "name": "asShortTime",
           "kind": "function",
-          "line": 773
-        },
-        {
-          "name": "asShortTime",
-          "kind": "function",
-          "line": 776
+          "line": 427
         }
       ],
-      "localImportCount": 15,
+      "localImportCount": 7,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
-        "me.rerere.hugeicons.HugeIcons",
-        "me.rerere.hugeicons.stroke.ChartColumn",
-        "me.rerere.hugeicons.stroke.Cpu",
-        "me.rerere.hugeicons.stroke.Message01",
-        "me.rerere.hugeicons.stroke.Rocket01",
-        "me.rerere.hugeicons.stroke.Zap",
-        "me.rerere.rikkahub.R",
         "me.rerere.rikkahub.data.ai.ApiUsageRecord",
         "me.rerere.rikkahub.data.ai.ApiUsageSummary",
         "me.rerere.rikkahub.data.ai.PerformanceMonitor",
         "me.rerere.rikkahub.data.ai.PerformanceTiming",
         "me.rerere.rikkahub.ui.components.nav.BackButton",
         "me.rerere.rikkahub.ui.pages.debug.TokenLoggingPage",
-        "me.rerere.rikkahub.ui.theme.CustomColors",
-        "me.rerere.rikkahub.utils.plus"
+        "me.rerere.rikkahub.ui.theme.CustomColors"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/PerformanceMonitor.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugPage.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt",
-        "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
@@ -42140,7 +42071,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingWebPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/share/handler/ShareHandlerPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt"
       ]
     },
@@ -90020,102 +89950,46 @@
         "line": 26
       }
     ],
-    "me.rerere.rikkahub.ui.pages.stats.CacheMetric": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "composable",
-        "line": 481
-      }
-    ],
     "me.rerere.rikkahub.ui.pages.stats.CacheMonitorContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "composable",
-        "line": 115
+        "line": 103
       }
     ],
-    "me.rerere.rikkahub.ui.pages.stats.CachePill": [
+    "me.rerere.rikkahub.ui.pages.stats.CacheRecordCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "composable",
-        "line": 463
+        "line": 241
       }
     ],
-    "me.rerere.rikkahub.ui.pages.stats.CacheRecordRow": [
+    "me.rerere.rikkahub.ui.pages.stats.CacheSourceSummaryCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "composable",
-        "line": 419
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.CacheRecordsCard": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "composable",
-        "line": 365
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.CacheSourceSummaryRow": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "composable",
-        "line": 335
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.CacheStatsCard": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "composable",
-        "line": 235
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.ChatHeatmap": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "composable",
-        "line": 539
+        "line": 216
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.DurationMonitorContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "composable",
-        "line": 133
+        "line": 293
       }
     ],
-    "me.rerere.rikkahub.ui.pages.stats.HeatmapCard": [
+    "me.rerere.rikkahub.ui.pages.stats.MetricLine": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "composable",
-        "line": 500
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.HeatmapCell": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "composable",
-        "line": 656
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.StatCard": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "composable",
-        "line": 728
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.StatsGrid": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "composable",
-        "line": 671
+        "line": 369
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.StatsPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "composable",
-        "line": 75
+        "line": 50
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.StatsPageTest": [
@@ -90136,47 +90010,35 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "class",
-        "line": 206
+        "line": 384
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.asShortTime": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "function",
-        "line": 773
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "function",
-        "line": 776
+        "line": 427
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.buildTimingSummaries": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "function",
-        "line": 215
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.formatCount": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "function",
-        "line": 758
+        "line": 393
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.formatPercent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "function",
-        "line": 771
+        "line": 425
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.formatTokens": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "kind": "function",
-        "line": 764
+        "line": 418
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.loadStats": [
@@ -90184,20 +90046,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt",
         "kind": "function",
         "line": 55
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.stableCacheRecordKey": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "function",
-        "line": 416
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.stats.visibleCacheRecords": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
-        "kind": "function",
-        "line": 413
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.AchievementCard": [
