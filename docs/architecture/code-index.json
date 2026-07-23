@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T15:33:10.995451+00:00",
-  "commit": "2076d393c119c6d37668d9824fb1693c8409db6a",
+  "generatedAt": "2026-07-23T15:33:44.864194+00:00",
+  "commit": "91f8373baa762dc725ecf3e052b1ff9edb91bd5e",
   "branch": "master",
-  "sourceFingerprint": "aa96cd84d68be2b0c7ca356561ed4d13d9b78400cfa2dd97f73f87808dfedd10",
+  "sourceFingerprint": "c49dd6504107e4beac9bf4778d6b1559bb34ae103e803c2ce979602b9ae3d69d",
   "summary": {
-    "files": 1111,
-    "lines": 263191,
-    "symbols": 5451,
-    "productionCodeFiles": 786,
+    "files": 1112,
+    "lines": 263286,
+    "symbols": 5452,
+    "productionCodeFiles": 787,
     "testFiles": 132,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 650,
+      "app": 651,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 718,
+      ".kt": 719,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -55,7 +55,7 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 137,
+      "AI与上下文": 138,
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
@@ -64,11 +64,11 @@
       "插件": 44,
       "数据库": 75,
       "构建与发布": 13,
-      "电话与语音": 48,
+      "电话与语音": 49,
       "界面": 284,
       "记忆": 42
     },
-    "resolvedImportEdges": 1923
+    "resolvedImportEdges": 1928
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 122,
+        "importedByCount": 123,
         "todoMarkers": 0
       },
       {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 99,
+        "importedByCount": 100,
         "todoMarkers": 0
       },
       {
@@ -926,7 +926,7 @@
         "lines": 29,
         "symbols": 3,
         "localImportCount": 3,
-        "importedByCount": 50,
+        "importedByCount": 51,
         "todoMarkers": 0
       },
       {
@@ -1014,7 +1014,7 @@
         "lines": 519,
         "symbols": 33,
         "localImportCount": 14,
-        "importedByCount": 19,
+        "importedByCount": 20,
         "todoMarkers": 0
       },
       {
@@ -1209,6 +1209,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/MusicTool.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SearchTools.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SkillsTools.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SmsTool.kt",
@@ -1520,6 +1521,7 @@
       "web/build.gradle.kts"
     ],
     "电话与语音": [
+      "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt",
       "app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallModels.kt",
       "app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepository.kt",
@@ -1924,12 +1926,17 @@
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.core.Tool",
-      "imports": 20
+      "imports": 21
     },
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.ui.UIMessagePart",
-      "imports": 19
+      "imports": 20
+    },
+    {
+      "from": "me.rerere.rikkahub.data.ai.tools",
+      "to": "me.rerere.ai.core.InputSchema",
+      "imports": 18
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
@@ -1940,11 +1947,6 @@
       "from": "me.rerere.search",
       "to": "me.rerere.ai.core.InputSchema",
       "imports": 18
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.tools",
-      "to": "me.rerere.ai.core.InputSchema",
-      "imports": 17
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
@@ -3633,6 +3635,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/MusicTool.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SearchTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SkillsTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SmsTool.kt",
@@ -5916,6 +5919,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/MusicTool.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SearchTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SkillsTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SmsTool.kt",
@@ -10230,6 +10234,47 @@
       "importedBy": []
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 95,
+      "sha256": "80402c2e35e1d09100467dc277ab46bccc5474dea66053ae95394ca6021c926b",
+      "package": "me.rerere.rikkahub.data.ai.tools",
+      "categories": [
+        "AI与上下文",
+        "电话与语音"
+      ],
+      "symbols": [
+        {
+          "name": "createRequestedVoiceCallTool",
+          "kind": "function",
+          "line": 28
+        }
+      ],
+      "localImportCount": 8,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.core.InputSchema",
+        "me.rerere.ai.core.Tool",
+        "me.rerere.ai.ui.UIMessagePart",
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.getAssistantById",
+        "me.rerere.rikkahub.data.datastore.getCurrentAssistant",
+        "me.rerere.rikkahub.data.repository.ConversationRepository",
+        "me.rerere.rikkahub.data.voicecall.ProactiveCallManager"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/Tool.kt",
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SearchTools.kt",
       "module": "app",
       "extension": ".kt",
@@ -14444,6 +14489,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpManager.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ExploreNearbyTool.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SearchTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/WeatherTool.kt",
@@ -18810,6 +18856,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/db/dao/ConversationDAO.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/AssistantInteractionResetService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
@@ -23894,6 +23941,7 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantCallSettingsPage.kt",
@@ -66811,6 +66859,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/MusicTool.kt",
         "kind": "function",
         "line": 55
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.tools.createRequestedVoiceCallTool": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
+        "kind": "function",
+        "line": 28
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.createSearchTools": [

@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`2076d393c119c6d37668d9824fb1693c8409db6a`
+- 基准提交：`91f8373baa762dc725ecf3e052b1ff9edb91bd5e`
 - 分支：`master`
-- 源码指纹：`aa96cd84d68be2b0…`
-- 已索引文件：1111
-- 已索引代码/文本行：263191
-- 已发现类、接口、对象、函数及 Composable：5451
+- 源码指纹：`c49dd6504107e4be…`
+- 已索引文件：1112
+- 已索引代码/文本行：263286
+- 已发现类、接口、对象、函数及 Composable：5452
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 786 |
+| 生产代码文件 | 787 |
 | 测试文件 | 132 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 650 |
+| `app` | 651 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 718 |
+| `.kt` | 719 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -212,7 +212,7 @@
 - `ai/src/main/java/me/rerere/ai/util/ErrorParser.kt`
 - `ai/src/main/java/me/rerere/ai/util/FileEncoder.kt`
 - `ai/src/main/java/me/rerere/ai/util/Json.kt`
-- ……另有 107 个文件，见 `code-index.json`
+- ……另有 108 个文件，见 `code-index.json`
 
 ### 主动代理
 
@@ -410,6 +410,7 @@
 
 ### 电话与语音
 
+- `app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallModels.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepository.kt`
@@ -439,8 +440,7 @@
 - `speech/src/main/java/me/rerere/tts/controller/TtsController.kt`
 - `speech/src/main/java/me/rerere/tts/controller/TtsSynthesizer.kt`
 - `speech/src/main/java/me/rerere/tts/model/PlaybackState.kt`
-- `speech/src/main/java/me/rerere/tts/model/TTSRequest.kt`
-- ……另有 18 个文件，见 `code-index.json`
+- ……另有 19 个文件，见 `code-index.json`
 
 ### 界面
 
@@ -533,16 +533,16 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1923
-- 可检索完整符号：4852
+- 已解析本地导入边：1928
+- 可检索完整符号：4853
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 122 | 812 |
-| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 99 | 953 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 123 | 812 |
+| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 100 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 58 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 54 | 62 |
-| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 50 | 29 |
+| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 46 | 258 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 43 | 191 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
