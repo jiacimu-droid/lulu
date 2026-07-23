@@ -43,7 +43,11 @@ jobs:
           pattern = re.compile(
               r"generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|"
               r"suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|"
-              r"SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议"
+              r"SUGGESTION_MODEL|SUGGESTION_PROMPT|EMPTY_SUGGESTIONS|"
+              r"displaySuggestions|showSuggestions|handleClickSuggestion|"
+              r"onSuggestionClick|SuggestionChip|suggestion-row|suggestion-chip|"
+              r"建议回复|自动生成对话建议",
+              re.IGNORECASE,
           )
           matches = []
           for root in roots:
