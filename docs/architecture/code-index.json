@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T14:16:25.883744+00:00",
-  "commit": "b1c1c2dcfda8f07ed6a3b83cd79ab1f34b8bf4b4",
+  "generatedAt": "2026-07-23T14:32:10.849435+00:00",
+  "commit": "a02e76b66007f3081535a074034236cba3e19b54",
   "branch": "master",
-  "sourceFingerprint": "f7a46adcc2c9c07a67b1fdd8ad733aa59814a15b0922416cbbc492d23ba2d94f",
+  "sourceFingerprint": "34602aa34710d801c7238eb49b94f89be81ca691d2e5753c1eb10957d32c7578",
   "summary": {
-    "files": 1111,
-    "lines": 263189,
+    "files": 1112,
+    "lines": 263443,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -28,8 +28,8 @@
       "website": 10,
       "highlight": 9,
       "web": 7,
+      ".github": 6,
       ".claude": 5,
-      ".github": 5,
       "locale-tui": 4,
       "study-plans": 4,
       "money-lab": 3,
@@ -47,7 +47,7 @@
       ".kts": 11,
       ".js": 9,
       ".html": 7,
-      ".yml": 4,
+      ".yml": 5,
       ".css": 4,
       ".yaml": 3,
       ".properties": 3,
@@ -63,7 +63,7 @@
       "工具": 6,
       "插件": 44,
       "数据库": 75,
-      "构建与发布": 13,
+      "构建与发布": 14,
       "电话与语音": 48,
       "界面": 284,
       "记忆": 42
@@ -1506,6 +1506,7 @@
     ],
     "构建与发布": [
       ".github/workflows/code-index.yml",
+      ".github/workflows/one-time-chat-cleanup.yml",
       ".github/workflows/release.yml",
       "ai/build.gradle.kts",
       "app/baselineprofile/build.gradle.kts",
@@ -3219,6 +3220,25 @@
       "extension": ".yml",
       "lines": 93,
       "sha256": "1a5221f0bfb4b3e597f69e5343f20cd089c3619517d891807e65ed829e7ccd98",
+      "package": null,
+      "categories": [
+        "构建与发布"
+      ],
+      "symbols": [],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": ".github/workflows/one-time-chat-cleanup.yml",
+      "module": ".github",
+      "extension": ".yml",
+      "lines": 254,
+      "sha256": "be6efa2c2d1808958d4cacf25a4eb0f9e324f75c28656c12298f9f6bcff042da",
       "package": null,
       "categories": [
         "构建与发布"
