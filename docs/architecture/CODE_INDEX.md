@@ -11,10 +11,10 @@
 
 ## 索引状态
 
-- 基准提交：`5997b8e5a05ea82daf5c1b5752a7ebdf28aa21ed`
+- 基准提交：`034caec927f8bd8d0d2bc3c5ec5947d43821b48c`
 - 分支：`master`
-- 已索引文件：1100
-- 已索引代码/文本行：261585
+- 已索引文件：1101
+- 已索引代码/文本行：261886
 - 已发现类、接口、对象、函数及 Composable：5300
 
 ## 模块概览
@@ -34,8 +34,8 @@
 | `.agents` | 10 |
 | `website` | 10 |
 | `highlight` | 9 |
+| `.github` | 7 |
 | `web` | 7 |
-| `.github` | 6 |
 | `.claude` | 5 |
 | `locale-tui` | 4 |
 | `study-plans` | 4 |
@@ -57,7 +57,7 @@
 | `.kts` | 11 |
 | `.js` | 9 |
 | `.html` | 7 |
-| `.yml` | 5 |
+| `.yml` | 6 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -252,6 +252,7 @@
 - `.github/workflows/code-index.yml`
 - `.github/workflows/deploy-website.yml`
 - `.github/workflows/release.yml`
+- `.github/workflows/remove-reply-suggestions-once.yml`
 - `ai/build.gradle.kts`
 - `app/baselineprofile/build.gradle.kts`
 - `app/build.gradle.kts`
