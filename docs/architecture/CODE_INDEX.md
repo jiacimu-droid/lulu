@@ -11,10 +11,10 @@
 
 ## 索引状态
 
-- 基准提交：`fb0b1e5a2764246bbfe964b2b7ab28942342e34b`
+- 基准提交：`e96c4d53aac6ccd20925104a94f1fd43cc69f9fc`
 - 分支：`master`
-- 已索引文件：1101
-- 已索引代码/文本行：261850
+- 已索引文件：1102
+- 已索引代码/文本行：262316
 - 已发现类、接口、对象、函数及 Composable：5300
 
 ## 模块概览
@@ -34,7 +34,7 @@
 | `.agents` | 10 |
 | `website` | 10 |
 | `highlight` | 9 |
-| `.github` | 7 |
+| `.github` | 8 |
 | `web` | 7 |
 | `.claude` | 5 |
 | `locale-tui` | 4 |
@@ -56,8 +56,8 @@
 | `.pro` | 15 |
 | `.kts` | 11 |
 | `.js` | 9 |
+| `.yml` | 7 |
 | `.html` | 7 |
-| `.yml` | 6 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -249,6 +249,7 @@
 
 ### 构建与发布
 
+- `.github/workflows/add-performance-monitor-once.yml`
 - `.github/workflows/code-index.yml`
 - `.github/workflows/deploy-website.yml`
 - `.github/workflows/release.yml`
