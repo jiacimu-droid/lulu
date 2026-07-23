@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:41:31.782056+00:00",
-  "commit": "8af89021036584e36514d35764e914ab625425f2",
+  "generatedAt": "2026-07-23T17:43:21.837827+00:00",
+  "commit": "1478f11f7ddc355a71044213abc1e60e7a3582b0",
   "branch": "master",
-  "sourceFingerprint": "d1be1a6041fcb14d44109e2864a6857aba1b345da8b4793f6bb03f41944437c6",
+  "sourceFingerprint": "8219d9c6cea664a88000e892915454e61e9d735aecf6d80753922378ce6f1623",
   "summary": {
     "files": 1116,
-    "lines": 263736,
-    "symbols": 5472,
+    "lines": 263663,
+    "symbols": 5471,
     "productionCodeFiles": 789,
     "testFiles": 134,
     "largeProductionFiles": 42,
@@ -698,7 +698,7 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
-        "lines": 513,
+        "lines": 509,
         "symbols": 3,
         "localImportCount": 30,
         "todoMarkers": 0
@@ -761,8 +761,8 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
-        "lines": 893,
-        "symbols": 10,
+        "lines": 820,
+        "symbols": 9,
         "localImportCount": 27,
         "todoMarkers": 0
       }
@@ -10048,8 +10048,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 126,
-      "sha256": "46f694f981bffc762a6c6e865e682923880fd96b46c7651f2c231e28f87bcaf7",
+      "lines": 130,
+      "sha256": "0954ea7d11d80b651658fb055ad8a5925380e6900fd7657c8f8ffacf8f7bb8f4",
       "package": "me.rerere.rikkahub.data.ai.tools",
       "categories": [
         "AI与上下文"
@@ -10063,27 +10063,27 @@
         {
           "name": "synthesizeInlineVoiceMessage",
           "kind": "function",
-          "line": 44
+          "line": 48
         },
         {
           "name": "inlineVoiceDirectory",
           "kind": "function",
-          "line": 62
+          "line": 66
         },
         {
           "name": "synthesizeInlineVoiceToFile",
           "kind": "function",
-          "line": 65
+          "line": 69
         },
         {
           "name": "estimateVoiceDurationMs",
           "kind": "function",
-          "line": 95
+          "line": 99
         },
         {
           "name": "pcm16MonoToWav",
           "kind": "function",
-          "line": 98
+          "line": 102
         }
       ],
       "localImportCount": 8,
@@ -35145,8 +35145,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 893,
-      "sha256": "678215f83a88a232cc12ae5efac4d15a36cc979eeeacd2a2a6906df8fb90f948",
+      "lines": 820,
+      "sha256": "eda96f3d2d573c38002baec9361c3c89507034b5a5cda8401d0a0866f7258b96",
       "package": "me.rerere.rikkahub.ui.pages.chat",
       "categories": [
         "界面"
@@ -35155,52 +35155,47 @@
         {
           "name": "latestLuluPresenceDescription",
           "kind": "function",
-          "line": 120
+          "line": 115
         },
         {
           "name": "ChatList",
           "kind": "composable",
-          "line": 136
+          "line": 131
         },
         {
           "name": "ChatListNormal",
           "kind": "composable",
-          "line": 209
+          "line": 202
         },
         {
           "name": "isAtBottom",
           "kind": "function",
-          "line": 259
+          "line": 251
         },
         {
           "name": "isVisuallyContinuousWith",
           "kind": "function",
-          "line": 564
+          "line": 534
         },
         {
           "name": "extractMatchingSnippet",
           "kind": "function",
-          "line": 578
+          "line": 545
         },
         {
           "name": "buildHighlightedText",
           "kind": "function",
-          "line": 602
+          "line": 567
         },
         {
           "name": "ChatListPreview",
           "kind": "composable",
-          "line": 641
-        },
-        {
-          "name": "ChatSuggestionsRow",
-          "kind": "composable",
-          "line": 761
+          "line": 603
         },
         {
           "name": "MessageJumper",
           "kind": "composable",
-          "line": 793
+          "line": 720
         }
       ],
       "localImportCount": 27,
@@ -35257,8 +35252,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 513,
-      "sha256": "5cf2e326fcdc95aaaaafae60b6cbe9880621a4e96b1a98cd26b64e86873cc307",
+      "lines": 509,
+      "sha256": "cf102df55eff3a3f63ad782aacdee1f438a546fb0d48efdc71e69ac92acbb197",
       "package": "me.rerere.rikkahub.ui.pages.chat",
       "categories": [
         "界面"
@@ -35277,7 +35272,7 @@
         {
           "name": "TopBar",
           "kind": "composable",
-          "line": 420
+          "line": 416
         }
       ],
       "localImportCount": 30,
@@ -67150,7 +67145,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "kind": "function",
-        "line": 95
+        "line": 99
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.fakeTool": [
@@ -67251,7 +67246,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "kind": "function",
-        "line": 62
+        "line": 66
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.isNotificationListenerEnabled": [
@@ -67293,7 +67288,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "kind": "function",
-        "line": 98
+        "line": 102
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.playCompanionDiceDuel": [
@@ -67377,14 +67372,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "kind": "function",
-        "line": 44
+        "line": 48
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.synthesizeInlineVoiceToFile": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "kind": "function",
-        "line": 65
+        "line": 69
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.ticTacToeWinner": [
@@ -87949,21 +87944,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "composable",
-        "line": 136
+        "line": 131
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ChatListNormal": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "composable",
-        "line": 209
+        "line": 202
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ChatListPreview": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "composable",
-        "line": 641
+        "line": 603
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ChatPage": [
@@ -87978,13 +87973,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "kind": "composable",
         "line": 164
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.chat.ChatSuggestionsRow": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
-        "kind": "composable",
-        "line": 761
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ChatVM": [
@@ -88089,7 +88077,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "composable",
-        "line": 793
+        "line": 720
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.SectionTitle": [
@@ -88138,7 +88126,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "kind": "composable",
-        "line": 420
+        "line": 416
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.assistantMessage": [
@@ -88166,7 +88154,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "function",
-        "line": 602
+        "line": 567
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.canRequestManualReply": [
@@ -88243,7 +88231,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "function",
-        "line": 578
+        "line": 545
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.findAutoPlayTTSMessages": [
@@ -88355,7 +88343,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "function",
-        "line": 259
+        "line": 251
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.isFinishedSpeakableAssistantMessage": [
@@ -88376,14 +88364,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "function",
-        "line": 564
+        "line": 534
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.latestLuluPresenceDescription": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "kind": "function",
-        "line": 120
+        "line": 115
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.moveConversationToAssistant": [
