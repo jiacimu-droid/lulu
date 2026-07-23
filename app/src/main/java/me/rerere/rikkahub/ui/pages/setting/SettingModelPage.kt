@@ -63,7 +63,6 @@ import kotlin.uuid.Uuid
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.ai.prompts.DEFAULT_COMPRESS_PROMPT
 import me.rerere.rikkahub.data.ai.prompts.DEFAULT_OCR_PROMPT
-import me.rerere.rikkahub.data.ai.prompts.DEFAULT_SUGGESTION_PROMPT
 import me.rerere.rikkahub.data.ai.prompts.DEFAULT_TITLE_PROMPT
 import me.rerere.rikkahub.data.ai.prompts.DEFAULT_TRANSLATION_PROMPT
 import me.rerere.rikkahub.ui.components.ai.ReasoningButton
@@ -113,7 +112,6 @@ fun SettingModelPage(vm: SettingVM = koinViewModel()) {
                         ModelSettingSection.THEATER -> DefaultTheaterModelSetting(settings = settings, vm = vm)
                         ModelSettingSection.IMAGE_GENERATION -> DefaultImageGenerationModelSetting(settings = settings, vm = vm)
                         ModelSettingSection.VIDEO_GENERATION -> DefaultVideoGenerationModelSetting(settings = settings, vm = vm)
-                        ModelSettingSection.SUGGESTION -> DefaultSuggestionModelSetting(settings = settings, vm = vm)
                         ModelSettingSection.TRANSLATION -> DefaultTranslationModelSetting(settings = settings, vm = vm)
                         ModelSettingSection.OCR -> DefaultOcrModelSetting(settings = settings, vm = vm)
                         ModelSettingSection.COMPRESS -> DefaultCompressModelSetting(settings = settings, vm = vm)
@@ -134,7 +132,6 @@ internal enum class ModelSettingSection {
     THEATER,
     IMAGE_GENERATION,
     VIDEO_GENERATION,
-    SUGGESTION,
     TRANSLATION,
     OCR,
     COMPRESS,
@@ -150,7 +147,6 @@ internal fun defaultModelSettingSections(): List<ModelSettingSection> = listOf(
     ModelSettingSection.THEATER,
     ModelSettingSection.IMAGE_GENERATION,
     ModelSettingSection.VIDEO_GENERATION,
-    ModelSettingSection.SUGGESTION,
     ModelSettingSection.TRANSLATION,
     ModelSettingSection.OCR,
     ModelSettingSection.COMPRESS,
@@ -712,103 +708,6 @@ private fun DefaultTranslationModelSetting(
                             vm.updateSettings(
                                 settings.copy(
                                     translatePrompt = DEFAULT_TRANSLATION_PROMPT
-                                )
-                            )
-                        }
-                    ) {
-                        Text(stringResource(R.string.setting_model_page_reset_to_default))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DefaultSuggestionModelSetting(
-    settings: Settings,
-    vm: SettingVM
-) {
-    var showModal by remember { mutableStateOf(false) }
-    ModelFeatureCard(
-        title = {
-            Text(
-                text = stringResource(R.string.setting_model_page_suggestion_model),
-                maxLines = 1
-            )
-        },
-        description = {
-            Text(stringResource(R.string.setting_model_page_suggestion_model_desc))
-        },
-        icon = {
-            Icon(HugeIcons.MessageMultiple01, null)
-        },
-        actions = {
-            Box(modifier = Modifier.weight(1f)) {
-                ModelSelector(
-                    modelId = settings.suggestionModelId,
-                    type = ModelType.CHAT,
-                    onSelect = {
-                        vm.updateSettings(
-                            settings.copy(
-                                suggestionModelId = it.id
-                            )
-                        )
-                    },
-                    providers = settings.providers,
-                    allowClear = true,
-                    modifier = Modifier.wrapContentWidth()
-                )
-            }
-            IconButton(
-                onClick = {
-                    showModal = true
-                },
-                colors = IconButtonDefaults.filledTonalIconButtonColors()
-            ) {
-                Icon(HugeIcons.Tools, null)
-            }
-        }
-    )
-
-    if (showModal) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showModal = false
-            },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                FormItem(
-                    label = {
-                        Text(stringResource(R.string.setting_model_page_prompt))
-                    },
-                    description = {
-                        Text(stringResource(R.string.setting_model_page_suggestion_prompt_vars))
-                    }
-                ) {
-                    OutlinedTextField(
-                        value = settings.suggestionPrompt,
-                        onValueChange = {
-                            vm.updateSettings(
-                                settings.copy(
-                                    suggestionPrompt = it
-                                )
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        maxLines = 8
-                    )
-                    TextButton(
-                        onClick = {
-                            vm.updateSettings(
-                                settings.copy(
-                                    suggestionPrompt = DEFAULT_SUGGESTION_PROMPT
                                 )
                             )
                         }
