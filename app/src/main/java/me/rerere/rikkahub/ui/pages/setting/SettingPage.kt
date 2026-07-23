@@ -47,7 +47,6 @@ import me.rerere.hugeicons.stroke.Bookshelf01
 import me.rerere.hugeicons.stroke.Brain02
 import me.rerere.hugeicons.stroke.Clapping01
 import me.rerere.hugeicons.stroke.Database02
-import me.rerere.hugeicons.stroke.Developer
 import me.rerere.hugeicons.stroke.GlobalSearch
 import me.rerere.hugeicons.stroke.ImageUpload
 import me.rerere.hugeicons.stroke.InLove
@@ -218,12 +217,6 @@ fun SettingPage(vm: SettingVM = koinViewModel()) {
                         leadingContent = { Icon(HugeIcons.Brain02, null) },
                         supportingContent = { Text(stringResource(R.string.setting_page_providers_desc)) },
                         headlineContent = { Text(stringResource(R.string.setting_page_providers)) },
-                    )
-                    item(
-                        onClick = { navController.navigate(Screen.Developer) },
-                        leadingContent = { Icon(HugeIcons.Developer, null) },
-                        supportingContent = { Text("查看最近 API 调用、输入输出 token 和调用状态") },
-                        headlineContent = { Text("API 控制台") },
                     )
                     item(
                         onClick = { navController.navigate(Screen.SettingSearch) },
