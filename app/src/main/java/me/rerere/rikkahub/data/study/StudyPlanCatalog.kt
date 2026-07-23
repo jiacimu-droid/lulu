@@ -34,7 +34,7 @@ object StudyPlanCatalog {
             ?: ExamStudyPlan.todayPlan(date)
 
     fun plannedStudyMinutes(date: LocalDate): Int =
-        overlays.asReversed().firstNotNullOfOrNull { it.plannedMinutes(date) }
+        overlays.asReversed().firstNotNullOfOrNull { it.plannedMinutesOverride(date) }
             ?: ExamStudyPlan.plannedStudyMinutes(date)
 
     fun weeklyPlan(id: String): WeeklyStudyPlan? = weeklyPlans.firstOrNull { it.id == id }
@@ -57,5 +57,5 @@ interface StudyPlanOverlay {
     val dailyOverrides: Map<LocalDate, DailyStudyPlan>
     val weeklyOverrides: Map<String, WeeklyStudyPlan>
     fun monthlyPlan(base: MonthlyStudyPlan): MonthlyStudyPlan = base
-    fun plannedMinutes(date: LocalDate): Int? = null
+    fun plannedMinutesOverride(date: LocalDate): Int? = null
 }
