@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`c33d2e5caac91b354429782cfdc0e2a42ad048e2`
+- 基准提交：`fbdf60e59d28fbfd65e91e66e9696bd9929fe6f8`
 - 分支：`master`
-- 源码指纹：`12e4702fe6cc8931…`
-- 已索引文件：1114
-- 已索引代码/文本行：263546
+- 源码指纹：`bfc628208a6d9984…`
+- 已索引文件：1115
+- 已索引代码/文本行：263588
 - 已发现类、接口、对象、函数及 Composable：5451
 
 ## 仓库健康信号
@@ -147,8 +147,8 @@
 | `.agents` | 10 |
 | `root` | 10 |
 | `website` | 10 |
+| `.github` | 9 |
 | `highlight` | 9 |
-| `.github` | 8 |
 | `web` | 7 |
 | `.claude` | 5 |
 | `locale-tui` | 4 |
@@ -170,7 +170,7 @@
 | `.pro` | 15 |
 | `.kts` | 11 |
 | `.js` | 9 |
-| `.yml` | 7 |
+| `.yml` | 8 |
 | `.html` | 7 |
 | `.css` | 4 |
 | `.yaml` | 3 |
@@ -395,6 +395,7 @@
 ### 构建与发布
 
 - `.github/workflows/code-index.yml`
+- `.github/workflows/inspect-memory-pipeline.yml`
 - `.github/workflows/one-time-bubble-split-v3.yml`
 - `.github/workflows/one-time-bubble-split-v4.yml`
 - `.github/workflows/one-time-chat-cleanup-v2.yml`
@@ -481,6 +482,7 @@
 
 ### 记忆
 
+- `.github/workflows/inspect-memory-pipeline.yml`
 - `app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt`
@@ -510,8 +512,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnosticsTest.kt`
-- ……另有 12 个文件，见 `code-index.json`
+- ……另有 13 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 

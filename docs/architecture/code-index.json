@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T14:52:59.405043+00:00",
-  "commit": "c33d2e5caac91b354429782cfdc0e2a42ad048e2",
+  "generatedAt": "2026-07-23T15:02:43.392158+00:00",
+  "commit": "fbdf60e59d28fbfd65e91e66e9696bd9929fe6f8",
   "branch": "master",
-  "sourceFingerprint": "12e4702fe6cc8931c7ef90e360f67cc88331714ab71f6ab4d6cf7fc6aab8b032",
+  "sourceFingerprint": "bfc628208a6d99841ba7903d8a32ed1d70cb46ac6c1ba43081ebc2c07c6ac4f4",
   "summary": {
-    "files": 1114,
-    "lines": 263546,
+    "files": 1115,
+    "lines": 263588,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -26,8 +26,8 @@
       ".agents": 10,
       "root": 10,
       "website": 10,
+      ".github": 9,
       "highlight": 9,
-      ".github": 8,
       "web": 7,
       ".claude": 5,
       "locale-tui": 4,
@@ -46,7 +46,7 @@
       ".pro": 15,
       ".kts": 11,
       ".js": 9,
-      ".yml": 7,
+      ".yml": 8,
       ".html": 7,
       ".css": 4,
       ".yaml": 3,
@@ -63,10 +63,10 @@
       "工具": 6,
       "插件": 44,
       "数据库": 75,
-      "构建与发布": 16,
+      "构建与发布": 17,
       "电话与语音": 48,
       "界面": 284,
-      "记忆": 42
+      "记忆": 43
     },
     "resolvedImportEdges": 1923
   },
@@ -1506,6 +1506,7 @@
     ],
     "构建与发布": [
       ".github/workflows/code-index.yml",
+      ".github/workflows/inspect-memory-pipeline.yml",
       ".github/workflows/one-time-bubble-split-v3.yml",
       ".github/workflows/one-time-bubble-split-v4.yml",
       ".github/workflows/one-time-chat-cleanup-v2.yml",
@@ -1859,6 +1860,7 @@
       "web-ui/app/components/ui/ui-avatar.tsx"
     ],
     "记忆": [
+      ".github/workflows/inspect-memory-pipeline.yml",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt",
       "app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt",
@@ -3224,6 +3226,26 @@
       "sha256": "1a5221f0bfb4b3e597f69e5343f20cd089c3619517d891807e65ed829e7ccd98",
       "package": null,
       "categories": [
+        "构建与发布"
+      ],
+      "symbols": [],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": ".github/workflows/inspect-memory-pipeline.yml",
+      "module": ".github",
+      "extension": ".yml",
+      "lines": 42,
+      "sha256": "22999809f2ea45854a0fd3b3e1eedb639839f9348be5fe7e68da33e4ed694426",
+      "package": null,
+      "categories": [
+        "记忆",
         "构建与发布"
       ],
       "symbols": [],
