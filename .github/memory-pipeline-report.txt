@@ -1,0 +1,177 @@
+=== FILES ===
+app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/FinalCompanionContextBudget.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/prompts/CompressPrompt.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/prompts/LearningMode.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/prompts/OcrPrompt.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Suggestion.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Translation.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionContextDedupTransformer.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionFinalBudgetTransformer.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionLifeClaimOutputTransformer.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformer.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionRuntimeCompactTransformer.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionTransformerPipeline.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/DocumentAsPromptTransformer.kt
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentReducer.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCurrentLifeThread.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalLife.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionExplainableState.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionExplicitResponsibilities.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionHumanTextSanitizer.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionLifeEventFactory.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPresence.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRelationshipBehavior.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRelationshipInitialization.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRelationshipReducer.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionScheduledToolEvent.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionStateSanitizer.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionStore.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionWakePolicy.kt
+app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt
+app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryDAO.kt
+app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryBankEntity.kt
+app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryEntity.kt
+app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryExtractionBatchEntity.kt
+app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryExtractionCheckpointEntity.kt
+app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntity.kt
+app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt
+app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt
+app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt
+app/src/main/java/me/rerere/rikkahub/data/service/CompanionHeartbeat.kt
+app/src/main/java/me/rerere/rikkahub/data/service/CompanionPrivateImpressionSync.kt
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryCandidateQualityGate.kt
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryVector.kt
+app/src/main/java/me/rerere/rikkahub/data/sync/importer/ChatboxImporter.kt
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt
+app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt
+app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt
+app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt
+app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt
+app/src/main/java/me/rerere/rikkahub/service/CompanionRelationshipPolicy.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageCopySheet.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageCot.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageNerdLine.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageReasoning.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTranslation.kt
+app/src/main/java/me/rerere/rikkahub/ui/hooks/ChatInputState.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Background.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatSizeChecker.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ConversationSystemPromptCard.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/LuluStatusDialog.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/chat/TTSAutoPlay.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CompanionConcernCards.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CompanionRelationshipTimeline.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptVM.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt
+app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt
+app/src/main/java/me/rerere/rikkahub/utils/ChatUtil.kt
+
+=== MEMORY EXTRACTION REFERENCES ===
+app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt:414:                "Memory Extraction",
+app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt:7: * User-facing explanation of why memory extraction did or did not run.
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:1771:                            "Historical memory extraction paused for conversation=${conversation.id}; batch remains retryable",
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:1796:            Logging.log(TAG, "Historical memory extraction completed $completedBatchCount batches")
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:1799:            Log.w(TAG, "Historical memory extraction failed", error)
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:1934:                    Log.w(TAG, "Model memory extraction failed; source messages will be retried", error)
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:2084:                Log.w(TAG, "Affective memory extraction failed for conversation=$conversationId", error)
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:2086:            PerformanceMonitor.recordNanos("Memory Extraction", extractionStartedAt, assistant.name)
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:2896:            "Invalidated memory extraction after selected-path mutation: " +
+app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt:29:    /** Number of stable message nodes required before this role summarizes a memory batch. 0 disables automatic extraction. */
+app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt:31:    /** Number of newest logical messages kept out of long-term memory extraction. */
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt:13: * launch memory extraction, planning cleanup or indexing in an application scope.
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt:725:        require(sourceNodeIds.isNotEmpty()) { "A memory extraction batch cannot be empty" }
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt:1850:    require(sourceNodeIds.isNotEmpty()) { "A memory extraction batch cannot be empty" }
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryCandidateQualityGate.kt:4: * Deterministic second-pass guard for semantic memory extraction.
+app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankServiceExtractionTest.kt:45:    fun `memory extraction batch persists attempts failure and completion`() = runBlocking {
+app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankServiceExtractionTest.kt:71:    fun `third failed memory extraction attempt requires manual review`() = runBlocking {
+
+=== TIMING / AWAIT REFERENCES ===
+app/src/main/java/me/rerere/rikkahub/ui/components/ai/CompressContextDialog.kt:48:        currentJob?.join()
+app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt:194:                ).join()
+app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt:214:                ).join()
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:1757:                    ).join()
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:2086:            PerformanceMonitor.recordNanos("Memory Extraction", extractionStartedAt, assistant.name)
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:3184:        runCatching { job.join() }
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:206:        .onStart { defaultLorebooksSeedJob.join() }
+app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt:412:        defaultLorebooksSeedJob.join()
+app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt:13: * launch memory extraction, planning cleanup or indexing in an application scope.
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt:576:            return@withContext memoryBankDAO.getExtractionBatches(assistantId, conversationId)
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt:691:        generatedMemoryIds.forEach { memoryId ->
+app/src/main/java/me/rerere/rikkahub/data/db/migrations/Migration_28_29.kt:27:                `generated_memory_ids_json` TEXT NOT NULL,
+app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryExtractionBatchEntity.kt:42:    @ColumnInfo("generated_memory_ids_json") val generatedMemoryIdsJson: String,
+
+=== PROMPT VIEWPOINT REFERENCES ===
+app/src/main/res/values/strings.xml:78:  <string name="assistant_page_global_memory_desc">Legacy memory switch: use global shared memory instead of role-isolated memory. The main chat flow now uses Memory Bank/vector memory; this area remains for old data and compatibility.</string>
+app/src/main/res/values/strings.xml:123:  <string name="assistant_page_search_placeholder">Search roles</string>
+app/src/main/res/values/strings.xml:142:  <string name="assistant_page_template_variable_role">Role</string>
+app/src/main/res/values/strings.xml:550:  <string name="safe_mode_current_assistant">Current role: %s</string>
+app/src/main/res/values/strings.xml:662:  <string name="setting_display_page_show_assistant_bubble_desc">Whether to show bubble background for role messages</string>
+app/src/main/res/values-zh/strings.xml:89:  <string name="assistant_page_local_tools_lulu_journal_desc">允许角色在确认后把第一人称心迹保存到辞海，不计入露露日记</string>
+app/src/main/res/values-zh/strings.xml:142:  <string name="assistant_page_template_variable_role">角色</string>
+app/src/main/res/values-ru/strings.xml:140:  <string name="assistant_page_template_variable_role">Роль</string>
+app/src/main/res/values-ja/strings.xml:140:  <string name="assistant_page_template_variable_role">役割</string>
+app/src/main/res/values-ko-rKR/strings.xml:140:  <string name="assistant_page_template_variable_role">역할</string>
+app/src/main/res/values-zh-rTW/strings.xml:140:  <string name="assistant_page_template_variable_role">角色</string>
+app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt:143:                                        providerOverride = assistant?.let { role ->
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:152:                    onCompleted = { userMove, roleMove, outcome ->
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:155:                            summary = "用户选择$userMove，角色选择$roleMove，结果：$outcome。",
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:167:                    onCompleted = { userRoll, roleRoll, outcome ->
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:170:                            summary = "用户掷出$userRoll，角色掷出$roleRoll，结果：$outcome。",
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:227:            GameResultText("你出$userMove · $assistantName 出$roleMove · $outcome")
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:245:            userRoll > roleRoll -> "用户胜"
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:246:            userRoll < roleRoll -> "角色胜"
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:249:        onCompleted(userRoll, roleRoll, outcome.orEmpty())
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:256:                DiceFace(label = assistantName, value = roleRoll)
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:389:internal fun compareRockPaperScissors(userMove: String, roleMove: String): String = when {
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:390:    userMove == roleMove -> "平局"
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:391:    (userMove == "石头" && roleMove == "剪刀") ||
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:392:        (userMove == "剪刀" && roleMove == "布") ||
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:393:        (userMove == "布" && roleMove == "石头") -> "用户胜"
+app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt:398:    val userMark = if (roleMark == "X") "O" else "X"
+app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt:525:        emptyBody = "这里放角色按自己口吻写下的第一人称日记，主要记录真实感受和没说出口的想法。",
+app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt:291:                        append(stringResource(R.string.assistant_page_template_variable_role))
+app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt:456:                        val lastRole = assistant.presetMessages.lastOrNull()?.role ?: MessageRole.ASSISTANT
+app/src/main/java/me/rerere/rikkahub/service/ProactiveReminderPlanner.kt:381:                    reason = "用户明确提到记录，可以把这件事写成第一人称辞海日记。",
+app/src/main/java/me/rerere/rikkahub/service/ProactiveToolPlanner.kt:140:                addAuto("write_lulu_journal", "用户明确提到写入记录，可以主动把这件事写成第一人称辞海日记。")
+app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt:71:        appendLine("状态生成放在行动后，只生成心情、身体状况、精神状况、关系状态和第一人称没说出口；belief/motive/intention 不作为状态栏字段。")
+app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt:76:        appendLine("无论是否需要工具，都必须输出 innerThought：第一人称、角色本人本轮没说出口的具体心里话。它要体现人设、关系和本轮真实顾虑，不能只写‘注意力还停在对话上’之类通用占位句；不要写分析提纲、工具 JSON、字段名或 Seven-layer trace。")
+app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt:167:        appendLine("You are the background decision layer for ${input.perception.assistantName.ifBlank { "the current role" }}.")
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:2330:                appendLine("这只是后台第一人称心声，不要把它当成工具结果，也不要原样复述。")
+app/src/main/java/me/rerere/rikkahub/service/ChatService.kt:2414:            userText = perception.recentTurns.lastOrNull { it.role == CompanionTurnRole.USER }?.content.orEmpty(),
+app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishRules.kt:295:            append("主体是$subjectName，外貌参考：$appearance ")
+app/src/main/java/me/rerere/rikkahub/data/ai/prompts/LearningMode.kt:20:     **Practice together:** Ask the user to summarize, pepper in little questions, have the user "explain it back" to you, or roleplay (e.g., practice conversations in a different language). Correct mistakes — charitably! — in the moment.
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformer.kt:43:    appendLine("inner_voice: 可留空；仅写一瞬间未说出口的第一人称心声")
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformer.kt:44:    appendLine("thought: 可留空；仅写值得在后续继续惦记的第一人称念头")
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt:242:    "这只是后台第一人称心声",
+app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt:269:    "这只是后台第一人称心声",
+app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt:1185:        appendLine("载入这些记忆时必须代入当前角色，把它们当成“我记得/我当时/我没说出口”的内在回忆来理解；后续总结、沉淀和回应都要保持第一人称，不要改写成旁白或第三人称。")
+app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt:277:        appendLine("content：用$name 第一人称自然写清发生了什么，以及最值得记住的部分。不要写数据库摘要，不要写‘这是一段值得记住的经历’等空话。")
+app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt:1033:                        userText = historyMessages.lastOrNull { it.role == MessageRole.USER }?.toText().orEmpty(),
