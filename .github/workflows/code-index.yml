@@ -28,6 +28,23 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Scan suggestion-chain remnants
+        run: |
+          mkdir -p docs/architecture
+          {
+            echo "# Suggestion chain remnants"
+            echo
+            echo "Generated from commit: $GITHUB_SHA"
+            echo
+            rg -n --hidden \
+              --glob '!docs/architecture/suggestion-remnants.txt' \
+              --glob '!docs/architecture/code-index.json' \
+              --glob '!docs/architecture/CODE_INDEX.md' \
+              --glob '!.git/**' \
+              'generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议' \
+              app web web-ui plugins .github || true
+          } > docs/architecture/suggestion-remnants.txt
+
       - name: Generate repository index
         env:
           INDEX_COMMIT: ${{ github.sha }}
@@ -40,6 +57,7 @@ jobs:
         run: |
           test -s docs/architecture/CODE_INDEX.md
           test -s docs/architecture/code-index.json
+          test -s docs/architecture/suggestion-remnants.txt
           python3 -m json.tool docs/architecture/code-index.json >/dev/null
           python3 - <<'PY'
           import json
@@ -79,15 +97,15 @@ jobs:
               raise SystemExit("Code index contains no symbol index")
           PY
 
-      - name: Commit refreshed index
+      - name: Commit refreshed index and audit
         run: |
-          if [ -z "$(git status --porcelain -- docs/architecture/CODE_INDEX.md docs/architecture/code-index.json)" ]; then
-            echo "Code index is already current."
+          if [ -z "$(git status --porcelain -- docs/architecture/CODE_INDEX.md docs/architecture/code-index.json docs/architecture/suggestion-remnants.txt)" ]; then
+            echo "Code index and audit are already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --force docs/architecture/CODE_INDEX.md docs/architecture/code-index.json
-          git commit -m "docs: refresh code index [skip ci] [skip index]"
+          git add --force docs/architecture/CODE_INDEX.md docs/architecture/code-index.json docs/architecture/suggestion-remnants.txt
+          git commit -m "docs: refresh code index and suggestion audit [skip ci] [skip index]"
           git pull --rebase origin master
           git push origin HEAD:master
