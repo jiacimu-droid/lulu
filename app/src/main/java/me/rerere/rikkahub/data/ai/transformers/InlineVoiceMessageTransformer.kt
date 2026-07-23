@@ -65,8 +65,7 @@ internal fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
             }) {
             return@map part
         }
-        val requestedText = tool.requestedInlineVoiceText()?.takeIf(String::isNotBlank)
-            ?: return@map part
+        val requestedText = tool.requestedInlineVoiceSentence() ?: return@map part
         val cacheKey = "${tool.toolCallId}|$requestedText"
         val scheduled = synthesizedVoiceCache[cacheKey]
             ?: scheduleInlineVoiceMessage(context, requestedText).also { voice ->
@@ -83,8 +82,7 @@ internal fun List<UIMessagePart>.promoteMaterializedInlineVoiceParts(): List<UIM
     val requests = mapIndexedNotNull { index, part ->
         val tool = part as? UIMessagePart.Tool ?: return@mapIndexedNotNull null
         if (tool.toolName != TTS_TOOL_NAME || !tool.isExecuted) return@mapIndexedNotNull null
-        val requestedText = tool.requestedInlineVoiceText()?.takeIf(String::isNotBlank)
-            ?: return@mapIndexedNotNull null
+        val requestedText = tool.requestedInlineVoiceSentence() ?: return@mapIndexedNotNull null
         val voiceMessage = tool.output
             .filterIsInstance<UIMessagePart.VoiceMessage>()
             .firstOrNull { voice -> voice.url.isNotBlank() }
@@ -93,7 +91,7 @@ internal fun List<UIMessagePart>.promoteMaterializedInlineVoiceParts(): List<UIM
             partIndex = index,
             requestedText = requestedText,
             voiceMessage = voiceMessage.copy(
-                transcript = voiceMessage.transcript.ifBlank { requestedText },
+                transcript = requestedText,
             ),
         )
     }
@@ -152,6 +150,12 @@ private fun pruneSynthesizedVoiceCache() {
         .take(synthesizedVoiceCache.size - MAX_SYNTHESIZED_VOICE_CACHE)
         .forEach { key -> synthesizedVoiceCache.remove(key) }
 }
+
+private fun UIMessagePart.Tool.requestedInlineVoiceSentence(): String? =
+    requestedInlineVoiceText()
+        ?.toInlineVoiceSegments()
+        ?.firstOrNull()
+        ?.takeIf(String::isNotBlank)
 
 private fun UIMessagePart.Tool.requestedInlineVoiceText(): String? = runCatching {
     JsonInstant.parseToJsonElement(input)
