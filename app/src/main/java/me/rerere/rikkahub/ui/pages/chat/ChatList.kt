@@ -21,7 +21,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,11 +38,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
@@ -66,7 +62,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
@@ -151,7 +146,6 @@ fun ChatList(
     onForkMessage: (UIMessage) -> Unit = {},
     onDelete: (UIMessage) -> Unit = {},
     onUpdateMessage: (MessageNode) -> Unit = {},
-    onClickSuggestion: (String) -> Unit = {},
     onTranslate: ((UIMessage, java.util.Locale) -> Unit)? = null,
     onClearTranslation: (UIMessage) -> Unit = {},
     onJumpToMessage: (Int) -> Unit = {},
@@ -193,7 +187,6 @@ fun ChatList(
                 onForkMessage = onForkMessage,
                 onDelete = onDelete,
                 onUpdateMessage = onUpdateMessage,
-                onClickSuggestion = onClickSuggestion,
                 onTranslate = onTranslate,
                 onClearTranslation = onClearTranslation,
                 animatedVisibilityScope = this@AnimatedContent,
@@ -223,7 +216,6 @@ private fun ChatListNormal(
     onForkMessage: (UIMessage) -> Unit,
     onDelete: (UIMessage) -> Unit,
     onUpdateMessage: (MessageNode) -> Unit,
-    onClickSuggestion: (String) -> Unit,
     onTranslate: ((UIMessage, java.util.Locale) -> Unit)?,
     onClearTranslation: (UIMessage) -> Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -261,19 +253,15 @@ private fun ChatListNormal(
         val inputBarHeight = with(density) { innerPadding.calculateBottomPadding().toPx() }
         val lastPos = lastItem.offset + lastItem.size
         val inputPos = (state.layoutInfo.viewportEndOffset - inputBarHeight.roundToInt())
-        // println("lastPos = $lastPos, inputPos = $inputPos  | ${lastPos <= inputPos - 8}")
         return lastPos <= inputPos - 8
     }
 
-    // 聊天选择
     val selectedItems = remember { mutableStateListOf<Uuid>() }
     var selecting by remember { mutableStateOf(false) }
     var showExportSheet by remember { mutableStateOf(false) }
 
-    // 自动跟随键盘滚动
     ImeLazyListAutoScroller(lazyListState = state)
 
-    // 对话大小警告对话框
     val sizeInfo = rememberConversationSizeInfo(conversation)
     var showSizeWarningDialog by rememberSaveable(conversation.id) { mutableStateOf(true) }
     if (sizeInfo.showWarning && showSizeWarningDialog) {
@@ -284,25 +272,20 @@ private fun ChatListNormal(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
     ) {
-        // 自动滚动到底部
         if (settings.displaySetting.enableAutoScroll) {
             LaunchedEffect(state) {
                 snapshotFlow { state.layoutInfo.visibleItemsInfo }.collect { visibleItemsInfo ->
-                    // println("is bottom = ${visibleItemsInfo.isAtBottom()}, scroll = ${state.isScrollInProgress}, can_scroll = ${state.canScrollForward}, loading = $loading")
                     if (!state.isScrollInProgress && loadingState) {
                         if (visibleItemsInfo.isAtBottom()) {
                             state.requestScrollToItem(conversationUpdated.messageNodes.lastIndex + 10)
-                            // Log.i(TAG, "ChatList: scroll to ${conversationUpdated.messageNodes.lastIndex}")
                         }
                     }
                 }
             }
         }
 
-        // 判断最近是否滚动
         LaunchedEffect(state.isScrollInProgress) {
             if (state.isScrollInProgress) {
                 isRecentScroll = true
@@ -314,14 +297,13 @@ private fun ChatListNormal(
             }
         }
 
-        // Filter out [SKIP] messages and proactive message context markers
         val displayNodes = remember(conversation.messageNodes) {
             conversation.messageNodes.filter { node ->
                 val msg = node.currentMessage
                 val text = msg.toText().trim()
                 !(msg.role == MessageRole.ASSISTANT && text == "[SKIP]") &&
-                !(msg.role == MessageRole.ASSISTANT && sanitizeLuluVisibleExpression(text).isBlank()) &&
-                !(msg.role == MessageRole.USER && text.contains("[主动消息上下文]"))
+                    !(msg.role == MessageRole.ASSISTANT && sanitizeLuluVisibleExpression(text).isBlank()) &&
+                    !(msg.role == MessageRole.USER && text.contains("[主动消息上下文]"))
             }
         }
 
@@ -337,7 +319,7 @@ private fun ChatListNormal(
         ) {
             itemsIndexed(
                 items = displayNodes,
-                key = { index, item -> item.id },
+                key = { _, item -> item.id },
             ) { index, node ->
                 val groupedWithPrevious = displayNodes.getOrNull(index - 1)?.isVisuallyContinuousWith(node) == true
                 val groupedWithNext = displayNodes.getOrNull(index + 1)?.let(node::isVisuallyContinuousWith) == true
@@ -388,10 +370,12 @@ private fun ChatListNormal(
                                 onDelete(node.currentMessage)
                             },
                             onShare = {
-                                selecting = true  // 使用 CoroutineScope 延迟状态更新
+                                selecting = true
                                 selectedItems.clear()
-                                selectedItems.addAll(conversation.messageNodes.map { it.id }
-                                    .subList(0, conversation.messageNodes.indexOf(node) + 1))
+                                selectedItems.addAll(
+                                    conversation.messageNodes.map { it.id }
+                                        .subList(0, conversation.messageNodes.indexOf(node) + 1)
+                                )
                             },
                             onUpdate = {
                                 onUpdateMessage(it)
@@ -435,7 +419,6 @@ private fun ChatListNormal(
                 }
             }
 
-            // 为了能正确滚动到这
             item(ScrollBottomKey) {
                 Spacer(
                     Modifier
@@ -450,7 +433,6 @@ private fun ChatListNormal(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            // 错误消息卡片
             ErrorCardsDisplay(
                 errors = errors,
                 onDismissError = onDismissError,
@@ -460,7 +442,6 @@ private fun ChatListNormal(
                     .zIndex(5f)
             )
 
-            // 完成选择
             AnimatedVisibility(
                 visible = selecting,
                 modifier = Modifier
@@ -527,7 +508,6 @@ private fun ChatListNormal(
                 }
             }
 
-            // 导出对话框
             ChatExportSheet(
                 visible = showExportSheet,
                 onDismissRequest = {
@@ -541,22 +521,12 @@ private fun ChatListNormal(
 
             val captureProgress = LocalScrollCaptureInProgress.current
 
-            // 消息快速跳转
             MessageJumper(
                 show = isRecentScroll && !state.isScrollInProgress && settings.displaySetting.showMessageJumper && !captureProgress,
                 onLeft = settings.displaySetting.messageJumperOnLeft,
                 scope = scope,
                 state = state
             )
-
-            // Suggestion
-            if (conversation.chatSuggestions.isNotEmpty() && !captureProgress) {
-                ChatSuggestionsRow(
-                    conversation = conversation,
-                    onClickSuggestion = onClickSuggestion,
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
         }
     }
 }
@@ -572,9 +542,6 @@ private fun MessageNode.isVisuallyContinuousWith(other: MessageNode): Boolean {
 
 private const val CONTINUOUS_MESSAGE_WINDOW_MILLIS = 10L * 60L * 1_000L
 
-/**
- * 提取包含搜索词的文本片段，确保匹配词在开头可见
- */
 private fun extractMatchingSnippet(
     text: String,
     query: String
@@ -588,10 +555,8 @@ private fun extractMatchingSnippet(
         return text
     }
 
-    // 直接从匹配词开始显示，确保匹配词在最前面
     val snippet = text.substring(matchIndex)
 
-    // 只在前面有内容时添加省略号
     return if (matchIndex > 0) {
         "...$snippet"
     } else {
@@ -613,10 +578,8 @@ private fun buildHighlightedText(
         var index = text.indexOf(query, startIndex, ignoreCase = true)
 
         while (index >= 0) {
-            // 添加高亮前的文本
             append(text.substring(startIndex, index))
 
-            // 添加高亮文本
             withStyle(
                 style = SpanStyle(
                     background = highlightColor,
@@ -630,7 +593,6 @@ private fun buildHighlightedText(
             index = text.indexOf(query, startIndex, ignoreCase = true)
         }
 
-        // 添加剩余文本
         if (startIndex < text.length) {
             append(text.substring(startIndex))
         }
@@ -648,7 +610,6 @@ private fun ChatListPreview(
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
-    // 过滤消息，同时保留原始 index 避免后续 O(n) indexOf 查找
     val filteredMessages = remember(conversation.messageNodes, searchQuery) {
         if (searchQuery.isBlank()) {
             conversation.messageNodes.mapIndexed { index, node -> index to node }
@@ -664,7 +625,6 @@ private fun ChatListPreview(
             .fillMaxSize()
             .hazeSource(state = hazeState),
     ) {
-        // 搜索框
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -695,7 +655,6 @@ private fun ChatListPreview(
             maxLines = 1,
         )
 
-        // 消息预览
         LazyColumn(
             contentPadding = PaddingValues(16.dp) + PaddingValues(bottom = 32.dp + innerPadding.calculateBottomPadding()),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -705,7 +664,7 @@ private fun ChatListPreview(
         ) {
             itemsIndexed(
                 items = filteredMessages,
-                key = { index, item -> item.second.id },
+                key = { _, item -> item.second.id },
             ) { _, (originalIndex, node) ->
                 val message = node.currentMessage
                 val isUser = message.role == me.rerere.ai.core.MessageRole.USER
@@ -752,38 +711,6 @@ private fun ChatListPreview(
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ChatSuggestionsRow(
-    modifier: Modifier = Modifier,
-    conversation: Conversation,
-    onClickSuggestion: (String) -> Unit
-) {
-    LazyRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        items(conversation.chatSuggestions) { suggestion ->
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .clickable {
-                        onClickSuggestion(suggestion)
-                    }
-                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-            ) {
-                Text(
-                    text = suggestion,
-                    style = MaterialTheme.typography.bodySmall
-                )
             }
         }
     }
