@@ -7,7 +7,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
-import me.rerere.rikkahub.data.ai.tools.synthesizeInlineVoiceMessage
+import me.rerere.rikkahub.data.ai.tools.scheduleInlineVoiceMessage
 import me.rerere.rikkahub.utils.JsonInstant
 import org.koin.core.context.GlobalContext
 import java.util.concurrent.ConcurrentHashMap
@@ -32,7 +32,7 @@ private data class InlineVoiceRequest(
 
 /**
  * Compatibility entry used by the output transformer during visual and final passes.
- * A cache prevents the same completed tool call from requesting TTS more than once.
+ * A cache prevents the same completed tool call from scheduling TTS more than once.
  */
 internal suspend fun promoteInlineVoiceMessages(messages: List<UIMessage>): List<UIMessage> {
     val context = GlobalContext.get().get<Context>()
@@ -44,22 +44,20 @@ internal suspend fun materializeAndPromoteInlineVoiceMessages(
     messages: List<UIMessage>,
 ): List<UIMessage> = materializeAndPromoteInlineVoiceMessages(ctx.context, messages)
 
-private suspend fun materializeAndPromoteInlineVoiceMessages(
+private fun materializeAndPromoteInlineVoiceMessages(
     context: Context,
     messages: List<UIMessage>,
 ): List<UIMessage> {
-    val result = ArrayList<UIMessage>(messages.size)
-    for (message in messages) {
-        result += if (message.role == MessageRole.ASSISTANT) {
+    return messages.map { message ->
+        if (message.role == MessageRole.ASSISTANT) {
             message.copy(parts = message.parts.materializeAndPromoteInlineVoiceParts(context))
         } else {
             message
         }
     }
-    return result
 }
 
-internal suspend fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
+internal fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
     context: Context,
 ): List<UIMessagePart> {
     val requests = mutableListOf<InlineVoiceRequest>()
@@ -73,11 +71,10 @@ internal suspend fun List<UIMessagePart>.materializeAndPromoteInlineVoiceParts(
             .filterIsInstance<UIMessagePart.VoiceMessage>()
             .firstOrNull { voice -> voice.url.isNotBlank() }
             ?: synthesizedVoiceCache[cacheKey]
-            ?: synthesizeInlineVoiceMessage(context, requestedText).getOrNull()?.also { synthesized ->
-                synthesizedVoiceCache[cacheKey] = synthesized
+            ?: scheduleInlineVoiceMessage(context, requestedText).also { scheduled ->
+                synthesizedVoiceCache[cacheKey] = scheduled
                 pruneSynthesizedVoiceCache()
             }
-            ?: return@forEachIndexed
         requests += InlineVoiceRequest(
             partIndex = index,
             id = tool.toolCallId.ifBlank { "tts-$index" },
@@ -140,7 +137,7 @@ private fun pruneSynthesizedVoiceCache() {
     if (synthesizedVoiceCache.size <= MAX_SYNTHESIZED_VOICE_CACHE) return
     synthesizedVoiceCache.keys
         .take(synthesizedVoiceCache.size - MAX_SYNTHESIZED_VOICE_CACHE)
-        .forEach(synthesizedVoiceCache::remove)
+        .forEach { key -> synthesizedVoiceCache.remove(key) }
 }
 
 private fun UIMessagePart.Tool.requestedInlineVoiceText(): String? = runCatching {
