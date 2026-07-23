@@ -11,10 +11,10 @@
 
 ## 索引状态
 
-- 基准提交：`efe099f77a8a778f0974a92a1fb5d6ce67501d50`
+- 基准提交：`149de7aef7d8651e48abb116d2257adb2380a515`
 - 分支：`master`
-- 已索引文件：1105
-- 已索引代码/文本行：262383
+- 已索引文件：1106
+- 已索引代码/文本行：262543
 - 已发现类、接口、对象、函数及 Composable：5309
 
 ## 模块概览
@@ -30,9 +30,9 @@
 | `plugins` | 25 |
 | `docs` | 23 |
 | `common` | 21 |
+| `.github` | 11 |
 | `root` | 11 |
 | `.agents` | 10 |
-| `.github` | 10 |
 | `website` | 10 |
 | `highlight` | 9 |
 | `web` | 7 |
@@ -55,7 +55,7 @@
 | `.xml` | 37 |
 | `.pro` | 15 |
 | `.kts` | 11 |
-| `.yml` | 9 |
+| `.yml` | 10 |
 | `.js` | 9 |
 | `.html` | 7 |
 | `.css` | 4 |
@@ -252,6 +252,7 @@
 - `.github/workflows/code-index.yml`
 - `.github/workflows/compact-study-header-once.yml`
 - `.github/workflows/deploy-website.yml`
+- `.github/workflows/polish-study-app-once.yml`
 - `.github/workflows/polish-voice-call-once.yml`
 - `.github/workflows/release.yml`
 - `.github/workflows/remove-reply-suggestions-once.yml`
