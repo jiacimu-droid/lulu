@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:39:44.857801+00:00",
-  "commit": "6c4d022dfdb09ce93769fc2341434801b933134f",
+  "generatedAt": "2026-07-23T11:42:18.526772+00:00",
+  "commit": "3e7f140e20d8e39d8618ea0c736ab053f8bf435e",
   "branch": "master",
-  "sourceFingerprint": "da447afaef892ef89f3d79d64e50c0332c7c8d7582b43cf4890cecdb86c366ed",
+  "sourceFingerprint": "a25709a1ea334060784664567d64c63c2d5f2d4cdace2b661291737ee86fa363",
   "summary": {
     "files": 1107,
-    "lines": 262831,
-    "symbols": 5408,
+    "lines": 262798,
+    "symbols": 5410,
     "productionCodeFiles": 784,
     "testFiles": 128,
     "largeProductionFiles": 42,
@@ -21899,8 +21899,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 502,
-      "sha256": "b699afeb0137452e77c982238ed0e6eb68a11c87149129641a7669feff9f3b80",
+      "lines": 469,
+      "sha256": "39a5eeed3488d59022c455d314c295c83f737cebbe66be2353bafd5d01b99cb6",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -21909,97 +21909,107 @@
         {
           "name": "CurrentWeekStudyRecovery",
           "kind": "object",
-          "line": 17
+          "line": 15
         },
         {
-          "name": "installIntoExamStudyPlan",
+          "name": "monthlyPlan",
           "kind": "function",
-          "line": 243
+          "line": 219
+        },
+        {
+          "name": "plannedMinutesOverride",
+          "kind": "function",
+          "line": 247
         },
         {
           "name": "planFor",
           "kind": "function",
-          "line": 289
+          "line": 262
         },
         {
           "name": "plannedMinutes",
           "kind": "function",
-          "line": 291
+          "line": 264
         },
         {
           "name": "applyToState",
           "kind": "function",
-          "line": 306
+          "line": 267
         },
         {
           "name": "scheduleFor",
           "kind": "function",
-          "line": 346
+          "line": 306
         },
         {
           "name": "dynamicSchedulePrompt",
           "kind": "function",
-          "line": 385
+          "line": 345
         },
         {
           "name": "capacityAudit",
           "kind": "function",
-          "line": 415
+          "line": 375
         },
         {
           "name": "timeAfter",
           "kind": "function",
-          "line": 447
+          "line": 407
         },
         {
           "name": "daily",
           "kind": "function",
-          "line": 450
+          "line": 410
+        },
+        {
+          "name": "weekly",
+          "kind": "function",
+          "line": 416
         },
         {
           "name": "law",
           "kind": "function",
-          "line": 456
+          "line": 423
         },
         {
           "name": "review",
           "kind": "function",
-          "line": 457
+          "line": 424
         },
         {
           "name": "english",
           "kind": "function",
-          "line": 458
+          "line": 425
         },
         {
           "name": "health",
           "kind": "function",
-          "line": 459
+          "line": 426
         },
         {
           "name": "StudyMonthAllocation",
           "kind": "class",
-          "line": 462
+          "line": 429
         },
         {
           "name": "description",
           "kind": "function",
-          "line": 473
+          "line": 440
         },
         {
           "name": "minutesText",
           "kind": "function",
-          "line": 476
+          "line": 443
         },
         {
           "name": "StudyPlanSubject",
           "kind": "class",
-          "line": 483
+          "line": 450
         },
         {
           "name": "StudyCapacityAudit",
           "kind": "class",
-          "line": 490
+          "line": 457
         }
       ],
       "localImportCount": 0,
@@ -77135,7 +77145,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "object",
-        "line": 17
+        "line": 15
       }
     ],
     "me.rerere.rikkahub.data.study.DailyStudyPlan": [
@@ -77191,7 +77201,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "class",
-        "line": 490
+        "line": 457
       }
     ],
     "me.rerere.rikkahub.data.study.StudyDailyRecord": [
@@ -77261,7 +77271,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "class",
-        "line": 462
+        "line": 429
       }
     ],
     "me.rerere.rikkahub.data.study.StudyMysteryBoxReward": [
@@ -77289,7 +77299,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "class",
-        "line": 483
+        "line": 450
       }
     ],
     "me.rerere.rikkahub.data.study.StudyPlanTask": [
@@ -77492,7 +77502,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 306
+        "line": 267
       }
     ],
     "me.rerere.rikkahub.data.study.assertNoScheduleOverlap": [
@@ -77527,7 +77537,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 415
+        "line": 375
       }
     ],
     "me.rerere.rikkahub.data.study.claimAchievement": [
@@ -77646,7 +77656,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 450
+        "line": 410
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
@@ -77707,7 +77717,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 473
+        "line": 440
       }
     ],
     "me.rerere.rikkahub.data.study.downstreamPlanLeavesAFullRevisionRunwayBeforeFinalSprint": [
@@ -77756,7 +77766,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 385
+        "line": 345
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
@@ -77768,7 +77778,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 458
+        "line": 425
       }
     ],
     "me.rerere.rikkahub.data.study.englishWeeklyRotationCoversReadingGrammarSmallThreeAndBothEssays": [
@@ -77909,7 +77919,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 459
+        "line": 426
       }
     ],
     "me.rerere.rikkahub.data.study.highScorePlanKeepsEnglishCoreAndPoliticsSeparateFromVocabulary": [
@@ -77917,13 +77927,6 @@
         "path": "app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt",
         "kind": "function",
         "line": 628
-      }
-    ],
-    "me.rerere.rikkahub.data.study.installIntoExamStudyPlan": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
-        "kind": "function",
-        "line": 243
       }
     ],
     "me.rerere.rikkahub.data.study.isEarlySleepForUser": [
@@ -77979,7 +77982,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 456
+        "line": 423
       }
     ],
     "me.rerere.rikkahub.data.study.lawTheoryIsRecitedInsteadOfOnlySkimmed": [
@@ -78028,10 +78031,15 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 476
+        "line": 443
       }
     ],
     "me.rerere.rikkahub.data.study.monthlyPlan": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
+        "kind": "function",
+        "line": 219
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
@@ -78164,7 +78172,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 289
+        "line": 262
       }
     ],
     "me.rerere.rikkahub.data.study.planTask": [
@@ -78178,10 +78186,15 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 291
+        "line": 264
       }
     ],
     "me.rerere.rikkahub.data.study.plannedMinutesOverride": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
+        "kind": "function",
+        "line": 247
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
@@ -78295,7 +78308,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 457
+        "line": 424
       }
     ],
     "me.rerere.rikkahub.data.study.rolloverToDate": [
@@ -78330,7 +78343,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 346
+        "line": 306
       }
     ],
     "me.rerere.rikkahub.data.study.schedulePromptIncludesHabitsAndManualTasks": [
@@ -78414,7 +78427,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
         "kind": "function",
-        "line": 447
+        "line": 407
       }
     ],
     "me.rerere.rikkahub.data.study.timeRange": [
@@ -78527,6 +78540,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
         "kind": "function",
         "line": 455
+      }
+    ],
+    "me.rerere.rikkahub.data.study.weekly": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
+        "kind": "function",
+        "line": 416
       }
     ],
     "me.rerere.rikkahub.data.study.weeklyPlan": [
