@@ -146,6 +146,18 @@ jobs:
           fi
           tail -n 40 /tmp/tests.log
 
+      - name: Upload concise failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: companion-core-diagnostic
+          path: |
+            /tmp/refactor-comment.md
+            /tmp/compile-comment.md
+            /tmp/test-comment.md
+          if-no-files-found: ignore
+          retention-days: 3
+
       - name: Commit verified changes directly to master
         shell: bash
         run: |
