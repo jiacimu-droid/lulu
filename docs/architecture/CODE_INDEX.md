@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`fc13459eb49cd8d485df2224ff8ed06edd1928a1`
+- 基准提交：`1fb0f7a389a9a4b5afaac536efea2521d764cae9`
 - 分支：`master`
-- 源码指纹：`b100142c7cf4afb1…`
+- 源码指纹：`d67c05826ac74427…`
 - 已索引文件：1116
-- 已索引代码/文本行：263603
-- 已发现类、接口、对象、函数及 Composable：5470
+- 已索引代码/文本行：263502
+- 已发现类、接口、对象、函数及 Composable：5469
 
 ## 仓库健康信号
 
@@ -109,7 +109,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt` | 1266 | 25 | 27 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt` | 1234 | 21 | 28 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt` | 1211 | 14 | 31 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt` | 1201 | 23 | 29 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 1189 | 33 | 39 |
 
 ### 本地导入最多的生产文件
 
@@ -534,7 +534,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：1939
-- 可检索完整符号：4871
+- 可检索完整符号：4870
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|

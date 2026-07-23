@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:53:57.877517+00:00",
-  "commit": "fc13459eb49cd8d485df2224ff8ed06edd1928a1",
+  "generatedAt": "2026-07-23T17:55:59.347218+00:00",
+  "commit": "1fb0f7a389a9a4b5afaac536efea2521d764cae9",
   "branch": "master",
-  "sourceFingerprint": "b100142c7cf4afb1133a8e1f9471c59033ec788873c2df64a8c48883e410d49f",
+  "sourceFingerprint": "d67c05826ac74427e6e5614f75e26979e43cf48c2256407b47e7a762a4dc2924",
   "summary": {
     "files": 1116,
-    "lines": 263603,
-    "symbols": 5470,
+    "lines": 263502,
+    "symbols": 5469,
     "productionCodeFiles": 789,
     "testFiles": 134,
     "largeProductionFiles": 42,
@@ -231,13 +231,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
-        "lines": 1201,
-        "symbols": 23,
-        "localImportCount": 29,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "lines": 1189,
         "symbols": 33,
@@ -298,6 +291,13 @@
         "lines": 1117,
         "symbols": 12,
         "localImportCount": 37,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
+        "lines": 1100,
+        "symbols": 22,
+        "localImportCount": 28,
         "todoMarkers": 0
       },
       {
@@ -711,13 +711,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
-        "lines": 1201,
-        "symbols": 23,
-        "localImportCount": 29,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/HighlightCodeBlock.kt",
         "lines": 696,
         "symbols": 10,
@@ -735,6 +728,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "lines": 1234,
         "symbols": 21,
+        "localImportCount": 28,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
+        "lines": 1100,
+        "symbols": 22,
         "localImportCount": 28,
         "todoMarkers": 0
       },
@@ -2408,11 +2408,6 @@
       "imports": 5
     },
     {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.data.ai.prompts",
-      "imports": 5
-    },
-    {
       "from": "me.rerere.rikkahub.web.routes",
       "to": "me.rerere.rikkahub.web.BadRequestException",
       "imports": 5
@@ -2625,6 +2620,11 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.Screen",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.data.ai.prompts",
       "imports": 4
     },
     {
@@ -39249,8 +39249,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 1201,
-      "sha256": "6dfe01da042db2a56ebba9cd2f48d05f3d97695ccee51386bd4fe71611934c01",
+      "lines": 1100,
+      "sha256": "debff506789fe0c46de90d6a4c3ffe9d5e1c7e04baa7841a3be7d579bfdc5bc0",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -39259,120 +39259,115 @@
         {
           "name": "SettingModelPage",
           "kind": "composable",
-          "line": 80
+          "line": 79
         },
         {
           "name": "ModelSettingSection",
           "kind": "class",
-          "line": 128
+          "line": 126
         },
         {
           "name": "defaultModelSettingSections",
           "kind": "function",
-          "line": 144
+          "line": 141
         },
         {
           "name": "DefaultMemoryEmbeddingModelSetting",
           "kind": "composable",
-          "line": 160
+          "line": 156
         },
         {
           "name": "DefaultMemoryRerankModelSetting",
           "kind": "composable",
-          "line": 344
+          "line": 340
         },
         {
           "name": "DefaultMemoryExtractionModelSetting",
           "kind": "composable",
-          "line": 382
+          "line": 378
         },
         {
           "name": "DefaultLuluIntentModelSetting",
           "kind": "composable",
-          "line": 421
+          "line": 417
         },
         {
           "name": "DefaultTheaterModelSetting",
           "kind": "composable",
-          "line": 457
+          "line": 453
         },
         {
           "name": "DefaultImageGenerationModelSetting",
           "kind": "composable",
-          "line": 492
+          "line": 488
         },
         {
           "name": "DefaultVideoGenerationModelSetting",
           "kind": "composable",
-          "line": 527
+          "line": 523
         },
         {
           "name": "memoryModelName",
           "kind": "function",
-          "line": 561
+          "line": 557
         },
         {
           "name": "MemoryEngineDiagnostics",
           "kind": "composable",
-          "line": 567
+          "line": 563
         },
         {
           "name": "parseMemoryEmbeddingDimensionsInput",
           "kind": "function",
-          "line": 593
+          "line": 589
         },
         {
           "name": "parseMemoryEmbeddingBatchSizeInput",
           "kind": "function",
-          "line": 596
+          "line": 592
         },
         {
           "name": "parseMemoryRerankCandidateCountInput",
           "kind": "function",
-          "line": 599
+          "line": 595
         },
         {
           "name": "buildMemoryEngineDiagnostics",
           "kind": "function",
-          "line": 602
+          "line": 598
         },
         {
           "name": "DefaultTranslationModelSetting",
           "kind": "composable",
-          "line": 619
-        },
-        {
-          "name": "DefaultSuggestionModelSetting",
-          "kind": "composable",
-          "line": 728
+          "line": 615
         },
         {
           "name": "DefaultTitleModelSetting",
           "kind": "composable",
-          "line": 825
+          "line": 724
         },
         {
           "name": "DefaultChatModelSetting",
           "kind": "composable",
-          "line": 919
+          "line": 818
         },
         {
           "name": "DefaultOcrModelSetting",
           "kind": "composable",
-          "line": 954
+          "line": 853
         },
         {
           "name": "DefaultCompressModelSetting",
           "kind": "composable",
-          "line": 1050
+          "line": 949
         },
         {
           "name": "ModelFeatureCard",
           "kind": "composable",
-          "line": 1146
+          "line": 1045
         }
       ],
-      "localImportCount": 29,
+      "localImportCount": 28,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -39395,7 +39390,6 @@
         "me.rerere.rikkahub.R",
         "me.rerere.rikkahub.data.ai.prompts.DEFAULT_COMPRESS_PROMPT",
         "me.rerere.rikkahub.data.ai.prompts.DEFAULT_OCR_PROMPT",
-        "me.rerere.rikkahub.data.ai.prompts.DEFAULT_SUGGESTION_PROMPT",
         "me.rerere.rikkahub.data.ai.prompts.DEFAULT_TITLE_PROMPT",
         "me.rerere.rikkahub.data.ai.prompts.DEFAULT_TRANSLATION_PROMPT",
         "me.rerere.rikkahub.data.datastore.Settings",
@@ -90924,91 +90918,84 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 919
+        "line": 818
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultCompressModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 1050
+        "line": 949
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultImageGenerationModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 492
+        "line": 488
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultLuluIntentModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 421
+        "line": 417
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultMemoryEmbeddingModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 160
+        "line": 156
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultMemoryExtractionModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 382
+        "line": 378
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultMemoryRerankModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 344
+        "line": 340
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultOcrModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 954
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.setting.DefaultSuggestionModelSetting": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
-        "kind": "composable",
-        "line": 728
+        "line": 853
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultTheaterModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 457
+        "line": 453
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultTitleModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 825
+        "line": 724
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultTranslationModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 619
+        "line": 615
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultVideoGenerationModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 527
+        "line": 523
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DonateMethodsCardGroup": [
@@ -91127,7 +91114,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 567
+        "line": 563
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.MetasoOptions": [
@@ -91155,7 +91142,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 1146
+        "line": 1045
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.ModelList": [
@@ -91183,7 +91170,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "class",
-        "line": 128
+        "line": 126
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.ModelSettingsForm": [
@@ -91323,7 +91310,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
-        "line": 80
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.SettingPage": [
@@ -91449,7 +91436,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
-        "line": 602
+        "line": 598
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.buildMemoryEngineDiagnosticsSummarizesLocalPipelineStatus": [
@@ -91715,7 +91702,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
-        "line": 144
+        "line": 141
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.defaultModelSettingSectionsExposeMemoryAndImageEntrancesWithoutTitleSummary": [
@@ -91757,7 +91744,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
-        "line": 561
+        "line": 557
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.normalizeMcdonaldsMcpAuthValue": [
@@ -91778,7 +91765,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
-        "line": 596
+        "line": 592
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryEmbeddingBatchSizeInputClampsToServiceRange": [
@@ -91792,7 +91779,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
-        "line": 593
+        "line": 589
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryEmbeddingDimensionsInputAllowsBlankOrPositiveInteger": [
@@ -91806,7 +91793,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
-        "line": 599
+        "line": 595
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryRerankCandidateCountInputClampsToServiceRange": [
