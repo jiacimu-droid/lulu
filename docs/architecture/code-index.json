@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-23T06:02:05.991622+00:00",
-  "commit": "034caec927f8bd8d0d2bc3c5ec5947d43821b48c",
+  "generatedAt": "2026-07-23T06:07:49.737766+00:00",
+  "commit": "fb0b1e5a2764246bbfe964b2b7ab28942342e34b",
   "branch": "master",
   "summary": {
     "files": 1101,
-    "lines": 261886,
+    "lines": 261850,
     "symbols": 5300,
     "byModule": {
       "app": 638,
@@ -1957,7 +1957,7 @@
       "path": ".github/workflows/remove-reply-suggestions-once.yml",
       "module": ".github",
       "extension": ".yml",
-      "lines": 301,
+      "lines": 265,
       "package": null,
       "categories": [
         "构建与发布"
