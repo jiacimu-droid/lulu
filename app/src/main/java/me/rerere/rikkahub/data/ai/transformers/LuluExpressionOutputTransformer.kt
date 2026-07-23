@@ -326,108 +326,16 @@ internal fun splitCompanionExpressionBubbles(text: String): List<String> {
     if (clean.contains("```") || clean.contains("\n- ") || clean.contains("\n1. ")) return listOf(clean)
 
     val normalized = clean.replace("\r\n", "\n").replace('\r', '\n')
-    val paragraphSegments = normalized.split(COMPANION_PARAGRAPH_BOUNDARY_REGEX)
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-    val usesParagraphRhythm = paragraphSegments.size > 1 || clean.contains('\n')
-    val roughSegments = if (usesParagraphRhythm) {
-        segmentParagraphBubbles(paragraphSegments)
-    } else {
-        clean.split(COMPANION_SENTENCE_BOUNDARY_REGEX)
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-            .ifEmpty {
-                clean.split(Regex("(?<=[,\\uFF0C\\u3001\\uFF1B;])\\s*"))
-                    .map { it.trim() }
-                    .filter { it.isNotBlank() }
-            }
-    }
-    if (roughSegments.size <= 1) return listOf(clean)
-    val maxBubbles = if (usesParagraphRhythm) 4 else 3
-
-    return roughSegments
-        .fold(mutableListOf<String>()) { acc, segment ->
-            val last = acc.lastOrNull()
-            when {
-                last == null -> acc += segment
-                segment.length < 5 && last.length + segment.length <= 22 -> acc[acc.lastIndex] = "$last$segment"
-                acc.size >= maxBubbles -> acc[acc.lastIndex] = if (usesParagraphRhythm) {
-                    "$last\n$segment"
-                } else {
-                    "$last$segment"
-                }
-                else -> acc += segment
-            }
-            acc
-        }
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-        .takeIf { it.size > 1 }
-        ?: listOf(clean)
-}
-
-private fun segmentParagraphBubbles(paragraphs: List<String>): List<String> {
-    val result = mutableListOf<String>()
-    paragraphs.forEach { paragraph ->
-        val paragraphBubbles = paragraph.splitParagraphBubbleUnits()
-        paragraphBubbles.forEachIndexed { index, bubble ->
-            val previous = result.lastOrNull()
-            if (
-                index == 0 &&
-                previous != null &&
-                bubble.startsWithDependentConnector() &&
-                previous.visualBubbleLength() + bubble.visualBubbleLength() <= 48
-            ) {
-                result[result.lastIndex] = "$previous$bubble"
-            } else {
-                result += bubble
-            }
-        }
-    }
-    return result
-}
-
-private fun String.splitParagraphBubbleUnits(): List<String> {
-    val units = split(COMPANION_SENTENCE_OR_LINE_BOUNDARY_REGEX)
+    val segments = normalized
+        .split(COMPANION_SENTENCE_OR_LINE_BOUNDARY_REGEX)
         .map(String::trim)
         .filter(String::isNotBlank)
-    if (units.size <= 1) return listOf(trim())
 
-    return units.fold(mutableListOf<String>()) { bubbles, unit ->
-        val previous = bubbles.lastOrNull()
-        when {
-            previous == null -> bubbles += unit
-            (!previous.endsWithTerminalPunctuation() || unit.startsWithAnaphoricContinuation()) &&
-                previous.visualBubbleLength() + unit.visualBubbleLength() <= 44 -> {
-                bubbles[bubbles.lastIndex] = "$previous$unit"
-            }
-            else -> bubbles += unit
-        }
-        bubbles
-    }
+    // Human chat rhythm: every complete sentence or explicit line may stand alone,
+    // including one-character utterances such as “嗯。” and “好。”.
+    // Never merge short sentences merely to reduce the number of bubbles.
+    return segments.takeIf { it.size > 1 } ?: listOf(clean)
 }
-
-private fun String.startsWithDependentConnector(): Boolean = DEPENDENT_BUBBLE_CONNECTORS.any { startsWith(it) }
-
-private fun String.startsWithAnaphoricContinuation(): Boolean =
-    startsWith("这是") || startsWith("那是") || startsWith("这就是") || startsWith("那就是")
-
-private fun String.endsWithTerminalPunctuation(): Boolean {
-    val last = lastOrNull() ?: return false
-    return last in setOf('.', '!', '?', '~', '～', '。', '！', '？', '…')
-}
-
-private fun String.visualBubbleLength(): Int = count { !it.isWhitespace() }
-
-private val DEPENDENT_BUBBLE_CONNECTORS = listOf(
-    "但", "不过", "可是", "只是", "而且", "所以", "因为",
-)
-
-private val COMPANION_PARAGRAPH_BOUNDARY_REGEX =
-    Regex("(?:\\r?\\n)[ \\t]*(?:\\r?\\n)+")
-
-private val COMPANION_SENTENCE_BOUNDARY_REGEX =
-    Regex("(?<=[.!?~～。！？])\\s*|(?<=…)(?=\\s|$)\\s*")
 
 private val COMPANION_SENTENCE_OR_LINE_BOUNDARY_REGEX =
     Regex("(?<=[.!?~～。！？])\\s*|(?<=…)(?=\\s|$)\\s*|\\n+")
