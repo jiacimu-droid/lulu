@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:55:59.347218+00:00",
-  "commit": "1fb0f7a389a9a4b5afaac536efea2521d764cae9",
+  "generatedAt": "2026-07-23T18:05:22.950967+00:00",
+  "commit": "78f6ecdd450f394e2e3d5e88ed469cbe7b2bc99c",
   "branch": "master",
-  "sourceFingerprint": "d67c05826ac74427e6e5614f75e26979e43cf48c2256407b47e7a762a4dc2924",
+  "sourceFingerprint": "6a1d791e8db4e16335ddfb7a6378182a0bb430d425d8844648871350c617c6c7",
   "summary": {
-    "files": 1116,
-    "lines": 263502,
+    "files": 1117,
+    "lines": 263567,
     "symbols": 5469,
     "productionCodeFiles": 789,
     "testFiles": 134,
@@ -28,8 +28,8 @@
       "website": 10,
       "highlight": 9,
       "web": 7,
+      ".github": 6,
       ".claude": 5,
-      ".github": 5,
       "locale-tui": 4,
       "study-plans": 4,
       "money-lab": 3,
@@ -47,7 +47,7 @@
       ".kts": 11,
       ".js": 9,
       ".html": 7,
-      ".yml": 4,
+      ".yml": 5,
       ".css": 4,
       ".yaml": 3,
       ".properties": 3,
@@ -63,7 +63,7 @@
       "工具": 6,
       "插件": 44,
       "数据库": 75,
-      "构建与发布": 13,
+      "构建与发布": 14,
       "电话与语音": 49,
       "界面": 284,
       "记忆": 43
@@ -1511,6 +1511,7 @@
     "构建与发布": [
       ".github/workflows/code-index.yml",
       ".github/workflows/release.yml",
+      ".github/workflows/scan-suggestion-remnants.yml",
       "ai/build.gradle.kts",
       "app/baselineprofile/build.gradle.kts",
       "app/build.gradle.kts",
@@ -3223,8 +3224,8 @@
       "path": ".github/workflows/code-index.yml",
       "module": ".github",
       "extension": ".yml",
-      "lines": 93,
-      "sha256": "1a5221f0bfb4b3e597f69e5343f20cd089c3619517d891807e65ed829e7ccd98",
+      "lines": 111,
+      "sha256": "e8f5ccba5c0b65bb36f7e5588336f2d715ad5eb058b6eba2c8a43e63ce85a1d6",
       "package": null,
       "categories": [
         "构建与发布"
@@ -3244,6 +3245,25 @@
       "extension": ".yml",
       "lines": 128,
       "sha256": "b350d9ac0dd348d32b1af6f72c3f339d80f27ed95a4384b51dd94c81901b9a81",
+      "package": null,
+      "categories": [
+        "构建与发布"
+      ],
+      "symbols": [],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": ".github/workflows/scan-suggestion-remnants.yml",
+      "module": ".github",
+      "extension": ".yml",
+      "lines": 47,
+      "sha256": "2dda9ca5259738eaf580e3ad50fed8640f6f88f05c854c8e42af72ddeb6b17aa",
       "package": null,
       "categories": [
         "构建与发布"
