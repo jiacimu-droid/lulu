@@ -16,6 +16,7 @@ import me.rerere.rikkahub.data.companion.CompanionTurnEngine
 import me.rerere.rikkahub.data.event.AppEventBus
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.AssistantInteractionResetService
+import me.rerere.rikkahub.data.service.ProactiveTurnDispatcher
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.service.CompanionChatPort
 import me.rerere.rikkahub.service.DefaultCompanionChatPort
@@ -84,6 +85,10 @@ val appModule = module {
 
     single {
         CompanionTurnEngine()
+    }
+
+    single {
+        ProactiveTurnDispatcher(settingsStore = get())
     }
 
     single {
