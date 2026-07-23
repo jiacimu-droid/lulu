@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:31:57.333007+00:00",
-  "commit": "807bb59a387caeae5aaa29c64586bbd97dae8fb0",
+  "generatedAt": "2026-07-23T17:32:23.069579+00:00",
+  "commit": "550e675f00011f89473291820e1e427ef4fcd8db",
   "branch": "master",
-  "sourceFingerprint": "ec0db14cf285c03c524fc669f42ff3687f353dc9b668a5991065c9e8a8c31219",
+  "sourceFingerprint": "97eb88e92705a6fa7d157d102e720d7813570bc65ee1f077449ab0bf76e2e31c",
   "summary": {
     "files": 1114,
-    "lines": 263463,
-    "symbols": 5456,
+    "lines": 263511,
+    "symbols": 5461,
     "productionCodeFiles": 789,
     "testFiles": 132,
     "largeProductionFiles": 42,
@@ -471,6 +471,13 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
+        "lines": 494,
+        "symbols": 35,
+        "localImportCount": 3,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "lines": 1189,
         "symbols": 33,
@@ -524,13 +531,6 @@
         "lines": 1185,
         "symbols": 30,
         "localImportCount": 0,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
-        "lines": 446,
-        "symbols": 30,
-        "localImportCount": 3,
         "todoMarkers": 0
       },
       {
@@ -19256,8 +19256,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 446,
-      "sha256": "be4f355017fd656727b282984d6917bf9c636efb9101bc2764f03bc5a87be5bd",
+      "lines": 494,
+      "sha256": "0a9e2369631bc23a455ffb904c4b07d75cabbd78220c709b18e5224d17cb9903",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "记忆"
@@ -19354,64 +19354,89 @@
           "line": 298
         },
         {
+          "name": "deduplicateMemoryCandidates",
+          "kind": "function",
+          "line": 313
+        },
+        {
+          "name": "isSameMemoryAs",
+          "kind": "function",
+          "line": 340
+        },
+        {
+          "name": "mergeDuplicateEvidence",
+          "kind": "function",
+          "line": 349
+        },
+        {
+          "name": "memoryDetailScore",
+          "kind": "function",
+          "line": 360
+        },
+        {
+          "name": "memoryTextSimilarity",
+          "kind": "function",
+          "line": 368
+        },
+        {
+          "name": "memoryCharacterBigrams",
+          "kind": "function",
+          "line": 377
+        },
+        {
           "name": "decodeExtractionCandidates",
           "kind": "function",
-          "line": 317
+          "line": 387
         },
         {
           "name": "repairMemoryExtractionJsonOnce",
           "kind": "function",
-          "line": 326
+          "line": 396
         },
         {
           "name": "isTransientMemoryExtractionFailure",
           "kind": "function",
-          "line": 332
+          "line": 402
         },
         {
           "name": "retryTransientMemoryExtraction",
           "kind": "function",
-          "line": 342
+          "line": 412
         },
         {
           "name": "sourceTimeLabel",
           "kind": "function",
-          "line": 363
+          "line": 433
         },
         {
           "name": "hasAffectiveSummary",
           "kind": "function",
-          "line": 372
+          "line": 442
         },
         {
           "name": "toDisplayMemoryContent",
           "kind": "function",
-          "line": 378
+          "line": 448
         },
         {
           "name": "toEmbeddingMemoryText",
           "kind": "function",
-          "line": 386
+          "line": 456
         },
         {
           "name": "firstPersonSummary",
           "kind": "function",
-          "line": 397
+          "line": 467
         },
         {
           "name": "looksLikeRawToolOrTraceDump",
           "kind": "function",
-          "line": 407
+          "line": 477
         },
         {
           "name": "looksLikeVocabularyDrill",
           "kind": "function",
-          "line": 416
-        },
-        {
-          "name": "extractJsonPayload",
-          "kind": "function",
-          "line": 424
+          "line": 486
         }
       ],
       "localImportCount": 3,
@@ -75562,7 +75587,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 317
+        "line": 387
       }
     ],
     "me.rerere.rikkahub.data.service.decodeMemoryNodeIds": [
@@ -75577,6 +75602,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryVector.kt",
         "kind": "function",
         "line": 28
+      }
+    ],
+    "me.rerere.rikkahub.data.service.deduplicateMemoryCandidates": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
+        "kind": "function",
+        "line": 313
       }
     ],
     "me.rerere.rikkahub.data.service.deduplicateNearVectors": [
@@ -75797,13 +75829,6 @@
         "line": 142
       }
     ],
-    "me.rerere.rikkahub.data.service.extractJsonPayload": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
-        "kind": "function",
-        "line": 424
-      }
-    ],
     "me.rerere.rikkahub.data.service.failDurableCommitment": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -75822,7 +75847,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 397
+        "line": 467
       }
     ],
     "me.rerere.rikkahub.data.service.firstSelectedBranchMutationSequence": [
@@ -76318,7 +76343,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 372
+        "line": 442
       }
     ],
     "me.rerere.rikkahub.data.service.hasAny": [
@@ -76468,6 +76493,13 @@
         "line": 1639
       }
     ],
+    "me.rerere.rikkahub.data.service.isSameMemoryAs": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
+        "kind": "function",
+        "line": 340
+      }
+    ],
     "me.rerere.rikkahub.data.service.isShizukuAvailable": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/GadgetbridgeService.kt",
@@ -76493,7 +76525,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 332
+        "line": 402
       }
     ],
     "me.rerere.rikkahub.data.service.latestActivityAt": [
@@ -76535,14 +76567,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 407
+        "line": 477
       }
     ],
     "me.rerere.rikkahub.data.service.looksLikeVocabularyDrill": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 416
+        "line": 486
       }
     ],
     "me.rerere.rikkahub.data.service.maintenanceKeepScore": [
@@ -76592,11 +76624,39 @@
         "line": 50
       }
     ],
+    "me.rerere.rikkahub.data.service.memoryCharacterBigrams": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
+        "kind": "function",
+        "line": 377
+      }
+    ],
+    "me.rerere.rikkahub.data.service.memoryDetailScore": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
+        "kind": "function",
+        "line": 360
+      }
+    ],
     "me.rerere.rikkahub.data.service.memoryRerankCandidateCount": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "kind": "function",
         "line": 1038
+      }
+    ],
+    "me.rerere.rikkahub.data.service.memoryTextSimilarity": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
+        "kind": "function",
+        "line": 368
+      }
+    ],
+    "me.rerere.rikkahub.data.service.mergeDuplicateEvidence": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
+        "kind": "function",
+        "line": 349
       }
     ],
     "me.rerere.rikkahub.data.service.mergeProcessedMemoryNodeIds": [
@@ -77011,7 +77071,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 326
+        "line": 396
       }
     ],
     "me.rerere.rikkahub.data.service.repairTemporalMetadata": [
@@ -77124,7 +77184,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 342
+        "line": 412
       }
     ],
     "me.rerere.rikkahub.data.service.reverseGeocode": [
@@ -77445,7 +77505,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 363
+        "line": 433
       }
     ],
     "me.rerere.rikkahub.data.service.stableMinute": [
@@ -77487,14 +77547,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 378
+        "line": 448
       }
     ],
     "me.rerere.rikkahub.data.service.toEmbeddingMemoryText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 386
+        "line": 456
       }
     ],
     "me.rerere.rikkahub.data.service.toEntity": [
