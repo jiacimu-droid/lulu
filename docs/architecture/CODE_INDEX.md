@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`938cdbebf085953d0d0aff80d2ade99c334db9f0`
+- 基准提交：`776e6ea3b792a7081f17711d7c8dfdbdf31f25f9`
 - 分支：`master`
-- 源码指纹：`e6d5df8d61225aba…`
+- 源码指纹：`674472c2e7d90e1f…`
 - 已索引文件：1112
-- 已索引代码/文本行：263200
+- 已索引代码/文本行：263193
 - 已发现类、接口、对象、函数及 Composable：5446
 
 ## 仓库健康信号
@@ -122,7 +122,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt` | 51 | 3372 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt` | 46 | 1568 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 44 | 1166 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt` | 40 | 423 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt` | 39 | 416 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 39 | 1189 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt` | 39 | 784 |
 | `app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt` | 38 | 280 |

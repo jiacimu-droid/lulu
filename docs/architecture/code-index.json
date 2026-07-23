@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T15:36:37.066889+00:00",
-  "commit": "938cdbebf085953d0d0aff80d2ade99c334db9f0",
+  "generatedAt": "2026-07-23T15:38:15.743898+00:00",
+  "commit": "776e6ea3b792a7081f17711d7c8dfdbdf31f25f9",
   "branch": "master",
-  "sourceFingerprint": "e6d5df8d61225aba05e08a5efdd258ebd92c6b223c67d1ddb74985fbdb63ae9b",
+  "sourceFingerprint": "674472c2e7d90e1fd8a6ce45111b7640a5f91c122c40bd561bd70102645c8731",
   "summary": {
     "files": 1112,
-    "lines": 263200,
+    "lines": 263193,
     "symbols": 5446,
     "productionCodeFiles": 787,
     "testFiles": 132,
@@ -607,9 +607,9 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
-        "lines": 423,
+        "lines": 416,
         "symbols": 2,
-        "localImportCount": 40,
+        "localImportCount": 39,
         "todoMarkers": 0
       },
       {
@@ -39242,8 +39242,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 423,
-      "sha256": "b546d237ae7008c9ec76418235b655000bc36ff2e5f19139d70db2d6e080ef1f",
+      "lines": 416,
+      "sha256": "c2cfad8cf6b0550f67345ec99c86773a51a0e558dbcb098bed6d20c323b78e49",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -39252,15 +39252,15 @@
         {
           "name": "SettingPage",
           "kind": "composable",
-          "line": 85
+          "line": 84
         },
         {
           "name": "ProviderConfigWarningCard",
           "kind": "composable",
-          "line": 386
+          "line": 379
         }
       ],
-      "localImportCount": 40,
+      "localImportCount": 39,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -39274,7 +39274,6 @@
         "me.rerere.hugeicons.stroke.Brain02",
         "me.rerere.hugeicons.stroke.Clapping01",
         "me.rerere.hugeicons.stroke.Database02",
-        "me.rerere.hugeicons.stroke.Developer",
         "me.rerere.hugeicons.stroke.GlobalSearch",
         "me.rerere.hugeicons.stroke.ImageUpload",
         "me.rerere.hugeicons.stroke.InLove",
@@ -90802,7 +90801,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
         "kind": "composable",
-        "line": 386
+        "line": 379
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.ProviderItem": [
@@ -90914,7 +90913,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
         "kind": "composable",
-        "line": 85
+        "line": 84
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.SettingProactiveMessagePage": [
