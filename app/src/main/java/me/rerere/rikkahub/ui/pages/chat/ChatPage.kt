@@ -3,8 +3,12 @@ package me.rerere.rikkahub.ui.pages.chat
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
@@ -178,6 +182,7 @@ private fun ChatPageContent(
     val toaster = LocalToaster.current
     var previewMode by rememberSaveable { mutableStateOf(false) }
     val hazeState = rememberHazeState()
+    val imeVisible = WindowInsets.isImeVisible
     val assistant = setting.getAssistantById(conversation.assistantId)
         ?: setting.getCurrentAssistant()
     val companionSnapshot = companionState.snapshots
@@ -228,6 +233,11 @@ private fun ChatPageContent(
             },
             bottomBar = {
                 ChatInput(
+                    modifier = if (imeVisible) {
+                        Modifier.consumeWindowInsets(WindowInsets.navigationBars)
+                    } else {
+                        Modifier
+                    },
                     state = inputState,
                     loading = loadingJob != null,
                     settings = setting,
