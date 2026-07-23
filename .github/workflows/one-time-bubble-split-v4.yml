@@ -1,0 +1,90 @@
+name: One-time bubble split v4
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/one-time-bubble-split-v4.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Keep every complete sentence as its own bubble
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt')
+          text = path.read_text(encoding='utf-8')
+
+          text = re.sub(
+              r'val maxBubbles = if \(usesParagraphRhythm\) \d+ else \d+|val maxBubbles = \d+',
+              'val maxBubbles = 20',
+              text,
+              count=1,
+          )
+
+          text = re.sub(
+              r'''\n\s*segment\.visualBubbleLength\(\) <= 2 &&\n\s*last\.visualBubbleLength\(\) \+ segment\.visualBubbleLength\(\) <= 18 -> \{\n\s*acc\[acc\.lastIndex\] = "\$last\$segment"\n\s*\}''',
+              '',
+              text,
+              count=1,
+          )
+
+          text = re.sub(
+              r'''\n\s*segment\.length < 5 && last\.length \+ segment\.length <= 22 -> acc\[acc\.lastIndex\] = "\$last\$segment"''',
+              '',
+              text,
+              count=1,
+          )
+
+          text = text.replace(
+              '                previous.visualBubbleLength() + bubble.visualBubbleLength() <= 24',
+              '                false',
+              1,
+          )
+          text = text.replace(
+              '                previous.visualBubbleLength() + bubble.visualBubbleLength() <= 48',
+              '                false',
+              1,
+          )
+
+          text = re.sub(
+              r'''\s*\(!previous\.endsWithTerminalPunctuation\(\) \|\| unit\.startsWithAnaphoricContinuation\(\)\) &&\n\s*previous\.visualBubbleLength\(\) \+ unit\.visualBubbleLength\(\) <= \d+ -> \{''',
+              '            false -> {',
+              text,
+              count=1,
+          )
+
+          path.write_text(text, encoding='utf-8')
+          Path('.github/workflows/one-time-bubble-split-v4.yml').unlink()
+          PY
+
+      - name: Compile Android production sources
+        run: ./gradlew :app:compileReleaseKotlin --no-daemon
+
+      - name: Commit bubble split tuning
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: keep short sentences as separate chat bubbles"
+          git pull --rebase origin master
+          git push origin HEAD:master
