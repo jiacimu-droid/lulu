@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T15:17:22.918304+00:00",
-  "commit": "fb88e56b475d10ce6ec54d4843113048ff0e29e6",
+  "generatedAt": "2026-07-23T15:18:01.536935+00:00",
+  "commit": "0118c66df255de1b247115e182e81d96f7df17c7",
   "branch": "master",
-  "sourceFingerprint": "06baf73b5d6b2a6c58704109a9b91bb656cce9d02e4ee3ace3382617089bd9ad",
+  "sourceFingerprint": "a1d8b6df5e6ee7a7536ec68b4eb4c1c5356b234ca6104f460fb79585396405bc",
   "summary": {
-    "files": 1117,
-    "lines": 263793,
+    "files": 1113,
+    "lines": 263321,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -23,11 +23,11 @@
       "plugins": 25,
       "docs": 24,
       "common": 21,
-      ".github": 11,
       ".agents": 10,
       "root": 10,
       "website": 10,
       "highlight": 9,
+      ".github": 7,
       "web": 7,
       ".claude": 5,
       "locale-tui": 4,
@@ -45,9 +45,9 @@
       ".xml": 37,
       ".pro": 15,
       ".kts": 11,
-      ".yml": 10,
       ".js": 9,
       ".html": 7,
+      ".yml": 6,
       ".css": 4,
       ".yaml": 3,
       ".properties": 3,
@@ -63,10 +63,10 @@
       "工具": 6,
       "插件": 44,
       "数据库": 75,
-      "构建与发布": 19,
+      "构建与发布": 15,
       "电话与语音": 48,
       "界面": 284,
-      "记忆": 44
+      "记忆": 43
     },
     "resolvedImportEdges": 1923
   },
@@ -1506,12 +1506,8 @@
     ],
     "构建与发布": [
       ".github/workflows/code-index.yml",
-      ".github/workflows/fix-memory-narrator-ownership.yml",
       ".github/workflows/inspect-memory-pipeline.yml",
-      ".github/workflows/one-time-bubble-split-v3.yml",
       ".github/workflows/one-time-bubble-split-v4.yml",
-      ".github/workflows/one-time-chat-call-tool.yml",
-      ".github/workflows/one-time-chat-cleanup-v2.yml",
       ".github/workflows/release.yml",
       "ai/build.gradle.kts",
       "app/baselineprofile/build.gradle.kts",
@@ -1862,7 +1858,6 @@
       "web-ui/app/components/ui/ui-avatar.tsx"
     ],
     "记忆": [
-      ".github/workflows/fix-memory-narrator-ownership.yml",
       ".github/workflows/inspect-memory-pipeline.yml",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemory.kt",
@@ -3241,26 +3236,6 @@
       "importedBy": []
     },
     {
-      "path": ".github/workflows/fix-memory-narrator-ownership.yml",
-      "module": ".github",
-      "extension": ".yml",
-      "lines": 92,
-      "sha256": "f61aa06c920c328bad6e8ed80a13bacb966493615a4e0292668e6704800ec8ee",
-      "package": null,
-      "categories": [
-        "记忆",
-        "构建与发布"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
       "path": ".github/workflows/inspect-memory-pipeline.yml",
       "module": ".github",
       "extension": ".yml",
@@ -3281,68 +3256,11 @@
       "importedBy": []
     },
     {
-      "path": ".github/workflows/one-time-bubble-split-v3.yml",
-      "module": ".github",
-      "extension": ".yml",
-      "lines": 89,
-      "sha256": "03cd3edb96c82d1cb4e03ac2c35be6fc7ee707c46e54221b8108663524cf03a1",
-      "package": null,
-      "categories": [
-        "构建与发布"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
       "path": ".github/workflows/one-time-bubble-split-v4.yml",
       "module": ".github",
       "extension": ".yml",
       "lines": 90,
       "sha256": "03bee460e13c3c902d8bfd9b6bd4058b4931f6e53e8a860841ed90354a465e9a",
-      "package": null,
-      "categories": [
-        "构建与发布"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
-      "path": ".github/workflows/one-time-chat-call-tool.yml",
-      "module": ".github",
-      "extension": ".yml",
-      "lines": 113,
-      "sha256": "c4098ad22798c6d5f2bc367e4014c481ac944fc003e20e98a492302488317923",
-      "package": null,
-      "categories": [
-        "构建与发布"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
-      "path": ".github/workflows/one-time-chat-cleanup-v2.yml",
-      "module": ".github",
-      "extension": ".yml",
-      "lines": 178,
-      "sha256": "adb588a530c735e5d8680c57fb7f286f8c402ec979abc1694890e22038bd1e70",
       "package": null,
       "categories": [
         "构建与发布"
