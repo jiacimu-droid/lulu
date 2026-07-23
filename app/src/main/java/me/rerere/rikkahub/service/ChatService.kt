@@ -1055,10 +1055,6 @@ class ChatService(
         var turnPreparation = CompanionTurnPreparation()
 
         runCatching {
-
-            // reset suggestions
-            updateConversation(conversationId, initialConversation.copy(chatSuggestions = emptyList()))
-
             // memory tool
             if (!model.abilities.contains(ModelAbility.TOOL)) {
                 if (settings.enableWebSearch || mcpManager.getAllAvailableTools().isNotEmpty()) {
@@ -1432,10 +1428,6 @@ class ChatService(
                 pluginLoader.callEvent("message_received", eventData)
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to trigger message_received event", e)
-            }
-
-            launchWithConversationReference(conversationId) {
-                generateSuggestion(conversationId, finalConversation)
             }
         }
     }
@@ -2567,57 +2559,6 @@ class ChatService(
         }
     }
 
-    // ---- 生成建议 ----
-
-    suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation) {
-        runCatching {
-            val settings = settingsStore.settingsFlow.first()
-            val model = settings.findModelById(settings.suggestionModelId) ?: return
-            val provider = model.findProvider(settings.providers) ?: return
-
-            getConversationFlow(conversationId).value.let { currentConversation ->
-                updateConversation(
-                    conversationId,
-                    currentConversation.copy(chatSuggestions = emptyList())
-                )
-            }
-
-            val providerHandler = providerManager.getProviderByType(provider)
-            val result = providerHandler.generateText(
-                providerSetting = provider,
-                messages = listOf(
-                    UIMessage.user(
-                        settings.suggestionPrompt.applyPlaceholders(
-                            "locale" to Locale.getDefault().displayName,
-                            "content" to conversation.currentMessages
-                                .takeLast(8).joinToString("\n\n") { it.summaryAsText() }),
-                    )
-                ),
-                params = TextGenerationParams(
-                    model = model,
-                    reasoningLevel = ReasoningLevel.OFF,
-                ),
-            )
-            val suggestions =
-                result.choices[0].message?.toText()?.split("\n")?.map { it.trim() }
-                    ?.filter { it.isNotBlank() } ?: emptyList()
-
-            val latestConversation = conversationRepo.getConversationById(conversationId)
-                ?: getConversationFlow(conversationId).value
-                ?: conversation
-            saveConversation(
-                conversationId,
-                latestConversation.copy(
-                    chatSuggestions = suggestions.take(
-                        10
-                    )
-                )
-            )
-        }.onFailure {
-            it.printStackTrace()
-        }
-    }
-
     // ---- 压缩对话历史 ----
 
     suspend fun compressConversation(
@@ -2704,7 +2645,6 @@ class ChatService(
         }
         val newConversation = conversation.copy(
             messageNodes = newMessageNodes,
-            chatSuggestions = emptyList(),
         )
 
         saveConversation(conversationId, newConversation)
