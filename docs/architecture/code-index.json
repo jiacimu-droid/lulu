@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:42:18.526772+00:00",
-  "commit": "3e7f140e20d8e39d8618ea0c736ab053f8bf435e",
+  "generatedAt": "2026-07-23T11:55:14.225122+00:00",
+  "commit": "8c76d103afdb338cf973908d04d725105c291c7e",
   "branch": "master",
-  "sourceFingerprint": "a25709a1ea334060784664567d64c63c2d5f2d4cdace2b661291737ee86fa363",
+  "sourceFingerprint": "4836fbfbb8d5fb1ced0fd0fca84a47016ed75a220c91f19b66927abb1f631674",
   "summary": {
-    "files": 1107,
-    "lines": 262798,
-    "symbols": 5410,
+    "files": 1108,
+    "lines": 262918,
+    "symbols": 5414,
     "productionCodeFiles": 784,
-    "testFiles": 128,
+    "testFiles": 129,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 33,
     "byModule": {
-      "app": 644,
+      "app": 645,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 712,
+      ".kt": 713,
       ".tsx": 74,
       ".java": 64,
       ".md": 59,
@@ -45774,6 +45774,44 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionTurnEngineTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 120,
+      "sha256": "da7f5fedb2e42d04ac7d34431f9ead0d6a687f12272456474e1be539a45ae3cd",
+      "package": "me.rerere.rikkahub.data.companion",
+      "categories": [],
+      "symbols": [
+        {
+          "name": "CompanionTurnEngineTest",
+          "kind": "class",
+          "line": 10
+        },
+        {
+          "name": "executeUsesTheSingleOrderedLifecycleAndDefersMaintenance",
+          "kind": "function",
+          "line": 12
+        },
+        {
+          "name": "everyCompanionSurfaceIsRepresentedByTheSharedContract",
+          "kind": "function",
+          "line": 82
+        },
+        {
+          "name": "neutralEventsStoreEvidenceAndResponsibilityWithoutRoleWording",
+          "kind": "function",
+          "line": 95
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/datastore/DefaultProvidersTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -68473,6 +68511,13 @@
         "line": 15
       }
     ],
+    "me.rerere.rikkahub.data.companion.CompanionTurnEngineTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionTurnEngineTest.kt",
+        "kind": "class",
+        "line": 10
+      }
+    ],
     "me.rerere.rikkahub.data.companion.CompanionTurnEntryPoint": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
@@ -69194,6 +69239,13 @@
         "line": 99
       }
     ],
+    "me.rerere.rikkahub.data.companion.everyCompanionSurfaceIsRepresentedByTheSharedContract": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionTurnEngineTest.kt",
+        "kind": "function",
+        "line": 82
+      }
+    ],
     "me.rerere.rikkahub.data.companion.everyFirstBatchActivityHasACompleteExecutionContract": [
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivitiesTest.kt",
@@ -69211,6 +69263,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
         "kind": "function",
         "line": 16
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.executeUsesTheSingleOrderedLifecycleAndDefersMaintenance": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionTurnEngineTest.kt",
+        "kind": "function",
+        "line": 12
       }
     ],
     "me.rerere.rikkahub.data.companion.expandExplicitCompanionResponsibilities": [
@@ -69547,6 +69606,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionStore.kt",
         "kind": "function",
         "line": 540
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.neutralEventsStoreEvidenceAndResponsibilityWithoutRoleWording": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionTurnEngineTest.kt",
+        "kind": "function",
+        "line": 95
       }
     ],
     "me.rerere.rikkahub.data.companion.newerCompanionLifeAnchor": [
