@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T15:33:44.864194+00:00",
-  "commit": "91f8373baa762dc725ecf3e052b1ff9edb91bd5e",
+  "generatedAt": "2026-07-23T15:35:18.453873+00:00",
+  "commit": "dbbcb0884dbf34abaefef6c1abc4c51703cf788b",
   "branch": "master",
-  "sourceFingerprint": "c49dd6504107e4beac9bf4778d6b1559bb34ae103e803c2ce979602b9ae3d69d",
+  "sourceFingerprint": "fa95585649d477df49b999a907c4d539c1d32f9622960e6643f4587eccc35303",
   "summary": {
     "files": 1112,
-    "lines": 263286,
+    "lines": 263292,
     "symbols": 5452,
     "productionCodeFiles": 787,
     "testFiles": 132,
@@ -10481,8 +10481,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 207,
-      "sha256": "a8d2d0acece692572a0ee6fb0648f65ebdebc78e6a03f566d87094f0d7cf2d1a",
+      "lines": 213,
+      "sha256": "8330ca5f9fe35b39de26039a13cb754457cdcdc768f74aaa457d1a07eadafc1b",
       "package": "me.rerere.rikkahub.data.ai.tools",
       "categories": [
         "AI与上下文",
@@ -10492,35 +10492,35 @@
         {
           "name": "SystemToolOption",
           "kind": "class",
-          "line": 22
+          "line": 23
         },
         {
           "name": "SystemTools",
           "kind": "class",
-          "line": 36
+          "line": 37
         },
         {
           "name": "hasLocationPermission",
           "kind": "function",
-          "line": 39
+          "line": 40
         },
         {
           "name": "hasNotificationPermission",
           "kind": "function",
-          "line": 43
+          "line": 44
         },
         {
           "name": "hasAppUsagePermission",
           "kind": "function",
-          "line": 48
+          "line": 49
         },
         {
           "name": "getTools",
           "kind": "function",
-          "line": 192
+          "line": 196
         }
       ],
-      "localImportCount": 7,
+      "localImportCount": 8,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -10529,6 +10529,7 @@
         "me.rerere.ai.core.Tool",
         "me.rerere.ai.ui.UIMessagePart",
         "me.rerere.rikkahub.data.datastore.Settings",
+        "me.rerere.rikkahub.data.datastore.getCurrentAssistant",
         "me.rerere.rikkahub.data.service.AmapService",
         "me.rerere.rikkahub.data.service.LocationService",
         "me.rerere.rikkahub.data.service.RikkaNotificationListenerService"
@@ -66690,14 +66691,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
         "kind": "class",
-        "line": 22
+        "line": 23
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.SystemTools": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
         "kind": "class",
-        "line": 36
+        "line": 37
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.TimeInfo": [
@@ -66968,14 +66969,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
         "kind": "function",
-        "line": 192
+        "line": 196
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.hasAppUsagePermission": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
         "kind": "function",
-        "line": 48
+        "line": 49
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.hasLocationPermission": [
@@ -66987,14 +66988,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
         "kind": "function",
-        "line": 39
+        "line": 40
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.hasNotificationPermission": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
         "kind": "function",
-        "line": 43
+        "line": 44
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.humanLikeToolGuidance": [
