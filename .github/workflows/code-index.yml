@@ -79,15 +79,6 @@ jobs:
               raise SystemExit("Code index contains no symbol index")
           PY
 
-      - name: Upload generated index for diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: repository-code-index
-          path: |
-            docs/architecture/CODE_INDEX.md
-            docs/architecture/code-index.json
-          retention-days: 7
-
       - name: Commit refreshed index
         run: |
           if [ -z "$(git status --porcelain -- docs/architecture/CODE_INDEX.md docs/architecture/code-index.json)" ]; then
