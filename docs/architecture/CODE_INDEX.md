@@ -12,19 +12,19 @@
 
 ## 索引状态
 
-- 基准提交：`550e675f00011f89473291820e1e427ef4fcd8db`
+- 基准提交：`48f0d590e5be912dfd9f1693d3b50365aca7bdbe`
 - 分支：`master`
-- 源码指纹：`97eb88e92705a6fa…`
-- 已索引文件：1114
-- 已索引代码/文本行：263511
-- 已发现类、接口、对象、函数及 Composable：5461
+- 源码指纹：`a5fc5dca25a416d5…`
+- 已索引文件：1115
+- 已索引代码/文本行：263590
+- 已发现类、接口、对象、函数及 Composable：5462
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
 | 生产代码文件 | 789 |
-| 测试文件 | 132 |
+| 测试文件 | 133 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
 | TODO/FIXME/HACK/XXX | 32 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 653 |
+| `app` | 654 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 721 |
+| `.kt` | 722 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -504,11 +504,11 @@
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryArchiveTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankContextTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankServiceExtractionTest.kt`
+- `app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnosticsTest.kt`
-- ……另有 12 个文件，见 `code-index.json`
+- ……另有 13 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 
@@ -534,7 +534,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：1937
-- 可检索完整符号：4862
+- 可检索完整符号：4863
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|

@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:32:23.069579+00:00",
-  "commit": "550e675f00011f89473291820e1e427ef4fcd8db",
+  "generatedAt": "2026-07-23T17:32:41.977279+00:00",
+  "commit": "48f0d590e5be912dfd9f1693d3b50365aca7bdbe",
   "branch": "master",
-  "sourceFingerprint": "97eb88e92705a6fa7d157d102e720d7813570bc65ee1f077449ab0bf76e2e31c",
+  "sourceFingerprint": "a5fc5dca25a416d5b224c2192c5ee950e297cb12509c16b83392aca6650248c5",
   "summary": {
-    "files": 1114,
-    "lines": 263511,
-    "symbols": 5461,
+    "files": 1115,
+    "lines": 263590,
+    "symbols": 5462,
     "productionCodeFiles": 789,
-    "testFiles": 132,
+    "testFiles": 133,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 653,
+      "app": 654,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 721,
+      ".kt": 722,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -66,7 +66,7 @@
       "构建与发布": 13,
       "电话与语音": 49,
       "界面": 284,
-      "记忆": 42
+      "记忆": 43
     },
     "resolvedImportEdges": 1937
   },
@@ -1886,6 +1886,7 @@
       "app/src/test/java/me/rerere/rikkahub/data/service/MemoryArchiveTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankContextTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankServiceExtractionTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt",
@@ -47261,6 +47262,31 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 79,
+      "sha256": "cad83451356cbe5a1a0e31a65406fa90644723affa90a70a1549c7640a9566c7",
+      "package": "me.rerere.rikkahub.data.service",
+      "categories": [
+        "记忆"
+      ],
+      "symbols": [
+        {
+          "name": "MemoryCandidateDeduplicationTest",
+          "kind": "class",
+          "line": 7
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -74837,6 +74863,13 @@
         "path": "app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankServiceExtractionTest.kt",
         "kind": "class",
         "line": 16
+      }
+    ],
+    "me.rerere.rikkahub.data.service.MemoryCandidateDeduplicationTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt",
+        "kind": "class",
+        "line": 7
       }
     ],
     "me.rerere.rikkahub.data.service.MemoryCandidateQualityGate": [
