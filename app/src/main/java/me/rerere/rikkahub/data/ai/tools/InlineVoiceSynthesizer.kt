@@ -23,13 +23,12 @@ internal fun scheduleInlineVoiceMessage(
 ): UIMessagePart.VoiceMessage {
     val cleanText = text.trim()
     require(cleanText.isNotBlank()) { "voice text is blank" }
-    val directory = File(context.cacheDir, "inline-character-voice").apply { mkdirs() }
+    val directory = inlineVoiceDirectory(context)
     val target = File(directory, "${UUID.randomUUID()}.voice")
     val estimatedDurationMs = estimateVoiceDurationMs(cleanText)
 
     GlobalContext.get().get<AppScope>().launch {
         synthesizeInlineVoiceToFile(
-            context = context,
             text = cleanText,
             target = target,
         )
@@ -48,10 +47,8 @@ internal suspend fun synthesizeInlineVoiceMessage(
 ): Result<UIMessagePart.VoiceMessage> = runCatching {
     val cleanText = text.trim()
     require(cleanText.isNotBlank()) { "voice text is blank" }
-    val directory = File(context.cacheDir, "inline-character-voice").apply { mkdirs() }
-    val target = File(directory, "${UUID.randomUUID()}.voice")
+    val target = File(inlineVoiceDirectory(context), "${UUID.randomUUID()}.voice")
     val durationMs = synthesizeInlineVoiceToFile(
-        context = context,
         text = cleanText,
         target = target,
     )
@@ -62,8 +59,10 @@ internal suspend fun synthesizeInlineVoiceMessage(
     )
 }
 
+private fun inlineVoiceDirectory(context: Context): File =
+    File(context.filesDir, "inline-character-voice").apply { mkdirs() }
+
 private suspend fun synthesizeInlineVoiceToFile(
-    context: Context,
     text: String,
     target: File,
 ): Long {
@@ -86,7 +85,6 @@ private suspend fun synthesizeInlineVoiceToFile(
         response.audioData
     }
     target.writeBytes(playableBytes)
-    pruneInlineVoiceCache(File(context.cacheDir, "inline-character-voice"))
 
     return response.duration
         ?.takeIf { it > 0f }
@@ -122,16 +120,7 @@ private fun pcm16MonoToWav(pcm: ByteArray, sampleRate: Int): ByteArray {
     return output.toByteArray()
 }
 
-private fun pruneInlineVoiceCache(directory: File) {
-    directory.listFiles()
-        ?.filter(File::isFile)
-        ?.sortedByDescending(File::lastModified)
-        ?.drop(MAX_INLINE_VOICE_FILES)
-        ?.forEach { file -> file.delete() }
-}
-
 private const val DEFAULT_PCM_SAMPLE_RATE = 24_000
 private const val PCM_CHANNELS = 1
 private const val PCM_BITS_PER_SAMPLE = 16
 private const val WAV_HEADER_SIZE = 44
-private const val MAX_INLINE_VOICE_FILES = 80
