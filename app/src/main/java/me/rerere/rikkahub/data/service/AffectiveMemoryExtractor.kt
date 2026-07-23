@@ -369,7 +369,8 @@ private fun memoryTextSimilarity(left: String, right: String): Double {
     val leftParts = left.memoryCharacterBigrams()
     val rightParts = right.memoryCharacterBigrams()
     if (leftParts.isEmpty() || rightParts.isEmpty()) return 0.0
-    val intersection = leftParts.intersect(rightParts).size.toDouble()
+    val intersection = leftParts.intersect(rightParts).size
+    if (intersection < MEMORY_TEXT_DUPLICATE_MIN_SHARED_BIGRAMS) return 0.0
     val union = (leftParts + rightParts).size.toDouble()
     return if (union == 0.0) 0.0 else intersection / union
 }
@@ -491,4 +492,5 @@ private fun String.looksLikeVocabularyDrill(): Boolean {
     return uniqueRatio > 0.75 && !hasSentencePunctuation
 }
 
-private const val MEMORY_TEXT_DUPLICATE_THRESHOLD = 0.58
+private const val MEMORY_TEXT_DUPLICATE_THRESHOLD = 0.20
+private const val MEMORY_TEXT_DUPLICATE_MIN_SHARED_BIGRAMS = 3
