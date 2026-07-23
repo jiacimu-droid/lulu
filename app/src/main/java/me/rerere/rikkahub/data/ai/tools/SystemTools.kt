@@ -11,6 +11,7 @@ import me.rerere.ai.core.InputSchema
 import me.rerere.ai.core.Tool
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.datastore.Settings
+import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.service.AmapService
 import me.rerere.rikkahub.data.service.LocationService
 import me.rerere.rikkahub.data.service.RikkaNotificationListenerService
@@ -186,11 +187,16 @@ class SystemTools(private val context: Context, private val settings: Settings) 
     private val musicTool by lazy { createMusicTool(context) }
     private val smsTool by lazy { createSmsTool(context) }
     private val weatherTool by lazy { createWeatherTool(context, settings) }
+    private val requestedVoiceCallTool by lazy {
+        createRequestedVoiceCallTool(context, settings.getCurrentAssistant().id.toString())
+    }
 
     // ==================== 获取工具列表 ====================
 
     fun getTools(enabledTools: Set<SystemToolOption>): List<Tool> {
         val tools = mutableListOf<Tool>()
+        // Explicitly requested calls are a core character action, not an optional random-call setting.
+        tools.add(requestedVoiceCallTool)
         if (SystemToolOption.Location in enabledTools) tools.add(locationTool)
         if (SystemToolOption.Notifications in enabledTools) tools.add(notificationsTool)
         if (SystemToolOption.AppUsage in enabledTools) tools.add(appUsageTool)
