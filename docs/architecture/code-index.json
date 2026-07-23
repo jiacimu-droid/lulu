@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:30:56.244810+00:00",
-  "commit": "0e824b5faff0d99929fccafe0818378eae09184f",
+  "generatedAt": "2026-07-23T11:31:39.314824+00:00",
+  "commit": "e132f47471b2d339d86d2327b14d0c5b5e9d412e",
   "branch": "master",
-  "sourceFingerprint": "b4bc04d08059d21d09f7884eee425ee0b2db23dde02ccb278d0ad678a89226d7",
+  "sourceFingerprint": "935109650b15b1fcf795ea671bac5f5513f13231ec1633930faa78cc7953717e",
   "summary": {
     "files": 1106,
     "lines": 262657,
@@ -21320,7 +21320,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 250,
-      "sha256": "7695a028e7082c7b33fcf2f55537d9830859d52075f61f333e791a12aec82fbf",
+      "sha256": "28764a539f16043dd5d5b26e508c9ecb36b2ad10d19f210ab0b9a3b0d5daf809",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "主动代理"
