@@ -61,6 +61,17 @@ object CurrentWeekStudyRecovery {
         ),
     ).associateBy { it.date }
 
+    init {
+        installIntoExamStudyPlan()
+    }
+
+    /** Makes the existing Today/Tomorrow dashboard consume the same corrected plans. */
+    fun installIntoExamStudyPlan() {
+        @Suppress("UNCHECKED_CAST")
+        val mutableDailyPlans = ExamStudyPlan.dailyPlans as? MutableMap<LocalDate, DailyStudyPlan>
+        mutableDailyPlans?.putAll(plans)
+    }
+
     fun planFor(date: LocalDate): DailyStudyPlan? = plans[date]
 
     fun plannedMinutes(date: LocalDate): Int = when (date) {
@@ -73,6 +84,7 @@ object CurrentWeekStudyRecovery {
     }
 
     fun applyToState(state: StudyState, date: LocalDate): StudyState {
+        installIntoExamStudyPlan()
         val plan = planFor(date) ?: return state
         val dateText = date.toString()
         val manualTasks = state.tasks.filter { it.source != StudyTaskSource.Plan }
@@ -92,17 +104,22 @@ object CurrentWeekStudyRecovery {
                 source = StudyTaskSource.Plan,
             )
         }
+        val expectedSchedule = scheduleFor(date).orEmpty()
         val currentPlanTitles = state.tasks
             .filter { it.source == StudyTaskSource.Plan }
             .map { it.title }
         val nextPlanTitles = planTasks.map { it.title }
-        if (state.activePlanDate == dateText && currentPlanTitles == nextPlanTitles) return state
+        if (
+            state.activePlanDate == dateText &&
+            currentPlanTitles == nextPlanTitles &&
+            state.generatedSchedules[dateText] == expectedSchedule
+        ) return state
         return state.copy(
             today = dateText,
             tasks = planTasks + manualTasks,
             activePlanDate = dateText,
             superMomentAvailable = false,
-            generatedSchedules = state.generatedSchedules - dateText,
+            generatedSchedules = state.generatedSchedules + (dateText to expectedSchedule),
         )
     }
 
