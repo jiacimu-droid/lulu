@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`1478f11f7ddc355a71044213abc1e60e7a3582b0`
+- 基准提交：`fc13459eb49cd8d485df2224ff8ed06edd1928a1`
 - 分支：`master`
-- 源码指纹：`8219d9c6cea664a8…`
+- 源码指纹：`b100142c7cf4afb1…`
 - 已索引文件：1116
-- 已索引代码/文本行：263663
-- 已发现类、接口、对象、函数及 Composable：5471
+- 已索引代码/文本行：263603
+- 已发现类、接口、对象、函数及 Composable：5470
 
 ## 仓库健康信号
 
@@ -96,7 +96,7 @@
 | 文件 | 行数 | 符号 | 本地导入 |
 |---|---:|---:|---:|
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt` | 3372 | 87 | 51 |
-| `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 3203 | 91 | 126 |
+| `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 3143 | 90 | 126 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 2295 | 57 | 90 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt` | 1874 | 94 | 17 |
 | `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt` | 1579 | 14 | 18 |
@@ -115,7 +115,7 @@
 
 | 文件 | 本地导入 | 行数 |
 |---|---:|---:|
-| `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 126 | 3203 |
+| `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 126 | 3143 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 90 | 2295 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt` | 90 | 612 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 89 | 1032 |
