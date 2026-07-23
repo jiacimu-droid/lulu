@@ -1,6 +1,6 @@
 # Repository Guidelines
 
-本文档面向贡献者，概述本仓库的模块结构、开发流程与提交规范，便于快速上手并保持一致的协作质量。
+本文档面向贡献者及所有代码代理（包括 GPT、Codex 等），概述本仓库的模块结构、开发流程与提交规范，便于快速上手并保持一致的协作质量。
 
 ## Build, Test, and Development Commands
 
@@ -48,7 +48,7 @@
 
 - **Assistant**: An assistant configuration with system prompts, model parameters, and conversation isolation. Each
   assistant maintains its own settings including temperature, context size, custom headers, tools, memory options, regex
-  transformations, and prompt injections (mode/lorebook). Assistants provide isolated chat environments with specific
+  transformations, and prompt injections. Assistants provide isolated chat environments with specific
   behaviors and capabilities. (app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt)
 
 - **Conversation**: A persistent conversation thread between the user and an assistant. Each conversation maintains a
@@ -116,7 +116,6 @@
 
 角色相关改动建议检索：`陪伴`、`温柔`、`亲密`、`朋友`、`宝贝`、`主人`、`轻声`、`我在`、`接住`、`照看`。出现这些词不一定错误，但必须能由具体人设或用户证据解释，不能成为系统默认。
 
-
 ## Repository Index Protocol
 
 仓库级代码索引用于减少重复扫描，并保证跨阶段修改建立在最新调用链上：
@@ -126,3 +125,74 @@
 3. 新增、删除、重命名模块或关键入口时，不得手工伪造统计；运行生成器并检查索引 diff。
 4. `master` 上的 `Refresh code index` 工作流会自动提交最新索引；若工作流失败，代码改动不能被描述为“索引已同步”。
 5. 索引只负责导航。真实行为仍须回读实现、调用方、持久化路径、测试和失败路径，不得仅凭文件名推断。
+
+## GPT / Codex / AI Modification Efficiency Rules
+
+以下规则对 GPT、Codex 及所有在 Lulu 仓库工作的代码代理强制生效，目标是避免小改动或已接近完成的任务演变成长时间、重复性的 CI 会话。
+
+### 1. 修改前读取
+
+- 每个修改任务开始前必须阅读本文件。
+- 大范围修改前阅读当前代码索引或相关架构文档。
+- 必须检查当前真实实现和调用点，不得只依赖 Issue 描述或旧失败日志。
+- 必须区分历史失败和当前 `master` 的失败。
+
+### 2. 验证范围必须与改动范围匹配
+
+始终使用最小但有意义的验证命令，不得因为存在更大的测试套件就默认全部运行。
+
+- 仅文档修改：不需要编译。
+- `app` 内小型 Kotlin 生产代码修改：运行 `./gradlew :app:compileReleaseKotlin --no-daemon`。
+- 独立单元测试修改：尽可能只运行受影响的测试类。
+- 不涉及 Release 专属逻辑的 UI 修改：提交前进行一次聚焦 Kotlin 编译即可。
+- 完整 `assembleRelease`、Android Lint 和全仓测试属于阶段／发布验收，不是每次小改的默认门槛。
+
+### 3. 无关历史测试不得阻塞聚焦修改
+
+- 若生产代码的 Release Kotlin 编译成功，而全仓测试存在与当前文件无关的既有失败，应提交本次聚焦修改，并把测试基线债务单独记录。
+- 未证明失败与当前改动有关前，禁止反复重跑相同的全仓失败套件。
+- 一旦确认一次全仓失败与当前任务无关，立即停止把它作为本次任务门槛。
+- 用户未明确扩大范围时，不得在聚焦功能／重构任务中顺手修理无关测试。
+
+### 4. 一次诊断，然后直接修源码
+
+- 失败后提取第一批可执行的编译／测试错误，必须包含文件名和行号。
+- 直接修这些具体错误，然后只重跑同一个聚焦命令一次。
+- 当现有构建日志已经包含错误时，禁止继续叠加诊断工作流、评论、Artifact 和临时脚本。
+- 禁止把多轮时间花在改善日志采集，而不是修复源码。
+
+### 5. 工作流纪律
+
+- 禁止为每个修复创建新的单次 GitHub Actions 工作流。
+- 优先复用现有 Signed APK／Release 工作流和现有 CI。
+- 只有直接仓库工具无法安全完成修改时才允许临时工作流，并须在使用后立即关闭或删除。
+- 未经用户明确同意，临时工作流不得成为 Actions 页面中的永久入口。
+
+### 6. 提交策略
+
+- 先完成用户要求的代码，不得把任务的大部分时间用于设计验证基础设施。
+- 最小相关编译通过后，直接提交到用户指定分支。
+- 提交应聚焦、可回滚。
+- 代码提交后，由现有的 `master` push Release 工作流执行最终签名 APK 验收。
+- 当前 `master` 的 Release 未明确成功前，禁止宣称整个工程已经绿了。
+
+### 7. 多部分任务执行
+
+- 维护用户要求的具体清单。
+- 按顺序完成实现部分，不得反复重新审计已完成内容。
+- 仍有主要部分未完成时，不得描述为“差不多完成”。
+- 汇报时必须区分：已进入 `master`、仅验证过、仍未完成。
+
+### 8. 2026-07-23 效率事故复盘
+
+一次陪伴核心重构已经通过生产 Release Kotlin 编译，但仍因全仓测试被当作阻塞门槛而继续了多轮。该测试套件包含三十多个无关历史失败；额外的诊断工作流和重复运行消耗了大量用户时间，却没有实质推进用户要求的实现。
+
+正确流程应当是：
+
+1. 运行聚焦的 Release Kotlin 编译。
+2. 修复三处真实残留的 `sessions` 调用点。
+3. 重跑同一个聚焦编译。
+4. 编译通过后立即提交。
+5. 把无关测试基线失败单独记录。
+
+今后 Lulu 开发中，用户时间和实际实现进度优先于仪式化验证。验证必须成比例、聚焦，并与当前改动直接相关。
