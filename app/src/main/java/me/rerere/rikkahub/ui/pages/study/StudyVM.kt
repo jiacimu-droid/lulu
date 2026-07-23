@@ -21,6 +21,7 @@ import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
+import me.rerere.rikkahub.data.study.CurrentWeekStudyRecovery
 import me.rerere.rikkahub.data.study.ExamStudyPlan
 import me.rerere.rikkahub.data.study.StudyDrawResult
 import me.rerere.rikkahub.data.study.StudyMysteryBoxReward
@@ -52,7 +53,13 @@ class StudyVM(
     private val _isGeneratingSchedule = MutableStateFlow(false)
     val isGeneratingSchedule = _isGeneratingSchedule.asStateFlow()
 
-    fun syncToday() = reduce { StudyRules.rolloverToDate(it, LocalDate.now()) }
+    fun syncToday() = reduce { current ->
+        val date = LocalDate.now()
+        CurrentWeekStudyRecovery.applyToState(
+            state = StudyRules.rolloverToDate(current, date),
+            date = date,
+        )
+    }
 
     fun selectCompanion(assistantId: String) = reduce { StudyRules.selectCompanion(it, assistantId) }
 
@@ -78,7 +85,7 @@ class StudyVM(
             try {
                 val date = LocalDate.now()
                 val currentTime = LocalTime.now()
-                val currentState = state.value
+                val currentState = CurrentWeekStudyRecovery.applyToState(state.value, date)
                 val settings = settingsStore.settingsFlow.first()
                 val assistant = settings.getCurrentAssistant()
                 val model = settings.findModelById(assistant.chatModelId ?: settings.chatModelId)
@@ -87,10 +94,20 @@ class StudyVM(
                 val providerSetting = model.findProvider(settings.providers)
                     ?: error("当前主聊天模型没有找到对应提供商。")
                 val provider = providerManager.getProviderByType(providerSetting)
-                val prompt = ExamStudyPlan.dynamicSchedulePrompt(
+                val presetPlan = CurrentWeekStudyRecovery.planFor(date) ?: ExamStudyPlan.todayPlan(date)
+                val defaultSchedule = CurrentWeekStudyRecovery.scheduleFor(date) ?: ExamStudyPlan.todaySchedule(date)
+                val recoveryPrompt = presetPlan?.let { plan ->
+                    CurrentWeekStudyRecovery.dynamicSchedulePrompt(
+                        date = date,
+                        presetPlan = plan,
+                        tasks = currentState.tasks,
+                        currentTime = currentTime,
+                    )
+                }
+                val prompt = recoveryPrompt ?: ExamStudyPlan.dynamicSchedulePrompt(
                     date = date,
-                    presetPlan = ExamStudyPlan.todayPlan(date),
-                    defaultSchedule = ExamStudyPlan.todaySchedule(date),
+                    presetPlan = presetPlan,
+                    defaultSchedule = defaultSchedule,
                     tasks = currentState.tasks,
                     currentTime = currentTime,
                 )
