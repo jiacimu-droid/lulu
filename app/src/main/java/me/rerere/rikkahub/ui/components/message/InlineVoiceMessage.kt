@@ -2,17 +2,14 @@ package me.rerere.rikkahub.ui.components.message
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -37,11 +34,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.ai.ui.isEmptyUIMessage
 import me.rerere.hugeicons.HugeIcons
@@ -55,7 +50,7 @@ import me.rerere.tts.model.PlaybackStatus
 import org.koin.compose.koinInject
 
 private const val TTS_TOOL_NAME = "text_to_speech"
-private const val INLINE_TTS_TEXT_KEY = "lulu_inline_tts_text"
+internal const val INLINE_TTS_VOICE_URL = "lulu-tts://inline"
 
 private val INLINE_VOICE_SENTENCE_BOUNDARY_REGEX =
     Regex("(?<=[.!?~～。！？])\\s*|(?<=…)(?=\\s|$)\\s*|\\n+")
@@ -76,12 +71,11 @@ internal fun List<UIMessagePart>.hasVisibleChatContent(): Boolean =
     }
 
 /**
- * Promotes the character's text_to_speech tool call into the visible content stream.
+ * Promotes a character text_to_speech tool call into the visible content stream.
  *
- * The model can call the tool before it writes its final text. We therefore match the requested
- * voice sentence against the later text bubbles, replace that one sentence in place, and remove
- * the tool from the reasoning chain. If the model did not repeat the sentence, the voice bubble
- * remains at the original tool position as a safe fallback.
+ * The requested voice sentence is matched against the final text bubbles and replaces that exact
+ * sentence in place. The tool itself is removed from the reasoning chain. When a provider omits the
+ * sentence from its final text, the voice bubble remains at the original tool position as fallback.
  */
 internal fun List<UIMessagePart>.withInlineTtsVoiceMessages(): List<UIMessagePart> {
     val requests = mapIndexedNotNull { index, part ->
@@ -112,18 +106,15 @@ internal fun List<UIMessagePart>.withInlineTtsVoiceMessages(): List<UIMessagePar
     }
 
     val matchedIds = matches.values.mapTo(mutableSetOf()) { it.id }
-    val requestsByPart = requests.associateBy(InlineVoiceRequest::partIndex)
+    val unmatchedByPart = remaining.associateBy(InlineVoiceRequest::partIndex)
     val result = mutableListOf<UIMessagePart>()
 
     forEachIndexed { partIndex, part ->
         when {
             part is UIMessagePart.Tool && part.toolName == TTS_TOOL_NAME -> {
-                val request = requestsByPart[partIndex]
+                val request = unmatchedByPart[partIndex]
                 if (request != null && request.id !in matchedIds) {
-                    result += inlineVoiceTextPart(
-                        text = request.bubbleText,
-                        sourceMetadata = part.metadata,
-                    )
+                    result += request.toVoiceMessage()
                 }
             }
 
@@ -131,10 +122,7 @@ internal fun List<UIMessagePart>.withInlineTtsVoiceMessages(): List<UIMessagePar
                 part.text.toVoiceCandidateSegments().forEachIndexed { segmentIndex, segment ->
                     val request = matches[partIndex to segmentIndex]
                     result += if (request != null) {
-                        inlineVoiceTextPart(
-                            text = segment.trim(),
-                            sourceMetadata = part.metadata,
-                        )
+                        request.copy(bubbleText = segment.trim()).toVoiceMessage()
                     } else {
                         part.copy(text = segment.trim())
                     }
@@ -148,13 +136,17 @@ internal fun List<UIMessagePart>.withInlineTtsVoiceMessages(): List<UIMessagePar
     return result
 }
 
-internal fun UIMessagePart.Text.inlineTtsVoiceText(): String? =
-    metadata
-        ?.get(INLINE_TTS_TEXT_KEY)
-        ?.jsonPrimitive
-        ?.contentOrNull
-        ?.trim()
-        ?.takeIf(String::isNotBlank)
+internal fun UIMessagePart.VoiceMessage.isInlineTtsVoiceMessage(): Boolean =
+    url == INLINE_TTS_VOICE_URL
+
+private fun InlineVoiceRequest.toVoiceMessage(): UIMessagePart.VoiceMessage {
+    val estimatedDurationMs = (bubbleText.length / 5).coerceAtLeast(1) * 1_000L
+    return UIMessagePart.VoiceMessage(
+        url = INLINE_TTS_VOICE_URL,
+        duration = estimatedDurationMs,
+        transcript = bubbleText,
+    )
+}
 
 private fun UIMessagePart.Tool.inlineTtsRequestText(): String? {
     if (toolName != TTS_TOOL_NAME) return null
@@ -167,17 +159,6 @@ private fun UIMessagePart.Tool.inlineTtsRequestText(): String? {
             ?.takeIf(String::isNotBlank)
     }.getOrNull()
 }
-
-private fun inlineVoiceTextPart(
-    text: String,
-    sourceMetadata: kotlinx.serialization.json.JsonObject?,
-): UIMessagePart.Text = UIMessagePart.Text(
-    text = "",
-    metadata = buildJsonObject {
-        sourceMetadata?.forEach { (key, value) -> put(key, value) }
-        put(INLINE_TTS_TEXT_KEY, text)
-    },
-)
 
 private fun String.toVoiceCandidateSegments(): List<String> {
     val clean = trim()
@@ -239,16 +220,16 @@ internal fun InlineTtsVoiceMessageBubble(text: String) {
         val random = java.util.Random(text.hashCode().toLong())
         List(28) { 0.2f + random.nextFloat() * 0.8f }
     }
-    val voiceWidth = (140 + text.length.coerceAtMost(32) * 3).dp
+    val voiceWidth = (140 + text.length.coerceAtMost(32) * 3).coerceAtMost(240).dp
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val inactiveWaveColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.24f)
 
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.Start,
     ) {
         Surface(
-            modifier = Modifier
-                .widthIn(min = 140.dp, max = 240.dp)
-                .width(voiceWidth.coerceAtMost(240.dp)),
+            modifier = Modifier.width(voiceWidth),
             shape = RoundedCornerShape(18.dp),
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
             onClick = {
@@ -271,7 +252,7 @@ internal fun InlineTtsVoiceMessageBubble(text: String) {
                     modifier = Modifier
                         .size(30.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
+                        .background(primaryColor),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -296,11 +277,7 @@ internal fun InlineTtsVoiceMessageBubble(text: String) {
                         val x = index * (barWidth + gap)
                         val y = (size.height - barHeight) / 2f
                         drawRoundRect(
-                            color = if (index < playedBars) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.24f)
-                            },
+                            color = if (index < playedBars) primaryColor else inactiveWaveColor,
                             topLeft = Offset(x, y),
                             size = Size(barWidth, barHeight),
                             cornerRadius = CornerRadius(1.2f, 1.2f),
