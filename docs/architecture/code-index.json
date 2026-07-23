@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T15:35:18.453873+00:00",
-  "commit": "dbbcb0884dbf34abaefef6c1abc4c51703cf788b",
+  "generatedAt": "2026-07-23T15:36:37.066889+00:00",
+  "commit": "938cdbebf085953d0d0aff80d2ade99c334db9f0",
   "branch": "master",
-  "sourceFingerprint": "fa95585649d477df49b999a907c4d539c1d32f9622960e6643f4587eccc35303",
+  "sourceFingerprint": "e6d5df8d61225aba05e08a5efdd258ebd92c6b223c67d1ddb74985fbdb63ae9b",
   "summary": {
     "files": 1112,
-    "lines": 263292,
-    "symbols": 5452,
+    "lines": 263200,
+    "symbols": 5446,
     "productionCodeFiles": 787,
     "testFiles": 132,
     "largeProductionFiles": 42,
@@ -11163,8 +11163,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 433,
-      "sha256": "f0b7653ceb5fae31e892c7bd527cbc3271982cbc47ea4944dadf08b6435b2e1e",
+      "lines": 341,
+      "sha256": "08607fa5725924584ec6237c7cb4fff1db1863b5e06ddecd0713d2c9b2445641",
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -11244,36 +11244,6 @@
           "name": "splitCompanionExpressionBubbles",
           "kind": "function",
           "line": 323
-        },
-        {
-          "name": "segmentParagraphBubbles",
-          "kind": "function",
-          "line": 369
-        },
-        {
-          "name": "splitParagraphBubbleUnits",
-          "kind": "function",
-          "line": 390
-        },
-        {
-          "name": "startsWithDependentConnector",
-          "kind": "function",
-          "line": 410
-        },
-        {
-          "name": "startsWithAnaphoricContinuation",
-          "kind": "function",
-          "line": 412
-        },
-        {
-          "name": "endsWithTerminalPunctuation",
-          "kind": "function",
-          "line": 415
-        },
-        {
-          "name": "visualBubbleLength",
-          "kind": "function",
-          "line": 420
         }
       ],
       "localImportCount": 6,
@@ -67694,13 +67664,6 @@
         "line": 134
       }
     ],
-    "me.rerere.rikkahub.data.ai.transformers.endsWithTerminalPunctuation": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
-        "kind": "function",
-        "line": 415
-      }
-    ],
     "me.rerere.rikkahub.data.ai.transformers.extractLuluPresenceMetadata": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
@@ -67906,13 +67869,6 @@
         "line": 105
       }
     ],
-    "me.rerere.rikkahub.data.ai.transformers.segmentParagraphBubbles": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
-        "kind": "function",
-        "line": 369
-      }
-    ],
     "me.rerere.rikkahub.data.ai.transformers.setCharset": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/TemplateTransformer.kt",
@@ -67946,27 +67902,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "kind": "function",
         "line": 41
-      }
-    ],
-    "me.rerere.rikkahub.data.ai.transformers.splitParagraphBubbleUnits": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
-        "kind": "function",
-        "line": 390
-      }
-    ],
-    "me.rerere.rikkahub.data.ai.transformers.startsWithAnaphoricContinuation": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
-        "kind": "function",
-        "line": 412
-      }
-    ],
-    "me.rerere.rikkahub.data.ai.transformers.startsWithDependentConnector": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
-        "kind": "function",
-        "line": 410
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.supportClaim": [
@@ -68104,13 +68039,6 @@
         "path": "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/TimeReminderTransformerTest.kt",
         "kind": "function",
         "line": 19
-      }
-    ],
-    "me.rerere.rikkahub.data.ai.transformers.visualBubbleLength": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
-        "kind": "function",
-        "line": 420
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.visualTransform": [
