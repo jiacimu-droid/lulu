@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:38:43.352918+00:00",
-  "commit": "ceed8a4d8beb1749c497d55c0c60f1e176bd8c2d",
+  "generatedAt": "2026-07-23T17:39:57.647594+00:00",
+  "commit": "80a37501f04a2f9947f158fc46d6552c85b3b2b7",
   "branch": "master",
-  "sourceFingerprint": "5edf9d43d61c4b57ef79a5e1c681f82d89dc18b58bb6f2d5a210ea51fe6f2c9f",
+  "sourceFingerprint": "cb4afe8bd7d97510e62476e798f44497f977693fe6a90b98c231ff07ba7e51de",
   "summary": {
     "files": 1116,
-    "lines": 263743,
+    "lines": 263732,
     "symbols": 5471,
     "productionCodeFiles": 789,
     "testFiles": 134,
@@ -10048,8 +10048,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 137,
-      "sha256": "44f007ce9769316ec446945b6e0e0778a478cd6c38f04c78dceb5b13d56c824f",
+      "lines": 126,
+      "sha256": "46f694f981bffc762a6c6e865e682923880fd96b46c7651f2c231e28f87bcaf7",
       "package": "me.rerere.rikkahub.data.ai.tools",
       "categories": [
         "AI与上下文"
@@ -10063,7 +10063,12 @@
         {
           "name": "synthesizeInlineVoiceMessage",
           "kind": "function",
-          "line": 45
+          "line": 44
+        },
+        {
+          "name": "inlineVoiceDirectory",
+          "kind": "function",
+          "line": 62
         },
         {
           "name": "synthesizeInlineVoiceToFile",
@@ -10073,17 +10078,12 @@
         {
           "name": "estimateVoiceDurationMs",
           "kind": "function",
-          "line": 97
+          "line": 95
         },
         {
           "name": "pcm16MonoToWav",
           "kind": "function",
-          "line": 100
-        },
-        {
-          "name": "pruneInlineVoiceCache",
-          "kind": "function",
-          "line": 125
+          "line": 98
         }
       ],
       "localImportCount": 8,
@@ -67145,7 +67145,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "kind": "function",
-        "line": 97
+        "line": 95
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.fakeTool": [
@@ -67242,6 +67242,13 @@
         "line": 113
       }
     ],
+    "me.rerere.rikkahub.data.ai.tools.inlineVoiceDirectory": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
+        "kind": "function",
+        "line": 62
+      }
+    ],
     "me.rerere.rikkahub.data.ai.tools.isNotificationListenerEnabled": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/MusicTool.kt",
@@ -67281,7 +67288,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "kind": "function",
-        "line": 100
+        "line": 98
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.playCompanionDiceDuel": [
@@ -67310,13 +67317,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
         "kind": "function",
         "line": 209
-      }
-    ],
-    "me.rerere.rikkahub.data.ai.tools.pruneInlineVoiceCache": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
-        "kind": "function",
-        "line": 125
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.put": [
@@ -67372,7 +67372,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "kind": "function",
-        "line": 45
+        "line": 44
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.synthesizeInlineVoiceToFile": [
