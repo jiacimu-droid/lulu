@@ -43,3 +43,5 @@ jobs:
           git commit -m "docs: record suggestion-chain remnants [skip ci] [skip index]"
           git pull --rebase origin master
           git push origin HEAD:master
+
+# Triggered after the workflow existed on master.
