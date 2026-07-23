@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T16:46:27.815807+00:00",
-  "commit": "1409a98e00fe6fb3e1ce3b9984ca495622eb114a",
+  "generatedAt": "2026-07-23T17:01:00.006469+00:00",
+  "commit": "0924725bf2c210801b5307a467af5bbcec3c5b7d",
   "branch": "master",
-  "sourceFingerprint": "ea87ea7d91cb1c4e0fadb92c56d778090cc6f70000e84864f35c9dc84103b32a",
+  "sourceFingerprint": "1836c193b69e5695524ee498f66a1312b1bb586fe0e394eb2fcf49abf895576e",
   "summary": {
     "files": 1112,
-    "lines": 263187,
+    "lines": 263205,
     "symbols": 5446,
     "productionCodeFiles": 787,
     "testFiles": 132,
@@ -833,7 +833,7 @@
       },
       {
         "path": "AGENTS.md",
-        "lines": 167,
+        "lines": 185,
         "symbols": 0,
         "localImportCount": 0,
         "todoMarkers": 1
@@ -3257,8 +3257,8 @@
       "path": "AGENTS.md",
       "module": "root",
       "extension": ".md",
-      "lines": 167,
-      "sha256": "55d8c21c5f261ee222c8dc746ce3c8809530f40fba5e92ca7799206387644932",
+      "lines": 185,
+      "sha256": "9c8d3c3dc950f3843c191a7c3cbe1a76e112c195b6d4e33d4a6058e60dd6a109",
       "package": null,
       "categories": [],
       "symbols": [],
