@@ -16,7 +16,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Apply compile-safety cleanup
         run: |
           python3 <<'PY'
@@ -24,19 +23,13 @@ jobs:
           path = Path('app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt')
           text = path.read_text(encoding='utf-8')
           if 'import androidx.compose.foundation.layout.weight\n' not in text:
-              text = text.replace(
-                  'import androidx.compose.foundation.layout.wrapContentWidth\n',
-                  'import androidx.compose.foundation.layout.wrapContentWidth\nimport androidx.compose.foundation.layout.weight\n',
-                  1,
-              )
+              text = text.replace('import androidx.compose.foundation.layout.wrapContentWidth\n', 'import androidx.compose.foundation.layout.wrapContentWidth\nimport androidx.compose.foundation.layout.weight\n', 1)
           text = text.replace('import androidx.compose.material3.PrimaryTabRow\n', 'import androidx.compose.material3.SecondaryTabRow\n')
           text = text.replace('PrimaryTabRow(selectedTabIndex = pagerState.currentPage)', 'SecondaryTabRow(selectedTabIndex = pagerState.currentPage)')
           path.write_text(text, encoding='utf-8')
           PY
-
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
-
       - name: Commit verified changes
         run: |
           rm -f .github/workflows/verify-performance-monitor-once.yml
