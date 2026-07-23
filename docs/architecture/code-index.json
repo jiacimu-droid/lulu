@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T13:52:10.497406+00:00",
-  "commit": "0ce467c785f7c70cdae5e5ddb96292810ccbf20d",
+  "generatedAt": "2026-07-23T13:52:46.213885+00:00",
+  "commit": "c24d886b7a2e75947e937b02de6767582f6eb758",
   "branch": "master",
-  "sourceFingerprint": "f788a681dd1eaa749ebd01b032041e608e802a2bcdbdb44b62aade387823ad8b",
+  "sourceFingerprint": "2ed222ea95211279c79706901f97ee5125471cc9560761ea117b24e2cc84fea5",
   "summary": {
     "files": 1113,
-    "lines": 263452,
+    "lines": 263385,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -812,7 +812,7 @@
       },
       {
         "path": "CLAUDE.md",
-        "lines": 169,
+        "lines": 102,
         "symbols": 0,
         "localImportCount": 0,
         "todoMarkers": 2
@@ -3292,8 +3292,8 @@
       "path": "CLAUDE.md",
       "module": "root",
       "extension": ".md",
-      "lines": 169,
-      "sha256": "55834939fa69bc446221dee25c27bd0c13ac7f6f339fd94ee765de6a4a1106d8",
+      "lines": 102,
+      "sha256": "5673d935567fed264550d4cb1effdd7a0eca8f2afa109e387e3b77f09ab9fb7f",
       "package": null,
       "categories": [],
       "symbols": [],
