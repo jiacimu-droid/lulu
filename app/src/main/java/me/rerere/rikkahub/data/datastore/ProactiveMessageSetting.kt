@@ -52,10 +52,12 @@ internal fun shouldUseProactiveCallChannel(
 ): Boolean {
     if (!setting.enabled || setting.isQuietHour(localHour)) return false
     if (millisSinceLastCall < setting.minIntervalHours.coerceAtLeast(1) * 60L * 60L * 1_000L) return false
+    // This choice is reached only after the character has already decided to contact the user.
+    // Keep quiet hours, cooldown and persona judgment intact, while making calls realistically reachable.
     val chancePercent = when (setting.frequency) {
-        ProactiveCallFrequency.OCCASIONAL -> 15
-        ProactiveCallFrequency.NORMAL -> 30
-        ProactiveCallFrequency.FREQUENT -> 50
+        ProactiveCallFrequency.OCCASIONAL -> 30
+        ProactiveCallFrequency.NORMAL -> 65
+        ProactiveCallFrequency.FREQUENT -> 90
     }
     return selector.coerceIn(0, 99) < chancePercent
 }
