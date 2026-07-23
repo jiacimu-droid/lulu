@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T15:39:54.043329+00:00",
-  "commit": "c81576ab35e9bc25a70db883e4c6b3d798acf14c",
+  "generatedAt": "2026-07-23T15:42:39.241727+00:00",
+  "commit": "db0534d20c241254fd80695c85f70f0b5e14d71c",
   "branch": "master",
-  "sourceFingerprint": "59dba8299e7f380941701e308a2be2ae6eb1348e3f573a85f7c634aded37a6b5",
+  "sourceFingerprint": "2e08c5176a62855db9d593262a93a1661b51f8d7103abb47ced72b2452c60581",
   "summary": {
     "files": 1112,
-    "lines": 263195,
+    "lines": 263205,
     "symbols": 5446,
     "productionCodeFiles": 787,
     "testFiles": 132,
@@ -698,7 +698,7 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
-        "lines": 503,
+        "lines": 513,
         "symbols": 3,
         "localImportCount": 30,
         "todoMarkers": 0
@@ -35063,8 +35063,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 503,
-      "sha256": "c807a71e864b620447f313db41d9530db487486399ee376e40248fd957eeebfa",
+      "lines": 513,
+      "sha256": "5cf2e326fcdc95aaaaafae60b6cbe9880621a4e96b1a98cd26b64e86873cc307",
       "package": "me.rerere.rikkahub.ui.pages.chat",
       "categories": [
         "界面"
@@ -35073,17 +35073,17 @@
         {
           "name": "ChatPage",
           "kind": "composable",
-          "line": 75
+          "line": 79
         },
         {
           "name": "ChatPageContent",
           "kind": "composable",
-          "line": 160
+          "line": 164
         },
         {
           "name": "TopBar",
           "kind": "composable",
-          "line": 410
+          "line": 420
         }
       ],
       "localImportCount": 30,
@@ -87531,14 +87531,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "kind": "composable",
-        "line": 75
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ChatPageContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "kind": "composable",
-        "line": 160
+        "line": 164
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ChatSuggestionsRow": [
@@ -87699,7 +87699,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "kind": "composable",
-        "line": 410
+        "line": 420
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.assistantMessage": [
