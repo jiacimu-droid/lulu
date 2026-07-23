@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:28:44.185234+00:00",
-  "commit": "c7b6be3ab13a051257299c2c85b3e8229154cf4e",
+  "generatedAt": "2026-07-23T11:29:13.826373+00:00",
+  "commit": "006b882673fc3dac3c4dc7c248212f4769716edb",
   "branch": "master",
-  "sourceFingerprint": "9133d07df8a9a10ebcbd524f8be4d03023f3f3c7fe776eac0429e50d05144772",
+  "sourceFingerprint": "34a0e2ee95d8927e8eebc2c3bceb4948b839ad29df5413897dfdf78869531544",
   "summary": {
     "files": 1105,
-    "lines": 262574,
+    "lines": 262585,
     "symbols": 5383,
     "productionCodeFiles": 782,
     "testFiles": 128,
@@ -68,7 +68,7 @@
       "界面": 284,
       "记忆": 42
     },
-    "resolvedImportEdges": 1870
+    "resolvedImportEdges": 1872
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -14090,7 +14090,9 @@
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/PerformanceMonitor.kt"
       ],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt"
+      ]
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionWakePolicy.kt",
@@ -23693,12 +23695,12 @@
       "path": "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 143,
-      "sha256": "bb94ea0c4e429c461e7cb6fe075f848f3ab6026e4032c4aee2f974b981c82a09",
+      "lines": 154,
+      "sha256": "62789bf9ef09ffd0801208e5e06976f2294944d34735b246faa571dc78b6cb9b",
       "package": "me.rerere.rikkahub.di",
       "categories": [],
       "symbols": [],
-      "localImportCount": 17,
+      "localImportCount": 20,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -23710,10 +23712,13 @@
         "me.rerere.rikkahub.data.ai.tools.LocalTools",
         "me.rerere.rikkahub.data.cihai.CihaiService",
         "me.rerere.rikkahub.data.companion.CompanionRuntime",
+        "me.rerere.rikkahub.data.companion.CompanionTurnEngine",
         "me.rerere.rikkahub.data.event.AppEventBus",
         "me.rerere.rikkahub.data.service.AssistantInteractionResetService",
         "me.rerere.rikkahub.data.service.MemoryBankService",
         "me.rerere.rikkahub.service.ChatService",
+        "me.rerere.rikkahub.service.CompanionChatPort",
+        "me.rerere.rikkahub.service.DefaultCompanionChatPort",
         "me.rerere.rikkahub.utils.EmojiData",
         "me.rerere.rikkahub.utils.EmojiUtils",
         "me.rerere.rikkahub.utils.JsonInstant",
@@ -23728,10 +23733,12 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/cihai/CihaiService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
         "app/src/main/java/me/rerere/rikkahub/data/event/AppEventBus.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/AssistantInteractionResetService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
+        "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/EmojiUtils.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/SoundEffectPlayer.kt",
         "app/src/main/java/me/rerere/rikkahub/web/WebServerManager.kt",
@@ -26520,7 +26527,9 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpManager.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt"
       ],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt"
+      ]
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt",
