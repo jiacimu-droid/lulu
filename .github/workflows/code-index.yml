@@ -1,23 +1,21 @@
-name: Refresh code index
+name: Remove remaining suggestion chain
 
 on:
   push:
     branches: [master]
-    paths-ignore:
-      - "docs/architecture/CODE_INDEX.md"
-      - "docs/architecture/code-index.json"
+    paths:
+      - ".github/workflows/code-index.yml"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: code-index-master
+  group: remove-suggestion-chain-master
   cancel-in-progress: true
 
 jobs:
-  refresh:
-    if: ${{ !contains(github.event.head_commit.message || '', '[skip index]') }}
+  cleanup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,116 +26,264 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Scan suggestion-chain remnants
+      - name: Remove suggestion feature from every active layer
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
 
-          roots = [Path("app"), Path("web"), Path("web-ui"), Path("plugins"), Path(".github")]
-          excluded = {
-              Path("docs/architecture/suggestion-remnants.txt"),
-              Path("docs/architecture/code-index.json"),
-              Path("docs/architecture/CODE_INDEX.md"),
-          }
+          def read(path):
+              return Path(path).read_text(encoding="utf-8")
+
+          def write(path, text):
+              Path(path).write_text(text, encoding="utf-8")
+
+          def replace(path, old, new="", count=None):
+              text = read(path)
+              found = text.count(old)
+              expected = 1 if count is None else count
+              if found != expected:
+                  raise SystemExit(f"{path}: expected {expected} occurrence(s), found {found}: {old[:90]!r}")
+              write(path, text.replace(old, new))
+
+          # Android presentation/service ports.
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
+              "    suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation)\n",
+          )
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
+              "    override suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation) =\n"
+              "        chatService.generateSuggestion(conversationId, conversation)\n",
+          )
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+              "    fun generateSuggestion(conversation: Conversation) {\n"
+              "        viewModelScope.launch {\n"
+              "            chatService.generateSuggestion(_conversationId, conversation)\n"
+              "        }\n"
+              "    }\n\n",
+          )
+
+          # Settings and prompt configuration.
+          prefs = "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt"
+          for old in [
+              "import me.rerere.rikkahub.data.ai.prompts.DEFAULT_SUGGESTION_PROMPT\n",
+              "        val SUGGESTION_MODEL = stringPreferencesKey(\"suggestion_model\")\n",
+              "        val SUGGESTION_PROMPT = stringPreferencesKey(\"suggestion_prompt\")\n",
+              "                suggestionModelId = preferences[SUGGESTION_MODEL]?.let { Uuid.parse(it) }\n"
+              "                    ?: DEFAULT_AUTO_MODEL_ID,\n",
+              "                suggestionPrompt = preferences[SUGGESTION_PROMPT] ?: DEFAULT_SUGGESTION_PROMPT,\n",
+              "            preferences[SUGGESTION_MODEL] = settings.suggestionModelId.toString()\n",
+              "            preferences[SUGGESTION_PROMPT] = settings.suggestionPrompt\n",
+              "    val suggestionModelId: Uuid = Uuid.random(),\n",
+              "    val suggestionPrompt: String = DEFAULT_SUGGESTION_PROMPT,\n",
+          ]:
+              replace(prefs, old)
+
+          suggestion_prompt = Path("app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Suggestion.kt")
+          if not suggestion_prompt.exists():
+              raise SystemExit("Suggestion prompt file was unexpectedly missing")
+          suggestion_prompt.unlink()
+
+          setting_page = "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt"
+          replace(
+              setting_page,
+              "                    description = {\n"
+              "                        Text(stringResource(R.string.setting_model_page_suggestion_prompt_vars))\n"
+              "                    }\n",
+          )
+          for strings_path in Path("app/src/main/res").glob("values*/strings.xml"):
+              lines = strings_path.read_text(encoding="utf-8").splitlines()
+              cleaned = [
+                  line for line in lines
+                  if not any(name in line for name in (
+                      "setting_model_page_suggestion_model",
+                      "setting_model_page_suggestion_model_desc",
+                      "setting_model_page_suggestion_prompt_vars",
+                  ))
+              ]
+              strings_path.write_text("\n".join(cleaned) + "\n", encoding="utf-8")
+
+          # Conversation domain and storage. Keep the old SQLite column inert for upgrade compatibility.
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
+              "    val chatSuggestions: List<String> = emptyList(),\n",
+          )
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+              "            chatSuggestions = JsonInstant.encodeToString(conversation.chatSuggestions),\n",
+          )
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+              "            chatSuggestions = JsonInstant.decodeFromString(conversationEntity.chatSuggestions),\n",
+          )
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/data/db/entity/ConversationEntity.kt",
+              "    @ColumnInfo(\"suggestions\", defaultValue = \"[]\")\n"
+              "    val chatSuggestions: String,\n",
+              "    // Legacy database column retained only so existing installations upgrade safely.\n"
+              "    @ColumnInfo(\"suggestions\", defaultValue = \"[]\")\n"
+              "    val legacyQuickReplyPayload: String = \"[]\",\n",
+          )
+
+          # Android web API contract.
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationDiff.kt",
+              "        chatSuggestions != current.chatSuggestions ||\n",
+          )
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt",
+              "    val chatSuggestions: List<String>,\n",
+          )
+          replace(
+              "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt",
+              "    chatSuggestions = chatSuggestions,\n",
+          )
+
+          # Web route and input component.
+          route = "web-ui/app/routes/conversations.tsx"
+          for old in [
+              "const EMPTY_SUGGESTIONS: string[] = [];\n",
+              "  const chatSuggestions = detail?.chatSuggestions ?? EMPTY_SUGGESTIONS;\n",
+              "  const showSuggestions =\n"
+              "    Boolean(activeId) && !detailLoading && !detailError && chatSuggestions.length > 0;\n"
+              "  const displaySuggestions = showSuggestions ? chatSuggestions : EMPTY_SUGGESTIONS;\n\n",
+              "  const handleClickSuggestion = React.useCallback(\n"
+              "    (suggestion: string) => {\n"
+              "      if (editingSession) {\n"
+              "        setEditingSession(null);\n"
+              "      }\n"
+              "      handleInputTextChange(suggestion);\n"
+              "    },\n"
+              "    [editingSession, handleInputTextChange],\n"
+              "  );\n\n",
+              "          suggestions={displaySuggestions}\n",
+              "          onSuggestionClick={handleClickSuggestion}\n",
+          ]:
+              replace(route, old)
+
+          chat_input = "web-ui/app/components/input/chat-input.tsx"
+          for old in [
+              "  suggestions?: string[];\n",
+              "  onSuggestionClick?: (suggestion: string) => void;\n",
+              "  suggestions = [],\n",
+              "  onSuggestionClick,\n",
+              "  const handleSuggestionSelect = React.useCallback(\n"
+              "    (suggestion: string) => {\n"
+              "      if (!canUseQuickMessage || !suggestion) {\n"
+              "        return;\n"
+              "      }\n\n"
+              "      onSuggestionClick?.(suggestion);\n"
+              "      if (error) {\n"
+              "        setError(null);\n"
+              "      }\n"
+              "      textareaRef.current?.focus();\n"
+              "    },\n"
+              "    [canUseQuickMessage, error, onSuggestionClick],\n"
+              "  );\n\n",
+              "          {suggestions.length > 0 ? (\n"
+              "            <div className=\"flex gap-2 overflow-x-auto rounded-lg px-1 py-1\">\n"
+              "              {suggestions.map((suggestion, index) => (\n"
+              "                <button\n"
+              "                  key={`${suggestion}-${index}`}\n"
+              "                  type=\"button\"\n"
+              "                  disabled={!canUseQuickMessage}\n"
+              "                  className={cn(\n"
+              "                    \"shrink-0 rounded-lg border bg-background px-3 py-1 text-xs text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50\",\n"
+              "                  )}\n"
+              "                  onClick={() => {\n"
+              "                    handleSuggestionSelect(suggestion);\n"
+              "                  }}\n"
+              "                >\n"
+              "                  {suggestion}\n"
+              "                </button>\n"
+              "              ))}\n"
+              "            </div>\n"
+              "          ) : null}\n\n",
+          ]:
+              replace(chat_input, old)
+
+          replace("web-ui/app/types/dto.ts", "  chatSuggestions: string[];\n")
+          replace("web-ui/app/types/conversation.ts", "  chatSuggestions: string[];\n")
+
+          # Keep the memory regression test about paraphrase merging without referring to this removed feature.
+          memory_test = "app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt"
+          replace(memory_test, "我记得她不喜欢自动生成建议回复。", "我记得她不喜欢太亮的番茄钟界面。")
+          replace(memory_test, "我知道她不需要系统自动生成对话建议。", "我知道她不需要系统使用明亮的番茄钟主题。")
+          replace(memory_test, "自动生成对话建议", "明亮的番茄钟主题")
+
+          # Remove temporary audit artifacts.
+          Path(".github/workflows/scan-suggestion-remnants.yml").unlink(missing_ok=True)
+          Path("docs/architecture/suggestion-remnants.txt").unlink(missing_ok=True)
+
+          # Fail closed if an active-chain symbol remains. Historical Room schema snapshots are intentionally excluded.
           pattern = re.compile(
               r"generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|"
               r"suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|"
               r"SUGGESTION_MODEL|SUGGESTION_PROMPT|EMPTY_SUGGESTIONS|"
-              r"displaySuggestions|showSuggestions|handleClickSuggestion|"
-              r"onSuggestionClick|SuggestionChip|suggestion-row|suggestion-chip|"
-              r"建议回复|自动生成对话建议",
+              r"displaySuggestions|showSuggestions|handleClickSuggestion|onSuggestionClick|"
+              r"\bsuggestions\??\s*:|\bsuggestions\s*=|建议回复|自动生成对话建议",
               re.IGNORECASE,
           )
-          matches = []
-          for root in roots:
+          remaining = []
+          for root in [Path("app/src"), Path("web-ui/app"), Path("plugins")]:
               if not root.exists():
                   continue
               for path in root.rglob("*"):
-                  if not path.is_file() or path in excluded or ".git" in path.parts:
+                  if not path.is_file():
                       continue
                   try:
                       lines = path.read_text(encoding="utf-8").splitlines()
                   except (UnicodeDecodeError, OSError):
                       continue
-                  for line_number, line in enumerate(lines, start=1):
+                  for number, line in enumerate(lines, 1):
                       if pattern.search(line):
-                          matches.append(f"{path}:{line_number}:{line.strip()}")
-
-          report = [
-              "# Suggestion chain remnants",
-              "",
-              "Generated from commit: " + __import__("os").environ.get("GITHUB_SHA", "unknown"),
-              "",
-              *matches,
-          ]
-          output = Path("docs/architecture/suggestion-remnants.txt")
-          output.parent.mkdir(parents=True, exist_ok=True)
-          output.write_text("\n".join(report) + "\n", encoding="utf-8")
-          print(f"Found {len(matches)} matching lines")
+                          remaining.append(f"{path}:{number}:{line.strip()}")
+          if remaining:
+              raise SystemExit("Active suggestion-chain remnants remain:\n" + "\n".join(remaining))
+          print("Suggestion chain removed from active sources.")
           PY
 
-      - name: Generate repository index
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Compile Android and run memory regression tests
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:compileDebugKotlin :app:testDebugUnitTest \
+            --tests "me.rerere.rikkahub.data.service.MemoryCandidateDeduplicationTest" \
+            --no-daemon
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: web-ui/pnpm-lock.yaml
+
+      - name: Typecheck web UI
+        run: |
+          corepack enable
+          cd web-ui
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+
+      - name: Refresh repository index
         env:
-          INDEX_COMMIT: ${{ github.sha }}
-          INDEX_BRANCH: ${{ github.ref_name }}
+          INDEX_COMMIT: suggestion-chain-cleanup
+          INDEX_BRANCH: master
         run: |
           python3 scripts/generate_code_index.py
           python3 scripts/enrich_code_index.py
-
-      - name: Validate generated index
-        run: |
-          test -s docs/architecture/CODE_INDEX.md
-          test -s docs/architecture/code-index.json
-          test -s docs/architecture/suggestion-remnants.txt
           python3 -m json.tool docs/architecture/code-index.json >/dev/null
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
 
-          data = json.loads(Path("docs/architecture/code-index.json").read_text(encoding="utf-8"))
-          required = {
-              "schemaVersion",
-              "generatedAt",
-              "commit",
-              "branch",
-              "sourceFingerprint",
-              "summary",
-              "featureFlows",
-              "hotspots",
-              "symbolIndex",
-              "files",
-          }
-          missing = sorted(required - data.keys())
-          if missing:
-              raise SystemExit(f"Code index is missing required keys: {', '.join(missing)}")
-          if data["schemaVersion"] < 3:
-              raise SystemExit("Code index schemaVersion must be at least 3")
-          if not data["files"]:
-              raise SystemExit("Code index unexpectedly contains no files")
-          if len(data["sourceFingerprint"]) != 64:
-              raise SystemExit("Code index sourceFingerprint is invalid")
-          if not data["featureFlows"].get("陪伴聊天主链路", {}).get("paths"):
-              raise SystemExit("Core companion flow has no indexed entry points")
-          if not data["hotspots"].get("largestFiles"):
-              raise SystemExit("Code index contains no hotspot data")
-          if not data["hotspots"].get("highestApproximateFanIn"):
-              raise SystemExit("Code index contains no reverse dependency hotspots")
-          if data["summary"].get("resolvedImportEdges", 0) <= 0:
-              raise SystemExit("Code index did not resolve any local import edges")
-          if not data["symbolIndex"]:
-              raise SystemExit("Code index contains no symbol index")
-          PY
-
-      - name: Commit refreshed index and audit
+      - name: Commit cleanup
         run: |
-          if [ -z "$(git status --porcelain -- docs/architecture/CODE_INDEX.md docs/architecture/code-index.json docs/architecture/suggestion-remnants.txt)" ]; then
-            echo "Code index and audit are already current."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --force docs/architecture/CODE_INDEX.md docs/architecture/code-index.json docs/architecture/suggestion-remnants.txt
-          git commit -m "docs: refresh code index and suggestion audit [skip ci] [skip index]"
+          git add -A
+          git commit -m "refactor: remove remaining suggestion chain [skip index]"
           git pull --rebase origin master
           git push origin HEAD:master
