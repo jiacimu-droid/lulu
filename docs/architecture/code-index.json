@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T13:45:54.429086+00:00",
-  "commit": "b13c7866c676af66e1c4a5bc8691e918ba3c49e2",
+  "generatedAt": "2026-07-23T13:47:18.367850+00:00",
+  "commit": "1c365e129d31c08da476abe1f9c0e271e50b2946",
   "branch": "master",
-  "sourceFingerprint": "a4d33d76e0d73de294997f28e29b71dc2bd92fa0a883521c59a66992423f13bd",
+  "sourceFingerprint": "b74d350f3aa6418975a600004ecdbef37c5de7ade15f909514f30185c27464ac",
   "summary": {
     "files": 1113,
-    "lines": 263379,
+    "lines": 263382,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -3256,8 +3256,8 @@
       "path": ".github/workflows/release.yml",
       "module": ".github",
       "extension": ".yml",
-      "lines": 143,
-      "sha256": "fcfffd7f729483fd20dc274a1d3d550d3a866745d1de0899a585e7a745562d9a",
+      "lines": 146,
+      "sha256": "8c48a86e3ad97cc9aff842e959e61fe816d90e83aa71d19aeadbf21e30e552e8",
       "package": null,
       "categories": [
         "构建与发布"
