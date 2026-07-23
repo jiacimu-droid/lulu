@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:35:21.772923+00:00",
-  "commit": "ed6db9319b3dd3dafd2c824cb81689550c8ef4c2",
+  "generatedAt": "2026-07-23T17:36:11.300839+00:00",
+  "commit": "3a4cac411f3dbb1ed2a171203e00ca7febb2ac6c",
   "branch": "master",
-  "sourceFingerprint": "29562d9177e7aa78a647b24a815f29a3b7af37490ed6aae49f14859f31a3d6ef",
+  "sourceFingerprint": "84a4a25e90cb93f84f5a58b6a179a8c11ce41e89d8cb905cd91c9c9711228103",
   "summary": {
     "files": 1115,
-    "lines": 263653,
+    "lines": 263650,
     "symbols": 5468,
     "productionCodeFiles": 789,
     "testFiles": 133,
@@ -11239,8 +11239,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 180,
-      "sha256": "12e9b58012fe641a8526ae88f7d4df3d5c9c888b1d29547f366d441d7923869f",
+      "lines": 177,
+      "sha256": "9a569eca884a96631ebc5b02d6e4e6f0b262ca3d712b7a69bb44ba9855ed7bed",
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -11269,32 +11269,32 @@
         {
           "name": "materializeAndPromoteInlineVoiceParts",
           "kind": "function",
-          "line": 62
+          "line": 60
         },
         {
           "name": "pruneSynthesizedVoiceCache",
           "kind": "function",
-          "line": 139
+          "line": 136
         },
         {
           "name": "requestedInlineVoiceText",
           "kind": "function",
-          "line": 146
+          "line": 143
         },
         {
           "name": "toInlineVoiceSegments",
           "kind": "function",
-          "line": 154
+          "line": 151
         },
         {
           "name": "matchesVisibleSegment",
           "kind": "function",
-          "line": 169
+          "line": 166
         },
         {
           "name": "inlineVoiceMatchKey",
           "kind": "function",
-          "line": 179
+          "line": 176
         }
       ],
       "localImportCount": 5,
@@ -11305,7 +11305,7 @@
         "me.rerere.ai.core.MessageRole",
         "me.rerere.ai.ui.UIMessage",
         "me.rerere.ai.ui.UIMessagePart",
-        "me.rerere.rikkahub.data.ai.tools.synthesizeInlineVoiceMessage",
+        "me.rerere.rikkahub.data.ai.tools.scheduleInlineVoiceMessage",
         "me.rerere.rikkahub.utils.JsonInstant"
       ],
       "resolvedImports": [
@@ -67969,7 +67969,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 179
+        "line": 176
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.instantOf": [
@@ -67990,7 +67990,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 169
+        "line": 166
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.materializeAndPromoteInlineVoiceMessages": [
@@ -68009,7 +68009,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 62
+        "line": 60
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.maxItems": [
@@ -68111,7 +68111,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 139
+        "line": 136
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.readDocumentContent": [
@@ -68132,7 +68132,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 146
+        "line": 143
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.resolveRelativePath": [
@@ -68251,7 +68251,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "kind": "function",
-        "line": 154
+        "line": 151
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.toLocalDateOrToday": [
