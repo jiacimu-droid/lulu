@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-23T08:39:55.654888+00:00",
-  "commit": "b31e94ee07dc31b29c5a4bc667e71fe1d8cce917",
+  "generatedAt": "2026-07-23T08:42:47.534585+00:00",
+  "commit": "8640784fa614a612850aef07c16b6b75c5acf108",
   "branch": "master",
   "summary": {
     "files": 1102,
-    "lines": 261994,
-    "symbols": 5323,
+    "lines": 262072,
+    "symbols": 5327,
     "byModule": {
       "app": 640,
       "web-ui": 131,
@@ -15204,79 +15204,99 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 219,
+      "lines": 297,
       "package": "me.rerere.rikkahub.data.study",
       "categories": [],
       "symbols": [
         {
           "name": "CurrentWeekStudyRecovery",
           "kind": "object",
-          "line": 17
+          "line": 12
         },
         {
           "name": "installIntoExamStudyPlan",
           "kind": "function",
-          "line": 69
+          "line": 86
         },
         {
           "name": "planFor",
           "kind": "function",
-          "line": 75
+          "line": 118
         },
         {
           "name": "plannedMinutes",
           "kind": "function",
-          "line": 77
+          "line": 120
         },
         {
           "name": "applyToState",
           "kind": "function",
-          "line": 86
+          "line": 129
         },
         {
           "name": "scheduleFor",
           "kind": "function",
-          "line": 126
+          "line": 169
         },
         {
           "name": "dynamicSchedulePrompt",
           "kind": "function",
-          "line": 142
+          "line": 185
         },
         {
           "name": "capacityAudit",
           "kind": "function",
-          "line": 170
+          "line": 213
         },
         {
           "name": "daily",
           "kind": "function",
-          "line": 196
+          "line": 245
         },
         {
           "name": "law",
           "kind": "function",
-          "line": 202
+          "line": 251
         },
         {
           "name": "review",
           "kind": "function",
-          "line": 203
+          "line": 252
         },
         {
           "name": "english",
           "kind": "function",
-          "line": 204
+          "line": 253
         },
         {
           "name": "health",
           "kind": "function",
-          "line": 205
+          "line": 254
+        },
+        {
+          "name": "StudyMonthAllocation",
+          "kind": "class",
+          "line": 257
+        },
+        {
+          "name": "description",
+          "kind": "function",
+          "line": 268
+        },
+        {
+          "name": "minutesText",
+          "kind": "function",
+          "line": 271
+        },
+        {
+          "name": "StudyPlanSubject",
+          "kind": "class",
+          "line": 278
         },
         {
           "name": "StudyCapacityAudit",
           "kind": "class",
-          "line": 208
+          "line": 285
         }
       ]
     },
