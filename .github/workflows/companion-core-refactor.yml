@@ -36,15 +36,21 @@ jobs:
           from pathlib import Path
           path = Path('/tmp/refactor_companion_core.py')
           text = path.read_text(encoding='utf-8')
-          old = '''    if "sessions." in text or "sessions[" in text or "_sessionsVersion" in text:
+          old_guard = '''    if "sessions." in text or "sessions[" in text or "_sessionsVersion" in text:
                   raise RuntimeError("ChatService still directly owns session collection state")
           '''
-          new = '''    if "private val sessions = ConcurrentHashMap" in text or "private val _sessionsVersion" in text:
+          new_guard = '''    if "private val sessions = ConcurrentHashMap" in text or "private val _sessionsVersion" in text:
                   raise RuntimeError("ChatService still directly owns session collection state")
           '''
-          if old not in text:
+          if old_guard not in text:
               raise SystemExit('session ownership guard patch did not match')
-          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          text = text.replace(old_guard, new_guard, 1)
+          old_join = ').joinToString("\\n")'
+          new_join = ').joinToString("\\\\n")'
+          if old_join not in text:
+              raise SystemExit('neutral persistence test newline patch did not match')
+          text = text.replace(old_join, new_join, 1)
+          path.write_text(text, encoding='utf-8')
           PY
           git fetch origin master
           git checkout -B master origin/master
@@ -80,12 +86,29 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run focused tests and release Kotlin compilation
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          set +e
           ./gradlew \
             :app:testDebugUnitTest \
             :app:compileReleaseKotlin \
             --no-daemon \
-            --stacktrace
+            --stacktrace > /tmp/gradle.log 2>&1
+          status=$?
+          cat /tmp/gradle.log
+          if [ "$status" -ne 0 ]; then
+            {
+              echo '❌ Companion refactor failed Kotlin/tests validation; no changes were pushed to master.'
+              echo
+              echo '```text'
+              tail -n 140 /tmp/gradle.log
+              echo '```'
+            } > /tmp/compile-comment.md
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/compile-comment.md
+            exit "$status"
+          fi
 
       - name: Commit verified changes directly to master
         shell: bash
