@@ -30,20 +30,48 @@ jobs:
 
       - name: Scan suggestion-chain remnants
         run: |
-          mkdir -p docs/architecture
-          {
-            echo "# Suggestion chain remnants"
-            echo
-            echo "Generated from commit: $GITHUB_SHA"
-            echo
-            rg -n --hidden \
-              --glob '!docs/architecture/suggestion-remnants.txt' \
-              --glob '!docs/architecture/code-index.json' \
-              --glob '!docs/architecture/CODE_INDEX.md' \
-              --glob '!.git/**' \
-              'generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议' \
-              app web web-ui plugins .github || true
-          } > docs/architecture/suggestion-remnants.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          roots = [Path("app"), Path("web"), Path("web-ui"), Path("plugins"), Path(".github")]
+          excluded = {
+              Path("docs/architecture/suggestion-remnants.txt"),
+              Path("docs/architecture/code-index.json"),
+              Path("docs/architecture/CODE_INDEX.md"),
+          }
+          pattern = re.compile(
+              r"generateSuggestion|chatSuggestions|onClickSuggestion|ChatSuggestionsRow|"
+              r"suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|"
+              r"SUGGESTION_MODEL|SUGGESTION_PROMPT|建议回复|自动生成对话建议"
+          )
+          matches = []
+          for root in roots:
+              if not root.exists():
+                  continue
+              for path in root.rglob("*"):
+                  if not path.is_file() or path in excluded or ".git" in path.parts:
+                      continue
+                  try:
+                      lines = path.read_text(encoding="utf-8").splitlines()
+                  except (UnicodeDecodeError, OSError):
+                      continue
+                  for line_number, line in enumerate(lines, start=1):
+                      if pattern.search(line):
+                          matches.append(f"{path}:{line_number}:{line.strip()}")
+
+          report = [
+              "# Suggestion chain remnants",
+              "",
+              "Generated from commit: " + __import__("os").environ.get("GITHUB_SHA", "unknown"),
+              "",
+              *matches,
+          ]
+          output = Path("docs/architecture/suggestion-remnants.txt")
+          output.parent.mkdir(parents=True, exist_ok=True)
+          output.write_text("\n".join(report) + "\n", encoding="utf-8")
+          print(f"Found {len(matches)} matching lines")
+          PY
 
       - name: Generate repository index
         env:
