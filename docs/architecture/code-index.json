@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:29:15.516366+00:00",
-  "commit": "6ed858e1774b18c8f9dc7e3fefa83839fc6be690",
+  "generatedAt": "2026-07-23T17:29:53.473908+00:00",
+  "commit": "d9b2c90730de98357e782ce4a41263892f390e42",
   "branch": "master",
-  "sourceFingerprint": "f9061ca1dd457c4a0f4289a1792809cdd15bb2ea1b99946d05905637b5f581a9",
+  "sourceFingerprint": "ec2c576e9a3231539b11720c78892dfa25dd267d6b1ed8bfaf74aa4becb2ad89",
   "summary": {
-    "files": 1113,
-    "lines": 263357,
-    "symbols": 5454,
-    "productionCodeFiles": 788,
+    "files": 1114,
+    "lines": 263456,
+    "symbols": 5457,
+    "productionCodeFiles": 789,
     "testFiles": 132,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 652,
+      "app": 653,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 720,
+      ".kt": 721,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -55,7 +55,7 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 139,
+      "AI与上下文": 140,
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
@@ -68,7 +68,7 @@
       "界面": 284,
       "记忆": 42
     },
-    "resolvedImportEdges": 1930
+    "resolvedImportEdges": 1936
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 124,
+        "importedByCount": 125,
         "todoMarkers": 0
       },
       {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 100,
+        "importedByCount": 101,
         "todoMarkers": 0
       },
       {
@@ -1042,18 +1042,18 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
-        "lines": 196,
-        "symbols": 6,
-        "localImportCount": 1,
-        "importedByCount": 16,
-        "todoMarkers": 0
-      },
-      {
         "path": "speech/src/main/java/me/rerere/tts/model/TTSRequest.kt",
         "lines": 18,
         "symbols": 2,
         "localImportCount": 0,
+        "importedByCount": 17,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
+        "lines": 196,
+        "symbols": 6,
+        "localImportCount": 1,
         "importedByCount": 16,
         "todoMarkers": 0
       },
@@ -1207,6 +1207,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ExploreNearbyTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/MusicTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
@@ -1932,7 +1933,7 @@
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.ui.UIMessagePart",
-      "imports": 20
+      "imports": 21
     },
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
@@ -5919,6 +5920,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ExploreNearbyTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/MusicTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
@@ -10035,6 +10037,56 @@
         "ai/src/main/java/me/rerere/ai/core/Tool.kt",
         "ai/src/main/java/me/rerere/ai/ui/Message.kt",
         "app/src/main/java/me/rerere/rikkahub/data/gadgetbridge/GadgetbridgeReader.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 99,
+      "sha256": "cdc1ccc5a32ebba4833dcfe959e1905c7664ebdbd77c9144b1043874901d61e4",
+      "package": "me.rerere.rikkahub.data.ai.tools",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "synthesizeInlineVoiceMessage",
+          "kind": "function",
+          "line": 18
+        },
+        {
+          "name": "pcm16MonoToWav",
+          "kind": "function",
+          "line": 62
+        },
+        {
+          "name": "pruneInlineVoiceCache",
+          "kind": "function",
+          "line": 87
+        }
+      ],
+      "localImportCount": 7,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.ui.UIMessagePart",
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.getSelectedTTSProvider",
+        "me.rerere.tts.controller.TtsChunk",
+        "me.rerere.tts.controller.TtsSynthesizer",
+        "me.rerere.tts.model.AudioFormat",
+        "me.rerere.tts.provider.TTSManager"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "speech/src/main/java/me/rerere/tts/controller/TextChunker.kt",
+        "speech/src/main/java/me/rerere/tts/controller/TtsSynthesizer.kt",
+        "speech/src/main/java/me/rerere/tts/model/TTSRequest.kt",
+        "speech/src/main/java/me/rerere/tts/provider/TTSManager.kt"
       ],
       "importedBy": []
     },
@@ -14531,6 +14583,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpManager.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ExploreNearbyTool.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SearchTools.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
@@ -55888,7 +55941,9 @@
       "isProductionCode": true,
       "localImports": [],
       "resolvedImports": [],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt"
+      ]
     },
     {
       "path": "speech/src/main/java/me/rerere/tts/controller/TtsAudioCache.kt",
@@ -56101,7 +56156,9 @@
         "speech/src/main/java/me/rerere/tts/provider/TTSManager.kt",
         "speech/src/main/java/me/rerere/tts/provider/TTSProviderSetting.kt"
       ],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt"
+      ]
     },
     {
       "path": "speech/src/main/java/me/rerere/tts/model/PlaybackState.kt",
@@ -56169,6 +56226,7 @@
       "localImports": [],
       "resolvedImports": [],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "speech/src/main/java/me/rerere/tts/controller/AudioPlayer.kt",
         "speech/src/main/java/me/rerere/tts/controller/TtsAudioCache.kt",
         "speech/src/main/java/me/rerere/tts/controller/TtsSynthesizer.kt",
@@ -56304,6 +56362,7 @@
         "speech/src/main/java/me/rerere/tts/provider/providers/XAITTSProvider.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
         "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/TTS.kt",
         "speech/src/main/java/me/rerere/tts/controller/TtsController.kt",
@@ -67087,6 +67146,13 @@
         "line": 15
       }
     ],
+    "me.rerere.rikkahub.data.ai.tools.pcm16MonoToWav": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
+        "kind": "function",
+        "line": 62
+      }
+    ],
     "me.rerere.rikkahub.data.ai.tools.playCompanionDiceDuel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
@@ -67113,6 +67179,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
         "kind": "function",
         "line": 209
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.tools.pruneInlineVoiceCache": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
+        "kind": "function",
+        "line": 87
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.put": [
@@ -67155,6 +67228,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
         "line": 256
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.tools.synthesizeInlineVoiceMessage": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
+        "kind": "function",
+        "line": 18
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.ticTacToeWinner": [

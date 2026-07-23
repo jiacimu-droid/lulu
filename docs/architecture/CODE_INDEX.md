@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`6ed858e1774b18c8f9dc7e3fefa83839fc6be690`
+- 基准提交：`d9b2c90730de98357e782ce4a41263892f390e42`
 - 分支：`master`
-- 源码指纹：`f9061ca1dd457c4a…`
-- 已索引文件：1113
-- 已索引代码/文本行：263357
-- 已发现类、接口、对象、函数及 Composable：5454
+- 源码指纹：`ec2c576e9a323153…`
+- 已索引文件：1114
+- 已索引代码/文本行：263456
+- 已发现类、接口、对象、函数及 Composable：5457
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 788 |
+| 生产代码文件 | 789 |
 | 测试文件 | 132 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 652 |
+| `app` | 653 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 720 |
+| `.kt` | 721 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -212,7 +212,7 @@
 - `ai/src/main/java/me/rerere/ai/util/ErrorParser.kt`
 - `ai/src/main/java/me/rerere/ai/util/FileEncoder.kt`
 - `ai/src/main/java/me/rerere/ai/util/Json.kt`
-- ……另有 109 个文件，见 `code-index.json`
+- ……另有 110 个文件，见 `code-index.json`
 
 ### 主动代理
 
@@ -533,13 +533,13 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1930
-- 可检索完整符号：4855
+- 已解析本地导入边：1936
+- 可检索完整符号：4858
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 124 | 812 |
-| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 100 | 953 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 125 | 812 |
+| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 101 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 59 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 54 | 62 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
