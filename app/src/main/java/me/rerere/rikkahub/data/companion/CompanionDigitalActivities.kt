@@ -59,6 +59,112 @@ object CompanionDigitalActivityRegistry {
     private const val HOUR = 60 * MINUTE
 }
 
+/** A concrete executor must exist for every registered digital activity. */
+interface CompanionDigitalActivityExecutor {
+    val id: String
+    val supportedKinds: Set<CompanionDigitalActivityKind>
+    val supportsModelGeneration: Boolean
+
+    fun validate(
+        request: CompanionDigitalActivityRequest,
+        definition: CompanionDigitalActivityDefinition,
+    ): String?
+}
+
+class CompanionDigitalActivityExecutorRegistry(
+    executors: List<CompanionDigitalActivityExecutor> = defaultCompanionDigitalActivityExecutors(),
+) {
+    private val byKind: Map<CompanionDigitalActivityKind, CompanionDigitalActivityExecutor> = buildMap {
+        executors.forEach { executor ->
+            executor.supportedKinds.forEach { kind ->
+                require(put(kind, executor) == null) { "Duplicate digital activity executor for $kind" }
+            }
+        }
+    }
+
+    fun requireExecutor(kind: CompanionDigitalActivityKind): CompanionDigitalActivityExecutor =
+        requireNotNull(byKind[kind]) { "No executor wired for digital activity: $kind" }
+
+    fun audit(): CompanionDigitalActivityWiringAudit {
+        val issues = buildList {
+            CompanionDigitalActivityRegistry.definitions.values.forEach { definition ->
+                val executor = byKind[definition.kind]
+                if (executor == null) {
+                    add("${definition.kind}: missing executor")
+                } else if (definition.usesModel && !executor.supportsModelGeneration) {
+                    add("${definition.kind}: usesModel=true but executor ${executor.id} cannot generate model artifacts")
+                }
+            }
+            byKind.keys
+                .filterNot(CompanionDigitalActivityRegistry.definitions::containsKey)
+                .forEach { add("$it: executor exists without a registry definition") }
+        }
+        return CompanionDigitalActivityWiringAudit(
+            registeredKinds = CompanionDigitalActivityRegistry.definitions.keys,
+            executableKinds = byKind.keys,
+            issues = issues,
+        )
+    }
+}
+
+data class CompanionDigitalActivityWiringAudit(
+    val registeredKinds: Set<CompanionDigitalActivityKind>,
+    val executableKinds: Set<CompanionDigitalActivityKind>,
+    val issues: List<String>,
+) {
+    val isComplete: Boolean get() = issues.isEmpty() && registeredKinds == executableKinds
+}
+
+private fun defaultCompanionDigitalActivityExecutors(): List<CompanionDigitalActivityExecutor> = listOf(
+    BasicDigitalActivityExecutor(
+        id = "model-artifact",
+        supportedKinds = setOf(
+            CompanionDigitalActivityKind.PRIVATE_JOURNAL,
+            CompanionDigitalActivityKind.UNSENT_NOTE,
+            CompanionDigitalActivityKind.REVIEW_EXPERIENCES,
+            CompanionDigitalActivityKind.SHARED_PLAN,
+        ),
+        supportsModelGeneration = true,
+    ),
+    BasicDigitalActivityExecutor(
+        id = "deterministic-organizer",
+        supportedKinds = setOf(
+            CompanionDigitalActivityKind.ORGANIZE_FAVORITES,
+            CompanionDigitalActivityKind.ORGANIZE_CONCERNS,
+            CompanionDigitalActivityKind.REVIEW_COMMITMENTS,
+            CompanionDigitalActivityKind.ORGANIZE_STATE,
+        ),
+        supportsModelGeneration = false,
+    ),
+    BasicDigitalActivityExecutor(
+        id = "game-evidence",
+        supportedKinds = setOf(
+            CompanionDigitalActivityKind.PLAY_MINIGAME,
+            CompanionDigitalActivityKind.WATCH_REPLAY,
+        ),
+        supportsModelGeneration = false,
+        requireEvidence = true,
+    ),
+)
+
+private data class BasicDigitalActivityExecutor(
+    override val id: String,
+    override val supportedKinds: Set<CompanionDigitalActivityKind>,
+    override val supportsModelGeneration: Boolean,
+    val requireEvidence: Boolean = false,
+) : CompanionDigitalActivityExecutor {
+    override fun validate(
+        request: CompanionDigitalActivityRequest,
+        definition: CompanionDigitalActivityDefinition,
+    ): String? = when {
+        definition.usesModel && !supportsModelGeneration ->
+            "Activity was not completed: the wired executor cannot create the required model artifact."
+        (requireEvidence || definition.requiresEvidenceReference) && request.evidenceReference.isNullOrBlank() ->
+            "Activity was not completed: required execution evidence is missing."
+        else -> null
+    }
+}
+
 data class CompanionDigitalActivityCandidate(
     val kind: CompanionDigitalActivityKind,
     val triggerSatisfied: Boolean,
@@ -100,10 +206,15 @@ data class CompanionDigitalActivityRequest(
     val requestedAt: Long = System.currentTimeMillis(),
 )
 
-class CompanionDigitalLifeActivityService(private val store: CompanionStore) {
+class CompanionDigitalLifeActivityService(
+    private val store: CompanionStore,
+    private val executorRegistry: CompanionDigitalActivityExecutorRegistry = CompanionDigitalActivityExecutorRegistry(),
+) {
     fun favorites(assistantId: String): List<CompanionFavorite> = store.snapshot(assistantId).favorites
     fun activities(assistantId: String): List<CompanionLifeEvent> =
         store.snapshot(assistantId).lifeEvents.filter { it.type.isDigitalActivityType() }
+
+    fun wiringAudit(): CompanionDigitalActivityWiringAudit = executorRegistry.audit()
 
     suspend fun favoriteMessage(
         assistantId: String,
@@ -133,7 +244,8 @@ class CompanionDigitalLifeActivityService(private val store: CompanionStore) {
 
     suspend fun execute(request: CompanionDigitalActivityRequest): CompanionLifeEvent {
         val definition = CompanionDigitalActivityRegistry.requireRegistered(request.kind)
-        val validationError = validate(request, definition)
+        val executor = executorRegistry.requireExecutor(request.kind)
+        val validationError = validate(request, definition) ?: executor.validate(request, definition)
         val event = CompanionLifeEvent(
             assistantId = request.assistantId,
             type = request.kind.lifeEventType(),
@@ -144,6 +256,7 @@ class CompanionDigitalLifeActivityService(private val store: CompanionStore) {
             evidenceReference = request.evidenceReference,
             detailsJson = buildJsonObject {
                 put("activity_kind", request.kind.name)
+                put("executor_id", executor.id)
                 put("trigger", definition.trigger)
                 put("cooldown_millis", definition.cooldownMillis)
                 put("expected_duration_millis", definition.expectedDurationMillis)
