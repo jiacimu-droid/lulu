@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T17:38:26.071781+00:00",
-  "commit": "1ac4568aa67a92b9bd8c6f5ed89d6e826d739c85",
+  "generatedAt": "2026-07-23T17:38:43.352918+00:00",
+  "commit": "ceed8a4d8beb1749c497d55c0c60f1e176bd8c2d",
   "branch": "master",
-  "sourceFingerprint": "1dbc2f0d5d3c6c108979e61d8e912e8198606edcd5a36f8a9f5beaf87e4d90a1",
+  "sourceFingerprint": "5edf9d43d61c4b57ef79a5e1c681f82d89dc18b58bb6f2d5a210ea51fe6f2c9f",
   "summary": {
     "files": 1116,
-    "lines": 263741,
+    "lines": 263743,
     "symbols": 5471,
     "productionCodeFiles": 789,
     "testFiles": 134,
@@ -472,7 +472,7 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
-        "lines": 494,
+        "lines": 496,
         "symbols": 35,
         "localImportCount": 3,
         "todoMarkers": 0
@@ -19297,8 +19297,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 494,
-      "sha256": "0a9e2369631bc23a455ffb904c4b07d75cabbd78220c709b18e5224d17cb9903",
+      "lines": 496,
+      "sha256": "8ad2b6a7eb4c07d3fbea05a7788d4d017a3c55ec86ed362fd202fc397de8d804",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "记忆"
@@ -19422,62 +19422,62 @@
         {
           "name": "memoryCharacterBigrams",
           "kind": "function",
-          "line": 377
+          "line": 378
         },
         {
           "name": "decodeExtractionCandidates",
           "kind": "function",
-          "line": 387
+          "line": 388
         },
         {
           "name": "repairMemoryExtractionJsonOnce",
           "kind": "function",
-          "line": 396
+          "line": 397
         },
         {
           "name": "isTransientMemoryExtractionFailure",
           "kind": "function",
-          "line": 402
+          "line": 403
         },
         {
           "name": "retryTransientMemoryExtraction",
           "kind": "function",
-          "line": 412
+          "line": 413
         },
         {
           "name": "sourceTimeLabel",
           "kind": "function",
-          "line": 433
+          "line": 434
         },
         {
           "name": "hasAffectiveSummary",
           "kind": "function",
-          "line": 442
+          "line": 443
         },
         {
           "name": "toDisplayMemoryContent",
           "kind": "function",
-          "line": 448
+          "line": 449
         },
         {
           "name": "toEmbeddingMemoryText",
           "kind": "function",
-          "line": 456
+          "line": 457
         },
         {
           "name": "firstPersonSummary",
           "kind": "function",
-          "line": 467
+          "line": 468
         },
         {
           "name": "looksLikeRawToolOrTraceDump",
           "kind": "function",
-          "line": 477
+          "line": 478
         },
         {
           "name": "looksLikeVocabularyDrill",
           "kind": "function",
-          "line": 486
+          "line": 487
         }
       ],
       "localImportCount": 3,
@@ -75755,7 +75755,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 387
+        "line": 388
       }
     ],
     "me.rerere.rikkahub.data.service.decodeMemoryNodeIds": [
@@ -76015,7 +76015,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 467
+        "line": 468
       }
     ],
     "me.rerere.rikkahub.data.service.firstSelectedBranchMutationSequence": [
@@ -76511,7 +76511,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 442
+        "line": 443
       }
     ],
     "me.rerere.rikkahub.data.service.hasAny": [
@@ -76693,7 +76693,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 402
+        "line": 403
       }
     ],
     "me.rerere.rikkahub.data.service.latestActivityAt": [
@@ -76735,14 +76735,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 477
+        "line": 478
       }
     ],
     "me.rerere.rikkahub.data.service.looksLikeVocabularyDrill": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 486
+        "line": 487
       }
     ],
     "me.rerere.rikkahub.data.service.maintenanceKeepScore": [
@@ -76796,7 +76796,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 377
+        "line": 378
       }
     ],
     "me.rerere.rikkahub.data.service.memoryDetailScore": [
@@ -77239,7 +77239,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 396
+        "line": 397
       }
     ],
     "me.rerere.rikkahub.data.service.repairTemporalMetadata": [
@@ -77352,7 +77352,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 412
+        "line": 413
       }
     ],
     "me.rerere.rikkahub.data.service.reverseGeocode": [
@@ -77673,7 +77673,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 433
+        "line": 434
       }
     ],
     "me.rerere.rikkahub.data.service.stableMinute": [
@@ -77715,14 +77715,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 448
+        "line": 449
       }
     ],
     "me.rerere.rikkahub.data.service.toEmbeddingMemoryText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
-        "line": 456
+        "line": 457
       }
     ],
     "me.rerere.rikkahub.data.service.toEntity": [
