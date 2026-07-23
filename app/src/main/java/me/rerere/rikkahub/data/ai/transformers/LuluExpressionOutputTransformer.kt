@@ -23,12 +23,16 @@ object LuluExpressionOutputTransformer : OutputMessageTransformer {
     override suspend fun visualTransform(
         ctx: TransformerContext,
         messages: List<UIMessage>,
-    ): List<UIMessage> = sanitizeLuluAssistantExpressionMessages(messages)
+    ): List<UIMessage> = sanitizeLuluAssistantExpressionMessages(
+        promoteInlineVoiceMessages(messages),
+    )
 
     override suspend fun onGenerationFinish(
         ctx: TransformerContext,
         messages: List<UIMessage>,
-    ): List<UIMessage> = splitLuluAssistantExpressionMessages(messages)
+    ): List<UIMessage> = splitLuluAssistantExpressionMessages(
+        promoteInlineVoiceMessages(messages),
+    )
 }
 
 private fun sanitizeLuluAssistantExpressionMessages(messages: List<UIMessage>): List<UIMessage> {
