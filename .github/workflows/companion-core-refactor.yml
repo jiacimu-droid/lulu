@@ -83,7 +83,6 @@ jobs:
 
           chat_path = Path('app/src/main/java/me/rerere/rikkahub/service/ChatService.kt')
           chat = chat_path.read_text(encoding='utf-8')
-
           replacements = [
               (
                   '''            sessions[conversationId]?.let { session ->
@@ -198,7 +197,7 @@ jobs:
               echo '❌ Companion refactor passed Release compilation but failed unit tests; no changes were pushed to master.'
               echo
               echo '```text'
-              grep -E '(^[A-Za-z0-9_.]+ > .*FAILED$|AssertionError|expected:<|but was:<|There were failing tests|Execution failed for task|BUILD FAILED)' /tmp/tests.log | tail -n 120
+              grep -E '(^e: |^w: |Compilation error|Cannot infer|Unresolved reference|Type mismatch|Argument type mismatch|^[A-Za-z0-9_.]+ > .*FAILED$|AssertionError|expected:<|but was:<|There were failing tests|Execution failed for task|BUILD FAILED)' /tmp/tests.log | tail -n 160
               echo
               echo '--- tail ---'
               tail -n 50 /tmp/tests.log
@@ -219,6 +218,8 @@ jobs:
             /tmp/refactor-comment.md
             /tmp/compile-comment.md
             /tmp/test-comment.md
+            /tmp/compile.log
+            /tmp/tests.log
           if-no-files-found: ignore
           retention-days: 3
 
