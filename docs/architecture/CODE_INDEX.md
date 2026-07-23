@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`ee29c4ae923361a3ff1ef2eef7c9b758598ea51f`
+- 基准提交：`b1c1c2dcfda8f07ed6a3b83cd79ab1f34b8bf4b4`
 - 分支：`master`
-- 源码指纹：`c2599945553d5e51…`
-- 已索引文件：1112
-- 已索引代码/文本行：263252
+- 源码指纹：`f7a46adcc2c9c07a…`
+- 已索引文件：1111
+- 已索引代码/文本行：263189
 - 已发现类、接口、对象、函数及 Composable：5451
 
 ## 仓库健康信号
@@ -149,8 +149,8 @@
 | `website` | 10 |
 | `highlight` | 9 |
 | `web` | 7 |
-| `.github` | 6 |
 | `.claude` | 5 |
+| `.github` | 5 |
 | `locale-tui` | 4 |
 | `study-plans` | 4 |
 | `money-lab` | 3 |
@@ -171,7 +171,7 @@
 | `.kts` | 11 |
 | `.js` | 9 |
 | `.html` | 7 |
-| `.yml` | 5 |
+| `.yml` | 4 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -395,7 +395,6 @@
 ### 构建与发布
 
 - `.github/workflows/code-index.yml`
-- `.github/workflows/deploy-website.yml`
 - `.github/workflows/release.yml`
 - `ai/build.gradle.kts`
 - `app/baselineprofile/build.gradle.kts`

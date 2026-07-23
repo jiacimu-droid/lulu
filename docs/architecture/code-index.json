@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T14:15:56.374978+00:00",
-  "commit": "ee29c4ae923361a3ff1ef2eef7c9b758598ea51f",
+  "generatedAt": "2026-07-23T14:16:25.883744+00:00",
+  "commit": "b1c1c2dcfda8f07ed6a3b83cd79ab1f34b8bf4b4",
   "branch": "master",
-  "sourceFingerprint": "c2599945553d5e517375c34c1a509b9c39d62b484e022f0a697c8076f94a1035",
+  "sourceFingerprint": "f7a46adcc2c9c07a67b1fdd8ad733aa59814a15b0922416cbbc492d23ba2d94f",
   "summary": {
-    "files": 1112,
-    "lines": 263252,
+    "files": 1111,
+    "lines": 263189,
     "symbols": 5451,
     "productionCodeFiles": 786,
     "testFiles": 132,
@@ -28,8 +28,8 @@
       "website": 10,
       "highlight": 9,
       "web": 7,
-      ".github": 6,
       ".claude": 5,
+      ".github": 5,
       "locale-tui": 4,
       "study-plans": 4,
       "money-lab": 3,
@@ -47,7 +47,7 @@
       ".kts": 11,
       ".js": 9,
       ".html": 7,
-      ".yml": 5,
+      ".yml": 4,
       ".css": 4,
       ".yaml": 3,
       ".properties": 3,
@@ -63,7 +63,7 @@
       "工具": 6,
       "插件": 44,
       "数据库": 75,
-      "构建与发布": 14,
+      "构建与发布": 13,
       "电话与语音": 48,
       "界面": 284,
       "记忆": 42
@@ -1506,7 +1506,6 @@
     ],
     "构建与发布": [
       ".github/workflows/code-index.yml",
-      ".github/workflows/deploy-website.yml",
       ".github/workflows/release.yml",
       "ai/build.gradle.kts",
       "app/baselineprofile/build.gradle.kts",
@@ -3218,27 +3217,8 @@
       "path": ".github/workflows/code-index.yml",
       "module": ".github",
       "extension": ".yml",
-      "lines": 102,
-      "sha256": "6d8e185138d4da7c08b8fa6ad3c69bc3abfd0c4b9dd662ba7fa45c6b07c1b39b",
-      "package": null,
-      "categories": [
-        "构建与发布"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
-      "path": ".github/workflows/deploy-website.yml",
-      "module": ".github",
-      "extension": ".yml",
-      "lines": 54,
-      "sha256": "a771f4b24035059058f0cb101c049eeadf97b19ec9c969166827bb1abf4901ca",
+      "lines": 93,
+      "sha256": "1a5221f0bfb4b3e597f69e5343f20cd089c3619517d891807e65ed829e7ccd98",
       "package": null,
       "categories": [
         "构建与发布"
