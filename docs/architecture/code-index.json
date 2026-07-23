@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:31:39.314824+00:00",
-  "commit": "e132f47471b2d339d86d2327b14d0c5b5e9d412e",
+  "generatedAt": "2026-07-23T11:32:55.500780+00:00",
+  "commit": "88236e68a822f820213e01d62e449583594d5b41",
   "branch": "master",
-  "sourceFingerprint": "935109650b15b1fcf795ea671bac5f5513f13231ec1633930faa78cc7953717e",
+  "sourceFingerprint": "1fb3ff81a06c023e87ae557d774cf7461c11a92a5fb6771e3110d7fbe6ea21a8",
   "summary": {
     "files": 1106,
-    "lines": 262657,
-    "symbols": 5389,
+    "lines": 262770,
+    "symbols": 5399,
     "productionCodeFiles": 783,
     "testFiles": 128,
     "largeProductionFiles": 42,
@@ -485,6 +485,13 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "lines": 329,
+        "symbols": 32,
+        "localImportCount": 0,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "lines": 1358,
         "symbols": 31,
@@ -545,13 +552,6 @@
         "lines": 405,
         "symbols": 26,
         "localImportCount": 18,
-        "todoMarkers": 0
-      },
-      {
-        "path": "ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt",
-        "lines": 248,
-        "symbols": 26,
-        "localImportCount": 0,
         "todoMarkers": 0
       }
     ],
@@ -12419,8 +12419,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 216,
-      "sha256": "5e6e4caa50119e289da84a9fb0d817991850845fef4496b1d12174daabc2dc66",
+      "lines": 329,
+      "sha256": "26c789eb256cc38b415d6e274506191dd30639ee8e344dc6720bace3fad972b3",
       "package": "me.rerere.rikkahub.data.companion",
       "categories": [
         "娱乐与数字生活"
@@ -12462,79 +12462,129 @@
           "line": 46
         },
         {
-          "name": "CompanionDigitalActivityCandidate",
-          "kind": "class",
-          "line": 62
-        },
-        {
-          "name": "CompanionDigitalActivitySelector",
-          "kind": "object",
-          "line": 69
-        },
-        {
-          "name": "select",
-          "kind": "function",
-          "line": 70
-        },
-        {
-          "name": "CompanionDigitalActivityRequest",
-          "kind": "class",
-          "line": 91
-        },
-        {
-          "name": "CompanionDigitalLifeActivityService",
-          "kind": "class",
-          "line": 103
-        },
-        {
-          "name": "favorites",
-          "kind": "function",
-          "line": 104
-        },
-        {
-          "name": "activities",
-          "kind": "function",
-          "line": 105
-        },
-        {
-          "name": "favoriteMessage",
-          "kind": "function",
-          "line": 108
-        },
-        {
-          "name": "execute",
-          "kind": "function",
-          "line": 134
-        },
-        {
-          "name": "canClaimCompleted",
-          "kind": "function",
-          "line": 172
+          "name": "CompanionDigitalActivityExecutor",
+          "kind": "interface",
+          "line": 63
         },
         {
           "name": "validate",
           "kind": "function",
+          "line": 68
+        },
+        {
+          "name": "CompanionDigitalActivityExecutorRegistry",
+          "kind": "class",
+          "line": 74
+        },
+        {
+          "name": "requireExecutor",
+          "kind": "function",
+          "line": 85
+        },
+        {
+          "name": "audit",
+          "kind": "function",
+          "line": 88
+        },
+        {
+          "name": "CompanionDigitalActivityWiringAudit",
+          "kind": "class",
+          "line": 110
+        },
+        {
+          "name": "defaultCompanionDigitalActivityExecutors",
+          "kind": "function",
+          "line": 118
+        },
+        {
+          "name": "BasicDigitalActivityExecutor",
+          "kind": "class",
+          "line": 150
+        },
+        {
+          "name": "validate",
+          "kind": "function",
+          "line": 156
+        },
+        {
+          "name": "CompanionDigitalActivityCandidate",
+          "kind": "class",
+          "line": 168
+        },
+        {
+          "name": "CompanionDigitalActivitySelector",
+          "kind": "object",
           "line": 175
+        },
+        {
+          "name": "select",
+          "kind": "function",
+          "line": 176
+        },
+        {
+          "name": "CompanionDigitalActivityRequest",
+          "kind": "class",
+          "line": 197
+        },
+        {
+          "name": "CompanionDigitalLifeActivityService",
+          "kind": "class",
+          "line": 209
+        },
+        {
+          "name": "favorites",
+          "kind": "function",
+          "line": 213
+        },
+        {
+          "name": "activities",
+          "kind": "function",
+          "line": 214
+        },
+        {
+          "name": "wiringAudit",
+          "kind": "function",
+          "line": 217
+        },
+        {
+          "name": "favoriteMessage",
+          "kind": "function",
+          "line": 219
+        },
+        {
+          "name": "execute",
+          "kind": "function",
+          "line": 245
+        },
+        {
+          "name": "canClaimCompleted",
+          "kind": "function",
+          "line": 285
+        },
+        {
+          "name": "validate",
+          "kind": "function",
+          "line": 288
         },
         {
           "name": "shouldAutonomouslyFavorite",
           "kind": "function",
-          "line": 186
+          "line": 299
         },
         {
           "name": "lifeEventType",
           "kind": "function",
-          "line": 189
+          "line": 302
         },
         {
           "name": "isDigitalActivityType",
           "kind": "function",
-          "line": 202
+          "line": 315
         },
         {
           "name": "defaultTitle",
           "kind": "function",
-          "line": 205
+          "line": 318
         }
       ],
       "localImportCount": 0,
@@ -67668,6 +67718,13 @@
         "line": 97
       }
     ],
+    "me.rerere.rikkahub.data.companion.BasicDigitalActivityExecutor": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "class",
+        "line": 150
+      }
+    ],
     "me.rerere.rikkahub.data.companion.Cancel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt",
@@ -67840,7 +67897,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "class",
-        "line": 62
+        "line": 168
       }
     ],
     "me.rerere.rikkahub.data.companion.CompanionDigitalActivityDefinition": [
@@ -67848,6 +67905,20 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "class",
         "line": 17
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionDigitalActivityExecutor": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "interface",
+        "line": 63
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionDigitalActivityExecutorRegistry": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "class",
+        "line": 74
       }
     ],
     "me.rerere.rikkahub.data.companion.CompanionDigitalActivityKind": [
@@ -67868,21 +67939,28 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "class",
-        "line": 91
+        "line": 197
       }
     ],
     "me.rerere.rikkahub.data.companion.CompanionDigitalActivitySelector": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "object",
-        "line": 69
+        "line": 175
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.CompanionDigitalActivityWiringAudit": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "class",
+        "line": 110
       }
     ],
     "me.rerere.rikkahub.data.companion.CompanionDigitalLifeActivityService": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "class",
-        "line": 103
+        "line": 209
       }
     ],
     "me.rerere.rikkahub.data.companion.CompanionDigitalStorage": [
@@ -68454,7 +68532,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 105
+        "line": 214
       }
     ],
     "me.rerere.rikkahub.data.companion.activitySelectionUsesTriggerEvidenceAndCooldownInsteadOfChance": [
@@ -68537,6 +68615,13 @@
         "line": 58
       }
     ],
+    "me.rerere.rikkahub.data.companion.audit": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "function",
+        "line": 88
+      }
+    ],
     "me.rerere.rikkahub.data.companion.beginCommitment": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
@@ -68611,7 +68696,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 172
+        "line": 285
       }
     ],
     "me.rerere.rikkahub.data.companion.cancelCommitment": [
@@ -68893,6 +68978,13 @@
         "line": 65
       }
     ],
+    "me.rerere.rikkahub.data.companion.defaultCompanionDigitalActivityExecutors": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "function",
+        "line": 118
+      }
+    ],
     "me.rerere.rikkahub.data.companion.defaultCompanionGoals": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
@@ -68904,7 +68996,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 205
+        "line": 318
       }
     ],
     "me.rerere.rikkahub.data.companion.definition": [
@@ -69037,7 +69129,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 134
+        "line": 245
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionTurnEngine.kt",
@@ -69070,7 +69162,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 108
+        "line": 219
       }
     ],
     "me.rerere.rikkahub.data.companion.favoriteRequiresMessageReasonAndFeeling": [
@@ -69084,7 +69176,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 104
+        "line": 213
       }
     ],
     "me.rerere.rikkahub.data.companion.fieldItems": [
@@ -69213,7 +69305,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 202
+        "line": 315
       }
     ],
     "me.rerere.rikkahub.data.companion.isMeaningfulDigitalLifeEvidence": [
@@ -69324,7 +69416,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 189
+        "line": 302
       }
     ],
     "me.rerere.rikkahub.data.companion.matches": [
@@ -69618,6 +69710,13 @@
         "line": 403
       }
     ],
+    "me.rerere.rikkahub.data.companion.requireExecutor": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "function",
+        "line": 85
+      }
+    ],
     "me.rerere.rikkahub.data.companion.requireRegistered": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
@@ -69657,7 +69756,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 70
+        "line": 176
       }
     ],
     "me.rerere.rikkahub.data.companion.selectNextCompanionCommitment": [
@@ -69678,7 +69777,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 186
+        "line": 299
       }
     ],
     "me.rerere.rikkahub.data.companion.snapshot": [
@@ -69911,7 +70010,17 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "kind": "function",
-        "line": 175
+        "line": 68
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "function",
+        "line": 156
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "function",
+        "line": 288
       }
     ],
     "me.rerere.rikkahub.data.companion.wakeTargetAtOrNull": [
@@ -69919,6 +70028,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionWakePolicy.kt",
         "kind": "function",
         "line": 13
+      }
+    ],
+    "me.rerere.rikkahub.data.companion.wiringAudit": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
+        "kind": "function",
+        "line": 217
       }
     ],
     "me.rerere.rikkahub.data.companion.withUpdatedSnapshot": [
