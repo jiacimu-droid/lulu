@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T11:30:04.461219+00:00",
-  "commit": "467f873ac748f1d88fe2ad853e45290456fe9c2b",
+  "generatedAt": "2026-07-23T11:30:28.287540+00:00",
+  "commit": "19f0e311dae20493f54fc0d29163012e1a42e543",
   "branch": "master",
-  "sourceFingerprint": "be5dd5c5d8855983ba5da5492d763b7309e43dee8851757875584857bb73f7a2",
+  "sourceFingerprint": "30a91089900defcf4b2175927a409c1ef445e8d49b75f35139dc16143fd47f7d",
   "summary": {
-    "files": 1105,
-    "lines": 262585,
-    "symbols": 5383,
-    "productionCodeFiles": 782,
+    "files": 1106,
+    "lines": 262652,
+    "symbols": 5389,
+    "productionCodeFiles": 783,
     "testFiles": 128,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 33,
     "byModule": {
-      "app": 642,
+      "app": 643,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 710,
+      ".kt": 711,
       ".tsx": 74,
       ".java": 64,
       ".md": 59,
@@ -56,7 +56,7 @@
     },
     "byCategory": {
       "AI与上下文": 137,
-      "主动代理": 23,
+      "主动代理": 24,
       "关系与承诺": 17,
       "娱乐与数字生活": 35,
       "学习监督": 14,
@@ -68,7 +68,7 @@
       "界面": 284,
       "记忆": 42
     },
-    "resolvedImportEdges": 1873
+    "resolvedImportEdges": 1874
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 96,
+        "importedByCount": 97,
         "todoMarkers": 0
       },
       {
@@ -1278,6 +1278,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/service/NotificationListenerService.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
       "app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt",
       "app/src/main/java/me/rerere/rikkahub/service/ProactiveReminderPlanner.kt",
       "app/src/main/java/me/rerere/rikkahub/service/ProactiveToolPlanner.kt",
@@ -2083,6 +2084,11 @@
       "imports": 9
     },
     {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.datastore.SettingsStore",
+      "imports": 8
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.message",
       "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 8
@@ -2155,11 +2161,6 @@
     {
       "from": "me.rerere.rikkahub.data.db",
       "to": "me.rerere.rikkahub.data.db.dao",
-      "imports": 7
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.datastore.SettingsStore",
       "imports": 7
     },
     {
@@ -2803,6 +2804,11 @@
       "imports": 3
     },
     {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.datastore.getProactiveMessageSetting",
+      "imports": 3
+    },
+    {
       "from": "me.rerere.rikkahub.plugin.ui",
       "to": "me.rerere.hugeicons.HugeIcons",
       "imports": 3
@@ -2890,11 +2896,6 @@
     {
       "from": "me.rerere.rikkahub.ui.components.message",
       "to": "me.rerere.rikkahub.ui.modifier.shimmer",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.components.message",
-      "to": "me.rerere.rikkahub.utils.JsonInstant",
       "imports": 3
     }
   ],
@@ -14413,6 +14414,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/SupabaseService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/SupabaseSyncService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/S3Sync.kt",
@@ -21405,6 +21407,61 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantBasicPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProactiveMessagePage.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 67,
+      "sha256": "e3f0e98c06e7ff005c60c2f68476d942351ac8603885651e50ae80cef9c7e02e",
+      "package": "me.rerere.rikkahub.data.service",
+      "categories": [
+        "主动代理"
+      ],
+      "symbols": [
+        {
+          "name": "ProactiveTurnDispatcher",
+          "kind": "class",
+          "line": 18
+        },
+        {
+          "name": "dispatch",
+          "kind": "function",
+          "line": 21
+        },
+        {
+          "name": "ProactiveTurnDispatchResult",
+          "kind": "interface",
+          "line": 59
+        },
+        {
+          "name": "Dispatched",
+          "kind": "class",
+          "line": 60
+        },
+        {
+          "name": "Disabled",
+          "kind": "object",
+          "line": 65
+        },
+        {
+          "name": "InvalidTarget",
+          "kind": "class",
+          "line": 66
+        }
+      ],
+      "localImportCount": 2,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.getProactiveMessageSetting"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/SupabaseService.kt",
@@ -73704,6 +73761,20 @@
         "line": 42
       }
     ],
+    "me.rerere.rikkahub.data.service.Disabled": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "object",
+        "line": 65
+      }
+    ],
+    "me.rerere.rikkahub.data.service.Dispatched": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "class",
+        "line": 60
+      }
+    ],
     "me.rerere.rikkahub.data.service.DuplicateMemoryDeprecation": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
@@ -73730,6 +73801,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/GadgetbridgeService.kt",
         "kind": "class",
         "line": 13
+      }
+    ],
+    "me.rerere.rikkahub.data.service.InvalidTarget": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "class",
+        "line": 66
       }
     ],
     "me.rerere.rikkahub.data.service.Latest": [
@@ -73961,6 +74039,20 @@
         "path": "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveProjectionTest.kt",
         "kind": "class",
         "line": 7
+      }
+    ],
+    "me.rerere.rikkahub.data.service.ProactiveTurnDispatchResult": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "interface",
+        "line": 59
+      }
+    ],
+    "me.rerere.rikkahub.data.service.ProactiveTurnDispatcher": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "class",
+        "line": 18
       }
     ],
     "me.rerere.rikkahub.data.service.RecordingMemoryBankDAO": [
@@ -74668,6 +74760,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "kind": "function",
         "line": 1945
+      }
+    ],
+    "me.rerere.rikkahub.data.service.dispatch": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "function",
+        "line": 21
       }
     ],
     "me.rerere.rikkahub.data.service.doWork": [
