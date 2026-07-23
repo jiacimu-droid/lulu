@@ -7,12 +7,6 @@ on:
       - '**/*.md'
       - 'docs/**'
   workflow_dispatch:
-    inputs:
-      release_number:
-        description: '正式发布编号，例如 1、2、3'
-        required: true
-        default: '1'
-        type: string
 
 permissions:
   contents: write
@@ -83,27 +77,15 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Validate release number
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          RELEASE_NUMBER: ${{ inputs.release_number }}
-        run: |
-          [[ "$RELEASE_NUMBER" =~ ^[1-9][0-9]*$ ]] || {
-            echo '发布编号必须是从 1 开始的正整数。'
-            exit 1
-          }
-
       - name: Publish Lulu release
-        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_NUMBER: ${{ inputs.release_number }}
         run: |
           set -euo pipefail
-          tag="lulu-v${RELEASE_NUMBER}"
+          tag="signed-build-${GITHUB_RUN_NUMBER}"
           gh release create "$tag" apk-artifacts/Lulu.apk \
-            --title "Lulu v${RELEASE_NUMBER}" \
-            --notes "Lulu v${RELEASE_NUMBER}，构建自 ${GITHUB_SHA}."
+            --title "Lulu ${tag}" \
+            --notes "Automated signed APK build from ${GITHUB_SHA}."
 
       - name: Upload failure logs
         if: failure()
