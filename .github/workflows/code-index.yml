@@ -7,8 +7,6 @@ on:
       - "docs/architecture/CODE_INDEX.md"
       - "docs/architecture/code-index.json"
   workflow_dispatch:
-  schedule:
-    - cron: "17 */6 * * *"
 
 permissions:
   contents: write
@@ -46,12 +44,30 @@ jobs:
           from pathlib import Path
 
           data = json.loads(Path("docs/architecture/code-index.json").read_text(encoding="utf-8"))
-          required = {"schemaVersion", "generatedAt", "commit", "branch", "summary", "files"}
+          required = {
+              "schemaVersion",
+              "generatedAt",
+              "commit",
+              "branch",
+              "sourceFingerprint",
+              "summary",
+              "featureFlows",
+              "hotspots",
+              "files",
+          }
           missing = sorted(required - data.keys())
           if missing:
               raise SystemExit(f"Code index is missing required keys: {', '.join(missing)}")
+          if data["schemaVersion"] < 2:
+              raise SystemExit("Code index schemaVersion must be at least 2")
           if not data["files"]:
               raise SystemExit("Code index unexpectedly contains no files")
+          if len(data["sourceFingerprint"]) != 64:
+              raise SystemExit("Code index sourceFingerprint is invalid")
+          if not data["featureFlows"].get("陪伴聊天主链路", {}).get("paths"):
+              raise SystemExit("Core companion flow has no indexed entry points")
+          if not data["hotspots"].get("largestFiles"):
+              raise SystemExit("Code index contains no hotspot data")
           PY
 
       - name: Upload generated index for diagnostics
