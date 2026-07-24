@@ -243,13 +243,16 @@ data class StudyLevel(
     val reward: StudyReward,
 )
 
-@Serializable
 data class StudyAchievement(
     val id: String,
     val title: String,
     val condition: String,
-    val reward: StudyReward,
-)
+    private val configuredReward: StudyReward,
+) {
+    /** Current balanced reward; old table values remain only as a compatibility fallback. */
+    val reward: StudyReward
+        get() = StudyAchievementRewards.rewardFor(id, configuredReward)
+}
 
 @Serializable
 data class StudyShopItem(
