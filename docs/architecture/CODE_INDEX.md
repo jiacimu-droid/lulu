@@ -12,19 +12,19 @@
 
 ## 索引状态
 
-- 基准提交：`3319279f02c820d0dc645e791268ec7f9a77ee1e`
+- 基准提交：`36e4afbd2151b17835fc64a0bbc1e3dd7f7f350b`
 - 分支：`master`
-- 源码指纹：`9d22277aea2f1323…`
-- 已索引文件：1120
-- 已索引代码/文本行：264354
-- 已发现类、接口、对象、函数及 Composable：5489
+- 源码指纹：`91c2598c9c7fdeaa…`
+- 已索引文件：1123
+- 已索引代码/文本行：265289
+- 已发现类、接口、对象、函数及 Composable：5515
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 792 |
-| 测试文件 | 135 |
+| 生产代码文件 | 794 |
+| 测试文件 | 136 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
 | TODO/FIXME/HACK/XXX | 32 |
@@ -109,7 +109,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt` | 1266 | 25 | 27 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt` | 1234 | 21 | 28 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt` | 1211 | 14 | 31 |
-| `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt` | 1187 | 60 | 0 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 1191 | 33 | 39 |
 
 ### 本地导入最多的生产文件
 
@@ -123,7 +123,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt` | 46 | 1568 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 44 | 1166 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt` | 39 | 416 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 39 | 1180 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 39 | 1191 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt` | 39 | 784 |
 | `app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt` | 38 | 280 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt` | 37 | 1117 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 659 |
+| `app` | 662 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 727 |
+| `.kt` | 730 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -307,6 +307,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt`
+- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt`
@@ -474,7 +475,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 257 个文件，见 `code-index.json`
+- ……另有 260 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -533,8 +534,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1947
-- 可检索完整符号：4891
+- 已解析本地导入边：1950
+- 可检索完整符号：4916
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
@@ -544,7 +545,7 @@
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 55 | 62 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 46 | 258 |
-| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 43 | 191 |
+| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 44 | 191 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 36 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 35 | 50 |
