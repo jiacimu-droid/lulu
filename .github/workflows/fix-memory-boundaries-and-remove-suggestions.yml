@@ -1,0 +1,352 @@
+name: Fix memory boundaries and remove suggestions
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/fix-memory-boundaries-and-remove-suggestions.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fix-memory-boundaries-master
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Patch exact memory boundaries and compile blockers
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path: str) -> str:
+              return Path(path).read_text(encoding="utf-8")
+
+          def write(path: str, text: str) -> None:
+              Path(path).write_text(text, encoding="utf-8")
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              text = read(path)
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one match, found {count}: {old[:120]!r}")
+              write(path, text.replace(old, new, 1))
+
+          extractor = "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt"
+          extractor_text = read(extractor)
+          additions = []
+          if "private fun String.extractJsonPayload()" not in extractor_text:
+              additions.append(r'''
+          private fun String.extractJsonPayload(): String {
+              val trimmed = trim()
+              if (trimmed.startsWith("{") || trimmed.startsWith("[")) return trimmed
+              val fenced = Regex("```(?:json)?\\s*([\\s\\S]*?)```")
+                  .find(trimmed)?.groupValues?.getOrNull(1)?.trim()
+              if (!fenced.isNullOrBlank()) return fenced
+              val start = listOf(trimmed.indexOf('{'), trimmed.indexOf('['))
+                  .filter { it >= 0 }
+                  .minOrNull()
+                  ?: return trimmed
+              val end = maxOf(trimmed.lastIndexOf('}'), trimmed.lastIndexOf(']'))
+              return if (end >= start) trimmed.substring(start, end + 1) else trimmed
+          }
+          ''')
+          definitions = {
+              "MAX_MEMORIES_PER_BATCH": "private const val MAX_MEMORIES_PER_BATCH = 6",
+              "DETERMINISTIC_BOUNDARY_MARKERS": 'private val DETERMINISTIC_BOUNDARY_MARKERS = listOf("我不希望", "我不喜欢", "不要再", "别再", "不许")',
+              "DETERMINISTIC_CORRECTION_MARKERS": 'private val DETERMINISTIC_CORRECTION_MARKERS = listOf("不是这样的", "不是这个意思", "应该是", "纠正一下", "更正一下", "你理解错了")',
+              "DETERMINISTIC_PREFERENCE_MARKERS": 'private val DETERMINISTIC_PREFERENCE_MARKERS = listOf("我更喜欢", "我喜欢", "我希望", "我想要", "对我来说")',
+              "TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS": 'private val TRANSIENT_MEMORY_FAILURE_CLASS_MARKERS = listOf("timeout", "connect", "rateLimit", "tooManyRequests", "serviceUnavailable")',
+              "DURABLE_MEMORY_TYPES": 'private val DURABLE_MEMORY_TYPES = setOf("user_fact", "user_preference", "user_boundary", "promise", "relationship", "shared_event", "correction")',
+              "FIRST_PERSON_PREFIXES": 'private val FIRST_PERSON_PREFIXES = listOf("我", "咱", "本人", "本小姐", "本少爷", "本官", "本王", "本宫", "在下", "余", "吾", "I ", "I\'m ", "I’m ")',
+          }
+          for name, declaration in definitions.items():
+              if not re.search(rf"(?:const\s+val|val)\s+{name}\b", extractor_text):
+                  additions.append("\n" + declaration + "\n")
+          if not re.search(r"(?:const\s+val|val)\s+GENERIC_META_MEMORY_MARKERS\b", extractor_text):
+              additions.append(r'''
+          private val GENERIC_META_MEMORY_MARKERS = listOf(
+              "cihai_reflection", "我记得这件事。当时感觉", "复盘、收束、准备下一轮", "后续可复用的长期记忆",
+              "感知世界包", "意义评估", "动态判断", "状态生成", "辞海记忆架构", "七层架构",
+              "下一轮判断", "我完成了沉淀", "我整理了记忆", "以后可以参考", "等待下一次",
+          )
+          ''')
+          if additions:
+              write(extractor, extractor_text.rstrip() + "\n" + "".join(additions) + "\n")
+
+          planner = "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt"
+          replace_once(
+              planner,
+              "    direction: MemoryExtractionDirection = MemoryExtractionDirection.OLDEST_FIRST,\n): AffectiveMemoryExtractionPlan? {\n",
+              "    direction: MemoryExtractionDirection = MemoryExtractionDirection.OLDEST_FIRST,\n    requireExactBoundary: Boolean = true,\n): AffectiveMemoryExtractionPlan? {\n",
+          )
+          old_body = '''    if (extractionInterval <= 0) return null
+              val logicalTurns = messageNodes.toMemoryExtractionTurns()
+              val stableTurns = logicalTurns.dropLast(protectedRecentCount.coerceAtLeast(0))
+              // The role setting is the exact batch size (20 is only the default). Build standard
+              // contiguous windows before consulting the checkpoint so legacy holes cannot stitch
+              // fragments from two different windows into one extraction request.
+              val completeWindows = stableTurns
+                  .chunked(extractionInterval)
+                  .filter { window -> window.size == extractionInterval }
+              val pendingWindows = completeWindows.filter { window ->
+                  window.any { turn -> turn.nodeId !in processedSourceNodeIds }
+              }
+              if (pendingWindows.isEmpty()) return null
+
+              // A partially checkpointed legacy window is rebuilt as a whole standard batch.
+              // Saved memories keep their source IDs, so the storage layer can de-duplicate them.
+              val selectedTurns = when (direction) {
+                  MemoryExtractionDirection.OLDEST_FIRST -> pendingWindows.first()
+                  MemoryExtractionDirection.RECENT_FIRST -> pendingWindows.last()
+              }
+
+              return AffectiveMemoryExtractionPlan(
+                  turns = selectedTurns,
+                  reason = if (direction == MemoryExtractionDirection.RECENT_FIRST) "recent_interval" else "interval",
+              )
+          '''.replace("          ", "")
+          new_body = '''    if (extractionInterval <= 0) return null
+              val logicalTurns = messageNodes.toMemoryExtractionTurns()
+              val stableTurns = logicalTurns.dropLast(protectedRecentCount.coerceAtLeast(0))
+              if (stableTurns.size < extractionInterval) return null
+
+              val completeWindows = stableTurns
+                  .chunked(extractionInterval)
+                  .filter { window -> window.size == extractionInterval }
+
+              if (requireExactBoundary) {
+                  // Automatic extraction is edge-triggered. With an interval of 40, only the
+                  // 40th, 80th, 120th... stable message can start a job. Messages in between
+                  // never slide or rebuild a 20..59 / 30..69 style overlapping window.
+                  if (stableTurns.size % extractionInterval != 0) return null
+                  val boundaryWindow = completeWindows.lastOrNull() ?: return null
+                  if (boundaryWindow.all { turn -> turn.nodeId in processedSourceNodeIds }) return null
+                  return AffectiveMemoryExtractionPlan(
+                      turns = boundaryWindow,
+                      reason = if (direction == MemoryExtractionDirection.RECENT_FIRST) "recent_interval" else "interval",
+                  )
+              }
+
+              // Manual history continuation and full rebuild may deliberately catch up old fixed
+              // windows, but they still never stitch fragments from different windows together.
+              val pendingWindows = completeWindows.filter { window ->
+                  window.any { turn -> turn.nodeId !in processedSourceNodeIds }
+              }
+              if (pendingWindows.isEmpty()) return null
+              val selectedTurns = when (direction) {
+                  MemoryExtractionDirection.OLDEST_FIRST -> pendingWindows.first()
+                  MemoryExtractionDirection.RECENT_FIRST -> pendingWindows.last()
+              }
+              return AffectiveMemoryExtractionPlan(
+                  turns = selectedTurns,
+                  reason = if (direction == MemoryExtractionDirection.RECENT_FIRST) "recent_interval" else "interval",
+              )
+          '''.replace("          ", "")
+          replace_once(planner, old_body, new_body)
+
+          tests = "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt"
+          replace_once(
+              tests,
+              "    fun `planner selects the next unprocessed interval without overlap`() {\n        val conversation = nodes(56)\n",
+              "    fun `planner selects the next unprocessed interval without overlap`() {\n        val conversation = nodes(50)\n",
+          )
+          replace_once(
+              tests,
+              "            extractionInterval = 40,\n            direction = MemoryExtractionDirection.RECENT_FIRST,\n        )\n",
+              "            extractionInterval = 40,\n            direction = MemoryExtractionDirection.RECENT_FIRST,\n            requireExactBoundary = false,\n        )\n",
+          )
+          marker = "    @Test\n    fun `planner uses role configured interval and zero disables automatic extraction`() {\n"
+          exact_test = '''    @Test
+              fun `automatic planner only triggers on exact configured boundaries`() {
+                  val atBoundary = buildAffectiveMemoryExtractionPlan(
+                      messageNodes = nodes(50),
+                      processedSourceNodeIds = emptySet(),
+                      extractionInterval = 40,
+                      protectedRecentCount = 10,
+                  )
+                  requireNotNull(atBoundary)
+                  assertEquals(idOf(1), atBoundary.turns.first().nodeId)
+                  assertEquals(idOf(40), atBoundary.turns.last().nodeId)
+
+                  assertEquals(
+                      null,
+                      buildAffectiveMemoryExtractionPlan(
+                          messageNodes = nodes(51),
+                          processedSourceNodeIds = (1..40).map { idOf(it) }.toSet(),
+                          extractionInterval = 40,
+                          protectedRecentCount = 10,
+                      ),
+                  )
+
+                  val secondBoundary = buildAffectiveMemoryExtractionPlan(
+                      messageNodes = nodes(90),
+                      processedSourceNodeIds = (1..40).map { idOf(it) }.toSet(),
+                      extractionInterval = 40,
+                      protectedRecentCount = 10,
+                  )
+                  requireNotNull(secondBoundary)
+                  assertEquals(idOf(41), secondBoundary.turns.first().nodeId)
+                  assertEquals(idOf(80), secondBoundary.turns.last().nodeId)
+              }
+
+          '''.replace("          ", "")
+          test_text = read(tests)
+          if "automatic planner only triggers on exact configured boundaries" not in test_text:
+              if marker not in test_text:
+                  raise SystemExit("planner test insertion marker missing")
+              write(tests, test_text.replace(marker, exact_test + marker, 1))
+
+          chat = "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
+          chat_text = read(chat)
+          if "activeMemoryExtractionConversations" not in chat_text:
+              chat_text = chat_text.replace(
+                  'private const val MEMORY_OCCURRENCE_FUTURE_TOLERANCE_MS = 24L * 60 * 60 * 1_000\n',
+                  'private const val MEMORY_OCCURRENCE_FUTURE_TOLERANCE_MS = 24L * 60 * 60 * 1_000\n'
+                  'private val activeMemoryExtractionConversations = ConcurrentHashMap.newKeySet<Uuid>()\n',
+                  1,
+              )
+          chat_text = chat_text.replace(
+              "                        protectedRecentCount = assistant.memoryExtractionProtectedRecentCount,\n                        direction = direction,\n                    ) ?: break\n",
+              "                        protectedRecentCount = assistant.memoryExtractionProtectedRecentCount,\n                        direction = direction,\n                        requireExactBoundary = false,\n                    ) ?: break\n",
+              1,
+          )
+          chat_text = chat_text.replace(
+              "                        direction = direction,\n                        includeSavedMemorySources = includeSavedMemories,\n                    ).join()\n",
+              "                        direction = direction,\n                        includeSavedMemorySources = includeSavedMemories,\n                        requireExactBoundary = false,\n                    ).join()\n",
+              1,
+          )
+          chat_text = chat_text.replace(
+              "        direction: MemoryExtractionDirection = MemoryExtractionDirection.OLDEST_FIRST,\n        includeSavedMemorySources: Boolean = true,\n    ): Job = appScope.launch {\n            val extractionStartedAt = System.nanoTime()\n",
+              "        direction: MemoryExtractionDirection = MemoryExtractionDirection.OLDEST_FIRST,\n        includeSavedMemorySources: Boolean = true,\n        requireExactBoundary: Boolean = true,\n    ): Job = appScope.launch {\n            if (!activeMemoryExtractionConversations.add(conversationId)) {\n                Logging.log(TAG, \"Memory extraction already running for conversation=$conversationId\")\n                return@launch\n            }\n            try {\n            val extractionStartedAt = System.nanoTime()\n",
+              1,
+          )
+          chat_text = chat_text.replace(
+              "                    protectedRecentCount = assistant.memoryExtractionProtectedRecentCount,\n                    direction = direction,\n                ) ?: return@runCatching\n",
+              "                    protectedRecentCount = assistant.memoryExtractionProtectedRecentCount,\n                    direction = direction,\n                    requireExactBoundary = requireExactBoundary,\n                ) ?: return@runCatching\n",
+              1,
+          )
+          chat_text = chat_text.replace(
+              "            PerformanceMonitor.recordNanos(\"Memory Extraction\", extractionStartedAt, assistant.name)\n        }\n\n\n    // ---- 检查无效消息 ----\n",
+              "            PerformanceMonitor.recordNanos(\"Memory Extraction\", extractionStartedAt, assistant.name)\n            } finally {\n                activeMemoryExtractionConversations.remove(conversationId)\n            }\n        }\n\n\n    // ---- 检查无效消息 ----\n",
+              1,
+          )
+          required_chat_fragments = [
+              "requireExactBoundary: Boolean = true",
+              "requireExactBoundary = false",
+              "activeMemoryExtractionConversations.add(conversationId)",
+              "activeMemoryExtractionConversations.remove(conversationId)",
+          ]
+          missing = [item for item in required_chat_fragments if item not in chat_text]
+          if missing:
+              raise SystemExit(f"ChatService memory patch incomplete: {missing}")
+          write(chat, chat_text)
+          PY
+
+      - name: Remove the entire suggestion reply chain
+        run: |
+          cat > /tmp/code-index.yml <<'INDEXYAML'
+          name: Refresh code index
+
+          on:
+            push:
+              branches: [master]
+              paths-ignore:
+                - "docs/architecture/CODE_INDEX.md"
+                - "docs/architecture/code-index.json"
+            workflow_dispatch:
+
+          permissions:
+            contents: write
+
+          concurrency:
+            group: code-index-master
+            cancel-in-progress: true
+
+          jobs:
+            refresh:
+              if: ${{ !contains(github.event.head_commit.message || '', '[skip index]') }}
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                  with:
+                    fetch-depth: 1
+                - uses: actions/setup-python@v5
+                  with:
+                    python-version: "3.12"
+                - name: Generate repository index
+                  env:
+                    INDEX_COMMIT: ${{ github.sha }}
+                    INDEX_BRANCH: ${{ github.ref_name }}
+                  run: |
+                    python3 scripts/generate_code_index.py
+                    python3 scripts/enrich_code_index.py
+                - name: Validate generated index
+                  run: |
+                    test -s docs/architecture/CODE_INDEX.md
+                    test -s docs/architecture/code-index.json
+                    python3 -m json.tool docs/architecture/code-index.json >/dev/null
+                - name: Commit refreshed index
+                  run: |
+                    if [ -z "$(git status --porcelain -- docs/architecture/CODE_INDEX.md docs/architecture/code-index.json)" ]; then
+                      exit 0
+                    fi
+                    git config user.name "github-actions[bot]"
+                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                    git add --force docs/architecture/CODE_INDEX.md docs/architecture/code-index.json
+                    git commit -m "docs: refresh code index [skip ci] [skip index]"
+                    git pull --rebase origin master
+                    git push origin HEAD:master
+          INDEXYAML
+          export ORIGINAL_INDEX_WORKFLOW_B64="$(base64 -w0 /tmp/code-index.yml)"
+          python3 .github/scripts/cleanup_suggestion_chain.py
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Compile release Kotlin and run memory boundary tests
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:compileReleaseKotlin :app:testDebugUnitTest \
+            --tests "me.rerere.rikkahub.data.service.AffectiveMemoryExtractionPlannerTest" \
+            --tests "me.rerere.rikkahub.data.service.MemoryCandidateDeduplicationTest" \
+            --no-daemon
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: web-ui/pnpm-lock.yaml
+
+      - name: Typecheck web UI after suggestion removal
+        run: |
+          corepack enable
+          cd web-ui
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+
+      - name: Audit and commit fixes to master
+        run: |
+          rg -n 'generateSuggestion|chatSuggestions|suggestionModelId|suggestionPrompt|DEFAULT_SUGGESTION_PROMPT|SUGGESTION_MODEL|SUGGESTION_PROMPT|onSuggestionClick|handleSuggestionSelect|handleClickSuggestion|建议回复|自动生成对话建议' app/src web-ui/app plugins && exit 1 || true
+          rm -f .github/workflows/fix-memory-boundaries-and-remove-suggestions.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: use exact non-overlapping memory batches and remove suggestions"
+          git pull --rebase origin master
+          git push origin HEAD:master
