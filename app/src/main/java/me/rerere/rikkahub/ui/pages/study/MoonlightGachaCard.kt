@@ -3,7 +3,6 @@ package me.rerere.rikkahub.ui.pages.study
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,7 +21,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,11 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlin.reflect.KFunction0
-import me.rerere.hugeicons.HugeIcons
-import me.rerere.hugeicons.stroke.ArrowLeft01
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyState
-import me.rerere.rikkahub.ui.context.LocalNavController
 
 /**
  * Bright, fixed-height anime gacha screen.
@@ -58,8 +52,6 @@ internal fun GachaCard(
     onPurple: KFunction0<Unit>,
 ) {
     val configuration = LocalConfiguration.current
-    val navController = LocalNavController.current
-    val screenWidth = configuration.screenWidthDp.dp
     val cardHeight = (configuration.screenHeightDp - 205)
         .coerceIn(430, 590)
         .dp
@@ -70,147 +62,96 @@ internal fun GachaCard(
     }
     val hasSafetyDraw = state.wallet.purpleDrawTickets > 0
 
-    Box(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(cardHeight),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF7D7)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        border = BorderStroke(2.dp, Color(0xFFFFE8A7)),
     ) {
-        // Extend the same anime palette through the padded area around the card.
-        AnimeCandyBackdrop(
-            modifier = Modifier
-                .width(screenWidth)
-                .height(cardHeight + 20.dp)
-                .offset(x = (-16).dp, y = (-14).dp),
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            AnimeCandyBackdrop(Modifier.fillMaxSize())
 
-        // Cover the old standalone back-button row with the new light palette.
-        AnimeCandyBackdrop(
-            modifier = Modifier
-                .width(screenWidth)
-                .height(116.dp)
-                .offset(x = (-16).dp, y = (-194).dp),
-        )
-
-        // Lighten the existing section-chip row without blocking its clicks.
-        Surface(
-            modifier = Modifier
-                .width(screenWidth)
-                .height(66.dp)
-                .offset(x = (-16).dp, y = (-78).dp),
-            color = Color(0x55FFF7D7),
-        ) {}
-
-        Card(
-            modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(32.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF7D7)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            border = BorderStroke(2.dp, Color(0xFFFFE8A7)),
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                AnimeCandyBackdrop(Modifier.fillMaxSize())
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 18.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                KudosPanel(kudos = state.wallet.kudos)
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 18.dp, vertical = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    KudosPanel(kudos = state.wallet.kudos)
+                    Text(
+                        text = "星糖扭蛋机",
+                        color = Color(0xFF7B4B57),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        text = "把今天的努力，摇成一颗好运。",
+                        color = Color(0xFF9A6A70),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
 
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                AnimeGachaMachine(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Button(
+                        onClick = if (hasSafetyDraw) onPurple else onSingle,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFBFE7FF),
+                            contentColor = Color(0xFF31536D),
+                        ),
+                        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.92f)),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     ) {
                         Text(
-                            text = "星糖扭蛋机",
-                            color = Color(0xFF7B4B57),
-                            style = MaterialTheme.typography.headlineMedium,
+                            text = if (hasSafetyDraw) "单抽 · 免费" else "单抽 · $singleCost",
                             fontWeight = FontWeight.Black,
-                            textAlign = TextAlign.Center,
-                        )
-                        Text(
-                            text = "把今天的努力，摇成一颗好运。",
-                            color = Color(0xFF9A6A70),
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleMedium,
                         )
                     }
 
-                    AnimeGachaMachine(
+                    Button(
+                        onClick = onTen,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFC857),
+                            contentColor = Color(0xFF684018),
+                        ),
+                        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.92f)),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp),
                     ) {
-                        Button(
-                            onClick = if (hasSafetyDraw) onPurple else onSingle,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp),
-                            shape = RoundedCornerShape(20.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFBFE7FF),
-                                contentColor = Color(0xFF31536D),
-                            ),
-                            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.92f)),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        ) {
-                            Text(
-                                text = if (hasSafetyDraw) "单抽 · 免费" else "单抽 · $singleCost",
-                                fontWeight = FontWeight.Black,
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                        }
-
-                        Button(
-                            onClick = onTen,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp),
-                            shape = RoundedCornerShape(20.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFFFC857),
-                                contentColor = Color(0xFF684018),
-                            ),
-                            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.92f)),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp),
-                        ) {
-                            Text(
-                                text = "十连 · ${StudyRules.TEN_DRAW_COST}",
-                                fontWeight = FontWeight.Black,
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                        }
+                        Text(
+                            text = "十连 · ${StudyRules.TEN_DRAW_COST}",
+                            fontWeight = FontWeight.Black,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
                     }
                 }
-            }
-        }
-
-        // The compact exit control now sits on the same visual row as the section chips.
-        Surface(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset(y = (-70).dp)
-                .size(40.dp)
-                .clickable { navController.popBackStack() },
-            shape = CircleShape,
-            color = Color.White.copy(alpha = 0.94f),
-            border = BorderStroke(2.dp, Color(0xFFFFC9A6)),
-            shadowElevation = 5.dp,
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = HugeIcons.ArrowLeft01,
-                    contentDescription = "返回",
-                    tint = Color(0xFF7B4B57),
-                    modifier = Modifier.size(20.dp),
-                )
             }
         }
     }
