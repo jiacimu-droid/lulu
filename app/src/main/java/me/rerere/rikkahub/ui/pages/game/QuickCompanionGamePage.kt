@@ -283,7 +283,7 @@ fun QuickCompanionGamePage(gameId: String) {
                 QuickCompanionGame.DICE_DUEL -> YachtDiceGame(
                     assistantName = selectedAssistant.name.ifBlank { "角色" },
                     onRoundCompleted = { round, userCategory, roleCategory, userScore, roleScore, outcome, userTotal, roleTotal ->
-                        val summary = "快艇骰子第 $round 轮：用户将$userCategory记为$userScore 分，角色将$roleCategory记为$roleScore 分；$outcome。当前总分用户$userTotal，角色$roleTotal。"
+                        val summary = "快艇骰子第 $round 轮：用户将${userCategory}记为$userScore 分，角色将${roleCategory}记为$roleScore 分；$outcome。当前总分用户$userTotal，角色$roleTotal。"
                         completeSharedGame(
                             title = "一起完成一轮快艇骰子",
                             summary = summary,
