@@ -56,8 +56,18 @@ class StudyVM(
 
     fun syncToday() = reduce { current ->
         val date = LocalDate.now()
+        val currentForPlan = if (
+            current.today == date.toString() &&
+            CurrentWeekStudyRecovery.planFor(date) != null
+        ) {
+            // The visible task list already belongs to the recovery overlay. Running
+            // the base-plan synchronizer first would replace its ids and erase checks.
+            current
+        } else {
+            StudyRules.rolloverToDate(current, date)
+        }
         CurrentWeekStudyRecovery.applyToState(
-            state = StudyRules.rolloverToDate(current, date),
+            state = currentForPlan,
             date = date,
         )
     }
