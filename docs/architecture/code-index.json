@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-24T08:09:23.606351+00:00",
-  "commit": "36e4afbd2151b17835fc64a0bbc1e3dd7f7f350b",
+  "generatedAt": "2026-07-24T09:14:08.395829+00:00",
+  "commit": "5bac393a85822f4293ee2760d07dc2b016d8919d",
   "branch": "master",
-  "sourceFingerprint": "91c2598c9c7fdeaa25d521d76d81f8c9060fa6428ccb97c17b26bc91334b5e0b",
+  "sourceFingerprint": "bc995d93ff7a1b79daa47aa228876267f4773e6ac4f5eb4dc34c4a9dfec9aa45",
   "summary": {
     "files": 1123,
-    "lines": 265289,
+    "lines": 265350,
     "symbols": 5515,
     "productionCodeFiles": 794,
     "testFiles": 136,
@@ -41591,8 +41591,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 317,
-      "sha256": "d678826b32b5e50351e7f6603da50e01a4435b3b1e2196728aa7898dcb493213",
+      "lines": 378,
+      "sha256": "8709e47d3bb8cc875aa40f0faacb5b624ea1f58022e8a6ee4886d5310766d1b3",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -41602,30 +41602,29 @@
         {
           "name": "GachaCard",
           "kind": "composable",
-          "line": 51
+          "line": 49
         },
         {
-          "name": "MoonlightBackdrop",
+          "name": "KudosPanel",
           "kind": "composable",
-          "line": 259
+          "line": 162
         },
         {
-          "name": "MoonlightPill",
+          "name": "AnimeGachaMachine",
           "kind": "composable",
-          "line": 284
+          "line": 208
         },
         {
-          "name": "InventoryPill",
+          "name": "AnimeCandyBackdrop",
           "kind": "composable",
-          "line": 303
+          "line": 333
         }
       ],
-      "localImportCount": 3,
+      "localImportCount": 2,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
-        "me.rerere.rikkahub.R",
         "me.rerere.rikkahub.data.study.StudyRules",
         "me.rerere.rikkahub.data.study.StudyState"
       ],
@@ -92994,6 +92993,20 @@
         "line": 2875
       }
     ],
+    "me.rerere.rikkahub.ui.pages.study.AnimeCandyBackdrop": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
+        "kind": "composable",
+        "line": 333
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.AnimeGachaMachine": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
+        "kind": "composable",
+        "line": 208
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.study.CollectionCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
@@ -93173,7 +93186,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
         "kind": "composable",
-        "line": 51
+        "line": 49
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
@@ -93195,11 +93208,11 @@
         "line": 910
       }
     ],
-    "me.rerere.rikkahub.ui.pages.study.InventoryPill": [
+    "me.rerere.rikkahub.ui.pages.study.KudosPanel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
         "kind": "composable",
-        "line": 303
+        "line": 162
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.LevelDialog": [
@@ -93216,25 +93229,11 @@
         "line": 434
       }
     ],
-    "me.rerere.rikkahub.ui.pages.study.MoonlightBackdrop": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
-        "kind": "composable",
-        "line": 259
-      }
-    ],
     "me.rerere.rikkahub.ui.pages.study.MoonlightGachaRandom": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "kind": "class",
         "line": 326
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.study.MoonlightPill": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
-        "kind": "composable",
-        "line": 284
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.MysteryBox": [
