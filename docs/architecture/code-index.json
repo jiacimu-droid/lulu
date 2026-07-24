@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-24T11:41:57.555667+00:00",
-  "commit": "6adae47ddb563a424b2f798496b65d3e6dcf2449",
+  "generatedAt": "2026-07-24T12:24:58.670658+00:00",
+  "commit": "ec6d86fb9cec641f0e912fe121b335b0933cba30",
   "branch": "master",
-  "sourceFingerprint": "3ad853ff08f902fa0216ce625466091ba91701636ce23b0f815c0bdea185afb0",
+  "sourceFingerprint": "c74bb21d87cf75e308beb8147f45540c13c9b8a762c90dc62dde1b7e132b08cf",
   "summary": {
     "files": 1123,
-    "lines": 265349,
-    "symbols": 5515,
+    "lines": 265348,
+    "symbols": 5516,
     "productionCodeFiles": 794,
     "testFiles": 136,
     "largeProductionFiles": 42,
@@ -134,8 +134,8 @@
     "largestFiles": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
-        "lines": 3372,
-        "symbols": 87,
+        "lines": 3371,
+        "symbols": 88,
         "localImportCount": 51,
         "todoMarkers": 0
       },
@@ -360,8 +360,8 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
-        "lines": 3372,
-        "symbols": 87,
+        "lines": 3371,
+        "symbols": 88,
         "localImportCount": 51,
         "todoMarkers": 0
       },
@@ -586,8 +586,8 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
-        "lines": 3372,
-        "symbols": 87,
+        "lines": 3371,
+        "symbols": 88,
         "localImportCount": 51,
         "todoMarkers": 0
       },
@@ -41638,8 +41638,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 3372,
-      "sha256": "ae9e4e1323f7e94beac55cef68207aeb1f81e4927d7880231db12cb3cb5c7555",
+      "lines": 3371,
+      "sha256": "c433ccf77fbc8246369085127f686d45c7b23d466f38296b885b303c23a98d71",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -41674,412 +41674,417 @@
         {
           "name": "StudyPomodoroPage",
           "kind": "composable",
-          "line": 473
+          "line": 467
         },
         {
           "name": "StudyPomodoroFocusPage",
           "kind": "composable",
-          "line": 575
+          "line": 569
         },
         {
           "name": "finishPomodoro",
           "kind": "function",
-          "line": 602
+          "line": 596
         },
         {
           "name": "StudyHero",
           "kind": "composable",
-          "line": 784
+          "line": 778
         },
         {
           "name": "HeroMetric",
           "kind": "composable",
-          "line": 910
+          "line": 904
         },
         {
           "name": "SectionChips",
           "kind": "composable",
-          "line": 924
+          "line": 918
         },
         {
           "name": "TodayPomodoroLaunchCard",
           "kind": "composable",
-          "line": 956
+          "line": 949
         },
         {
           "name": "TodayProgressCard",
           "kind": "composable",
-          "line": 987
+          "line": 980
         },
         {
           "name": "DailyStudyDashboard",
           "kind": "composable",
-          "line": 1021
+          "line": 1014
         },
         {
           "name": "TaskContent",
           "kind": "composable",
-          "line": 1085
+          "line": 1078
         },
         {
           "name": "TodayPlanCard",
           "kind": "composable",
-          "line": 1133
+          "line": 1127
         },
         {
           "name": "TodayPlanContent",
           "kind": "composable",
-          "line": 1149
+          "line": 1143
         },
         {
           "name": "TomorrowPlanContent",
           "kind": "composable",
-          "line": 1201
+          "line": 1195
         },
         {
           "name": "StudyTipsCard",
           "kind": "composable",
-          "line": 1238
+          "line": 1232
         },
         {
           "name": "StudyTipsContent",
           "kind": "composable",
-          "line": 1245
+          "line": 1239
         },
         {
           "name": "PlanOverviewContent",
           "kind": "composable",
-          "line": 1264
+          "line": 1258
         },
         {
           "name": "LevelDialog",
           "kind": "composable",
-          "line": 1308
+          "line": 1302
         },
         {
           "name": "SuperMomentCelebration",
           "kind": "composable",
-          "line": 1354
+          "line": 1348
         },
         {
           "name": "DrawResultCelebration",
           "kind": "composable",
-          "line": 1427
+          "line": 1421
         },
         {
           "name": "nextPendingRewardVideoIndex",
           "kind": "function",
-          "line": 1506
+          "line": 1500
         },
         {
           "name": "skipAll",
           "kind": "function",
-          "line": 1517
+          "line": 1511
         },
         {
           "name": "finishRewardVideo",
           "kind": "function",
-          "line": 1526
+          "line": 1520
         },
         {
           "name": "closeCurrentVideo",
           "kind": "function",
-          "line": 1539
+          "line": 1533
         },
         {
           "name": "DrawOpeningVideoLayer",
           "kind": "composable",
-          "line": 1718
+          "line": 1712
         },
         {
           "name": "formatStudyTimeMetric",
           "kind": "function",
-          "line": 1741
+          "line": 1735
         },
         {
           "name": "DrawRewardVideoLayer",
           "kind": "composable",
-          "line": 1745
+          "line": 1739
         },
         {
           "name": "DrawVideoLayer",
           "kind": "composable",
-          "line": 1762
+          "line": 1756
         },
         {
           "name": "freezeAtEnd",
           "kind": "function",
-          "line": 1773
+          "line": 1767
         },
         {
           "name": "loadDrawVideo",
           "kind": "function",
-          "line": 1777
+          "line": 1771
         },
         {
           "name": "DrawVideoFrozenFrame",
           "kind": "composable",
-          "line": 1840
+          "line": 1834
         },
         {
           "name": "loadVideoLastFrame",
           "kind": "function",
-          "line": 1866
+          "line": 1860
         },
         {
           "name": "DrawResultSummary",
           "kind": "composable",
-          "line": 1885
+          "line": 1879
         },
         {
           "name": "DrawResultSquare",
           "kind": "composable",
-          "line": 1937
+          "line": 1931
         },
         {
           "name": "DrawRevealCard",
           "kind": "composable",
-          "line": 1982
+          "line": 1976
         },
         {
           "name": "drawFullscreenBrush",
           "kind": "function",
-          "line": 2081
+          "line": 2075
         },
         {
           "name": "MysteryBoxCelebration",
           "kind": "composable",
-          "line": 2089
+          "line": 2083
         },
         {
           "name": "MysteryBoxPendingDialog",
           "kind": "composable",
-          "line": 2137
+          "line": 2131
         },
         {
           "name": "GachaCard",
           "kind": "composable",
-          "line": 2161
+          "line": 2155
         },
         {
           "name": "SleepHabitRewardCard",
           "kind": "composable",
-          "line": 2311
+          "line": 2305
         },
         {
           "name": "SleepHabitRewardRow",
           "kind": "composable",
-          "line": 2349
+          "line": 2343
         },
         {
           "name": "StarryLetterBackdrop",
           "kind": "composable",
-          "line": 2386
+          "line": 2380
         },
         {
           "name": "StarryLetterSeal",
           "kind": "composable",
-          "line": 2413
+          "line": 2407
         },
         {
           "name": "StarryRarityPill",
           "kind": "composable",
-          "line": 2441
+          "line": 2435
         },
         {
           "name": "FragmentWalletPill",
           "kind": "composable",
-          "line": 2448
+          "line": 2442
         },
         {
           "name": "CollectionCard",
           "kind": "composable",
-          "line": 2455
+          "line": 2449
         },
         {
           "name": "EntertainmentRewardRow",
           "kind": "composable",
-          "line": 2585
+          "line": 2579
         },
         {
           "name": "DrawPoolChip",
           "kind": "composable",
-          "line": 2611
+          "line": 2605
         },
         {
           "name": "CollectionProgressList",
           "kind": "composable",
-          "line": 2624
+          "line": 2618
         },
         {
           "name": "normalOutfitTotal",
           "kind": "function",
-          "line": 2687
+          "line": 2681
         },
         {
           "name": "OutfitSummaryTile",
           "kind": "composable",
-          "line": 2693
+          "line": 2687
         },
         {
           "name": "OutfitProgressCard",
           "kind": "composable",
-          "line": 2739
+          "line": 2733
         },
         {
           "name": "CollectionProgressRow",
           "kind": "composable",
-          "line": 2808
+          "line": 2802
         },
         {
           "name": "AchievementCard",
           "kind": "composable",
-          "line": 2857
+          "line": 2851
         },
         {
           "name": "AchievementRow",
           "kind": "composable",
-          "line": 2875
+          "line": 2869
         },
         {
           "name": "ShopCard",
           "kind": "composable",
-          "line": 2890
+          "line": 2884
         },
         {
           "name": "StudyGuideCard",
           "kind": "composable",
-          "line": 2918
+          "line": 2912
         },
         {
           "name": "GuideBlock",
           "kind": "composable",
-          "line": 2989
+          "line": 2983
         },
         {
           "name": "RecentEventsCard",
           "kind": "composable",
-          "line": 2999
+          "line": 2993
         },
         {
           "name": "CompanionPrepCard",
           "kind": "composable",
-          "line": 3012
+          "line": 3006
         },
         {
           "name": "DurationCard",
           "kind": "composable",
-          "line": 3029
+          "line": 3023
         },
         {
           "name": "PomodoroTimerCircle",
           "kind": "composable",
-          "line": 3060
+          "line": 3054
         },
         {
           "name": "FocusChatPanel",
           "kind": "composable",
-          "line": 3101
+          "line": 3095
         },
         {
           "name": "StudyCard",
           "kind": "composable",
-          "line": 3155
+          "line": 3149
         },
         {
           "name": "PomodoroFocusPalette",
           "kind": "class",
-          "line": 3164
+          "line": 3158
         },
         {
           "name": "focusPalette",
           "kind": "function",
-          "line": 3178
+          "line": 3172
         },
         {
           "name": "PomodoroThemePickerDialog",
           "kind": "composable",
-          "line": 3208
+          "line": 3202
         },
         {
           "name": "StudyColors",
           "kind": "object",
-          "line": 3264
+          "line": 3258
         },
         {
           "name": "heroBrush",
           "kind": "function",
-          "line": 3275
+          "line": 3270
+        },
+        {
+          "name": "gachaPageBrush",
+          "kind": "function",
+          "line": 3274
         },
         {
           "name": "focusBrush",
           "kind": "function",
-          "line": 3279
+          "line": 3278
         },
         {
           "name": "rarityColor",
           "kind": "function",
-          "line": 3283
+          "line": 3282
         },
         {
           "name": "drawResultTitle",
           "kind": "function",
-          "line": 3298
+          "line": 3297
         },
         {
           "name": "superMomentBrush",
           "kind": "function",
-          "line": 3307
+          "line": 3306
         },
         {
           "name": "gachaBrush",
           "kind": "function",
-          "line": 3311
+          "line": 3310
         },
         {
           "name": "drawBrush",
           "kind": "function",
-          "line": 3315
+          "line": 3314
         },
         {
           "name": "drawCardBrush",
           "kind": "function",
-          "line": 3324
+          "line": 3323
         },
         {
           "name": "mysteryBoxText",
           "kind": "function",
-          "line": 3331
+          "line": 3330
         },
         {
           "name": "secondsText",
           "kind": "function",
-          "line": 3339
+          "line": 3338
         },
         {
           "name": "toRecordedMinutes",
           "kind": "function",
-          "line": 3344
+          "line": 3343
         },
         {
           "name": "studyDurationText",
           "kind": "function",
-          "line": 3348
+          "line": 3347
         },
         {
           "name": "buildEncourageLine",
           "kind": "function",
-          "line": 3359
+          "line": 3358
         },
         {
           "name": "buildStudyChatPrompt",
           "kind": "function",
-          "line": 3364
+          "line": 3363
         },
         {
           "name": "buildPomodoroOpeningPrompt",
           "kind": "function",
-          "line": 3369
+          "line": 3368
         }
       ],
       "localImportCount": 51,
@@ -92983,14 +92988,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2857
+        "line": 2851
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.AchievementRow": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2875
+        "line": 2869
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.AnimeCandyBackdrop": [
@@ -93011,21 +93016,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2455
+        "line": 2449
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.CollectionProgressList": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2624
+        "line": 2618
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.CollectionProgressRow": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2808
+        "line": 2802
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.CollectionSection": [
@@ -93039,7 +93044,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 3012
+        "line": 3006
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DailyDashboardView": [
@@ -93053,42 +93058,42 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1021
+        "line": 1014
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawOpeningVideoLayer": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1718
+        "line": 1712
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawPoolChip": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2611
+        "line": 2605
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawResultCelebration": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1427
+        "line": 1421
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawResultSquare": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1937
+        "line": 1931
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawResultSummary": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1885
+        "line": 1879
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawResults": [
@@ -93102,7 +93107,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1982
+        "line": 1976
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawRevealFlow": [
@@ -93137,49 +93142,49 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1745
+        "line": 1739
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawVideoFrozenFrame": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1840
+        "line": 1834
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DrawVideoLayer": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1762
+        "line": 1756
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DurationCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 3029
+        "line": 3023
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.EntertainmentRewardRow": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2585
+        "line": 2579
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.FocusChatPanel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 3101
+        "line": 3095
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.FragmentWalletPill": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2448
+        "line": 2442
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.GachaCard": [
@@ -93191,21 +93196,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2161
+        "line": 2155
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.GuideBlock": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2989
+        "line": 2983
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.HeroMetric": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 910
+        "line": 904
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.KudosPanel": [
@@ -93219,7 +93224,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1308
+        "line": 1302
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.Message": [
@@ -93247,14 +93252,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2089
+        "line": 2083
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.MysteryBoxPendingDialog": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2137
+        "line": 2131
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.MysteryBoxReady": [
@@ -93268,21 +93273,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2739
+        "line": 2733
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.OutfitSummaryTile": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2693
+        "line": 2687
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PlanOverviewContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1264
+        "line": 1258
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PlanView": [
@@ -93296,91 +93301,91 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "class",
-        "line": 3164
+        "line": 3158
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroThemePickerDialog": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 3208
+        "line": 3202
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroTimerCircle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 3060
+        "line": 3054
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.RecentEventsCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2999
+        "line": 2993
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.SectionChips": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 924
+        "line": 918
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.ShopCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2890
+        "line": 2884
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.SleepHabitRewardCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2311
+        "line": 2305
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.SleepHabitRewardRow": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2349
+        "line": 2343
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StarryLetterBackdrop": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2386
+        "line": 2380
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StarryLetterSeal": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2413
+        "line": 2407
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StarryRarityPill": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2441
+        "line": 2435
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 3155
+        "line": 3149
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyColors": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "object",
-        "line": 3264
+        "line": 3258
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyDrawReveal": [
@@ -93401,14 +93406,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 2918
+        "line": 2912
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyHero": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 784
+        "line": 778
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPage": [
@@ -93422,14 +93427,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 575
+        "line": 569
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 473
+        "line": 467
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudySection": [
@@ -93443,14 +93448,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1238
+        "line": 1232
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyTipsContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1245
+        "line": 1239
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyVM": [
@@ -93464,7 +93469,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1354
+        "line": 1348
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.SuperMomentReady": [
@@ -93478,42 +93483,42 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1085
+        "line": 1078
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.TodayPlanCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1133
+        "line": 1127
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.TodayPlanContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1149
+        "line": 1143
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.TodayPomodoroLaunchCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 956
+        "line": 949
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.TodayProgressCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 987
+        "line": 980
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.TomorrowPlanContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 1201
+        "line": 1195
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.addTask": [
@@ -93548,21 +93553,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3359
+        "line": 3358
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.buildPomodoroOpeningPrompt": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3369
+        "line": 3368
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.buildStudyChatPrompt": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3364
+        "line": 3363
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.buyShopItem": [
@@ -93597,7 +93602,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 1539
+        "line": 1533
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.completePomodoro": [
@@ -93637,21 +93642,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3315
+        "line": 3314
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.drawCardBrush": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3324
+        "line": 3323
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.drawFullscreenBrush": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 2081
+        "line": 2075
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.drawPurpleTicket": [
@@ -93665,7 +93670,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3298
+        "line": 3297
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.drawWithAnyEpicStartsWithOneOpeningVideoBeforeFirstCard": [
@@ -93700,49 +93705,56 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 602
+        "line": 596
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.finishRewardVideo": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 1526
+        "line": 1520
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.focusBrush": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3279
+        "line": 3278
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.focusPalette": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3178
+        "line": 3172
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.formatStudyTimeMetric": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 1741
+        "line": 1735
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.freezeAtEnd": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 1773
+        "line": 1767
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.gachaBrush": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3311
+        "line": 3310
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.gachaPageBrush": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "kind": "function",
+        "line": 3274
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.generateTodaySchedule": [
@@ -93756,21 +93768,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3275
+        "line": 3270
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.loadDrawVideo": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 1777
+        "line": 1771
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.loadVideoLastFrame": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 1866
+        "line": 1860
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.mapRoll": [
@@ -93784,7 +93796,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3331
+        "line": 3330
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.next": [
@@ -93819,14 +93831,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 1506
+        "line": 1500
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.normalOutfitTotal": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 2687
+        "line": 2681
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.openMysteryBox": [
@@ -93854,7 +93866,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3283
+        "line": 3282
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.redeemEntertainment": [
@@ -93882,7 +93894,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3339
+        "line": 3338
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.selectCompanion": [
@@ -93910,7 +93922,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 1517
+        "line": 1511
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.skipDuringTheBatchOpeningVideoRevealsTheFirstCard": [
@@ -93945,7 +93957,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3348
+        "line": 3347
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.summary": [
@@ -93959,7 +93971,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3307
+        "line": 3306
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.syncToday": [
@@ -93973,7 +93985,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 3344
+        "line": 3343
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.toggleTask": [
