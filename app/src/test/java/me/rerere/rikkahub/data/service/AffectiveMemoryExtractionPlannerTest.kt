@@ -93,8 +93,8 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
-    fun `planner selects the next unprocessed interval without overlap`() {
-        val conversation = nodes(56)
+    fun `planner selects the next exact interval without overlap`() {
+        val conversation = nodes(50)
         val processed = (1..20).map { idOf(it) }.toSet()
 
         val plan = buildAffectiveMemoryExtractionPlan(
@@ -110,7 +110,22 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
-    fun `planner rebuilds an entire configured window when a legacy checkpoint has a hole`() {
+    fun `planner does not trigger between configured boundaries`() {
+        val conversation = nodes(51)
+        val processed = (1..40).map { idOf(it) }.toSet()
+
+        val plan = buildAffectiveMemoryExtractionPlan(
+            messageNodes = conversation,
+            processedSourceNodeIds = processed,
+            extractionInterval = 40,
+            protectedRecentCount = 10,
+        )
+
+        assertEquals(null, plan)
+    }
+
+    @Test
+    fun `planner rebuilds an entire configured window when a checkpoint has a hole`() {
         val conversation = nodes(50)
         val partiallyProcessed = (1..30).map { idOf(it) }.toSet()
 
@@ -144,8 +159,8 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
-    fun `recent planner selects newest complete aligned forty message batch`() {
-        val conversation = nodes(335)
+    fun `recent planner selects newest exact aligned forty message batch`() {
+        val conversation = nodes(330)
 
         val plan = buildAffectiveMemoryExtractionPlan(
             messageNodes = conversation,
