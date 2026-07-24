@@ -27,6 +27,7 @@ import me.rerere.rikkahub.data.study.StudyDrawResult
 import me.rerere.rikkahub.data.study.StudyEntertainmentReward
 import me.rerere.rikkahub.data.study.StudyFragmentType
 import me.rerere.rikkahub.data.study.StudyMysteryBoxReward
+import me.rerere.rikkahub.data.study.StudyRarity
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyShopItem
 import me.rerere.rikkahub.data.study.StudyState
@@ -198,12 +199,19 @@ class StudyVM(
             var message: String? = null
             var updatedStarWish = starWishStore.state.value
             store.update { current ->
-                val result = StudyRules.draw(current, count, Random.Default)
+                val random = MoonlightGachaRandom(
+                    delegate = Random.Default,
+                    initialDrawsSinceNonNormal = current.drawsSinceNonNormal,
+                )
+                val result = StudyRules.draw(current, count, random)
                 if (result.results.isEmpty()) {
                     message = "夸夸值或抽卡券不够"
                     return@update result.state
                 }
-                var updatedStudy = result.state
+                var updatedStudy = result.state.correctMoonlightSpecialTracking(
+                    previousState = current,
+                    results = result.results,
+                )
                 revealItems = result.results.map { drawResult ->
                     if (drawResult.fragmentType != StudyFragmentType.Video) {
                         StudyDrawReveal(drawResult)
@@ -234,7 +242,7 @@ class StudyVM(
                 result.state
             }
             if (revealItems.isEmpty()) {
-                _effects.tryEmit(StudyEffect.Message("没有可用的今日零紫安全抽"))
+                _effects.tryEmit(StudyEffect.Message("没有可用的今日安全抽"))
             } else {
                 _effects.tryEmit(StudyEffect.DrawResults(revealItems))
             }
@@ -308,6 +316,118 @@ class StudyVM(
             _effects.tryEmit(StudyEffect.Message(title))
         }
     }
+}
+
+/**
+ * Rebalances only the regular-pool rarity roll while leaving StudyRules' inventory,
+ * pity, fragment and reveal behavior untouched. The persisted five-minute reward
+ * cadence is deliberately not changed.
+ */
+private class MoonlightGachaRandom(
+    private val delegate: Random,
+    initialDrawsSinceNonNormal: Int,
+) : Random() {
+    private var drawsSinceNonNormal = initialDrawsSinceNonNormal
+        .coerceIn(0, StudyRules.NON_NORMAL_PITY_DRAW_COUNT - 1)
+    private var waitingForSubtypeRoll = false
+
+    override fun nextBits(bitCount: Int): Int {
+        if (bitCount == 0) return 0
+        return delegate.nextInt().ushr(Int.SIZE_BITS - bitCount)
+    }
+
+    override fun nextDouble(): Double {
+        if (waitingForSubtypeRoll) {
+            waitingForSubtypeRoll = false
+            return delegate.nextDouble()
+        }
+
+        // On the guaranteed 30th pull StudyRules calls drawRare directly, so this
+        // double is the purple subtype roll rather than a rarity roll.
+        if (drawsSinceNonNormal >= StudyRules.NON_NORMAL_PITY_DRAW_COUNT - 1) {
+            drawsSinceNonNormal = 0
+            return delegate.nextDouble()
+        }
+
+        val roll = delegate.nextDouble()
+        return when {
+            roll < MOONLIGHT_NORMAL_END -> {
+                drawsSinceNonNormal += 1
+                mapRoll(roll, 0.0, MOONLIGHT_NORMAL_END, 0.0, LEGACY_NORMAL_END)
+            }
+            roll < MOONLIGHT_RARE_END -> {
+                drawsSinceNonNormal = 0
+                waitingForSubtypeRoll = true
+                mapRoll(roll, MOONLIGHT_NORMAL_END, MOONLIGHT_RARE_END, LEGACY_NORMAL_END, LEGACY_RARE_END)
+            }
+            roll < MOONLIGHT_EPIC_END -> {
+                drawsSinceNonNormal = 0
+                waitingForSubtypeRoll = true
+                mapRoll(roll, MOONLIGHT_RARE_END, MOONLIGHT_EPIC_END, LEGACY_RARE_END, LEGACY_EPIC_END)
+            }
+            else -> {
+                drawsSinceNonNormal = 0
+                mapRoll(roll, MOONLIGHT_EPIC_END, 1.0, LEGACY_EPIC_END, 1.0)
+            }
+        }
+    }
+
+    private fun mapRoll(
+        value: Double,
+        sourceStart: Double,
+        sourceEnd: Double,
+        targetStart: Double,
+        targetEnd: Double,
+    ): Double {
+        val fraction = (value - sourceStart) / (sourceEnd - sourceStart)
+        return targetStart + fraction * (targetEnd - targetStart)
+    }
+
+    private companion object {
+        // New regular-pool rates: blue 94%, purple 4.8%, gold 1%, rainbow 0.2%.
+        const val MOONLIGHT_NORMAL_END = 0.94
+        const val MOONLIGHT_RARE_END = 0.988
+        const val MOONLIGHT_EPIC_END = 0.998
+
+        // Current StudyRules thresholds. Mapping into these intervals lets us keep
+        // all existing reward construction and persistence code in one place.
+        const val LEGACY_NORMAL_END = 0.9215
+        const val LEGACY_RARE_END = 0.9815
+        const val LEGACY_EPIC_END = 0.9965
+    }
+}
+
+private fun StudyState.correctMoonlightSpecialTracking(
+    previousState: StudyState,
+    results: List<StudyDrawResult>,
+): StudyState {
+    val specialCount = results.count { it.rarity != StudyRarity.Normal }
+    val purpleCount = results.count { it.rarity == StudyRarity.Rare }
+    val goldOrRainbowCount = specialCount - purpleCount
+    if (goldOrRainbowCount <= 0) return this
+
+    val drawDate = today.ifBlank { LocalDate.now().toString() }
+    val safetyWasIncorrectlyGranted =
+        purpleCount == 0 &&
+            previousState.purpleSafetyGrantedDate != drawDate &&
+            purpleSafetyGrantedDate == drawDate &&
+            wallet.purpleDrawTickets > previousState.wallet.purpleDrawTickets
+
+    return copy(
+        wallet = if (safetyWasIncorrectlyGranted) {
+            wallet.copy(purpleDrawTickets = (wallet.purpleDrawTickets - 1).coerceAtLeast(0))
+        } else {
+            wallet
+        },
+        // Keep the old serialized field name for compatibility, but from this point
+        // it records all purple/gold/rainbow results, not purple alone.
+        dailyPurpleDrawCount = dailyPurpleDrawCount + goldOrRainbowCount,
+        purpleSafetyGrantedDate = if (safetyWasIncorrectlyGranted) {
+            previousState.purpleSafetyGrantedDate
+        } else {
+            purpleSafetyGrantedDate
+        },
+    )
 }
 
 sealed interface StudyEffect {
