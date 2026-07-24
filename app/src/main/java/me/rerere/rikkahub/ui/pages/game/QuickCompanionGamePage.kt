@@ -69,6 +69,7 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuickCompanionGamePage(gameId: String) {
+    val game = remember(gameId) { QuickCompanionGame.fromWireName(gameId) }
     val navController = LocalNavController.current
     val currentSettings = LocalSettings.current
     val settingsStore = koinInject<SettingsStore>()
@@ -76,12 +77,11 @@ fun QuickCompanionGamePage(gameId: String) {
     val apiUsageStore = koinInject<ApiUsageStore>()
     val companionRuntime = koinInject<CompanionRuntime>()
     val scope = rememberCoroutineScope()
-    var activeGame by remember(gameId) { mutableStateOf(QuickCompanionGame.fromWireName(gameId)) }
     var selectedAssistantId by remember { mutableStateOf(currentSettings.assistantId.toString()) }
     val selectedAssistant = currentSettings.assistants.firstOrNull { it.id.toString() == selectedAssistantId }
         ?: currentSettings.getCurrentAssistant()
     val assistantName = selectedAssistant.name.ifBlank { "角色" }
-    var reactionLine by remember(activeGame.wireName, selectedAssistantId) {
+    var reactionLine by remember(game.wireName, selectedAssistantId) {
         mutableStateOf("（开始游戏后，角色会根据真实对局和自己的记忆回应你）")
     }
     var isGeneratingReaction by remember { mutableStateOf(false) }
@@ -99,16 +99,16 @@ fun QuickCompanionGamePage(gameId: String) {
                 assistantId = assistantId,
                 lifeEvents = listOf(
                     CompanionLifeEvent(
-                        id = "shared-game:${activeGame.wireName}:$assistantId:$nowMillis",
+                        id = "shared-game:${game.wireName}:$assistantId:$nowMillis",
                         assistantId = assistantId,
                         type = CompanionLifeEventType.GAME,
                         status = CompanionLifeEventStatus.COMPLETED,
                         title = title,
                         summary = summary,
                         source = CompanionLifeEventSource.CHAT,
-                        evidenceReference = "shared-game:${activeGame.wireName}:$nowMillis",
+                        evidenceReference = "shared-game:${game.wireName}:$nowMillis",
                         detailsJson = detailsJson,
-                        importance = if (activeGame == QuickCompanionGame.ROLEPLAY_ADVENTURE) 4 else 3,
+                        importance = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 4 else 3,
                         startedAt = nowMillis,
                         endedAt = nowMillis,
                         createdAt = nowMillis,
@@ -133,7 +133,7 @@ fun QuickCompanionGamePage(gameId: String) {
             val personaPrompt = buildString {
                 appendLine("你正在以‘${player.name.ifBlank { "角色" }}’的身份和用户一起玩游戏。")
                 appendLine("程序提供的题目真相、掷骰、棋局和分数都是不可修改的事实。")
-                appendLine("必须保持角色人设和关系连续性，不要默认活泼、亲密、温柔或吐槽。");
+                appendLine("必须保持角色人设和关系连续性，不要默认活泼、亲密、温柔或吐槽。")
                 if (player.systemPrompt.isNotBlank()) {
                     appendLine("角色人设：")
                     appendLine(player.systemPrompt)
@@ -168,14 +168,14 @@ fun QuickCompanionGamePage(gameId: String) {
                     model = model,
                     temperature = 0.82f,
                     topP = 0.9f,
-                    maxTokens = if (activeGame == QuickCompanionGame.ROLEPLAY_ADVENTURE) 520 else 260,
+                    maxTokens = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 520 else 260,
                     reasoningLevel = ReasoningLevel.OFF,
                 ),
             )
             chunk.usage?.let { usage ->
                 apiUsageStore.record(
                     source = ApiUsageSource.GAME,
-                    title = "${activeGame.title}：${player.name.ifBlank { "当前角色" }}",
+                    title = "${game.title}：${player.name.ifBlank { "当前角色" }}",
                     model = model.displayName.ifBlank { model.modelId },
                     provider = providerSetting.name.ifBlank { providerSetting.id.toString() },
                     usage = usage,
@@ -227,7 +227,7 @@ fun QuickCompanionGamePage(gameId: String) {
         containerColor = GameColors.background,
         topBar = {
             TopAppBar(
-                title = { Text(activeGame.title) },
+                title = { Text(game.title) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(HugeIcons.ArrowLeft02, contentDescription = "返回")
@@ -259,18 +259,13 @@ fun QuickCompanionGamePage(gameId: String) {
                             )
                         }
                     }
-                    Text("选择玩法", fontWeight = FontWeight.SemiBold)
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(QuickCompanionGame.entries, key = { it.wireName }) { game ->
-                            FilterChip(
-                                selected = game == activeGame,
-                                onClick = { activeGame = game },
-                                label = { Text(game.shortTitle) },
-                            )
-                        }
-                    }
                     Text(
-                        "跑团、海龟汤和默契问答会读取角色人设与记忆；固定真相、掷骰和胜负仍由程序掌管。",
+                        when (game) {
+                            QuickCompanionGame.TURTLE_SOUP -> "这是海龟汤独立页面：题面和汤底由程序锁定，角色只负责主持与回应。"
+                            QuickCompanionGame.RAPPORT_QUIZ -> "这是默契问答独立页面：角色会读取人设、记忆和对你的印象后独立作答。"
+                            QuickCompanionGame.ROLEPLAY_ADVENTURE -> "这是跑团独立页面：程序负责 d20 判定和状态，角色负责同伴演出与剧情主持。"
+                            else -> "游戏引擎负责真实规则和结果，角色模型根据这些事实按人设回应。"
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -283,7 +278,7 @@ fun QuickCompanionGamePage(gameId: String) {
                 isGenerating = isGeneratingReaction,
             )
 
-            when (activeGame) {
+            when (game) {
                 QuickCompanionGame.ROCK_PAPER_SCISSORS -> RockPaperScissorsGame(
                     assistantName = assistantName,
                     onCompleted = { userMove, roleMove, outcome ->
@@ -292,7 +287,7 @@ fun QuickCompanionGamePage(gameId: String) {
                             title = "一起玩完一轮猜拳",
                             summary = summary,
                             detailsJson = buildJsonObject {
-                                put("game", activeGame.wireName)
+                                put("game", game.wireName)
                                 put("user_move", userMove)
                                 put("role_move", roleMove)
                                 put("outcome", outcome)
