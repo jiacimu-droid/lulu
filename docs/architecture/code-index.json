@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-24T04:06:04.933382+00:00",
-  "commit": "e511e4e03a253002b6176c1a8bab7094052686bc",
+  "generatedAt": "2026-07-24T04:07:35.029649+00:00",
+  "commit": "5cdc7c1aeb14a2b3d82d4391b45015165189c11e",
   "branch": "master",
-  "sourceFingerprint": "59acbf71b2bb45d974cf113dd22ad651a768d2c03287f0c162233c70231f0943",
+  "sourceFingerprint": "4b9ef87be2e031baa075e8fb74314ad2e84199459a39a3845ac12f25fbf1f5cd",
   "summary": {
-    "files": 1118,
-    "lines": 263864,
-    "symbols": 5476,
-    "productionCodeFiles": 791,
+    "files": 1119,
+    "lines": 264260,
+    "symbols": 5490,
+    "productionCodeFiles": 792,
     "testFiles": 134,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 657,
+      "app": 658,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 725,
+      ".kt": 726,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,7 +65,7 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 285,
+      "界面": 286,
       "记忆": 44
     },
     "resolvedImportEdges": 1939
@@ -1744,6 +1744,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/health/HealthPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/health/HealthVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/history/HistoryPage.kt",
@@ -2620,6 +2621,16 @@
       "imports": 4
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.game",
+      "to": "me.rerere.hugeicons.HugeIcons",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.game",
+      "to": "me.rerere.hugeicons.stroke.Refresh03",
+      "imports": 4
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.Screen",
       "imports": 4
@@ -2897,16 +2908,6 @@
     {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.companion.CompanionState",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.companion.CompanionToolExecution",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.service.CompanionIntent",
       "imports": 3
     }
   ],
@@ -37856,6 +37857,100 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 396,
+      "sha256": "aca8654984997e0fd090045bd6475940ea4e2c212c4f92ed7e863fe9a2d30c68",
+      "package": "me.rerere.rikkahub.ui.pages.game",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "YachtDiceGame",
+          "kind": "composable",
+          "line": 39
+        },
+        {
+          "name": "resetTurn",
+          "kind": "function",
+          "line": 64
+        },
+        {
+          "name": "resetGame",
+          "kind": "function",
+          "line": 70
+        },
+        {
+          "name": "rollDice",
+          "kind": "function",
+          "line": 78
+        },
+        {
+          "name": "score",
+          "kind": "function",
+          "line": 91
+        },
+        {
+          "name": "YachtScoreSummary",
+          "kind": "composable",
+          "line": 221
+        },
+        {
+          "name": "YachtTotalTile",
+          "kind": "composable",
+          "line": 238
+        },
+        {
+          "name": "YachtScoreCard",
+          "kind": "composable",
+          "line": 255
+        },
+        {
+          "name": "yachtScore",
+          "kind": "function",
+          "line": 306
+        },
+        {
+          "name": "chooseRoleYachtTurn",
+          "kind": "function",
+          "line": 333
+        },
+        {
+          "name": "simulateRoleDice",
+          "kind": "function",
+          "line": 343
+        },
+        {
+          "name": "chooseRoleHeldIndices",
+          "kind": "function",
+          "line": 352
+        },
+        {
+          "name": "RoleYachtTurn",
+          "kind": "class",
+          "line": 374
+        },
+        {
+          "name": "YachtCategory",
+          "kind": "class",
+          "line": 380
+        }
+      ],
+      "localImportCount": 3,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.Play",
+        "me.rerere.hugeicons.stroke.Refresh03"
+      ],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/health/HealthPage.kt",
@@ -89750,6 +89845,13 @@
         "line": 200
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.RoleYachtTurn": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "class",
+        "line": 374
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.RoundHeader": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
@@ -89827,6 +89929,41 @@
         "line": 960
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.YachtCategory": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "class",
+        "line": 380
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.YachtDiceGame": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "composable",
+        "line": 39
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.YachtScoreCard": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "composable",
+        "line": 255
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.YachtScoreSummary": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "composable",
+        "line": 221
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.YachtTotalTile": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "composable",
+        "line": 238
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.actionTitle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
@@ -89851,6 +89988,20 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
         "line": 169
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.chooseRoleHeldIndices": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "function",
+        "line": 352
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.chooseRoleYachtTurn": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "function",
+        "line": 333
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.chooseTicTacToeMove": [
@@ -89970,11 +90121,46 @@
         "line": 293
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.resetGame": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "function",
+        "line": 70
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.resetTurn": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "function",
+        "line": 64
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.roll": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
         "line": 241
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.rollDice": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "function",
+        "line": 78
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.score": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "function",
+        "line": 91
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.simulateRoleDice": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "function",
+        "line": 343
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.speak": [
@@ -90024,6 +90210,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 661
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.yachtScore": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
+        "kind": "function",
+        "line": 306
       }
     ],
     "me.rerere.rikkahub.ui.pages.health.CircularIndicator": [
