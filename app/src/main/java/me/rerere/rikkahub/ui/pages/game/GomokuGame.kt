@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -159,8 +159,8 @@ internal fun GomokuGame(
             GameResultText(result.orEmpty())
             Button(onClick = ::reset, modifier = Modifier.fillMaxWidth()) {
                 Icon(HugeIcons.Refresh03, contentDescription = null)
-                Spacer(Modifier.height(0.dp))
-                Text("再来一局", modifier = Modifier.padding(start = 8.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("再来一局")
             }
         }
     }
@@ -185,12 +185,14 @@ internal fun chooseGomokuMove(board: List<Int>, roleStone: Int): Int {
     val candidates = open.filter { cell ->
         val row = cell / GOMOKU_SIZE
         val column = cell % GOMOKU_SIZE
-        (-2..2).any { dr ->
-            (-2..2).any { dc ->
-                if (dr == 0 && dc == 0) return@any false
-                val nr = row + dr
-                val nc = column + dc
-                nr in 0 until GOMOKU_SIZE && nc in 0 until GOMOKU_SIZE && board[gomokuIndex(nr, nc)] != 0
+        (-2..2).any { rowDelta ->
+            (-2..2).any { columnDelta ->
+                val neighbourRow = row + rowDelta
+                val neighbourColumn = column + columnDelta
+                (rowDelta != 0 || columnDelta != 0) &&
+                    neighbourRow in 0 until GOMOKU_SIZE &&
+                    neighbourColumn in 0 until GOMOKU_SIZE &&
+                    board[gomokuIndex(neighbourRow, neighbourColumn)] != 0
             }
         }
     }.ifEmpty { open }
@@ -212,9 +214,9 @@ internal fun gomokuWinner(board: List<Int>, lastMove: Int): Int? {
     val row = lastMove / GOMOKU_SIZE
     val column = lastMove % GOMOKU_SIZE
     return stone.takeIf { candidate ->
-        GOMOKU_DIRECTIONS.any { (dr, dc) ->
-            1 + countDirection(board, row, column, dr, dc, candidate) +
-                countDirection(board, row, column, -dr, -dc, candidate) >= 5
+        GOMOKU_DIRECTIONS.any { (rowDelta, columnDelta) ->
+            1 + countDirection(board, row, column, rowDelta, columnDelta, candidate) +
+                countDirection(board, row, column, -rowDelta, -columnDelta, candidate) >= 5
         }
     }
 }
@@ -222,15 +224,17 @@ internal fun gomokuWinner(board: List<Int>, lastMove: Int): Int? {
 private fun gomokuPlacementScore(board: List<Int>, cell: Int, stone: Int): Int {
     val row = cell / GOMOKU_SIZE
     val column = cell % GOMOKU_SIZE
-    return GOMOKU_DIRECTIONS.sumOf { (dr, dc) ->
-        val forward = countDirection(board, row, column, dr, dc, stone)
-        val backward = countDirection(board, row, column, -dr, -dc, stone)
+    return GOMOKU_DIRECTIONS.sumOf { (rowDelta, columnDelta) ->
+        val forward = countDirection(board, row, column, rowDelta, columnDelta, stone)
+        val backward = countDirection(board, row, column, -rowDelta, -columnDelta, stone)
         val length = 1 + forward + backward
         val openEnds = listOf(
-            row + (forward + 1) * dr to column + (forward + 1) * dc,
-            row - (backward + 1) * dr to column - (backward + 1) * dc,
-        ).count { (r, c) ->
-            r in 0 until GOMOKU_SIZE && c in 0 until GOMOKU_SIZE && board[gomokuIndex(r, c)] == 0
+            row + (forward + 1) * rowDelta to column + (forward + 1) * columnDelta,
+            row - (backward + 1) * rowDelta to column - (backward + 1) * columnDelta,
+        ).count { (openRow, openColumn) ->
+            openRow in 0 until GOMOKU_SIZE &&
+                openColumn in 0 until GOMOKU_SIZE &&
+                board[gomokuIndex(openRow, openColumn)] == 0
         }
         when {
             length >= 5 -> 100_000
