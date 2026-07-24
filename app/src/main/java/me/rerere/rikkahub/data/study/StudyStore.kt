@@ -130,7 +130,18 @@ private val studyJson = Json(JsonInstant) {
 }
 
 private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState {
-    return StudyRules.rolloverToDate(this, date)
+    val dateText = date.toString()
+    return if (today == dateText && CurrentWeekStudyRecovery.planFor(date) != null) {
+        // Keep the already-visible recovery-plan task instances intact on same-day
+        // reads and writes so their checked state and stable ids are not replaced by
+        // the base ExamStudyPlan before the recovery overlay is reapplied.
+        CurrentWeekStudyRecovery.applyToState(this, date)
+    } else {
+        CurrentWeekStudyRecovery.applyToState(
+            StudyRules.rolloverToDate(this, date),
+            date,
+        )
+    }
 }
 
 private fun StudyState.preserveOfficialEconomy(): StudyState {
