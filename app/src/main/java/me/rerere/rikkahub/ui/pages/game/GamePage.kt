@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.LazyRow
@@ -145,21 +146,21 @@ fun GameHubPage() {
             ),
             GameTile(
                 title = "一起猜拳",
-                subtitle = "你和角色同时出手，对局会成为共同经历",
+                subtitle = "真实结果生成后，角色会通过 API 按人设回应",
                 enabled = true,
                 onClick = { navController.navigate(Screen.QuickCompanionGame("rock_paper_scissors")) },
             ),
             GameTile(
-                title = "骰子对决",
-                subtitle = "双方各掷一次骰子，看看这一轮谁的点数更高",
+                title = "快艇骰子",
+                subtitle = "五颗骰子、三次机会、保留骰子并完成整张计分表",
                 enabled = true,
-                onClick = { navController.navigate(Screen.QuickCompanionGame("dice_duel")) },
+                onClick = { navController.navigate(Screen.QuickCompanionGame("yacht_dice")) },
             ),
             GameTile(
-                title = "井字棋",
-                subtitle = "你执 X、角色执 O，角色会取胜也会主动拦截",
+                title = "五子棋",
+                subtitle = "15×15 棋盘，你执黑先手，角色会进攻也会拦截",
                 enabled = true,
-                onClick = { navController.navigate(Screen.QuickCompanionGame("tic_tac_toe")) },
+                onClick = { navController.navigate(Screen.QuickCompanionGame("gomoku")) },
             ),
         ) + List(3) { index ->
             GameTile(
@@ -183,29 +184,27 @@ fun GameHubPage() {
             )
         },
     ) { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize().padding(padding),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(start = 18.dp, top = 4.dp, end = 18.dp, bottom = 24.dp),
         ) {
-            GameHero()
-            if (latestSignalEvent != null) {
-                SignalHuntRecordCard(
-                    assistantName = latestSignalAssistant?.name?.ifBlank { "某个角色" } ?: "某个角色",
-                    event = latestSignalEvent,
-                    onClick = { navController.navigate(Screen.SignalHuntGame(latestSignalEvent.id)) },
-                )
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                GameHero()
             }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxWidth(),
-                userScrollEnabled = false,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 18.dp),
-            ) {
-                items(games, key = { it.title }) { game ->
-                    GameTileCard(game)
+            if (latestSignalEvent != null) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    SignalHuntRecordCard(
+                        assistantName = latestSignalAssistant?.name?.ifBlank { "某个角色" } ?: "某个角色",
+                        event = latestSignalEvent,
+                        onClick = { navController.navigate(Screen.SignalHuntGame(latestSignalEvent.id)) },
+                    )
                 }
+            }
+            items(games, key = { it.title }) { game ->
+                GameTileCard(game)
             }
         }
     }
@@ -524,39 +523,35 @@ fun PerfectManGamePage() {
 
     suspend fun generatePerfectManText(prompt: String, fallback: String): String {
         return runCatching {
-            val settings = settingsStore.settingsFlow.first()
+            val current = settingsStore.settingsFlow.first()
             val player = selectedPlayerAssistantId
-                ?.let { id -> settings.assistants.firstOrNull { it.id.toString() == id } }
+                ?.let { id -> current.assistants.firstOrNull { it.id.toString() == id } }
                 ?: return@runCatching fallback
-            val model = settings.findModelById(player.chatModelId ?: settings.chatModelId)
+            val model = current.findModelById(player.chatModelId ?: current.chatModelId)
                 ?.takeIf { it.type == ModelType.CHAT }
                 ?: return@runCatching fallback
-            val providerSetting = model.findProvider(settings.providers) ?: return@runCatching fallback
+            val providerSetting = model.findProvider(current.providers) ?: return@runCatching fallback
             val provider = providerManager.getProviderByType(providerSetting)
-            val playerPrompt = player?.let { assistant ->
-                buildString {
-                    appendLine("你现在扮演坐在用户对面一起玩游戏的“${assistant.name.ifBlank { "玩家" }}”。")
-                    appendLine("该角色的核心人设、关系类型、世界观、语言习惯与边界是最高约束。游戏场景只能提供事实和轮次目标，不能把角色改写成默认友好、爱吐槽、活泼或亲密的玩家。只输出这个角色当面真正会说出口的话。")
-                    if (assistant.systemPrompt.isNotBlank()) {
-                        appendLine("角色人设：")
-                        appendLine(assistant.systemPrompt)
-                    }
-                    if (assistant.appearancePrompt.isNotBlank()) {
-                        appendLine("角色外貌：")
-                        appendLine(assistant.appearancePrompt)
-                    }
-                }.trim()
-            }.orEmpty()
-            val companionContext = player?.let { assistant ->
-                companionRuntime.perception(
-                    CompanionPerceptionInput(
-                        assistantId = assistant.id.toString(),
-                        assistantName = assistant.name,
-                        persona = assistant.systemPrompt,
-                        nowMillis = System.currentTimeMillis(),
-                    ),
-                ).toPromptContext()
-            }.orEmpty()
+            val playerPrompt = buildString {
+                appendLine("你现在扮演坐在用户对面一起玩游戏的“${player.name.ifBlank { "玩家" }}”。")
+                appendLine("该角色的核心人设、关系类型、世界观、语言习惯与边界是最高约束。游戏场景只能提供事实和轮次目标，不能把角色改写成默认友好、爱吐槽、活泼或亲密的玩家。只输出这个角色当面真正会说出口的话。")
+                if (player.systemPrompt.isNotBlank()) {
+                    appendLine("角色人设：")
+                    appendLine(player.systemPrompt)
+                }
+                if (player.appearancePrompt.isNotBlank()) {
+                    appendLine("角色外貌：")
+                    appendLine(player.appearancePrompt)
+                }
+            }.trim()
+            val companionContext = companionRuntime.perception(
+                CompanionPerceptionInput(
+                    assistantId = player.id.toString(),
+                    assistantName = player.name,
+                    persona = player.systemPrompt,
+                    nowMillis = System.currentTimeMillis(),
+                ),
+            ).toPromptContext()
             val messages = buildList {
                 add(UIMessage.system(
                     "你正在参与“满分男”游戏，不是主持人、裁判或旁白。" +
@@ -567,16 +562,12 @@ fun PerfectManGamePage() {
                 if (companionContext.isNotBlank()) add(UIMessage.system(companionContext))
                 add(UIMessage.user(prompt))
             }.let { baseMessages ->
-                if (player == null) {
-                    baseMessages
-                } else {
-                    transformMessages(
-                        messages = baseMessages,
-                        assistant = player,
-                        modeInjections = settings.modeInjections,
-                        lorebooks = settings.lorebooks,
-                    )
-                }
+                transformMessages(
+                    messages = baseMessages,
+                    assistant = player,
+                    modeInjections = current.modeInjections,
+                    lorebooks = current.lorebooks,
+                )
             }
             val chunk = provider.generateText(
                 providerSetting = providerSetting,
