@@ -2,50 +2,48 @@ package me.rerere.rikkahub.ui.pages.study
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.weight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlin.reflect.KFunction0
-import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyState
 
 /**
- * Callable-reference overload selected by the existing vm::drawPurpleTicket call.
- * This keeps the oversized StudyPage.kt untouched while replacing its gacha skin.
+ * Bright, fixed-height anime gacha screen.
+ *
+ * The probability, pity and inventory details still exist in the rules and guide,
+ * but this main screen intentionally shows only the current kudos and draw actions.
  */
 @Composable
 internal fun GachaCard(
@@ -54,200 +52,105 @@ internal fun GachaCard(
     onTen: () -> Unit,
     onPurple: KFunction0<Unit>,
 ) {
+    val configuration = LocalConfiguration.current
+    val cardHeight = (configuration.screenHeightDp - 205)
+        .coerceIn(430, 590)
+        .dp
     val singleCost = if (StudyRules.hasSingleDrawDiscount(state)) {
         StudyRules.DISCOUNT_SINGLE_DRAW_COST
     } else {
         StudyRules.SINGLE_DRAW_COST
     }
-    val ticketDraws = state.wallet.singleDrawTickets + state.wallet.tenDrawTickets * 10
-    val pityUsed = state.drawsSinceNonNormal
-        .coerceIn(0, StudyRules.NON_NORMAL_PITY_DRAW_COUNT - 1)
-    val pityRemaining = StudyRules.NON_NORMAL_PITY_DRAW_COUNT - pityUsed
-    val pityProgress = pityUsed.toFloat() / StudyRules.NON_NORMAL_PITY_DRAW_COUNT
+    val hasSafetyDraw = state.wallet.purpleDrawTickets > 0
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(30.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF17132F)),
-        border = BorderStroke(1.dp, Color(0x66E9DCFF)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(cardHeight),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF7D7)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        border = BorderStroke(2.dp, Color(0xFFFFE8A7)),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(840.dp)
-                .clip(RoundedCornerShape(30.dp)),
-        ) {
-            MoonlightBackdrop(Modifier.fillMaxSize())
+        Box(modifier = Modifier.fillMaxSize()) {
+            AnimeCandyBackdrop(Modifier.fillMaxSize())
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(18.dp),
+                    .padding(horizontal = 18.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    MoonlightPill("✦ 常驻卡池", Color(0xFFD7BBFF))
-                    Spacer(Modifier.weight(1f))
-                    Text("券可抽 $ticketDraws 次", color = Color.White.copy(alpha = 0.78f))
-                }
+                KudosPanel(kudos = state.wallet.kudos)
 
-                Surface(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(18.dp),
-                    color = Color.White.copy(alpha = 0.10f),
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.20f)),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 11.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text("❀ 当前夸夸值", color = Color(0xFFECE3FF))
-                        Spacer(Modifier.weight(1f))
-                        Text(
-                            state.wallet.kudos.toString(),
-                            color = Color(0xFFFFE6AA),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Black,
-                        )
-                        Spacer(Modifier.width(5.dp))
-                        Text("✦", color = Color(0xFFFFE6AA))
-                    }
+                    Text(
+                        text = "星糖扭蛋机",
+                        color = Color(0xFF7B4B57),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        text = "把今天的努力，摇成一颗好运。",
+                        color = Color(0xFF9A6A70),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
                 }
 
-                Text(
-                    "月光花匣",
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFFFFF5FF),
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Black,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    "把今天认真学习的心意，藏进会发光的花瓣里。",
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFFE8DFF5),
-                    textAlign = TextAlign.Center,
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    MoonlightPill("紫 4.8%", Color(0xFFD2AEFF), Modifier.weight(1f))
-                    MoonlightPill("金 1.0%", Color(0xFFFFD98C), Modifier.weight(1f))
-                    MoonlightPill("彩 0.2%", Color(0xFFFFC9EE), Modifier.weight(1f))
-                }
-
-                Box(
+                AnimeGachaMachine(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(226.dp)
-                        .clip(RoundedCornerShape(24.dp)),
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.moonlight_flower_box),
-                        contentDescription = "月光花匣",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    0f to Color.Transparent,
-                                    0.72f to Color.Transparent,
-                                    1f to Color(0xB0191434),
-                                ),
-                            ),
-                    )
-                    MoonlightPill(
-                        text = "每一次抽卡，都是你努力的回响",
-                        color = Color(0xFFF2DFFF),
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 10.dp),
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    InventoryPill("抖音20分", state.inventory.douyinFragments, Color(0xFFD2AEFF))
-                    InventoryPill("剧场", state.inventory.theaterFragments, Color(0xFFE4C0FF))
-                    InventoryPill("游戏120分", state.inventory.gameFragments, Color(0xFFFFD98C))
-                    InventoryPill("视频卡", state.inventory.videoFragments, Color(0xFFFFE4AE))
-                    InventoryPill("番剧3小时", state.inventory.animeFragments, Color(0xFFFFC9EE))
-                }
-
-                Text(
-                    "紫色：抖音20分钟 4.0% / 剧场碎片 0.8% · 金色 1.0% · 彩色 0.2%",
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.White.copy(alpha = 0.68f),
-                    style = MaterialTheme.typography.labelSmall,
-                    textAlign = TextAlign.Center,
+                        .weight(1f),
                 )
-
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(17.dp),
-                    color = Color.White.copy(alpha = 0.10f),
-                    border = BorderStroke(1.dp, Color(0x55E8D9FF)),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                        verticalArrangement = Arrangement.spacedBy(7.dp),
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("特殊奖励保底", color = Color(0xFFF4ECFF), fontWeight = FontWeight.SemiBold)
-                            Spacer(Modifier.weight(1f))
-                            Text("还差 $pityRemaining 抽", color = Color(0xFFFFE2A5))
-                        }
-                        LinearProgressIndicator(
-                            progress = { pityProgress },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Text(
-                            "连续全蓝第30抽保底紫色；紫、金、彩任一出现后重新计算。",
-                            color = Color.White.copy(alpha = 0.62f),
-                            style = MaterialTheme.typography.labelSmall,
-                        )
-                    }
-                }
-
-                if (state.wallet.purpleDrawTickets > 0) {
-                    Button(
-                        onClick = onPurple,
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8A63C7)),
-                    ) {
-                        Text("♡ 今日安全抽 · ${state.wallet.purpleDrawTickets}张", fontWeight = FontWeight.Bold)
-                    }
-                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    OutlinedButton(
-                        onClick = onSingle,
-                        modifier = Modifier.weight(1f).height(54.dp),
-                        border = BorderStroke(1.dp, Color(0xFFE5D6FF)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                    Button(
+                        onClick = if (hasSafetyDraw) onPurple else onSingle,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFBFE7FF),
+                            contentColor = Color(0xFF31536D),
+                        ),
+                        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.92f)),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     ) {
-                        Text("单抽 · $singleCost", fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = if (hasSafetyDraw) "单抽 · 免费" else "单抽 · $singleCost",
+                            fontWeight = FontWeight.Black,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
                     }
+
                     Button(
                         onClick = onTen,
-                        modifier = Modifier.weight(1f).height(54.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFE5B963),
-                            contentColor = Color(0xFF2A1836),
+                            containerColor = Color(0xFFFFC857),
+                            contentColor = Color(0xFF684018),
                         ),
+                        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.92f)),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp),
                     ) {
-                        Text("十连 · ${StudyRules.TEN_DRAW_COST}", fontWeight = FontWeight.Black)
+                        Text(
+                            text = "十连 · ${StudyRules.TEN_DRAW_COST}",
+                            fontWeight = FontWeight.Black,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
                     }
                 }
             }
@@ -256,62 +159,220 @@ internal fun GachaCard(
 }
 
 @Composable
-private fun MoonlightBackdrop(modifier: Modifier = Modifier) {
+private fun KudosPanel(kudos: Int) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = Color.White.copy(alpha = 0.86f),
+        border = BorderStroke(2.dp, Color(0xFFFFD79B)),
+        shadowElevation = 3.dp,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier.size(40.dp),
+                shape = CircleShape,
+                color = Color(0xFFFFE48E),
+                border = BorderStroke(2.dp, Color.White),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "★",
+                        color = Color(0xFFFF8A77),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Black,
+                    )
+                }
+            }
+            Spacer(Modifier.width(12.dp))
+            Text(
+                text = "我的夸夸值",
+                color = Color(0xFF815B60),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.weight(1f))
+            Text(
+                text = kudos.toString(),
+                color = Color(0xFFFF8A62),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Black,
+            )
+        }
+    }
+}
+
+@Composable
+private fun AnimeGachaMachine(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                color = Color(0x55FFFFFF),
+                radius = size.minDimension * 0.44f,
+                center = Offset(size.width * 0.50f, size.height * 0.48f),
+            )
+            drawCircle(
+                color = Color(0x66FFD2DB),
+                radius = size.minDimension * 0.10f,
+                center = Offset(size.width * 0.13f, size.height * 0.25f),
+            )
+            drawCircle(
+                color = Color(0x667CCBFF),
+                radius = size.minDimension * 0.075f,
+                center = Offset(size.width * 0.87f, size.height * 0.22f),
+            )
+            drawCircle(
+                color = Color(0x77FFE27A),
+                radius = size.minDimension * 0.06f,
+                center = Offset(size.width * 0.83f, size.height * 0.78f),
+            )
+        }
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth(0.72f)
+                .fillMaxHeight(0.92f),
+            shape = RoundedCornerShape(38.dp),
+            color = Color(0xFFFFAFA6),
+            border = BorderStroke(4.dp, Color.White.copy(alpha = 0.96f)),
+            shadowElevation = 8.dp,
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFFFFC4AE),
+                                Color(0xFFFF9FAD),
+                            ),
+                        ),
+                    )
+                    .padding(14.dp),
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.64f)
+                        .align(Alignment.TopCenter),
+                    shape = RoundedCornerShape(32.dp),
+                    color = Color(0xFFBFE9FF),
+                    border = BorderStroke(4.dp, Color.White.copy(alpha = 0.94f)),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.radialGradient(
+                                    colors = listOf(
+                                        Color(0xFFFFF7B4),
+                                        Color(0xFFD8F2FF),
+                                        Color(0xFFB9E2FF),
+                                    ),
+                                ),
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Surface(
+                            modifier = Modifier.size(108.dp),
+                            shape = CircleShape,
+                            color = Color.White.copy(alpha = 0.80f),
+                            border = BorderStroke(3.dp, Color(0xFFFFE58E)),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = "★",
+                                    color = Color(0xFFFFB83E),
+                                    style = MaterialTheme.typography.displayLarge,
+                                    fontWeight = FontWeight.Black,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier
+                        .size(72.dp)
+                        .align(Alignment.BottomCenter),
+                    shape = CircleShape,
+                    color = Color(0xFFFFE278),
+                    border = BorderStroke(4.dp, Color.White),
+                    shadowElevation = 4.dp,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "GO!",
+                            color = Color(0xFF87514A),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Black,
+                        )
+                    }
+                }
+
+                Text(
+                    text = "LUCKY!",
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 4.dp, bottom = 6.dp),
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Black,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimeCandyBackdrop(modifier: Modifier = Modifier) {
     Canvas(
-        modifier.background(
-            Brush.verticalGradient(
-                listOf(Color(0xFF111A42), Color(0xFF39285F), Color(0xFF211A43), Color(0xFF100F27)),
+        modifier = modifier.background(
+            Brush.linearGradient(
+                colors = listOf(
+                    Color(0xFFFFF4BD),
+                    Color(0xFFFFD8C7),
+                    Color(0xFFD7ECFF),
+                ),
             ),
         ),
     ) {
         drawCircle(
-            color = Color(0x33FFF5D8),
-            radius = size.minDimension * 0.28f,
-            center = Offset(size.width * 0.88f, size.height * 0.08f),
+            color = Color.White.copy(alpha = 0.48f),
+            radius = size.minDimension * 0.30f,
+            center = Offset(size.width * 0.92f, size.height * 0.06f),
         )
-        listOf(0.12f to 0.15f, 0.78f to 0.22f, 0.20f to 0.48f, 0.88f to 0.66f, 0.34f to 0.84f)
-            .forEachIndexed { index, (x, y) ->
-                drawCircle(
-                    color = if (index % 2 == 0) Color(0x66FFD8F3) else Color(0x66D9C6FF),
-                    radius = 3f + index,
-                    center = Offset(size.width * x, size.height * y),
-                )
-            }
-    }
-}
-
-@Composable
-private fun MoonlightPill(text: String, color: Color, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(999.dp),
-        color = color.copy(alpha = 0.16f),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.58f)),
-    ) {
-        Text(
-            text,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
-            color = color,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
+        drawCircle(
+            color = Color(0x55FF9CAF),
+            radius = size.minDimension * 0.16f,
+            center = Offset(size.width * 0.06f, size.height * 0.62f),
         )
-    }
-}
-
-@Composable
-private fun InventoryPill(label: String, count: Int, color: Color) {
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = Color.Black.copy(alpha = 0.19f),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.38f)),
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 11.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(label, color = Color.White.copy(alpha = 0.82f), style = MaterialTheme.typography.labelSmall)
-            Text(count.toString(), color = color, fontWeight = FontWeight.Black)
+        drawCircle(
+            color = Color(0x5577C9FF),
+            radius = size.minDimension * 0.13f,
+            center = Offset(size.width * 0.94f, size.height * 0.84f),
+        )
+        listOf(
+            0.12f to 0.12f,
+            0.78f to 0.18f,
+            0.22f to 0.40f,
+            0.86f to 0.52f,
+            0.16f to 0.86f,
+        ).forEachIndexed { index, (x, y) ->
+            drawCircle(
+                color = if (index % 2 == 0) {
+                    Color(0xAAFFFFFF)
+                } else {
+                    Color(0x99FFE96B)
+                },
+                radius = 3.5f + index,
+                center = Offset(size.width * x, size.height * y),
+            )
         }
     }
 }
