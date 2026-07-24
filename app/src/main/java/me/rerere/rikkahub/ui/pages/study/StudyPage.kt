@@ -2159,6 +2159,19 @@ private fun GachaCard(
     onPurple: () -> Unit,
 ) {
     val singleCost = if (StudyRules.hasSingleDrawDiscount(state)) StudyRules.DISCOUNT_SINGLE_DRAW_COST else StudyRules.SINGLE_DRAW_COST
+    val singleTicketCount = state.wallet.singleDrawTickets
+    val tenTicketCount = state.wallet.tenDrawTickets
+    val ticketDrawCount = singleTicketCount + tenTicketCount * 10
+    val singleButtonText = if (singleTicketCount > 0) {
+        "单抽 · 用券（${singleTicketCount}张）"
+    } else {
+        "单抽 · ${singleCost}夸夸"
+    }
+    val tenButtonText = if (tenTicketCount > 0) {
+        "十连 · 用券（${tenTicketCount}张）"
+    } else {
+        "十连 · ${StudyRules.TEN_DRAW_COST}夸夸"
+    }
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0x55101427)),
@@ -2203,7 +2216,7 @@ private fun GachaCard(
                     }
                     Spacer(Modifier.weight(1f))
                     Text(
-                        "券可抽 ${state.wallet.singleDrawTickets + state.wallet.tenDrawTickets * 10} 次",
+                        "票券共 $ticketDrawCount 抽",
                         color = Color.White.copy(alpha = 0.68f),
                         style = MaterialTheme.typography.labelMedium,
                     )
@@ -2214,17 +2227,31 @@ private fun GachaCard(
                     border = BorderStroke(1.dp, Color.White.copy(alpha = 0.16f)),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalArrangement = Arrangement.spacedBy(9.dp),
                     ) {
-                        Text("当前夸夸值", color = Color.White.copy(alpha = 0.72f))
-                        Spacer(Modifier.weight(1f))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("当前夸夸值", color = Color.White.copy(alpha = 0.72f))
+                            Spacer(Modifier.weight(1f))
+                            Text(
+                                state.wallet.kudos.toString(),
+                                color = Color(0xFFF4E8C9),
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Black,
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            FragmentWalletPill("单抽券", singleTicketCount, Color(0xFFC5A5FF))
+                            FragmentWalletPill("十连券", tenTicketCount, Color(0xFFF2D18A))
+                        }
                         Text(
-                            state.wallet.kudos.toString(),
-                            color = Color(0xFFF4E8C9),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Black,
+                            "抽卡会优先扣对应券；没有券时才扣夸夸值",
+                            color = Color.White.copy(alpha = 0.62f),
+                            style = MaterialTheme.typography.labelSmall,
                         )
                     }
                 }
@@ -2283,7 +2310,7 @@ private fun GachaCard(
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
                         modifier = Modifier.weight(1f).height(52.dp),
                     ) {
-                        Text("单抽 · $singleCost")
+                        Text(singleButtonText)
                     }
                     Button(
                         onClick = onTen,
@@ -2293,7 +2320,7 @@ private fun GachaCard(
                         ),
                         modifier = Modifier.weight(1f).height(52.dp),
                     ) {
-                        Text("十连 · ${StudyRules.TEN_DRAW_COST}", fontWeight = FontWeight.Bold)
+                        Text(tenButtonText, fontWeight = FontWeight.Bold)
                     }
                 }
             }
