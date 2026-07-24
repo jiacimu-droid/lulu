@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-24T10:54:38.978736+00:00",
-  "commit": "c158a521377323b3e21c2b421d8765ac2eed4e5c",
+  "generatedAt": "2026-07-24T11:41:57.555667+00:00",
+  "commit": "6adae47ddb563a424b2f798496b65d3e6dcf2449",
   "branch": "master",
-  "sourceFingerprint": "cf21727629fbf53415fdcb3895cdc910d92bc9cc18f0e607d3b0ccb6247813fd",
+  "sourceFingerprint": "3ad853ff08f902fa0216ce625466091ba91701636ce23b0f815c0bdea185afb0",
   "summary": {
     "files": 1123,
-    "lines": 265408,
+    "lines": 265349,
     "symbols": 5515,
     "productionCodeFiles": 794,
     "testFiles": 136,
@@ -41591,8 +41591,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 436,
-      "sha256": "af87937dc9cbf86129a274cc8969705311c55a3f038f01f513d4157b0b546481",
+      "lines": 377,
+      "sha256": "f512b028bc16e99c17cc6bd6e93e9979c195974c480c29f4e5e8e4f2a8fcb9ae",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -41602,34 +41602,31 @@
         {
           "name": "GachaCard",
           "kind": "composable",
-          "line": 54
+          "line": 48
         },
         {
           "name": "KudosPanel",
           "kind": "composable",
-          "line": 220
+          "line": 161
         },
         {
           "name": "AnimeGachaMachine",
           "kind": "composable",
-          "line": 266
+          "line": 207
         },
         {
           "name": "AnimeCandyBackdrop",
           "kind": "composable",
-          "line": 391
+          "line": 332
         }
       ],
-      "localImportCount": 5,
+      "localImportCount": 2,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
-        "me.rerere.hugeicons.HugeIcons",
-        "me.rerere.hugeicons.stroke.ArrowLeft01",
         "me.rerere.rikkahub.data.study.StudyRules",
-        "me.rerere.rikkahub.data.study.StudyState",
-        "me.rerere.rikkahub.ui.context.LocalNavController"
+        "me.rerere.rikkahub.data.study.StudyState"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
@@ -93000,14 +92997,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
         "kind": "composable",
-        "line": 391
+        "line": 332
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.AnimeGachaMachine": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
         "kind": "composable",
-        "line": 266
+        "line": 207
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.CollectionCard": [
@@ -93189,7 +93186,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
         "kind": "composable",
-        "line": 54
+        "line": 48
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
@@ -93215,7 +93212,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
         "kind": "composable",
-        "line": 220
+        "line": 161
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.LevelDialog": [
