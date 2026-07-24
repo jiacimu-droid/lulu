@@ -394,9 +394,10 @@ private class MoonlightGachaRandom(
     }
 
     private companion object {
-        // New regular-pool rates: blue 94%, purple 4.8%, gold 1%, rainbow 0.2%.
-        const val MOONLIGHT_NORMAL_END = 0.94
-        const val MOONLIGHT_RARE_END = 0.988
+        // Regular-pool rates: blue 93.5%, purple 4.8%, gold 1.5%, rainbow 0.2%.
+        // Gold keeps StudyRules' original 80/20 split: game 1.2%, video 0.3%.
+        const val MOONLIGHT_NORMAL_END = 0.935
+        const val MOONLIGHT_RARE_END = 0.983
         const val MOONLIGHT_EPIC_END = 0.998
 
         // Current StudyRules thresholds. Mapping into these intervals lets us keep
