@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`7990f639bbb10a0b747e4f0de1652f4e10f9d03f`
+- 基准提交：`ffba4e05e2e626ee06b19b4dec765f01f7b30f57`
 - 分支：`master`
-- 源码指纹：`521ec15fda7efa3e…`
+- 源码指纹：`0be767a44aba2015…`
 - 已索引文件：1119
-- 已索引代码/文本行：264288
+- 已索引代码/文本行：264279
 - 已发现类、接口、对象、函数及 Composable：5487
 
 ## 仓库健康信号
@@ -109,7 +109,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt` | 1266 | 25 | 27 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt` | 1234 | 21 | 28 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt` | 1211 | 14 | 31 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 1189 | 33 | 39 |
+| `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt` | 1187 | 60 | 0 |
 
 ### 本地导入最多的生产文件
 
@@ -123,7 +123,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt` | 46 | 1568 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 44 | 1166 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt` | 39 | 416 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 39 | 1189 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 39 | 1180 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt` | 39 | 784 |
 | `app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt` | 38 | 280 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt` | 37 | 1117 |
