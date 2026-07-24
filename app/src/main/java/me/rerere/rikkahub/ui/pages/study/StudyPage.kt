@@ -214,7 +214,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
     var showLevelDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val isGachaSection = section == StudySection.Gacha
-    val pageColor = if (isGachaSection) StudyColors.starryPage else StudyColors.page
+    val pageColor = if (isGachaSection) StudyColors.gachaPage else StudyColors.page
 
     LaunchedEffect(Unit) {
         vm.effects.collect { effect ->
@@ -238,54 +238,48 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                 .background(pageColor),
         ) {
             if (isGachaSection) {
-                StarryLetterBackdrop(Modifier.fillMaxSize())
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                0f to StudyColors.starryPage.copy(alpha = 0.32f),
-                                0.55f to Color.Transparent,
-                                1f to StudyColors.starryPageDeep.copy(alpha = 0.72f),
-                            ),
-                        ),
+                        .background(gachaPageBrush()),
                 )
             }
             LazyColumn(
                 modifier = Modifier.fillMaxSize().statusBarsPadding(),
-                contentPadding = padding + PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                contentPadding = padding + PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                userScrollEnabled = !isGachaSection,
             ) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         Surface(
-                            modifier = Modifier.size(48.dp).clickable { navController.popBackStack() },
+                            modifier = Modifier.size(44.dp).clickable { navController.popBackStack() },
                             shape = CircleShape,
-                            color = if (isGachaSection) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.72f),
+                            color = if (isGachaSection) Color.White.copy(alpha = 0.90f) else Color.White.copy(alpha = 0.72f),
                             border = BorderStroke(
                                 1.dp,
-                                if (isGachaSection) Color.White.copy(alpha = 0.14f) else StudyColors.blue.copy(alpha = 0.12f),
+                                if (isGachaSection) Color(0xFFFFC9A6) else StudyColors.blue.copy(alpha = 0.12f),
                             ),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     HugeIcons.ArrowLeft01,
                                     contentDescription = "返回",
-                                    tint = if (isGachaSection) Color.White else MaterialTheme.colorScheme.onSurface,
+                                    tint = if (isGachaSection) Color(0xFF7B4B57) else MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                         }
+                        SectionChips(
+                            selected = section,
+                            onSelected = { section = it },
+                            gacha = isGachaSection,
+                            modifier = Modifier.weight(1f),
+                        )
                     }
-                }
-                item {
-                    SectionChips(
-                        selected = section,
-                        onSelected = { section = it },
-                        dark = isGachaSection,
-                    )
                 }
                 when (section) {
                     StudySection.Companion -> {
@@ -924,25 +918,24 @@ private fun HeroMetric(label: String, value: String, modifier: Modifier = Modifi
 private fun SectionChips(
     selected: StudySection,
     onSelected: (StudySection) -> Unit,
-    dark: Boolean = false,
+    gacha: Boolean = false,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
+        modifier = modifier.horizontalScroll(rememberScrollState()),
     ) {
         StudySection.entries.forEach { section ->
             FilterChip(
                 selected = selected == section,
                 onClick = { onSelected(section) },
-                label = { Text(section.label) },
-                colors = if (dark) {
+                label = { Text(section.label, maxLines = 1) },
+                colors = if (gacha) {
                     FilterChipDefaults.filterChipColors(
-                        containerColor = Color.White.copy(alpha = 0.06f),
-                        labelColor = Color.White.copy(alpha = 0.72f),
-                        selectedContainerColor = Color(0xFFD9C5FF).copy(alpha = 0.20f),
-                        selectedLabelColor = Color.White,
+                        containerColor = Color.White.copy(alpha = 0.72f),
+                        labelColor = Color(0xFF815B60),
+                        selectedContainerColor = Color(0xFFFFCFA6),
+                        selectedLabelColor = Color(0xFF684018),
                     )
                 } else {
                     FilterChipDefaults.filterChipColors()
@@ -1129,6 +1122,7 @@ private fun TaskContent(
         }
     }
 }
+
 @Composable
 private fun TodayPlanCard(
     todayPlan: DailyStudyPlan?,
@@ -3263,6 +3257,7 @@ private fun PomodoroThemePickerDialog(
 
 private object StudyColors {
     val page = Color(0xFFF7F3EA)
+    val gachaPage = Color(0xFFFFE4C8)
     val starryPage = Color(0xFF151831)
     val starryPageDeep = Color(0xFF090C1B)
     val hero = Color(0xFFFFE6B8)
@@ -3274,6 +3269,10 @@ private object StudyColors {
 
 private fun heroBrush(): Brush = Brush.linearGradient(
     listOf(Color(0xFFFFE5AE), Color(0xFFE2F0F7), Color(0xFFFFF8D8))
+)
+
+private fun gachaPageBrush(): Brush = Brush.linearGradient(
+    listOf(Color(0xFFFFF4BD), Color(0xFFFFD8C7), Color(0xFFD7ECFF))
 )
 
 private fun focusBrush(theme: PomodoroTheme): Brush = Brush.verticalGradient(
