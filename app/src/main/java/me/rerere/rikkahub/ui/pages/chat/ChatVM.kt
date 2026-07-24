@@ -297,12 +297,6 @@ class ChatVM(
         }
     }
 
-    fun generateSuggestion(conversation: Conversation) {
-        viewModelScope.launch {
-            chatService.generateSuggestion(_conversationId, conversation)
-        }
-    }
-
     fun clearTranslationField(messageId: Uuid) {
         chatService.clearTranslationField(_conversationId, messageId)
     }
@@ -347,7 +341,6 @@ class ChatVM(
             }
         }
     }
-
 }
 
 internal fun canRequestManualReply(conversation: Conversation): Boolean =
