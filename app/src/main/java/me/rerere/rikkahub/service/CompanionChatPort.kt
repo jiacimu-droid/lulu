@@ -65,7 +65,6 @@ interface CompanionChatPort {
     suspend fun saveConversation(conversationId: Uuid, conversation: Conversation)
     fun translateMessage(conversationId: Uuid, message: UIMessage, targetLanguage: Locale)
     suspend fun generateTitle(conversationId: Uuid, conversation: Conversation, force: Boolean = false)
-    suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation)
     fun clearTranslationField(conversationId: Uuid, messageId: Uuid)
     fun updateConversationState(conversationId: Uuid, transform: (Conversation) -> Conversation)
 }
@@ -125,8 +124,6 @@ class DefaultCompanionChatPort(
         chatService.translateMessage(conversationId, message, targetLanguage)
     override suspend fun generateTitle(conversationId: Uuid, conversation: Conversation, force: Boolean) =
         chatService.generateTitle(conversationId, conversation, force)
-    override suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation) =
-        chatService.generateSuggestion(conversationId, conversation)
     override fun clearTranslationField(conversationId: Uuid, messageId: Uuid) =
         chatService.clearTranslationField(conversationId, messageId)
     override fun updateConversationState(conversationId: Uuid, transform: (Conversation) -> Conversation) =
