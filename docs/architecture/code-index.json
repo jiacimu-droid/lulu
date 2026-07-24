@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-24T04:17:15.276326+00:00",
-  "commit": "34e12b15fa51557cc96793e094e72ce3c9aaf3be",
+  "generatedAt": "2026-07-24T04:17:46.300064+00:00",
+  "commit": "8ce9241b214a8cd9c5187656e8f704d7e4e73cd2",
   "branch": "master",
-  "sourceFingerprint": "3bea7c02372ec6ff79ce862e3b11e0b09667fcda5d09db061cbefa3cabb1d606",
+  "sourceFingerprint": "1af94d467097c413953555048c5f05f9a1bda409073b4b182e53589f4cafb9f8",
   "summary": {
-    "files": 1119,
-    "lines": 264283,
-    "symbols": 5487,
+    "files": 1120,
+    "lines": 264354,
+    "symbols": 5489,
     "productionCodeFiles": 792,
-    "testFiles": 134,
+    "testFiles": 135,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 658,
+      "app": 659,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 726,
+      ".kt": 727,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,7 +65,7 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 286,
+      "界面": 287,
       "记忆": 44
     },
     "resolvedImportEdges": 1947
@@ -1813,6 +1813,7 @@
       "app/src/test/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPageEntryKindsTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/cihai/CompanionConcernCardsTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/cihai/CompanionRelationshipTimelineTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/ui/pages/game/CompanionGameEnginesTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGameTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenFileNameTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenReferenceImagesTest.kt",
@@ -48763,6 +48764,36 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/game/CompanionGameEnginesTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 71,
+      "sha256": "22d1f51c48bf24f1fd12296b169fe26b0c26948aa77f2d1fb95b9d1cf3ff47c2",
+      "package": "me.rerere.rikkahub.ui.pages.game",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "CompanionGameEnginesTest",
+          "kind": "class",
+          "line": 7
+        },
+        {
+          "name": "index",
+          "kind": "function",
+          "line": 70
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGameTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -89717,6 +89748,13 @@
         "line": 58
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.CompanionGameEnginesTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/game/CompanionGameEnginesTest.kt",
+        "kind": "class",
+        "line": 7
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.CompanionGameReactionCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
@@ -90072,6 +90110,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
         "line": 210
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.index": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/game/CompanionGameEnginesTest.kt",
+        "kind": "function",
+        "line": 70
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.nextRound": [
