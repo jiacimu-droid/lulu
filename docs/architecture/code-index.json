@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-23T18:09:35.803751+00:00",
-  "commit": "08572aa19d34908209183faa2360a5412dc1bfa9",
+  "generatedAt": "2026-07-24T04:06:04.933382+00:00",
+  "commit": "e511e4e03a253002b6176c1a8bab7094052686bc",
   "branch": "master",
-  "sourceFingerprint": "1a21b7a392acd0848360e6f62adb5fd31ad2a76945952ebfbb36c3bd696dfa0e",
+  "sourceFingerprint": "59acbf71b2bb45d974cf113dd22ad651a768d2c03287f0c162233c70231f0943",
   "summary": {
-    "files": 1117,
-    "lines": 263599,
-    "symbols": 5469,
-    "productionCodeFiles": 789,
+    "files": 1118,
+    "lines": 263864,
+    "symbols": 5476,
+    "productionCodeFiles": 791,
     "testFiles": 134,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 655,
+      "app": 657,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -28,15 +28,15 @@
       "website": 10,
       "highlight": 9,
       "web": 7,
-      ".github": 6,
       ".claude": 5,
+      ".github": 5,
       "locale-tui": 4,
       "study-plans": 4,
       "money-lab": 3,
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 723,
+      ".kt": 725,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -47,7 +47,7 @@
       ".kts": 11,
       ".js": 9,
       ".html": 7,
-      ".yml": 5,
+      ".yml": 4,
       ".css": 4,
       ".yaml": 3,
       ".properties": 3,
@@ -63,10 +63,10 @@
       "工具": 6,
       "插件": 44,
       "数据库": 75,
-      "构建与发布": 14,
+      "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 284,
-      "记忆": 43
+      "界面": 285,
+      "记忆": 44
     },
     "resolvedImportEdges": 1939
   },
@@ -408,16 +408,16 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
-        "lines": 134,
-        "symbols": 50,
+        "path": "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "lines": 812,
+        "symbols": 49,
         "localImportCount": 4,
         "todoMarkers": 0
       },
       {
-        "path": "ai/src/main/java/me/rerere/ai/ui/Message.kt",
-        "lines": 812,
-        "symbols": 49,
+        "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
+        "lines": 131,
+        "symbols": 48,
         "localImportCount": 4,
         "todoMarkers": 0
       },
@@ -520,13 +520,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
-        "lines": 354,
-        "symbols": 30,
-        "localImportCount": 21,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
         "lines": 1185,
         "symbols": 30,
@@ -538,6 +531,13 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "lines": 347,
+        "symbols": 29,
+        "localImportCount": 21,
         "todoMarkers": 0
       },
       {
@@ -1195,8 +1195,8 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/transport/StreamableHttpClientTransport.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/CompressPrompt.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/LearningMode.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/LegacySuggestionCompatibility.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/OcrPrompt.kt",
-      "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Suggestion.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/TitleSummary.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Translation.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/AlarmTool.kt",
@@ -1511,7 +1511,6 @@
     "构建与发布": [
       ".github/workflows/code-index.yml",
       ".github/workflows/release.yml",
-      ".github/workflows/scan-suggestion-remnants.yml",
       "ai/build.gradle.kts",
       "app/baselineprofile/build.gradle.kts",
       "app/build.gradle.kts",
@@ -1743,6 +1742,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoritePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoriteVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/health/HealthPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/health/HealthVM.kt",
@@ -1872,6 +1872,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryExtractionCheckpointEntity.kt",
       "app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntity.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionSupport.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/DailySummaryService.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
@@ -3224,8 +3225,8 @@
       "path": ".github/workflows/code-index.yml",
       "module": ".github",
       "extension": ".yml",
-      "lines": 143,
-      "sha256": "4e2360f8902ad7fce8bb063311fc7d724addca97b3561a8ee1c7535940e7d364",
+      "lines": 86,
+      "sha256": "ef31b8ca292c2f87e8f6803731e0d73855658ef3a2634e4cb209ba0a3cbb3efb",
       "package": null,
       "categories": [
         "构建与发布"
@@ -3243,27 +3244,8 @@
       "path": ".github/workflows/release.yml",
       "module": ".github",
       "extension": ".yml",
-      "lines": 128,
-      "sha256": "b350d9ac0dd348d32b1af6f72c3f339d80f27ed95a4384b51dd94c81901b9a81",
-      "package": null,
-      "categories": [
-        "构建与发布"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
-      "path": ".github/workflows/scan-suggestion-remnants.yml",
-      "module": ".github",
-      "extension": ".yml",
-      "lines": 47,
-      "sha256": "2dda9ca5259738eaf580e3ad50fed8640f6f88f05c854c8e42af72ddeb6b17aa",
+      "lines": 132,
+      "sha256": "3be59c21fd987659c472badb718afd4a1bfc0957a5dd2d23213b0e3e176bbc6d",
       "package": null,
       "categories": [
         "构建与发布"
@@ -9640,11 +9622,11 @@
       "importedBy": []
     },
     {
-      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/OcrPrompt.kt",
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/LegacySuggestionCompatibility.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 18,
-      "sha256": "5dd0d2ad27a271d25d54b8eef61a497104fcc147f47ac3b7a9cd9e63381a60cd",
+      "lines": 8,
+      "sha256": "62021aabd3f7e77beb63ab1c55dc6403cc9bd4c2a55ac894f72d7f687f537f38",
       "package": "me.rerere.rikkahub.data.ai.prompts",
       "categories": [
         "AI与上下文"
@@ -9659,11 +9641,11 @@
       "importedBy": []
     },
     {
-      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Suggestion.kt",
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/prompts/OcrPrompt.kt",
       "module": "app",
       "extension": ".kt",
       "lines": 18,
-      "sha256": "7a390865e4e1b94fd8bb33af79dbb4e6fcc58e61d9e55f51f9dfa3836d13a51a",
+      "sha256": "5dd0d2ad27a271d25d54b8eef61a497104fcc147f47ac3b7a9cd9e63381a60cd",
       "package": "me.rerere.rikkahub.data.ai.prompts",
       "categories": [
         "AI与上下文"
@@ -19263,8 +19245,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 103,
-      "sha256": "93540b73189b2b2019c649498461dfaabb54a7db2142d1bc636ebf47d560411a",
+      "lines": 97,
+      "sha256": "ef966bb194ff9ef9033493e77bdf8652d5f68afb9f4847d25b7d74cf2dca3c3f",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "记忆"
@@ -19298,7 +19280,7 @@
         {
           "name": "toMemoryExtractionTurns",
           "kind": "function",
-          "line": 89
+          "line": 83
         }
       ],
       "localImportCount": 2,
@@ -19317,6 +19299,31 @@
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionSupport.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 99,
+      "sha256": "448048bc290955a640e473f8e56d4994fcfb41cafe33fb52ce70266c5053aed6",
+      "package": "me.rerere.rikkahub.data.service",
+      "categories": [
+        "记忆"
+      ],
+      "symbols": [
+        {
+          "name": "extractJsonPayload",
+          "kind": "function",
+          "line": 3
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
@@ -26903,8 +26910,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 134,
-      "sha256": "44866c6fba246ec7e16af897eef0183e7bd55e6c2210610be84cfd5fe6152bce",
+      "lines": 131,
+      "sha256": "f4e605d14dcacdc9ca2ce234a6cc4d1c6d52d65b301abc19f5c69de983fb1d4e",
       "package": "me.rerere.rikkahub.service",
       "categories": [],
       "symbols": [
@@ -27019,144 +27026,134 @@
           "line": 67
         },
         {
-          "name": "generateSuggestion",
+          "name": "clearTranslationField",
           "kind": "function",
           "line": 68
         },
         {
-          "name": "clearTranslationField",
+          "name": "updateConversationState",
           "kind": "function",
           "line": 69
         },
         {
-          "name": "updateConversationState",
-          "kind": "function",
-          "line": 70
-        },
-        {
           "name": "DefaultCompanionChatPort",
           "kind": "class",
-          "line": 73
+          "line": 72
         },
         {
           "name": "getConversationFlow",
           "kind": "function",
-          "line": 80
+          "line": 79
         },
         {
           "name": "getGenerationJobStateFlow",
           "kind": "function",
-          "line": 81
+          "line": 80
         },
         {
           "name": "getProcessingStatusFlow",
           "kind": "function",
-          "line": 82
+          "line": 81
         },
         {
           "name": "getConversationJobs",
           "kind": "function",
-          "line": 83
+          "line": 82
         },
         {
           "name": "addConversationReference",
           "kind": "function",
-          "line": 84
+          "line": 83
         },
         {
           "name": "removeConversationReference",
           "kind": "function",
-          "line": 85
+          "line": 84
         },
         {
           "name": "initializeConversation",
           "kind": "function",
-          "line": 86
+          "line": 85
         },
         {
           "name": "dismissError",
           "kind": "function",
-          "line": 87
+          "line": 86
         },
         {
           "name": "clearAllErrors",
           "kind": "function",
-          "line": 88
+          "line": 87
         },
         {
           "name": "addError",
           "kind": "function",
-          "line": 89
+          "line": 88
         },
         {
           "name": "sendMessage",
           "kind": "function",
-          "line": 91
+          "line": 90
         },
         {
           "name": "requestReply",
           "kind": "function",
-          "line": 93
+          "line": 92
         },
         {
           "name": "editMessage",
           "kind": "function",
-          "line": 94
+          "line": 93
         },
         {
           "name": "compressConversation",
           "kind": "function",
-          "line": 96
+          "line": 95
         },
         {
           "name": "forkConversationAtMessage",
           "kind": "function",
-          "line": 109
+          "line": 108
         },
         {
           "name": "deleteMessage",
           "kind": "function",
-          "line": 111
+          "line": 110
         },
         {
           "name": "regenerateAtMessage",
           "kind": "function",
-          "line": 113
+          "line": 112
         },
         {
           "name": "handleToolApproval",
           "kind": "function",
-          "line": 115
+          "line": 114
         },
         {
           "name": "saveConversation",
           "kind": "function",
-          "line": 122
+          "line": 121
         },
         {
           "name": "translateMessage",
           "kind": "function",
-          "line": 124
+          "line": 123
         },
         {
           "name": "generateTitle",
           "kind": "function",
-          "line": 126
-        },
-        {
-          "name": "generateSuggestion",
-          "kind": "function",
-          "line": 128
+          "line": 125
         },
         {
           "name": "clearTranslationField",
           "kind": "function",
-          "line": 130
+          "line": 127
         },
         {
           "name": "updateConversationState",
           "kind": "function",
-          "line": 132
+          "line": 129
         }
       ],
       "localImportCount": 4,
@@ -35395,8 +35392,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 354,
-      "sha256": "1341b362001e300f61251018e93fdced299afdfb41b073156b19c7c9231f8018",
+      "lines": 347,
+      "sha256": "055c82d1008e68c49d63eabf05b45cbed56ae65aa70ede0a4dfbc856c36666c7",
       "package": "me.rerere.rikkahub.ui.pages.chat",
       "categories": [
         "界面"
@@ -35528,29 +35525,24 @@
           "line": 293
         },
         {
-          "name": "generateSuggestion",
+          "name": "clearTranslationField",
           "kind": "function",
           "line": 300
         },
         {
-          "name": "clearTranslationField",
-          "kind": "function",
-          "line": 306
-        },
-        {
           "name": "updateConversation",
           "kind": "function",
-          "line": 310
+          "line": 304
         },
         {
           "name": "toggleMessageFavorite",
           "kind": "function",
-          "line": 316
+          "line": 310
         },
         {
           "name": "canRequestManualReply",
           "kind": "function",
-          "line": 353
+          "line": 346
         }
       ],
       "localImportCount": 21,
@@ -37669,6 +37661,74 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 277,
+      "sha256": "56c29752d19d447d5af1a548cf850ed40304ab4a18e964f874f943722a85a045",
+      "package": "me.rerere.rikkahub.ui.pages.game",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "GomokuGame",
+          "kind": "composable",
+          "line": 43
+        },
+        {
+          "name": "reset",
+          "kind": "function",
+          "line": 51
+        },
+        {
+          "name": "finish",
+          "kind": "function",
+          "line": 57
+        },
+        {
+          "name": "choose",
+          "kind": "function",
+          "line": 64
+        },
+        {
+          "name": "chooseGomokuMove",
+          "kind": "function",
+          "line": 169
+        },
+        {
+          "name": "gomokuWinner",
+          "kind": "function",
+          "line": 208
+        },
+        {
+          "name": "gomokuPlacementScore",
+          "kind": "function",
+          "line": 222
+        },
+        {
+          "name": "countDirection",
+          "kind": "function",
+          "line": 247
+        },
+        {
+          "name": "gomokuIndex",
+          "kind": "function",
+          "line": 270
+        }
+      ],
+      "localImportCount": 2,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.Refresh03"
+      ],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
@@ -46622,8 +46682,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 242,
-      "sha256": "26415314324b5088505bc94450769e6a0de318d8a092b8642013013c1fe6809e",
+      "lines": 257,
+      "sha256": "d3b511a5175d549fcb5f327d14dcae2697c31ecfe30e7225a05abfafc7dfda03",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "记忆"
@@ -46637,12 +46697,12 @@
         {
           "name": "nodes",
           "kind": "function",
-          "line": 226
+          "line": 241
         },
         {
           "name": "idOf",
           "kind": "function",
-          "line": 241
+          "line": 256
         }
       ],
       "localImportCount": 4,
@@ -76013,6 +76073,13 @@
         "line": 142
       }
     ],
+    "me.rerere.rikkahub.data.service.extractJsonPayload": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionSupport.kt",
+        "kind": "function",
+        "line": 3
+      }
+    ],
     "me.rerere.rikkahub.data.service.failDurableCommitment": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -76583,7 +76650,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
         "kind": "function",
-        "line": 241
+        "line": 256
       }
     ],
     "me.rerere.rikkahub.data.service.insertDeviceEvent": [
@@ -76861,7 +76928,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
         "kind": "function",
-        "line": 226
+        "line": 241
       }
     ],
     "me.rerere.rikkahub.data.service.normalized": [
@@ -77766,7 +77833,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
         "kind": "function",
-        "line": 89
+        "line": 83
       }
     ],
     "me.rerere.rikkahub.data.service.toMemoryRerankResults": [
@@ -82363,7 +82430,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "class",
-        "line": 73
+        "line": 72
       }
     ],
     "me.rerere.rikkahub.service.LocalTimeContextFormatter": [
@@ -82525,7 +82592,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 84
+        "line": 83
       }
     ],
     "me.rerere.rikkahub.service.addError": [
@@ -82542,7 +82609,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 89
+        "line": 88
       }
     ],
     "me.rerere.rikkahub.service.addProactiveMessage": [
@@ -82798,7 +82865,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 88
+        "line": 87
       }
     ],
     "me.rerere.rikkahub.service.clearTranslationField": [
@@ -82810,12 +82877,12 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 69
+        "line": 68
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 130
+        "line": 127
       }
     ],
     "me.rerere.rikkahub.service.collectCompanionPassivePerceptionFacts": [
@@ -82860,7 +82927,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 96
+        "line": 95
       }
     ],
     "me.rerere.rikkahub.service.compressMessages": [
@@ -82950,7 +83017,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 111
+        "line": 110
       }
     ],
     "me.rerere.rikkahub.service.determineNotificationContent": [
@@ -82974,7 +83041,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 87
+        "line": 86
       }
     ],
     "me.rerere.rikkahub.service.dismissWakeAlarms": [
@@ -83012,7 +83079,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 94
+        "line": 93
       }
     ],
     "me.rerere.rikkahub.service.enforceRelationshipPolicy": [
@@ -83111,7 +83178,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 109
+        "line": 108
       }
     ],
     "me.rerere.rikkahub.service.format": [
@@ -83128,18 +83195,6 @@
         "line": 761
       }
     ],
-    "me.rerere.rikkahub.service.generateSuggestion": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
-        "kind": "function",
-        "line": 68
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
-        "kind": "function",
-        "line": 128
-      }
-    ],
     "me.rerere.rikkahub.service.generateTitle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -83154,7 +83209,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 126
+        "line": 125
       }
     ],
     "me.rerere.rikkahub.service.generationJobFlow": [
@@ -83178,7 +83233,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 80
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.service.getConversationJobs": [
@@ -83195,7 +83250,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 83
+        "line": 82
       }
     ],
     "me.rerere.rikkahub.service.getGenerationJobStateFlow": [
@@ -83212,7 +83267,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 81
+        "line": 80
       }
     ],
     "me.rerere.rikkahub.service.getJob": [
@@ -83264,7 +83319,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 82
+        "line": 81
       }
     ],
     "me.rerere.rikkahub.service.handleMessageComplete": [
@@ -83288,7 +83343,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 115
+        "line": 114
       }
     ],
     "me.rerere.rikkahub.service.hasAny": [
@@ -83331,7 +83386,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 86
+        "line": 85
       }
     ],
     "me.rerere.rikkahub.service.invalidateMemoryExtractionAfterSelectedPathMutation": [
@@ -83551,7 +83606,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 113
+        "line": 112
       }
     ],
     "me.rerere.rikkahub.service.release": [
@@ -83580,7 +83635,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 85
+        "line": 84
       }
     ],
     "me.rerere.rikkahub.service.removeIfIdle": [
@@ -83604,7 +83659,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 93
+        "line": 92
       }
     ],
     "me.rerere.rikkahub.service.requiredFactChecks": [
@@ -83663,7 +83718,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 122
+        "line": 121
       }
     ],
     "me.rerere.rikkahub.service.scheduleIdleCheck": [
@@ -83715,7 +83770,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 91
+        "line": 90
       }
     ],
     "me.rerere.rikkahub.service.sendVoiceCallTurn": [
@@ -83899,7 +83954,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 124
+        "line": 123
       }
     ],
     "me.rerere.rikkahub.service.updateConversation": [
@@ -83918,12 +83973,12 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 70
+        "line": 69
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "kind": "function",
-        "line": 132
+        "line": 129
       }
     ],
     "me.rerere.rikkahub.service.updateNotification": [
@@ -88165,7 +88220,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 353
+        "line": 346
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.checkUserAvatarDelete": [
@@ -88186,7 +88241,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 306
+        "line": 300
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.conversationWith": [
@@ -88285,13 +88340,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/LuluStatusDialog.kt",
         "kind": "function",
         "line": 353
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.chat.generateSuggestion": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
-        "kind": "function",
-        "line": 300
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.generateTitle": [
@@ -88452,7 +88500,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 316
+        "line": 310
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.translateMessage": [
@@ -88466,7 +88514,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 310
+        "line": 304
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.updatePinnedStatus": [
@@ -89625,6 +89673,13 @@
         "line": 835
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.GomokuGame": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "composable",
+        "line": 43
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.OpponentSeatCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
@@ -89781,9 +89836,21 @@
     ],
     "me.rerere.rikkahub.ui.pages.game.choose": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "function",
+        "line": 64
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
         "line": 298
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.chooseGomokuMove": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "function",
+        "line": 169
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.chooseTicTacToeMove": [
@@ -89800,6 +89867,20 @@
         "line": 389
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.countDirection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "function",
+        "line": 247
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.finish": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "function",
+        "line": 57
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.fromWireName": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
@@ -89812,6 +89893,27 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 525
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.gomokuIndex": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "function",
+        "line": 270
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.gomokuPlacementScore": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "function",
+        "line": 222
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.gomokuWinner": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "function",
+        "line": 208
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.nextRound": [
@@ -89857,6 +89959,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.reset": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
+        "kind": "function",
+        "line": 51
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",

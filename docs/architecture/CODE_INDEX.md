@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`08572aa19d34908209183faa2360a5412dc1bfa9`
+- 基准提交：`e511e4e03a253002b6176c1a8bab7094052686bc`
 - 分支：`master`
-- 源码指纹：`1a21b7a392acd084…`
-- 已索引文件：1117
-- 已索引代码/文本行：263599
-- 已发现类、接口、对象、函数及 Composable：5469
+- 源码指纹：`59acbf71b2bb45d9…`
+- 已索引文件：1118
+- 已索引代码/文本行：263864
+- 已发现类、接口、对象、函数及 Composable：5476
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 789 |
+| 生产代码文件 | 791 |
 | 测试文件 | 134 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 655 |
+| `app` | 657 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -149,8 +149,8 @@
 | `website` | 10 |
 | `highlight` | 9 |
 | `web` | 7 |
-| `.github` | 6 |
 | `.claude` | 5 |
+| `.github` | 5 |
 | `locale-tui` | 4 |
 | `study-plans` | 4 |
 | `money-lab` | 3 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 723 |
+| `.kt` | 725 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -171,7 +171,7 @@
 | `.kts` | 11 |
 | `.js` | 9 |
 | `.html` | 7 |
-| `.yml` | 5 |
+| `.yml` | 4 |
 | `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
@@ -396,7 +396,6 @@
 
 - `.github/workflows/code-index.yml`
 - `.github/workflows/release.yml`
-- `.github/workflows/scan-suggestion-remnants.yml`
 - `ai/build.gradle.kts`
 - `app/baselineprofile/build.gradle.kts`
 - `app/build.gradle.kts`
@@ -475,7 +474,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 254 个文件，见 `code-index.json`
+- ……另有 255 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -489,6 +488,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryExtractionCheckpointEntity.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntity.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt`
+- `app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionSupport.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/DailySummaryService.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt`
@@ -508,8 +508,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt`
-- ……另有 13 个文件，见 `code-index.json`
+- ……另有 14 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 
@@ -535,7 +534,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：1939
-- 可检索完整符号：4870
+- 可检索完整符号：4876
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
