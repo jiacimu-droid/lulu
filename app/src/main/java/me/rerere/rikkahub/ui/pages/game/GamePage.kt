@@ -145,6 +145,24 @@ fun GameHubPage() {
                 onClick = { navController.navigate(Screen.PerfectManGame) },
             ),
             GameTile(
+                title = "轻量跑团",
+                subtitle = "自由行动、d20 判定，与角色共同探索倒走的钟",
+                enabled = true,
+                onClick = { navController.navigate(Screen.QuickCompanionGame("roleplay_adventure")) },
+            ),
+            GameTile(
+                title = "海龟汤",
+                subtitle = "角色主持固定汤底，你自由提问并逐步还原真相",
+                enabled = true,
+                onClick = { navController.navigate(Screen.QuickCompanionGame("turtle_soup")) },
+            ),
+            GameTile(
+                title = "默契问答",
+                subtitle = "分别秘密作答，用角色记忆检验彼此有多了解",
+                enabled = true,
+                onClick = { navController.navigate(Screen.QuickCompanionGame("rapport_quiz")) },
+            ),
+            GameTile(
                 title = "一起猜拳",
                 subtitle = "真实结果生成后，角色会通过 API 按人设回应",
                 enabled = true,
@@ -162,14 +180,7 @@ fun GameHubPage() {
                 enabled = true,
                 onClick = { navController.navigate(Screen.QuickCompanionGame("gomoku")) },
             ),
-        ) + List(3) { index ->
-            GameTile(
-                title = "待解锁游戏 ${index + 1}",
-                subtitle = "后续继续扩展",
-                enabled = false,
-                onClick = {},
-            )
-        }
+        )
     }
     Scaffold(
         containerColor = GameColors.background,
