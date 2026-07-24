@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-24T04:17:46.300064+00:00",
-  "commit": "8ce9241b214a8cd9c5187656e8f704d7e4e73cd2",
+  "generatedAt": "2026-07-24T04:19:41.702935+00:00",
+  "commit": "0893d31635839e5d6a833f9237d486ca0e3e27fa",
   "branch": "master",
-  "sourceFingerprint": "1af94d467097c413953555048c5f05f9a1bda409073b4b182e53589f4cafb9f8",
+  "sourceFingerprint": "1d4c9d1cd507fab54b4f3723f414dc513711a6db0057e5f1fcc41699d89c83f2",
   "summary": {
     "files": 1120,
     "lines": 264354,
@@ -48768,7 +48768,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 71,
-      "sha256": "22d1f51c48bf24f1fd12296b169fe26b0c26948aa77f2d1fb95b9d1cf3ff47c2",
+      "sha256": "eb0bbb13005114621bf1488b859e8c11e174683c662ff6930b63bf4fc7ff4a90",
       "package": "me.rerere.rikkahub.ui.pages.game",
       "categories": [
         "界面"
