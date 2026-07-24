@@ -60,28 +60,22 @@ fun buildAffectiveMemoryExtractionPlan(
     direction: MemoryExtractionDirection = MemoryExtractionDirection.OLDEST_FIRST,
 ): AffectiveMemoryExtractionPlan? {
     if (extractionInterval <= 0) return null
+
     val logicalTurns = messageNodes.toMemoryExtractionTurns()
     val stableTurns = logicalTurns.dropLast(protectedRecentCount.coerceAtLeast(0))
-    // The role setting is the exact batch size (20 is only the default). Build standard
-    // contiguous windows before consulting the checkpoint so legacy holes cannot stitch
-    // fragments from two different windows into one extraction request.
-    val completeWindows = stableTurns
-        .chunked(extractionInterval)
-        .filter { window -> window.size == extractionInterval }
-    val pendingWindows = completeWindows.filter { window ->
-        window.any { turn -> turn.nodeId !in processedSourceNodeIds }
-    }
-    if (pendingWindows.isEmpty()) return null
+    if (stableTurns.size < extractionInterval) return null
 
-    // A partially checkpointed legacy window is rebuilt as a whole standard batch.
-    // Saved memories keep their source IDs, so the storage layer can de-duplicate them.
-    val selectedTurns = when (direction) {
-        MemoryExtractionDirection.OLDEST_FIRST -> pendingWindows.first()
-        MemoryExtractionDirection.RECENT_FIRST -> pendingWindows.last()
-    }
+    // Automatic extraction is edge-triggered instead of level-triggered.
+    // With an interval of 40, only stable counts 40, 80, 120... are eligible.
+    // Counts such as 41, 59 or 79 cannot create sliding 2..41 / 20..59 windows.
+    if (stableTurns.size % extractionInterval != 0) return null
+
+    val boundaryWindow = stableTurns.takeLast(extractionInterval)
+    if (boundaryWindow.size != extractionInterval) return null
+    if (boundaryWindow.all { turn -> turn.nodeId in processedSourceNodeIds }) return null
 
     return AffectiveMemoryExtractionPlan(
-        turns = selectedTurns,
+        turns = boundaryWindow,
         reason = if (direction == MemoryExtractionDirection.RECENT_FIRST) "recent_interval" else "interval",
     )
 }
