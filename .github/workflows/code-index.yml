@@ -1,22 +1,38 @@
-name: Finalize suggestion chain cleanup
+name: Refresh code index
 
 on:
   push:
     branches: [master]
     paths:
-      - ".github/workflows/code-index.yml"
+      - 'app/**'
+      - 'ai/**'
+      - 'common/**'
+      - 'document/**'
+      - 'highlight/**'
+      - 'locale-tui/**'
+      - 'plugins/**'
+      - 'search/**'
+      - 'speech/**'
+      - 'web/**'
+      - 'web-ui/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradle/**'
+      - 'scripts/generate_code_index.py'
+      - 'scripts/enrich_code_index.py'
   workflow_dispatch:
 
 permissions:
   contents: write
-  statuses: write
 
 concurrency:
-  group: remove-suggestion-chain-master
+  group: code-index-master
   cancel-in-progress: true
 
 jobs:
-  cleanup:
+  refresh:
+    if: ${{ !contains(github.event.head_commit.message || '', '[skip index]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,380 +41,46 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
-      - name: Remove every active suggestion-reply layer
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          def load(path: str) -> str:
-              return Path(path).read_text(encoding="utf-8")
-
-          def save(path: str, text: str) -> None:
-              Path(path).write_text(text, encoding="utf-8")
-
-          def drop_literal(path: str, *parts: str) -> None:
-              text = load(path)
-              for part in parts:
-                  text = text.replace(part, "")
-              save(path, text)
-
-          def drop_regex(path: str, pattern: str, flags: int = 0) -> None:
-              text = load(path)
-              text = re.sub(pattern, "", text, flags=flags)
-              save(path, text)
-
-          # Android service and ViewModel entry points.
-          drop_regex(
-              "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
-              r"\n\s*suspend fun generateSuggestion\([^\n]*\)\n",
-          )
-          drop_regex(
-              "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
-              r"\n\s*override suspend fun generateSuggestion\([^\n]*\)\s*=\s*\n\s*chatService\.generateSuggestion\([^\n]*\)\n",
-          )
-          drop_regex(
-              "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
-              r"\n\s*fun generateSuggestion\(conversation: Conversation\) \{.*?\n\s*\}\n",
-              re.S,
-          )
-
-          # Settings, preference persistence, and the obsolete prompt.
-          prefs = "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt"
-          drop_regex(prefs, r"^import .*DEFAULT_SUGGESTION_PROMPT\n", re.M)
-          drop_regex(prefs, r"^\s*val SUGGESTION_MODEL = .*\n", re.M)
-          drop_regex(prefs, r"^\s*val SUGGESTION_PROMPT = .*\n", re.M)
-          drop_regex(prefs, r"^\s*suggestionModelId = preferences\[SUGGESTION_MODEL\].*?DEFAULT_AUTO_MODEL_ID,\n", re.M | re.S)
-          drop_regex(prefs, r"^\s*suggestionPrompt = preferences\[SUGGESTION_PROMPT\].*\n", re.M)
-          drop_regex(prefs, r"^\s*preferences\[SUGGESTION_MODEL\].*\n", re.M)
-          drop_regex(prefs, r"^\s*preferences\[SUGGESTION_PROMPT\].*\n", re.M)
-          drop_regex(prefs, r"^\s*val suggestionModelId: Uuid = .*\n", re.M)
-          drop_regex(prefs, r"^\s*val suggestionPrompt: String = .*\n", re.M)
-          Path("app/src/main/java/me/rerere/rikkahub/data/ai/prompts/Suggestion.kt").unlink(missing_ok=True)
-
-          drop_regex(
-              "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
-              r"\n\s*description = \{\s*Text\(stringResource\(R\.string\.setting_model_page_suggestion_prompt_vars\)\)\s*\}",
-              re.S,
-          )
-          for strings_path in Path("app/src/main/res").glob("values*/strings.xml"):
-              lines = strings_path.read_text(encoding="utf-8").splitlines()
-              lines = [
-                  line for line in lines
-                  if "setting_model_page_suggestion_" not in line
-              ]
-              strings_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-          # Conversation model and persistence. The old SQLite column remains inert under a neutral
-          # name so upgrades do not lose user data or require a destructive migration.
-          drop_regex(
-              "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
-              r"^\s*val chatSuggestions: List<String> = emptyList\(\),\n",
-              re.M,
-          )
-          repo = "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt"
-          drop_regex(repo, r"^\s*chatSuggestions = JsonInstant\.encodeToString\(conversation\.chatSuggestions\),\n", re.M)
-          drop_regex(repo, r"^\s*chatSuggestions = JsonInstant\.decodeFromString\(conversationEntity\.chatSuggestions\),\n", re.M)
-
-          entity = "app/src/main/java/me/rerere/rikkahub/data/db/entity/ConversationEntity.kt"
-          entity_text = load(entity)
-          entity_text = re.sub(
-              r"\s*@ColumnInfo\(\"suggestions\", defaultValue = \"\[\]\"\)\s*\n\s*val chatSuggestions: String,",
-              "\n    // Legacy database column retained only for non-destructive upgrades; no feature reads it.\n"
-              "    @ColumnInfo(\"suggestions\", defaultValue = \"[]\")\n"
-              "    val legacyQuickReplyPayload: String = \"[]\",",
-              entity_text,
-          )
-          save(entity, entity_text)
-
-          # Android web API.
-          drop_regex(
-              "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationDiff.kt",
-              r"^\s*chatSuggestions != current\.chatSuggestions \|\|\n",
-              re.M,
-          )
-          web_dto = "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt"
-          drop_regex(web_dto, r"^\s*val chatSuggestions: List<String>,\n", re.M)
-          drop_regex(web_dto, r"^\s*chatSuggestions = chatSuggestions,\n", re.M)
-
-          # Web route.
-          route = "web-ui/app/routes/conversations.tsx"
-          drop_regex(route, r"^const EMPTY_SUGGESTIONS: string\[\] = \[\];\n", re.M)
-          drop_regex(route, r"^\s*const chatSuggestions = detail\?\.chatSuggestions \?\? EMPTY_SUGGESTIONS;\n", re.M)
-          drop_regex(
-              route,
-              r"\n\s*const showSuggestions =.*?const displaySuggestions = .*?;\n",
-              re.S,
-          )
-          drop_regex(
-              route,
-              r"\n\s*const handleClickSuggestion = React\.useCallback\(.*?\n\s*\);\n",
-              re.S,
-          )
-          drop_regex(route, r"^\s*suggestions=\{displaySuggestions\}\n", re.M)
-          drop_regex(route, r"^\s*onSuggestionClick=\{handleClickSuggestion\}\n", re.M)
-
-          # Web input component.
-          chat_input = "web-ui/app/components/input/chat-input.tsx"
-          drop_regex(chat_input, r"^\s*suggestions\?: string\[\];\n", re.M)
-          drop_regex(chat_input, r"^\s*onSuggestionClick\?: \(suggestion: string\) => void;\n", re.M)
-          drop_regex(chat_input, r"^\s*suggestions = \[\],\n", re.M)
-          drop_regex(chat_input, r"^\s*onSuggestionClick,\n", re.M)
-          drop_regex(
-              chat_input,
-              r"\n\s*const handleSuggestionSelect = React\.useCallback\(.*?\n\s*\);\n",
-              re.S,
-          )
-          drop_regex(
-              chat_input,
-              r"\n\s*\{suggestions\.length > 0 \? \(.*?\n\s*\) : null\}\n",
-              re.S,
-          )
-          drop_regex("web-ui/app/types/dto.ts", r"^\s*chatSuggestions: string\[\];\n", re.M)
-          drop_regex("web-ui/app/types/conversation.ts", r"^\s*chatSuggestions: string\[\];\n", re.M)
-
-          # Preserve the memory-dedup test while removing references to this deleted product feature.
-          test_path = "app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt"
-          test_text = load(test_path)
-          test_text = test_text.replace(
-              "我记得她不喜欢自动生成建议回复。",
-              "我记得她不喜欢太亮的番茄钟界面。",
-          ).replace(
-              "我知道她不需要系统自动生成对话建议。",
-              "我知道她不需要系统使用明亮的番茄钟主题。",
-          ).replace(
-              "自动生成对话建议",
-              "明亮的番茄钟主题",
-          )
-          save(test_path, test_text)
-
-          # Remove temporary audit artifacts.
-          Path(".github/workflows/scan-suggestion-remnants.yml").unlink(missing_ok=True)
-          Path("docs/architecture/suggestion-remnants.txt").unlink(missing_ok=True)
-
-          # Restore the repository's normal index workflow in the same cleanup commit.
-          original_workflow = '''name: Refresh code index
-
-          on:
-            push:
-              branches: [master]
-              paths-ignore:
-                - "docs/architecture/CODE_INDEX.md"
-                - "docs/architecture/code-index.json"
-            workflow_dispatch:
-
-          permissions:
-            contents: write
-
-          concurrency:
-            group: code-index-master
-            cancel-in-progress: true
-
-          jobs:
-            refresh:
-              if: ${{ !contains(github.event.head_commit.message || '', '[skip index]') }}
-              runs-on: ubuntu-latest
-              steps:
-                - uses: actions/checkout@v4
-                  with:
-                    fetch-depth: 1
-
-                - uses: actions/setup-python@v5
-                  with:
-                    python-version: "3.12"
-
-                - name: Generate repository index
-                  env:
-                    INDEX_COMMIT: ${{ github.sha }}
-                    INDEX_BRANCH: ${{ github.ref_name }}
-                  run: |
-                    python3 scripts/generate_code_index.py
-                    python3 scripts/enrich_code_index.py
-
-                - name: Validate generated index
-                  run: |
-                    test -s docs/architecture/CODE_INDEX.md
-                    test -s docs/architecture/code-index.json
-                    python3 -m json.tool docs/architecture/code-index.json >/dev/null
-                    python3 - <<'INDEXPY'
-                    import json
-                    from pathlib import Path
-
-                    data = json.loads(Path("docs/architecture/code-index.json").read_text(encoding="utf-8"))
-                    required = {
-                        "schemaVersion", "generatedAt", "commit", "branch", "sourceFingerprint",
-                        "summary", "featureFlows", "hotspots", "symbolIndex", "files",
-                    }
-                    missing = sorted(required - data.keys())
-                    if missing:
-                        raise SystemExit(f"Code index is missing required keys: {', '.join(missing)}")
-                    if data["schemaVersion"] < 3:
-                        raise SystemExit("Code index schemaVersion must be at least 3")
-                    if not data["files"]:
-                        raise SystemExit("Code index unexpectedly contains no files")
-                    if len(data["sourceFingerprint"]) != 64:
-                        raise SystemExit("Code index sourceFingerprint is invalid")
-                    if not data["featureFlows"].get("陪伴聊天主链路", {}).get("paths"):
-                        raise SystemExit("Core companion flow has no indexed entry points")
-                    if not data["hotspots"].get("largestFiles"):
-                        raise SystemExit("Code index contains no hotspot data")
-                    if not data["hotspots"].get("highestApproximateFanIn"):
-                        raise SystemExit("Code index contains no reverse dependency hotspots")
-                    if data["summary"].get("resolvedImportEdges", 0) <= 0:
-                        raise SystemExit("Code index did not resolve any local import edges")
-                    if not data["symbolIndex"]:
-                        raise SystemExit("Code index contains no symbol index")
-                    INDEXPY
-
-                - name: Commit refreshed index
-                  run: |
-                    if [ -z "$(git status --porcelain -- docs/architecture/CODE_INDEX.md docs/architecture/code-index.json)" ]; then
-                      echo "Code index is already current."
-                      exit 0
-                    fi
-                    git config user.name "github-actions[bot]"
-                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                    git add --force docs/architecture/CODE_INDEX.md docs/architecture/code-index.json
-                    git commit -m "docs: refresh code index [skip ci] [skip index]"
-                    git pull --rebase origin master
-                    git push origin HEAD:master
-          '''
-          original_workflow = re.sub(r"(?m)^          ", "", original_workflow)
-          save(".github/workflows/code-index.yml", original_workflow)
-
-          # Fail closed if any active-chain symbol remains. Historical Room schema snapshots are
-          # intentionally outside app/src and preserve migration history only.
-          pattern = re.compile(
-              r"generateSuggestion|chatSuggestions|suggestionModelId|suggestionPrompt|"
-              r"DEFAULT_SUGGESTION_PROMPT|SUGGESTION_MODEL|SUGGESTION_PROMPT|"
-              r"onSuggestionClick|handleSuggestionSelect|handleClickSuggestion|"
-              r"EMPTY_SUGGESTIONS|displaySuggestions|showSuggestions|"
-              r"suggestions\.map|suggestions\.length|setting_model_page_suggestion_|"
-              r"建议回复|自动生成对话建议",
-              re.IGNORECASE,
-          )
-          remaining = []
-          for root in (Path("app/src"), Path("web-ui/app"), Path("plugins")):
-              if not root.exists():
-                  continue
-              for path in root.rglob("*"):
-                  if not path.is_file():
-                      continue
-                  try:
-                      lines = path.read_text(encoding="utf-8").splitlines()
-                  except (UnicodeDecodeError, OSError):
-                      continue
-                  for line_number, line in enumerate(lines, 1):
-                      if pattern.search(line):
-                          remaining.append(f"{path}:{line_number}:{line.strip()}")
-          if remaining:
-              raise SystemExit("Active suggestion chain remains:\n" + "\n".join(remaining))
-          print("Active suggestion-reply chain removed.")
-          PY
-
-      - name: Refresh repository index
+      - name: Generate repository index
         env:
-          INDEX_COMMIT: suggestion-chain-cleanup
-          INDEX_BRANCH: master
+          INDEX_COMMIT: ${{ github.sha }}
+          INDEX_BRANCH: ${{ github.ref_name }}
         run: |
           python3 scripts/generate_code_index.py
           python3 scripts/enrich_code_index.py
-          python3 -m json.tool docs/architecture/code-index.json >/dev/null
 
-      - name: Commit and push cleanup
-        id: commit
+      - name: Validate generated index
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "refactor: remove remaining suggestion chain [skip index]"
+          test -s docs/architecture/CODE_INDEX.md
+          test -s docs/architecture/code-index.json
+          python3 -m json.tool docs/architecture/code-index.json >/dev/null
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path('docs/architecture/code-index.json').read_text(encoding='utf-8'))
+          required = {
+              'schemaVersion', 'generatedAt', 'commit', 'branch', 'sourceFingerprint',
+              'summary', 'featureFlows', 'hotspots', 'symbolIndex', 'files',
+          }
+          missing = sorted(required - data.keys())
+          if missing:
+              raise SystemExit(f"Code index is missing required keys: {', '.join(missing)}")
+          if data['schemaVersion'] < 3 or not data['files'] or not data['symbolIndex']:
+              raise SystemExit('Code index validation failed')
+          PY
+
+      - name: Commit refreshed index
+        run: |
+          if [ -z "$(git status --porcelain -- docs/architecture/CODE_INDEX.md docs/architecture/code-index.json)" ]; then
+            echo 'Code index is already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --force docs/architecture/CODE_INDEX.md docs/architecture/code-index.json
+          git commit -m 'docs: refresh code index [skip ci] [skip index]'
           git pull --rebase origin master
           git push origin HEAD:master
-          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
-      - name: Mark validation pending
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CLEANUP_SHA: ${{ steps.commit.outputs.sha }}
-        run: |
-          python3 - <<'PY'
-          import json, os, urllib.request
-          sha = os.environ["CLEANUP_SHA"]
-          req = urllib.request.Request(
-              f"https://api.github.com/repos/${{ github.repository }}/statuses/{sha}",
-              data=json.dumps({
-                  "state": "pending",
-                  "context": "suggestion-cleanup/validation",
-                  "description": "Android compile, memory regression, and web typecheck are running",
-              }).encode(),
-              headers={
-                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
-                  "Accept": "application/vnd.github+json",
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  "Content-Type": "application/json",
-              },
-              method="POST",
-          )
-          urllib.request.urlopen(req).read()
-          PY
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
-
-      - name: Compile Android and run memory regression
-        run: |
-          chmod +x gradlew
-          ./gradlew :app:compileDebugKotlin :app:testDebugUnitTest \
-            --tests "me.rerere.rikkahub.data.service.MemoryCandidateDeduplicationTest" \
-            --no-daemon
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: pnpm
-          cache-dependency-path: web-ui/pnpm-lock.yaml
-
-      - name: Typecheck web UI
-        run: |
-          corepack enable
-          cd web-ui
-          pnpm install --frozen-lockfile
-          pnpm typecheck
-
-      - name: Publish validation result
-        if: always() && steps.commit.outputs.sha != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CLEANUP_SHA: ${{ steps.commit.outputs.sha }}
-          JOB_STATUS: ${{ job.status }}
-        run: |
-          python3 - <<'PY'
-          import json, os, urllib.request
-          success = os.environ["JOB_STATUS"] == "success"
-          sha = os.environ["CLEANUP_SHA"]
-          payload = {
-              "state": "success" if success else "failure",
-              "context": "suggestion-cleanup/validation",
-              "description": (
-                  "Android compile, memory regression, and web typecheck passed"
-                  if success else
-                  "One or more cleanup validation checks failed"
-              ),
-          }
-          req = urllib.request.Request(
-              f"https://api.github.com/repos/${{ github.repository }}/statuses/{sha}",
-              data=json.dumps(payload).encode(),
-              headers={
-                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
-                  "Accept": "application/vnd.github+json",
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  "Content-Type": "application/json",
-              },
-              method="POST",
-          )
-          urllib.request.urlopen(req).read()
-          PY
