@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-24T04:07:35.029649+00:00",
-  "commit": "5cdc7c1aeb14a2b3d82d4391b45015165189c11e",
+  "generatedAt": "2026-07-24T04:09:20.478881+00:00",
+  "commit": "7990f639bbb10a0b747e4f0de1652f4e10f9d03f",
   "branch": "master",
-  "sourceFingerprint": "4b9ef87be2e031baa075e8fb74314ad2e84199459a39a3845ac12f25fbf1f5cd",
+  "sourceFingerprint": "521ec15fda7efa3e75aac50ef45c78a0c4d1e2461af7222e229f5e9f33459de3",
   "summary": {
     "files": 1119,
-    "lines": 264260,
-    "symbols": 5490,
+    "lines": 264288,
+    "symbols": 5487,
     "productionCodeFiles": 792,
     "testFiles": 134,
     "largeProductionFiles": 42,
@@ -68,7 +68,7 @@
       "界面": 286,
       "记忆": 44
     },
-    "resolvedImportEdges": 1939
+    "resolvedImportEdges": 1947
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 126,
+        "importedByCount": 127,
         "todoMarkers": 0
       },
       {
@@ -918,7 +918,7 @@
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
-        "importedByCount": 54,
+        "importedByCount": 55,
         "todoMarkers": 0
       },
       {
@@ -998,7 +998,7 @@
         "lines": 141,
         "symbols": 19,
         "localImportCount": 6,
-        "importedByCount": 28,
+        "importedByCount": 29,
         "todoMarkers": 1
       },
       {
@@ -1018,25 +1018,25 @@
         "todoMarkers": 0
       },
       {
-        "path": "speech/src/main/java/me/rerere/tts/provider/TTSProviderSetting.kt",
-        "lines": 225,
-        "symbols": 19,
-        "localImportCount": 0,
-        "importedByCount": 17,
-        "todoMarkers": 0
-      },
-      {
         "path": "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
         "lines": 57,
         "symbols": 4,
         "localImportCount": 3,
-        "importedByCount": 17,
+        "importedByCount": 18,
         "todoMarkers": 0
       },
       {
         "path": "ai/src/main/java/me/rerere/ai/core/Reasoning.kt",
         "lines": 32,
         "symbols": 2,
+        "localImportCount": 0,
+        "importedByCount": 18,
+        "todoMarkers": 0
+      },
+      {
+        "path": "speech/src/main/java/me/rerere/tts/provider/TTSProviderSetting.kt",
+        "lines": 225,
+        "symbols": 19,
         "localImportCount": 0,
         "importedByCount": 17,
         "todoMarkers": 0
@@ -1114,20 +1114,20 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/UIAvatar.kt",
-        "lines": 330,
-        "symbols": 3,
-        "localImportCount": 10,
-        "importedByCount": 11,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
         "lines": 321,
         "symbols": 13,
         "localImportCount": 0,
-        "importedByCount": 11,
+        "importedByCount": 12,
         "todoMarkers": 1
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
+        "lines": 138,
+        "symbols": 8,
+        "localImportCount": 3,
+        "importedByCount": 12,
+        "todoMarkers": 0
       }
     ]
   },
@@ -2626,11 +2626,6 @@
       "imports": 4
     },
     {
-      "from": "me.rerere.rikkahub.ui.pages.game",
-      "to": "me.rerere.hugeicons.stroke.Refresh03",
-      "imports": 4
-    },
-    {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.Screen",
       "imports": 4
@@ -2908,6 +2903,11 @@
     {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.companion.CompanionState",
+      "imports": 3
+    },
+    {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.companion.CompanionToolExecution",
       "imports": 3
     }
   ],
@@ -3581,6 +3581,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ReasoningPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
@@ -3825,6 +3826,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
@@ -3989,6 +3991,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/PropertyEditor.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
@@ -4056,6 +4059,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ProviderBalanceText.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
@@ -5996,6 +6000,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -8743,6 +8748,7 @@
         "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt",
@@ -11700,6 +11706,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt"
       ]
     },
@@ -13448,6 +13455,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/CompanionWakeGoalTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
@@ -37735,8 +37743,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 438,
-      "sha256": "a55455acc292798e2156dc8d91b29a4860ad93f8e6cadb971cd7cd3f2f996f58",
+      "lines": 466,
+      "sha256": "3f42e1c12904021352c79866cfe9b17f5ec48b2e80bdeacdc1749bdd05c0cdd8",
       "package": "me.rerere.rikkahub.ui.pages.game",
       "categories": [
         "界面"
@@ -37745,111 +37753,115 @@
         {
           "name": "QuickCompanionGamePage",
           "kind": "composable",
-          "line": 66
+          "line": 75
         },
         {
           "name": "recordSharedGame",
           "kind": "function",
-          "line": 76
+          "line": 93
+        },
+        {
+          "name": "generateCompanionReaction",
+          "kind": "function",
+          "line": 125
+        },
+        {
+          "name": "completeSharedGame",
+          "kind": "function",
+          "line": 194
+        },
+        {
+          "name": "CompanionGameReactionCard",
+          "kind": "composable",
+          "line": 329
         },
         {
           "name": "RockPaperScissorsGame",
           "kind": "composable",
-          "line": 200
+          "line": 346
         },
         {
           "name": "play",
           "kind": "function",
-          "line": 209
-        },
-        {
-          "name": "DiceDuelGame",
-          "kind": "composable",
-          "line": 233
-        },
-        {
-          "name": "roll",
-          "kind": "function",
-          "line": 241
-        },
-        {
-          "name": "DiceFace",
-          "kind": "composable",
-          "line": 269
-        },
-        {
-          "name": "TicTacToeGame",
-          "kind": "composable",
-          "line": 286
-        },
-        {
-          "name": "reset",
-          "kind": "function",
-          "line": 293
-        },
-        {
-          "name": "choose",
-          "kind": "function",
-          "line": 298
+          "line": 355
         },
         {
           "name": "GameBody",
           "kind": "composable",
-          "line": 356
+          "line": 379
         },
         {
           "name": "GameResultText",
           "kind": "composable",
-          "line": 374
+          "line": 397
         },
         {
           "name": "compareRockPaperScissors",
           "kind": "function",
-          "line": 389
+          "line": 412
         },
         {
           "name": "chooseTicTacToeMove",
           "kind": "function",
-          "line": 397
+          "line": 421
         },
         {
           "name": "quickTicTacToeWinner",
           "kind": "function",
-          "line": 410
+          "line": 435
         },
         {
           "name": "QuickCompanionGame",
           "kind": "class",
-          "line": 426
+          "line": 451
         },
         {
           "name": "fromWireName",
           "kind": "function",
-          "line": 435
+          "line": 460
         }
       ],
-      "localImportCount": 14,
+      "localImportCount": 25,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
+        "me.rerere.ai.core.ReasoningLevel",
+        "me.rerere.ai.provider.ModelType",
+        "me.rerere.ai.provider.ProviderManager",
+        "me.rerere.ai.provider.TextGenerationParams",
+        "me.rerere.ai.ui.UIMessage",
         "me.rerere.hugeicons.HugeIcons",
         "me.rerere.hugeicons.stroke.ArrowLeft02",
-        "me.rerere.hugeicons.stroke.Play",
-        "me.rerere.hugeicons.stroke.Refresh03",
+        "me.rerere.rikkahub.data.ai.ApiUsageSource",
+        "me.rerere.rikkahub.data.ai.ApiUsageStore",
+        "me.rerere.rikkahub.data.ai.transformers.transformMessages",
         "me.rerere.rikkahub.data.companion.CompanionLifeEvent",
         "me.rerere.rikkahub.data.companion.CompanionLifeEventSource",
         "me.rerere.rikkahub.data.companion.CompanionLifeEventStatus",
         "me.rerere.rikkahub.data.companion.CompanionLifeEventType",
+        "me.rerere.rikkahub.data.companion.CompanionPerceptionInput",
         "me.rerere.rikkahub.data.companion.CompanionRuntime",
         "me.rerere.rikkahub.data.companion.CompanionTurnMutation",
+        "me.rerere.rikkahub.data.companion.toPromptContext",
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.findModelById",
+        "me.rerere.rikkahub.data.datastore.findProvider",
         "me.rerere.rikkahub.data.datastore.getCurrentAssistant",
         "me.rerere.rikkahub.ui.context.LocalNavController",
         "me.rerere.rikkahub.ui.context.LocalSettings",
         "me.rerere.rikkahub.ui.theme.CustomColors"
       ],
       "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/Reasoning.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
+        "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
@@ -89705,25 +89717,18 @@
         "line": 58
       }
     ],
-    "me.rerere.rikkahub.ui.pages.game.DiceDuelGame": [
+    "me.rerere.rikkahub.ui.pages.game.CompanionGameReactionCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 233
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.game.DiceFace": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "kind": "composable",
-        "line": 269
+        "line": 329
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameBody": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 356
+        "line": 379
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameColors": [
@@ -89751,7 +89756,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 374
+        "line": 397
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameTile": [
@@ -89814,14 +89819,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "class",
-        "line": 426
+        "line": 451
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.QuickCompanionGamePage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 66
+        "line": 75
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.QuickCompanionGameTest": [
@@ -89842,7 +89847,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 200
+        "line": 346
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.RoleYachtTurn": [
@@ -89908,13 +89913,6 @@
         "line": 355
       }
     ],
-    "me.rerere.rikkahub.ui.pages.game.TicTacToeGame": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "kind": "composable",
-        "line": 286
-      }
-    ],
     "me.rerere.rikkahub.ui.pages.game.VoiceInputTarget": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
@@ -89976,11 +89974,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
         "line": 64
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "kind": "function",
-        "line": 298
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.chooseGomokuMove": [
@@ -90008,14 +90001,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 397
+        "line": 421
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.compareRockPaperScissors": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 389
+        "line": 412
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.completeSharedGame": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
+        "kind": "function",
+        "line": 194
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.countDirection": [
@@ -90036,7 +90036,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 435
+        "line": 460
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.generateCompanionReaction": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
+        "kind": "function",
+        "line": 125
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.generatePerfectManText": [
@@ -90085,14 +90092,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 209
+        "line": 355
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.quickTicTacToeWinner": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 410
+        "line": 435
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.recordCompletedRound": [
@@ -90106,7 +90113,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 76
+        "line": 93
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.reset": [
@@ -90114,11 +90121,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
         "line": 51
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "kind": "function",
-        "line": 293
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.resetGame": [
@@ -90133,13 +90135,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
         "kind": "function",
         "line": 64
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.game.roll": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "kind": "function",
-        "line": 241
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.rollDice": [
