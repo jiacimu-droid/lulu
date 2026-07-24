@@ -140,7 +140,7 @@ internal fun TurtleSoupGame(
                 revealed = true
                 checkpoint(
                     "一起玩海龟汤：${soup.title}",
-                    "用户与$assistantName完成海龟汤《${soup.title}》，共提问 ${history.size} 次，使用提示 $hintIndex 次。",
+                    "用户与${assistantName}完成海龟汤《${soup.title}》，共提问 ${history.size} 次，使用提示 $hintIndex 次。",
                     "{\"game\":\"turtle_soup\",\"case\":\"${escapeJson(soup.title)}\",\"questions\":${history.size},\"hints\":$hintIndex}",
                 )
             },
@@ -237,7 +237,7 @@ internal fun RapportQuizGame(
                         score += 1
                         checkpoint(
                             "默契问答：答对彼此",
-                            "用户认为第 ${nextAnswered} 题与$assistantName很有默契。问题：$question",
+                            "用户认为第 ${nextAnswered} 题与${assistantName}很有默契。问题：$question",
                             "{\"game\":\"rapport_quiz\",\"question\":\"${escapeJson(question)}\",\"match\":true}",
                         )
                         answered = nextAnswered
@@ -252,7 +252,7 @@ internal fun RapportQuizGame(
                         val nextAnswered = answered + 1
                         checkpoint(
                             "默契问答：发现不同",
-                            "用户发现自己与$assistantName在第 ${nextAnswered} 题的答案不同。问题：$question",
+                            "用户发现自己与${assistantName}在第 ${nextAnswered} 题的答案不同。问题：$question",
                             "{\"game\":\"rapport_quiz\",\"question\":\"${escapeJson(question)}\",\"match\":false}",
                         )
                         answered = nextAnswered
@@ -285,7 +285,7 @@ internal fun RoleplayAdventureGame(
     var customAction by remember { mutableStateOf("") }
     var choices by remember { mutableStateOf(RPG_OPENING_CHOICES) }
     var narration by remember {
-        mutableStateOf("雨夜里，你和$assistantName站在一座废弃天文台前。三天前失踪的研究员，最后一条讯息只有一句：不要相信会倒着走的钟。")
+        mutableStateOf("雨夜里，你和${assistantName}站在一座废弃天文台前。三天前失踪的研究员，最后一条讯息只有一句：不要相信会倒着走的钟。")
     }
     var log by remember { mutableStateOf(emptyList<String>()) }
     var busy by remember { mutableStateOf(false) }
@@ -320,7 +320,7 @@ internal fun RoleplayAdventureGame(
             clues = nextClues
             checkpoint(
                 "跑团第 $chapter 幕",
-                "用户与$assistantName在废弃天文台冒险：选择“$action”，掷出 $roll，判定${if (success) "成功" else "失败"}。当前体力 $nextHp，线索 $nextClues。",
+                "用户与${assistantName}在废弃天文台冒险：选择“$action”，掷出 $roll，判定${if (success) "成功" else "失败"}。当前体力 $nextHp，线索 $nextClues。",
                 "{\"game\":\"roleplay_adventure\",\"chapter\":$chapter,\"roll\":$roll,\"difficulty\":$difficulty,\"success\":$success,\"hp\":$nextHp,\"clues\":$nextClues,\"action\":\"${escapeJson(action)}\"}",
             )
             chapter += 1
@@ -379,7 +379,7 @@ internal fun RoleplayAdventureGame(
                     chapter = 1
                     hp = 4
                     clues = 0
-                    narration = "雨夜里，你和$assistantName再次站在废弃天文台前。这一次，钟声比记忆中更早响起。"
+                    narration = "雨夜里，你和${assistantName}再次站在废弃天文台前。这一次，钟声比记忆中更早响起。"
                     choices = RPG_OPENING_CHOICES
                     log = emptyList()
                 },
