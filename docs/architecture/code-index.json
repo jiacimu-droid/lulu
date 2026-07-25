@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-25T10:17:49.282437+00:00",
-  "commit": "413bc510068ac958b4e5a271f1b8feb0ff794b83",
+  "generatedAt": "2026-07-25T10:47:23.165334+00:00",
+  "commit": "ff928a3055a6e9b5fdfc9f5629f639ec7c152cba",
   "branch": "master",
-  "sourceFingerprint": "02281ce7f6579f51af97ebb2d731a6d1a703e3153070dd2aeb01f31cc03ea4a5",
+  "sourceFingerprint": "43434f352cabc141f390bb4e18dc0c4cec6cfcafcafeb6a4191e8f45817ea0d8",
   "summary": {
     "files": 1126,
-    "lines": 265682,
-    "symbols": 5532,
+    "lines": 265727,
+    "symbols": 5534,
     "productionCodeFiles": 796,
     "testFiles": 137,
     "largeProductionFiles": 42,
@@ -8768,8 +8768,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 287,
-      "sha256": "0b5365b00bc90c7f480ee818dfd0d8a64a48f858de8a52c5e7da50c03f7201c0",
+      "lines": 332,
+      "sha256": "73682bda8b29c9d4c3014c15284a2b0fb82c26af869d66b4bafb41b520ecf521",
       "package": "me.rerere.rikkahub.data.ai",
       "categories": [
         "AI与上下文"
@@ -8803,77 +8803,87 @@
         {
           "name": "ClassifiedSystemContext",
           "kind": "class",
-          "line": 130
+          "line": 135
         },
         {
           "name": "messageCount",
           "kind": "function",
-          "line": 138
+          "line": 143
         },
         {
           "name": "classifyStructuredSystemContext",
           "kind": "function",
-          "line": 141
+          "line": 146
         },
         {
           "name": "content",
           "kind": "function",
-          "line": 164
+          "line": 169
         },
         {
           "name": "extractRuntimeCommitmentLines",
           "kind": "function",
-          "line": 175
+          "line": 180
         },
         {
           "name": "stripRuntimeCommitmentLines",
           "kind": "function",
-          "line": 193
+          "line": 198
         },
         {
           "name": "deduplicateEnvelopeSystemMessages",
           "kind": "function",
-          "line": 210
+          "line": 215
         },
         {
           "name": "collapseAdjacentDuplicateHistory",
           "kind": "function",
-          "line": 231
+          "line": 236
+        },
+        {
+          "name": "normalizeConversationTurns",
+          "kind": "function",
+          "line": 256
+        },
+        {
+          "name": "startAtUserBoundary",
+          "kind": "function",
+          "line": 284
         },
         {
           "name": "isRollingSummaryText",
           "kind": "function",
-          "line": 244
+          "line": 289
         },
         {
           "name": "structuredKind",
           "kind": "function",
-          "line": 251
+          "line": 296
         },
         {
           "name": "normalizeSystemText",
           "kind": "function",
-          "line": 263
+          "line": 308
         },
         {
           "name": "normalizeConversationText",
           "kind": "function",
-          "line": 266
+          "line": 311
         },
         {
           "name": "section",
           "kind": "function",
-          "line": 270
+          "line": 315
         },
         {
           "name": "companionContextBudget",
           "kind": "function",
-          "line": 277
+          "line": 322
         },
         {
           "name": "estimateCompanionPromptTokens",
           "kind": "function",
-          "line": 284
+          "line": 329
         }
       ],
       "localImportCount": 4,
@@ -66565,7 +66575,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "class",
-        "line": 130
+        "line": 135
       }
     ],
     "me.rerere.rikkahub.data.ai.CompanionContextBudget": [
@@ -66712,7 +66722,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 141
+        "line": 146
       }
     ],
     "me.rerere.rikkahub.data.ai.clear": [
@@ -66733,7 +66743,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 231
+        "line": 236
       }
     ],
     "me.rerere.rikkahub.data.ai.compactOldToolOutputsForPrompt": [
@@ -66754,21 +66764,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 277
+        "line": 322
       }
     ],
     "me.rerere.rikkahub.data.ai.content": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 164
+        "line": 169
       }
     ],
     "me.rerere.rikkahub.data.ai.deduplicateEnvelopeSystemMessages": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 210
+        "line": 215
       }
     ],
     "me.rerere.rikkahub.data.ai.deduplicateFinalSystemSnapshots": [
@@ -66789,7 +66799,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 284
+        "line": 329
       }
     ],
     "me.rerere.rikkahub.data.ai.estimateMessagesTokens": [
@@ -66824,7 +66834,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 175
+        "line": 180
       }
     ],
     "me.rerere.rikkahub.data.ai.finalCompanionInputBudget": [
@@ -66885,7 +66895,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 244
+        "line": 289
       }
     ],
     "me.rerere.rikkahub.data.ai.joinToTokenEstimateText": [
@@ -67258,21 +67268,28 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 138
+        "line": 143
       }
     ],
     "me.rerere.rikkahub.data.ai.normalizeConversationText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 266
+        "line": 311
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.normalizeConversationTurns": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
+        "kind": "function",
+        "line": 256
       }
     ],
     "me.rerere.rikkahub.data.ai.normalizeSystemText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 263
+        "line": 308
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/FinalCompanionContextBudget.kt",
@@ -67303,21 +67320,28 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 270
+        "line": 315
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.startAtUserBoundary": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
+        "kind": "function",
+        "line": 284
       }
     ],
     "me.rerere.rikkahub.data.ai.stripRuntimeCommitmentLines": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 193
+        "line": 198
       }
     ],
     "me.rerere.rikkahub.data.ai.structuredKind": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelope.kt",
         "kind": "function",
-        "line": 251
+        "line": 296
       }
     ],
     "me.rerere.rikkahub.data.ai.summarizeApiUsage": [
