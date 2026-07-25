@@ -250,7 +250,7 @@ private fun collapseAdjacentDuplicateHistory(messages: List<UIMessage>): List<UI
  * Provider protocols treat a function call as part of one assistant/model turn. The app,
  * however, may persist a normal reply and a later proactive reply as adjacent assistant
  * messages because no visible user message exists between them. Merge adjacent same-role
- * conversational messages for the request only, preserving their part order and every tool
+ * assistant messages for the request only, preserving their part order and every tool
  * result, so a later function call remains attached to the preceding valid user/tool turn.
  */
 private fun normalizeConversationTurns(messages: List<UIMessage>): List<UIMessage> {
@@ -260,8 +260,8 @@ private fun normalizeConversationTurns(messages: List<UIMessage>): List<UIMessag
         val previous = result.lastOrNull()
         if (
             previous != null &&
-            previous.role == message.role &&
-            message.role != MessageRole.TOOL
+            previous.role == MessageRole.ASSISTANT &&
+            message.role == MessageRole.ASSISTANT
         ) {
             result[result.lastIndex] = previous.copy(
                 parts = previous.parts + message.parts,
