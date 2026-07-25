@@ -60,14 +60,17 @@ class AILoggingManager {
     fun getLogs(): StateFlow<List<AILogging>> = logs
 
     fun addLog(log: AILogging) {
-        val privacySafeLog = when (log) {
+        val consoleLog = when (log) {
             is AILogging.Generation -> log.copy(
-                messages = emptyList(),
-                sentMessages = emptyList(),
+                // TokenLoggingPage needs the actual, already assembled request messages to
+                // calculate where the input token budget went. These records are memory-only,
+                // capped at MAX_LOGS, and disappear when the app process exits.
+                messages = log.messages.toList(),
+                sentMessages = log.sentMessages.toList(),
                 error = log.error?.let { REDACTED_ERROR },
             )
         }
-        logs.value = (logs.value + privacySafeLog).takeLast(MAX_LOGS)
+        logs.value = (logs.value + consoleLog).takeLast(MAX_LOGS)
     }
 
     fun updateGenerationUsage(id: Uuid, usage: TokenUsage) {
