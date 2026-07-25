@@ -27,6 +27,7 @@ import me.rerere.rikkahub.data.study.StudyDrawResult
 import me.rerere.rikkahub.data.study.StudyEntertainmentReward
 import me.rerere.rikkahub.data.study.StudyFragmentType
 import me.rerere.rikkahub.data.study.StudyMysteryBoxReward
+import me.rerere.rikkahub.data.study.StudyPlanTaskSync
 import me.rerere.rikkahub.data.study.StudyRarity
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyShopItem
@@ -55,21 +56,7 @@ class StudyVM(
     val isGeneratingSchedule = _isGeneratingSchedule.asStateFlow()
 
     fun syncToday() = reduce { current ->
-        val date = LocalDate.now()
-        val currentForPlan = if (
-            current.today == date.toString() &&
-            CurrentWeekStudyRecovery.planFor(date) != null
-        ) {
-            // The visible task list already belongs to the recovery overlay. Running
-            // the base-plan synchronizer first would replace its ids and erase checks.
-            current
-        } else {
-            StudyRules.rolloverToDate(current, date)
-        }
-        CurrentWeekStudyRecovery.applyToState(
-            state = currentForPlan,
-            date = date,
-        )
+        StudyPlanTaskSync.sync(current, LocalDate.now())
     }
 
     fun selectCompanion(assistantId: String) = reduce { StudyRules.selectCompanion(it, assistantId) }
@@ -96,7 +83,7 @@ class StudyVM(
             try {
                 val date = LocalDate.now()
                 val currentTime = LocalTime.now()
-                val currentState = CurrentWeekStudyRecovery.applyToState(state.value, date)
+                val currentState = StudyPlanTaskSync.sync(state.value, date)
                 val settings = settingsStore.settingsFlow.first()
                 val assistant = settings.getCurrentAssistant()
                 val model = settings.findModelById(assistant.chatModelId ?: settings.chatModelId)
@@ -105,20 +92,11 @@ class StudyVM(
                 val providerSetting = model.findProvider(settings.providers)
                     ?: error("当前主聊天模型没有找到对应提供商。")
                 val provider = providerManager.getProviderByType(providerSetting)
-                val presetPlan = CurrentWeekStudyRecovery.planFor(date) ?: ExamStudyPlan.todayPlan(date)
-                val defaultSchedule = CurrentWeekStudyRecovery.scheduleFor(date) ?: ExamStudyPlan.todaySchedule(date)
-                val recoveryPrompt = presetPlan?.let { plan ->
-                    CurrentWeekStudyRecovery.dynamicSchedulePrompt(
-                        date = date,
-                        presetPlan = plan,
-                        tasks = currentState.tasks,
-                        currentTime = currentTime,
-                    )
-                }
-                val prompt = recoveryPrompt ?: ExamStudyPlan.dynamicSchedulePrompt(
+                val presetPlan = StudyPlanTaskSync.visiblePlan(currentState, date)
+                val prompt = ExamStudyPlan.dynamicSchedulePrompt(
                     date = date,
                     presetPlan = presetPlan,
-                    defaultSchedule = defaultSchedule,
+                    defaultSchedule = emptyList(),
                     tasks = currentState.tasks,
                     currentTime = currentTime,
                 )
@@ -127,7 +105,9 @@ class StudyVM(
                     appendLine()
                     appendLine(CurrentWeekStudyRecovery.executionOrderReference)
                     appendLine()
-                    appendLine("刑法阶段节点：${CurrentWeekStudyRecovery.criminalLawTimeline}")
+                    appendLine("暑期硬节点：8月15日前完成刑法，9月15日前完成民法，9月30日前完成宪法与法制史全部新课。")
+                    appendLine("每周星期日完整休息；被用户删除的系统待办不得重新排回今日计划。")
+                    appendLine("背诵轮次：9月前第一轮目录树与关键词，9月下半月启动第二轮规范表述，11月进入第三轮限时输出。")
                 }
                 val chunk = provider.generateText(
                     providerSetting = providerSetting,
