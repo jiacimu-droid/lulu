@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-25T10:59:31.952655+00:00",
-  "commit": "93862d4a5566084ffa879f84f88ff2aee2468b11",
+  "generatedAt": "2026-07-25T11:04:50.218410+00:00",
+  "commit": "72a876e6fb22a69c24c4f144b29f8fc529fc02e6",
   "branch": "master",
-  "sourceFingerprint": "c579aeebe3c7ed218c6a8c1637999d27832cb279993161de1003012eee9a0910",
+  "sourceFingerprint": "2be2f41ee0b2ddd7381e93456507b080577acbf9d19cf8cd221fb71de4f1289f",
   "summary": {
-    "files": 1126,
-    "lines": 265823,
-    "symbols": 5537,
-    "productionCodeFiles": 796,
+    "files": 1127,
+    "lines": 265904,
+    "symbols": 5542,
+    "productionCodeFiles": 797,
     "testFiles": 137,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 665,
+      "app": 666,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 733,
+      ".kt": 734,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 20,
+      "学习监督": 21,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
@@ -1366,6 +1366,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
@@ -22955,6 +22956,51 @@
           "name": "plannedMinutesOverride",
           "kind": "function",
           "line": 63
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 81,
+      "sha256": "9451d2533df191f874271cf87ed6834363e1dae7faef5499ef6c0fae31f58afd",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "StudyPlanTaskSync",
+          "kind": "object",
+          "line": 13
+        },
+        {
+          "name": "sync",
+          "kind": "function",
+          "line": 16
+        },
+        {
+          "name": "visiblePlan",
+          "kind": "function",
+          "line": 38
+        },
+        {
+          "name": "installCatalogPlan",
+          "kind": "function",
+          "line": 50
+        },
+        {
+          "name": "idPrefix",
+          "kind": "function",
+          "line": 80
         }
       ],
       "localImportCount": 0,
@@ -78989,6 +79035,13 @@
         "line": 1178
       }
     ],
+    "me.rerere.rikkahub.data.study.StudyPlanTaskSync": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt",
+        "kind": "object",
+        "line": 13
+      }
+    ],
     "me.rerere.rikkahub.data.study.StudyRarity": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
@@ -79652,6 +79705,20 @@
         "line": 628
       }
     ],
+    "me.rerere.rikkahub.data.study.idPrefix": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt",
+        "kind": "function",
+        "line": 80
+      }
+    ],
+    "me.rerere.rikkahub.data.study.installCatalogPlan": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt",
+        "kind": "function",
+        "line": 50
+      }
+    ],
     "me.rerere.rikkahub.data.study.isEarlySleepForUser": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
@@ -80212,6 +80279,13 @@
         "line": 478
       }
     ],
+    "me.rerere.rikkahub.data.study.sync": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt",
+        "kind": "function",
+        "line": 16
+      }
+    ],
     "me.rerere.rikkahub.data.study.syncPlanTasks": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
@@ -80322,6 +80396,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
         "kind": "function",
         "line": 899
+      }
+    ],
+    "me.rerere.rikkahub.data.study.visiblePlan": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt",
+        "kind": "function",
+        "line": 38
       }
     ],
     "me.rerere.rikkahub.data.study.vocabularyCanBeMovedEarlierAsAvoidanceStartup": [
