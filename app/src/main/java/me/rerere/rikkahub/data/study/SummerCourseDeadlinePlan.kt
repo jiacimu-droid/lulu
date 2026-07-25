@@ -139,7 +139,7 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
 
     private fun datesBetween(start: LocalDate, endInclusive: LocalDate): List<LocalDate> {
         val count = ChronoUnit.DAYS.between(start, endInclusive).toInt()
-        return (0..count).map(start::plusDays)
+        return (0..count).map { offset -> start.plusDays(offset.toLong()) }
     }
 
     private fun defaultEnglishTask(date: LocalDate): String = when (date.dayOfWeek.value) {
