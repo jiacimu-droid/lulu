@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-25T10:49:29.173084+00:00",
-  "commit": "2877f984845f4cf40643a70774102b8d64ebc1dd",
+  "generatedAt": "2026-07-25T10:59:31.952655+00:00",
+  "commit": "93862d4a5566084ffa879f84f88ff2aee2468b11",
   "branch": "master",
-  "sourceFingerprint": "fda34e939d07b7081e94cb11db2d5465ee3f881b842e51fe2554202c5cde1308",
+  "sourceFingerprint": "c579aeebe3c7ed218c6a8c1637999d27832cb279993161de1003012eee9a0910",
   "summary": {
     "files": 1126,
-    "lines": 265787,
-    "symbols": 5534,
+    "lines": 265823,
+    "symbols": 5537,
     "productionCodeFiles": 796,
     "testFiles": 137,
     "largeProductionFiles": 42,
@@ -23385,8 +23385,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 164,
-      "sha256": "229c33130ae400d45372beacbea2850bfc9f470aa5481a1af2a5952d7a5d91ae",
+      "lines": 200,
+      "sha256": "820447d3bb9696d287d71894e8aae48f5c68b999ef3b373aa2380dd39b2ca9aa",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -23395,52 +23395,67 @@
         {
           "name": "SummerCourseDeadlinePlan",
           "kind": "object",
-          "line": 15
+          "line": 13
         },
         {
-          "name": "civilBoundary",
+          "name": "recitationTask",
           "kind": "function",
-          "line": 137
+          "line": 156
+        },
+        {
+          "name": "chapterBoundary",
+          "kind": "function",
+          "line": 167
+        },
+        {
+          "name": "chapterText",
+          "kind": "function",
+          "line": 170
+        },
+        {
+          "name": "studyDatesBetween",
+          "kind": "function",
+          "line": 173
         },
         {
           "name": "datesBetween",
           "kind": "function",
-          "line": 140
+          "line": 176
         },
         {
           "name": "defaultEnglishTask",
           "kind": "function",
-          "line": 145
+          "line": 181
         },
         {
           "name": "daily",
           "kind": "function",
-          "line": 153
+          "line": 189
         },
         {
           "name": "law",
           "kind": "function",
-          "line": 159
+          "line": 195
         },
         {
           "name": "review",
           "kind": "function",
-          "line": 160
+          "line": 196
         },
         {
           "name": "english",
           "kind": "function",
-          "line": 161
+          "line": 197
         },
         {
           "name": "politics",
           "kind": "function",
-          "line": 162
+          "line": 198
         },
         {
           "name": "health",
           "kind": "function",
-          "line": 163
+          "line": 199
         }
       ],
       "localImportCount": 0,
@@ -79104,7 +79119,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "object",
-        "line": 15
+        "line": 13
       }
     ],
     "me.rerere.rikkahub.data.study.SuperMomentChoice": [
@@ -79205,11 +79220,18 @@
         "line": 375
       }
     ],
-    "me.rerere.rikkahub.data.study.civilBoundary": [
+    "me.rerere.rikkahub.data.study.chapterBoundary": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 137
+        "line": 167
+      }
+    ],
+    "me.rerere.rikkahub.data.study.chapterText": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
+        "kind": "function",
+        "line": 170
       }
     ],
     "me.rerere.rikkahub.data.study.claimAchievement": [
@@ -79338,7 +79360,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 153
+        "line": 189
       }
     ],
     "me.rerere.rikkahub.data.study.dailyLoadUsesThreeHoursThisWeekAndGrowsOnlyByGate": [
@@ -79366,7 +79388,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 140
+        "line": 176
       }
     ],
     "me.rerere.rikkahub.data.study.daysLeft": [
@@ -79394,7 +79416,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 145
+        "line": 181
       }
     ],
     "me.rerere.rikkahub.data.study.deleteTask": [
@@ -79474,7 +79496,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 161
+        "line": 197
       }
     ],
     "me.rerere.rikkahub.data.study.englishWeeklyRotationCoversReadingGrammarSmallThreeAndBothEssays": [
@@ -79620,7 +79642,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 163
+        "line": 199
       }
     ],
     "me.rerere.rikkahub.data.study.highScorePlanKeepsEnglishCoreAndPoliticsSeparateFromVocabulary": [
@@ -79695,7 +79717,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 159
+        "line": 195
       }
     ],
     "me.rerere.rikkahub.data.study.lawTheoryIsRecitedInsteadOfOnlySkimmed": [
@@ -79951,7 +79973,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 162
+        "line": 198
       }
     ],
     "me.rerere.rikkahub.data.study.politicsQuestionVolumeCanActuallyReachAFirstAndSecondPass": [
@@ -80001,6 +80023,13 @@
         "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyPlanCatalogOverlayTest.kt",
         "kind": "function",
         "line": 11
+      }
+    ],
+    "me.rerere.rikkahub.data.study.recitationTask": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
+        "kind": "function",
+        "line": 156
       }
     ],
     "me.rerere.rikkahub.data.study.recoveryDayStillGivesAtLeastOneHourOfConcreteStudy": [
@@ -80061,7 +80090,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
-        "line": 160
+        "line": 196
       }
     ],
     "me.rerere.rikkahub.data.study.rewardFor": [
@@ -80167,6 +80196,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
         "kind": "function",
         "line": 408
+      }
+    ],
+    "me.rerere.rikkahub.data.study.studyDatesBetween": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
+        "kind": "function",
+        "line": 173
       }
     ],
     "me.rerere.rikkahub.data.study.studyTimeOverview": [
