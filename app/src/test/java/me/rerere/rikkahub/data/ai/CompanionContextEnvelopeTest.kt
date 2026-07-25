@@ -1,6 +1,8 @@
 package me.rerere.rikkahub.data.ai
 
+import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
+import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.model.Assistant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -136,6 +138,64 @@ class CompanionContextEnvelopeTest {
             envelope.messages.map { it.toText() },
         )
         assertEquals(2, envelope.droppedHistoryMessages)
+    }
+
+    @Test
+    fun `adjacent assistant turns are merged without losing executed tools`() {
+        val executedTool = UIMessagePart.Tool(
+            toolCallId = "tool-1",
+            toolName = "get_location",
+            input = "{}",
+            output = listOf(UIMessagePart.Text("confirmed")),
+        )
+        val envelope = buildCompanionContextEnvelope(
+            assistant = Assistant(),
+            source = ApiUsageSource.CHAT,
+            messages = listOf(
+                UIMessage.user("first request"),
+                UIMessage.assistant("ordinary reply"),
+                UIMessage(role = MessageRole.ASSISTANT, parts = listOf(executedTool)),
+                UIMessage.user("latest request"),
+            ),
+            characterCore = "persona",
+            globalLorebook = "",
+            roleLorebook = "",
+            otherMandatoryPrompt = "",
+        )
+
+        assertEquals(
+            listOf(MessageRole.USER, MessageRole.ASSISTANT, MessageRole.USER),
+            envelope.messages.map { it.role },
+        )
+        val mergedAssistant = envelope.messages[1]
+        assertEquals("ordinary reply", mergedAssistant.toText())
+        assertTrue(mergedAssistant.parts.any { it is UIMessagePart.Tool && it.isExecuted })
+    }
+
+    @Test
+    fun `sliding window drops orphaned assistant tool prefix and starts from user`() {
+        val executedTool = UIMessagePart.Tool(
+            toolCallId = "tool-1",
+            toolName = "get_location",
+            input = "{}",
+            output = listOf(UIMessagePart.Text("confirmed")),
+        )
+        val envelope = buildCompanionContextEnvelope(
+            assistant = Assistant(contextMessageSize = 2),
+            source = ApiUsageSource.CHAT,
+            messages = listOf(
+                UIMessage.user("old request"),
+                UIMessage(role = MessageRole.ASSISTANT, parts = listOf(executedTool)),
+                UIMessage.user("latest request"),
+            ),
+            characterCore = "persona",
+            globalLorebook = "",
+            roleLorebook = "",
+            otherMandatoryPrompt = "",
+        )
+
+        assertEquals(MessageRole.USER, envelope.messages.first().role)
+        assertEquals("latest request", envelope.messages.first().toText())
     }
 
     @Test(expected = CompanionContextOverflowException::class)
