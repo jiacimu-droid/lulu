@@ -155,7 +155,7 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
 
     private fun recitationTask(date: LocalDate, currentSubject: String): String = when {
         date < LocalDate.of(2026, 9, 16) ->
-            "第一轮背诵：法理当前章节闭卷30-40分钟，并抽背$currentSubject已学章节的目录树、关键词和构成关系；每章最多3个主块，达到约70%后推进，薄弱点按D1/D3/D7回炉"
+            "第一轮背诵：法理当前章节闭卷30-40分钟，并抽背${currentSubject}已学章节的目录树、关键词和构成关系；每章最多3个主块，达到约70%后推进，薄弱点按D1/D3/D7回炉"
         date < LocalDate.of(2026, 10, 1) ->
             "第一轮收口 + 第二轮启动：当前科目做目录树和关键词闭卷；法理、刑法、民法较早章节轮流背定义、构成要件与规范表述40-60分钟"
         date < LocalDate.of(2026, 11, 1) ->
