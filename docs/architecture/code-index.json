@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-25T10:47:23.165334+00:00",
-  "commit": "ff928a3055a6e9b5fdfc9f5629f639ec7c152cba",
+  "generatedAt": "2026-07-25T10:48:08.023776+00:00",
+  "commit": "6934b0aabd1db18cdbd14561a21edafaec7d4fd3",
   "branch": "master",
-  "sourceFingerprint": "43434f352cabc141f390bb4e18dc0c4cec6cfcafcafeb6a4191e8f45817ea0d8",
+  "sourceFingerprint": "a7c2d639e93350da72585f096958bcd99887d16664298f76300e20f8f2a8b2bf",
   "summary": {
     "files": 1126,
-    "lines": 265727,
+    "lines": 265787,
     "symbols": 5534,
     "productionCodeFiles": 796,
     "testFiles": 137,
@@ -68,7 +68,7 @@
       "界面": 290,
       "记忆": 44
     },
-    "resolvedImportEdges": 1950
+    "resolvedImportEdges": 1951
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -910,7 +910,7 @@
         "lines": 19,
         "symbols": 1,
         "localImportCount": 0,
-        "importedByCount": 59,
+        "importedByCount": 60,
         "todoMarkers": 0
       },
       {
@@ -2474,6 +2474,11 @@
       "imports": 4
     },
     {
+      "from": "me.rerere.rikkahub.data.ai",
+      "to": "me.rerere.ai.core.MessageRole",
+      "imports": 4
+    },
+    {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.rikkahub.data.datastore.Settings",
       "imports": 4
@@ -2771,11 +2776,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai",
       "to": "me.rerere.ai.provider.TextGenerationParams",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai",
-      "to": "me.rerere.ai.core.MessageRole",
       "imports": 3
     },
     {
@@ -3538,6 +3538,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt",
         "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationRoutes.kt",
+        "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/CompanionPresenceContractTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
@@ -45682,8 +45683,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 153,
-      "sha256": "0f61ec4d58ed024a62c214ebb108c7f019c7c691b8772e56d6acb92677974939",
+      "lines": 213,
+      "sha256": "7bbcaf880825c4fcb3c4674a24b01b522d0b42beaad0348137491ebbd6f1cb47",
       "package": "me.rerere.rikkahub.data.ai",
       "categories": [
         "AI与上下文"
@@ -45692,18 +45693,21 @@
         {
           "name": "CompanionContextEnvelopeTest",
           "kind": "class",
-          "line": 9
+          "line": 11
         }
       ],
-      "localImportCount": 2,
+      "localImportCount": 4,
       "todoMarkers": 0,
       "isTest": true,
       "isProductionCode": false,
       "localImports": [
+        "me.rerere.ai.core.MessageRole",
         "me.rerere.ai.ui.UIMessage",
+        "me.rerere.ai.ui.UIMessagePart",
         "me.rerere.rikkahub.data.model.Assistant"
       ],
       "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/MessageRole.kt",
         "ai/src/main/java/me/rerere/ai/ui/Message.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt"
       ],
@@ -66596,7 +66600,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
         "kind": "class",
-        "line": 9
+        "line": 11
       }
     ],
     "me.rerere.rikkahub.data.ai.CompanionContextOverflowException": [
