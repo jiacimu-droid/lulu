@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-25T10:48:08.023776+00:00",
-  "commit": "6934b0aabd1db18cdbd14561a21edafaec7d4fd3",
+  "generatedAt": "2026-07-25T10:49:29.173084+00:00",
+  "commit": "2877f984845f4cf40643a70774102b8d64ebc1dd",
   "branch": "master",
-  "sourceFingerprint": "a7c2d639e93350da72585f096958bcd99887d16664298f76300e20f8f2a8b2bf",
+  "sourceFingerprint": "fda34e939d07b7081e94cb11db2d5465ee3f881b842e51fe2554202c5cde1308",
   "summary": {
     "files": 1126,
     "lines": 265787,
@@ -8770,7 +8770,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 332,
-      "sha256": "73682bda8b29c9d4c3014c15284a2b0fb82c26af869d66b4bafb41b520ecf521",
+      "sha256": "ad1256ba6fc887a2cc2f2517733e992e18bddb1272a324dbd4d491ebe12e82fb",
       "package": "me.rerere.rikkahub.data.ai",
       "categories": [
         "AI与上下文"
