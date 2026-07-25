@@ -10,7 +10,10 @@ import java.time.LocalDate
  * process-global list or depend on unsafe MutableList/MutableMap casts.
  */
 object StudyPlanCatalog {
-    private val overlays: List<StudyPlanOverlay> = listOf(CurrentWeekStudyRecovery)
+    private val overlays: List<StudyPlanOverlay> = listOf(
+        CurrentWeekStudyRecovery,
+        SummerCourseDeadlinePlan,
+    )
 
     val dailyPlans: Map<LocalDate, DailyStudyPlan>
         get() = overlays.fold(ExamStudyPlan.dailyPlans.toMap()) { current, overlay ->
