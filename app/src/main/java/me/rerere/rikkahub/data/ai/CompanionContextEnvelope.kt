@@ -67,8 +67,12 @@ internal fun buildCompanionContextEnvelope(
     val allHistoryBeforeDedup = messages.filter { message ->
         message.role != MessageRole.SYSTEM && !message.toText().isRollingSummaryText()
     }
-    val allHistory = collapseAdjacentDuplicateHistory(allHistoryBeforeDedup)
-    var history = allHistory.limitContext(configuredWindow)
+    val allHistory = normalizeConversationTurns(
+        collapseAdjacentDuplicateHistory(allHistoryBeforeDedup),
+    )
+    var history = allHistory
+        .limitContext(configuredWindow)
+        .startAtUserBoundary()
 
     val systemText = deduplicatedSystemMessages.joinToString("\n\n") { it.toText() }
     val fixedText = listOf(
@@ -89,8 +93,9 @@ internal fun buildCompanionContextEnvelope(
         fixedTokens + estimateCompanionPromptTokens(history.joinToString("\n\n") { it.toText() }) >
         budget.maxEstimatedInputTokens
     ) {
-        history = history.drop(1)
-        while (history.firstOrNull()?.role == MessageRole.TOOL) history = history.drop(1)
+        // Drop a complete oldest conversational prefix. A tool/function call must never
+        // become the first retained turn after its triggering user turn was trimmed away.
+        history = history.drop(1).startAtUserBoundary()
     }
 
     val recentText = history.joinToString("\n\n") { it.toText() }
@@ -239,6 +244,46 @@ private fun collapseAdjacentDuplicateHistory(messages: List<UIMessage>): List<UI
         if (!duplicate) result += message
     }
     return result
+}
+
+/**
+ * Provider protocols treat a function call as part of one assistant/model turn. The app,
+ * however, may persist a normal reply and a later proactive reply as adjacent assistant
+ * messages because no visible user message exists between them. Merge adjacent same-role
+ * conversational messages for the request only, preserving their part order and every tool
+ * result, so a later function call remains attached to the preceding valid user/tool turn.
+ */
+private fun normalizeConversationTurns(messages: List<UIMessage>): List<UIMessage> {
+    if (messages.size < 2) return messages
+    val result = ArrayList<UIMessage>(messages.size)
+    messages.forEach { message ->
+        val previous = result.lastOrNull()
+        if (
+            previous != null &&
+            previous.role == message.role &&
+            message.role != MessageRole.TOOL
+        ) {
+            result[result.lastIndex] = previous.copy(
+                parts = previous.parts + message.parts,
+                annotations = previous.annotations + message.annotations,
+                finishedAt = message.finishedAt ?: previous.finishedAt,
+            )
+        } else {
+            result += message
+        }
+    }
+    return result
+}
+
+/**
+ * If a sliding window cuts into the middle of an older assistant/tool exchange, discard that
+ * incomplete prefix. The newest real or internal user turn is still retained, including the
+ * hidden user-context turn used by proactive generation, so proactive messages keep full tool
+ * access without pretending that the previous assistant message was a user request.
+ */
+private fun List<UIMessage>.startAtUserBoundary(): List<UIMessage> {
+    val firstUserIndex = indexOfFirst { it.role == MessageRole.USER }
+    return if (firstUserIndex > 0) drop(firstUserIndex) else this
 }
 
 private fun String.isRollingSummaryText(): Boolean {
