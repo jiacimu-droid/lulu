@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-26T05:32:18.977600+00:00",
-  "commit": "d866691b6798129e9e9e66ed32780ea3f8a8f9c9",
+  "generatedAt": "2026-07-26T06:39:01.073507+00:00",
+  "commit": "8c0f3d91e9ef6fdaf6bed271ca2b3ef1751eb90c",
   "branch": "master",
-  "sourceFingerprint": "a63558b76b2d99a21c1a72014611f716b3115ea2b7c4696ecf6ba95822069486",
+  "sourceFingerprint": "2e07e20c6984200d1cc4770615b10b0ebdbdbdd55c655179d110860836e42b4e",
   "summary": {
-    "files": 1127,
-    "lines": 265378,
-    "symbols": 5519,
-    "productionCodeFiles": 797,
+    "files": 1128,
+    "lines": 265450,
+    "symbols": 5521,
+    "productionCodeFiles": 798,
     "testFiles": 137,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 666,
+      "app": 667,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 734,
+      ".kt": 735,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 21,
+      "学习监督": 22,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
@@ -1362,6 +1362,7 @@
     "学习监督": [
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyExecutionPolicy.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
@@ -22570,6 +22571,36 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformerTest.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 72,
+      "sha256": "1de549f9145e8b4206553f0b1b03b32d6bfcca67ce6293eae6aabf5d95c175b4",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "July26StudyDayCorrection",
+          "kind": "object",
+          "line": 9
+        },
+        {
+          "name": "monthlyPlan",
+          "kind": "function",
+          "line": 58
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt",
@@ -78763,6 +78794,13 @@
         "line": 949
       }
     ],
+    "me.rerere.rikkahub.data.study.July26StudyDayCorrection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
+        "kind": "object",
+        "line": 9
+      }
+    ],
     "me.rerere.rikkahub.data.study.MonthlyStudyPlan": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
@@ -79666,6 +79704,11 @@
       }
     ],
     "me.rerere.rikkahub.data.study.monthlyPlan": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
+        "kind": "function",
+        "line": 58
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
