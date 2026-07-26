@@ -140,7 +140,134 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         addSundayRestDays(legalHistoryStart, allCourseDeadline)
     }
 
-    override val weeklyOverrides: Map<String, WeeklyStudyPlan> = emptyMap()
+    override val weeklyOverrides: Map<String, WeeklyStudyPlan> = listOf(
+        weekly(
+            "2026-07-w4",
+            "刑法第3-7章收口后完整休息",
+            "2026-07-20 至 2026-07-26",
+            "7月25日已完成刑法第7章题目与框架；7月26日为每周完整休息日，不安排单词或补课",
+            "7月27日从刑法第8章进入唯一新课主线，不提前启动民法",
+        ),
+        weekly(
+            "2026-07-w5",
+            "刑法第8章起按8月15日节点推进",
+            "2026-07-27 至 2026-07-31",
+            "专业课只学刑法：课程→闭卷骨架→正式框架→配套题→唯一主错因",
+            "法理维持第一轮目录树与关键词背诵；英语保留120词与真题主训练",
+            "每天按真实课时推进，长章允许跨日，不用章节数制造虚假完成",
+        ),
+        weekly(
+            "2026-08-w1",
+            "刑法课程连续推进与第一轮背诵",
+            "2026-08-01 至 2026-08-07",
+            "继续刑法第8-25章唯一新课主线，完成章当天留下最低可用正式框架和配套题入口",
+            "周日完整休息；法理与已学刑法按D1/D3/D7回炉",
+        ),
+        weekly(
+            "2026-08-w2",
+            "刑法课程结束与8月15日总验收",
+            "2026-08-08 至 2026-08-14",
+            "8月12日前听完刑法新课；随后集中补课程账本、重点章题目、主错因与第一轮背诵",
+            "民法不得提前插入，刑法一轮在8月15日前完成总收口",
+        ),
+        weekly(
+            "2026-08-w3",
+            "刑法收口后启动民法",
+            "2026-08-15 至 2026-08-21",
+            "8月15日验收刑法；8月16日起按顺序启动民法第1章，不两本书并行听新课",
+            "民法按课程、框架、题目、错因闭环；刑法和法理转为背诵复线",
+        ),
+        weekly(
+            "2026-08-w4",
+            "民法唯一新课主线",
+            "2026-08-22 至 2026-08-31",
+            "按9月15日节点均匀推进民法54章，短章可合并，长章按真实课时跨日",
+            "周日完整休息；英语和第一轮背诵从当天总预算中切分",
+        ),
+        weekly(
+            "2026-09-w1",
+            "民法后半程连续推进",
+            "2026-09-01 至 2026-09-07",
+            "继续民法唯一新课主线，完成章留下正式框架、配套题入口和唯一主错因",
+            "法理、刑法与已学民法继续第一轮目录树和关键词抽背",
+        ),
+        weekly(
+            "2026-09-w2",
+            "民法9月15日节点收口",
+            "2026-09-08 至 2026-09-15",
+            "9月15日前完成民法全部新课与最低可用一轮闭环",
+            "9月15日起启动政治；新增政治时间从当天总预算中切分",
+        ),
+        weekly(
+            "2026-09-w3",
+            "宪法新课与第二轮规范表述启动",
+            "2026-09-16 至 2026-09-21",
+            "9月16日起只听宪法新课，按章节完成目录树、正式框架和配套题入口",
+            "第一轮继续收口，同时启动较早章节第二轮定义、构成要件与答题骨架",
+        ),
+        weekly(
+            "2026-09-w4",
+            "宪法收口并完成法制史全部新课",
+            "2026-09-22 至 2026-09-30",
+            "9月22日前完成宪法；9月23日切换缓冲；9月24-30日完成法制史第1-7章",
+            "9月30日验收四科常规新课全部结束，10月进入第二轮，11月进入第三轮限时输出",
+        ),
+    ).associateBy { it.id }
+
+    override fun monthlyPlan(base: MonthlyStudyPlan): MonthlyStudyPlan = when (base.month) {
+        "2026-07" -> base.copy(
+            focus = "刑法第3-7章收口，7月27日起从第8章继续",
+            tasks = listOf(
+                "7月25日已完成刑法第7章题目与框架；7月26日完整休息，不安排任何学习任务",
+                "7月27日起只推进刑法第8章及后续章节，按课程→闭卷骨架→正式框架→配套题→主错因执行",
+                "法理进入第一轮目录树与关键词背诵；英语保留每日120词和真题训练",
+                "本月不启动民法和政治，不用多本新课并行制造进度",
+            ),
+        )
+        "2026-08" -> base.copy(
+            focus = "8月15日前完成刑法，随后启动民法",
+            tasks = listOf(
+                "8月12日前完成刑法第8-25章课程，8月13-15日集中验收框架、配套题、主错因和第一轮背诵",
+                "8月16日起按顺序启动民法第1章；刑法未收口前不得提前听民法新课",
+                "每周星期日完整休息；法理与已学专业课按D1/D3/D7持续抽背",
+                "英语每天120词并轮换阅读、完形、翻译和新题型，全部计入当天总预算",
+            ),
+        )
+        "2026-09" -> base.copy(
+            focus = "9月15日前完成民法，9月30日前完成宪法与法制史",
+            tasks = listOf(
+                "9月15日前完成民法54章全部新课与最低可用一轮闭环",
+                "9月16-22日完成宪法第1-7章；9月23日为收口与切换缓冲",
+                "9月24-30日完成法制史第1-7章，9月30日验收四科常规新课全部结束",
+                "9月15日起启动政治；第一轮背诵收口并在9月下半月启动第二轮规范表述",
+            ),
+        )
+        else -> base
+    }
+
+    /**
+     * Some older composables still read ExamStudyPlan directly. Install this
+     * overlay into those already-existing collections so the screen cannot show
+     * the retired recovery plan while persistence and scheduling use the catalog.
+     */
+    @Suppress("UNCHECKED_CAST")
+    internal fun installIntoLegacyExamPlanViews() {
+        (ExamStudyPlan.dailyPlans as? MutableMap<LocalDate, DailyStudyPlan>)
+            ?.putAll(dailyOverrides)
+
+        (ExamStudyPlan.weeklyPlans as? MutableList<WeeklyStudyPlan>)?.let { plans ->
+            weeklyOverrides.values.forEach { replacement ->
+                val index = plans.indexOfFirst { it.id == replacement.id }
+                if (index >= 0) plans[index] = replacement
+            }
+        }
+
+        (ExamStudyPlan.monthlyPlans as? MutableList<MonthlyStudyPlan>)?.let { plans ->
+            plans.indices.forEach { index ->
+                plans[index] = monthlyPlan(plans[index])
+            }
+        }
+    }
 
     private fun MutableMap<LocalDate, DailyStudyPlan>.addSundayRestDays(
         start: LocalDate,
@@ -191,6 +318,13 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         title: String,
         vararg tasks: StudyPlanTask,
     ): DailyStudyPlan = DailyStudyPlan(date = date, title = title, tasks = tasks.toList())
+
+    private fun weekly(
+        id: String,
+        title: String,
+        dateRange: String,
+        vararg tasks: String,
+    ): WeeklyStudyPlan = WeeklyStudyPlan(id = id, title = title, dateRange = dateRange, tasks = tasks.toList())
 
     private fun law(title: String) = StudyPlanTask(title, StudyPlanTaskKind.Law)
     private fun review(title: String) = StudyPlanTask(title, StudyPlanTaskKind.Review)
