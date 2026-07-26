@@ -39,10 +39,11 @@ import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyState
 
 /**
- * Bright, fixed-height anime gacha screen.
+ * Bright, fixed-height anime gacha screen approved by the user.
  *
- * The probability, pity and inventory details still exist in the rules and guide,
- * but this main screen intentionally shows only the current kudos and draw actions.
+ * The probability, pity and inventory details remain in the rules and guide. The
+ * main screen keeps the light candy-machine design and clearly shows both ticket
+ * balances without switching back to the obsolete dark card.
  */
 @Composable
 internal fun GachaCard(
@@ -60,7 +61,20 @@ internal fun GachaCard(
     } else {
         StudyRules.SINGLE_DRAW_COST
     }
-    val hasSafetyDraw = state.wallet.purpleDrawTickets > 0
+    val singleTicketCount = state.wallet.singleDrawTickets
+    val tenTicketCount = state.wallet.tenDrawTickets
+    val purpleTicketCount = state.wallet.purpleDrawTickets
+    val hasSafetyDraw = purpleTicketCount > 0
+    val singleButtonText = when {
+        hasSafetyDraw -> "安全抽 · ${purpleTicketCount}张"
+        singleTicketCount > 0 -> "单抽 · 用券（${singleTicketCount}张）"
+        else -> "单抽 · $singleCost"
+    }
+    val tenButtonText = if (tenTicketCount > 0) {
+        "十连 · 用券（${tenTicketCount}张）"
+    } else {
+        "十连 · ${StudyRules.TEN_DRAW_COST}"
+    }
 
     Card(
         modifier = Modifier
@@ -78,9 +92,13 @@ internal fun GachaCard(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 18.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                KudosPanel(kudos = state.wallet.kudos)
+                KudosPanel(
+                    kudos = state.wallet.kudos,
+                    singleTicketCount = singleTicketCount,
+                    tenTicketCount = tenTicketCount,
+                )
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -126,9 +144,10 @@ internal fun GachaCard(
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     ) {
                         Text(
-                            text = if (hasSafetyDraw) "单抽 · 免费" else "单抽 · $singleCost",
+                            text = singleButtonText,
                             fontWeight = FontWeight.Black,
                             style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
                         )
                     }
 
@@ -146,9 +165,10 @@ internal fun GachaCard(
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp),
                     ) {
                         Text(
-                            text = "十连 · ${StudyRules.TEN_DRAW_COST}",
+                            text = tenButtonText,
                             fontWeight = FontWeight.Black,
                             style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
@@ -158,7 +178,11 @@ internal fun GachaCard(
 }
 
 @Composable
-private fun KudosPanel(kudos: Int) {
+private fun KudosPanel(
+    kudos: Int,
+    singleTicketCount: Int,
+    tenTicketCount: Int,
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
@@ -166,37 +190,96 @@ private fun KudosPanel(kudos: Int) {
         border = BorderStroke(2.dp, Color(0xFFFFD79B)),
         shadowElevation = 3.dp,
     ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Surface(
+                    modifier = Modifier.size(38.dp),
+                    shape = CircleShape,
+                    color = Color(0xFFFFE48E),
+                    border = BorderStroke(2.dp, Color.White),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "★",
+                            color = Color(0xFFFF8A77),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                        )
+                    }
+                }
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    text = "我的夸夸值",
+                    color = Color(0xFF815B60),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.weight(1f))
+                Text(
+                    text = kudos.toString(),
+                    color = Color(0xFFFF8A62),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Black,
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                TicketBalancePill(
+                    label = "单抽券",
+                    count = singleTicketCount,
+                    containerColor = Color(0xFFDDF1FF),
+                    contentColor = Color(0xFF31536D),
+                    modifier = Modifier.weight(1f),
+                )
+                TicketBalancePill(
+                    label = "十连券",
+                    count = tenTicketCount,
+                    containerColor = Color(0xFFFFE9A9),
+                    contentColor = Color(0xFF684018),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TicketBalancePill(
+    label: String,
+    count: Int,
+    containerColor: Color,
+    contentColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(14.dp),
+        color = containerColor,
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.94f)),
+    ) {
         Row(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
-                modifier = Modifier.size(40.dp),
-                shape = CircleShape,
-                color = Color(0xFFFFE48E),
-                border = BorderStroke(2.dp, Color.White),
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "★",
-                        color = Color(0xFFFF8A77),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Black,
-                    )
-                }
-            }
-            Spacer(Modifier.width(12.dp))
             Text(
-                text = "我的夸夸值",
-                color = Color(0xFF815B60),
-                style = MaterialTheme.typography.titleMedium,
+                text = label,
+                color = contentColor,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.weight(1f))
             Text(
-                text = kudos.toString(),
-                color = Color(0xFFFF8A62),
-                style = MaterialTheme.typography.headlineSmall,
+                text = "× $count",
+                color = contentColor,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Black,
             )
         }
