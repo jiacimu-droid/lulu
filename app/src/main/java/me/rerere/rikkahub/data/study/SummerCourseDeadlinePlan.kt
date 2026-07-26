@@ -246,26 +246,26 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
     }
 
     /**
-     * Some older composables still read ExamStudyPlan directly. Install this
-     * overlay into those already-existing collections so the screen cannot show
-     * the retired recovery plan while persistence and scheduling use the catalog.
+     * Older composables still read ExamStudyPlan directly. Remove every overlapping
+     * legacy entry first, then install the current plan. These casts are deliberate:
+     * a loud failure is safer than silently falling back to a retired plan again.
      */
     @Suppress("UNCHECKED_CAST")
     internal fun installIntoLegacyExamPlanViews() {
-        (ExamStudyPlan.dailyPlans as? MutableMap<LocalDate, DailyStudyPlan>)
-            ?.putAll(dailyOverrides)
+        val dailyPlans = ExamStudyPlan.dailyPlans as MutableMap<LocalDate, DailyStudyPlan>
+        dailyPlans.keys.removeAll { date -> !date.isBefore(criminalStart) && !date.isAfter(allCourseDeadline) }
+        dailyPlans.putAll(dailyOverrides)
 
-        (ExamStudyPlan.weeklyPlans as? MutableList<WeeklyStudyPlan>)?.let { plans ->
-            weeklyOverrides.values.forEach { replacement ->
-                val index = plans.indexOfFirst { it.id == replacement.id }
-                if (index >= 0) plans[index] = replacement
-            }
-        }
+        val weeklyPlans = ExamStudyPlan.weeklyPlans as MutableList<WeeklyStudyPlan>
+        val firstReplacementIndex = weeklyPlans
+            .indexOfFirst { it.id in weeklyOverrides.keys }
+            .let { index -> if (index >= 0) index else weeklyPlans.size }
+        weeklyPlans.removeAll { it.id in weeklyOverrides.keys }
+        weeklyPlans.addAll(firstReplacementIndex.coerceAtMost(weeklyPlans.size), weeklyOverrides.values)
 
-        (ExamStudyPlan.monthlyPlans as? MutableList<MonthlyStudyPlan>)?.let { plans ->
-            plans.indices.forEach { index ->
-                plans[index] = monthlyPlan(plans[index])
-            }
+        val monthlyPlans = ExamStudyPlan.monthlyPlans as MutableList<MonthlyStudyPlan>
+        monthlyPlans.indices.forEach { index ->
+            monthlyPlans[index] = monthlyPlan(monthlyPlans[index])
         }
     }
 
