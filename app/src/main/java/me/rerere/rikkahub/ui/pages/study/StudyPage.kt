@@ -82,7 +82,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -2152,183 +2151,6 @@ private fun MysteryBoxPendingDialog(
 }
 
 @Composable
-private fun GachaCard(
-    state: StudyState,
-    onSingle: () -> Unit,
-    onTen: () -> Unit,
-    onPurple: () -> Unit,
-) {
-    val singleCost = if (StudyRules.hasSingleDrawDiscount(state)) StudyRules.DISCOUNT_SINGLE_DRAW_COST else StudyRules.SINGLE_DRAW_COST
-    val singleTicketCount = state.wallet.singleDrawTickets
-    val tenTicketCount = state.wallet.tenDrawTickets
-    val ticketDrawCount = singleTicketCount + tenTicketCount * 10
-    val singleButtonText = if (singleTicketCount > 0) {
-        "单抽 · 用券（${singleTicketCount}张）"
-    } else {
-        "单抽 · ${singleCost}夸夸"
-    }
-    val tenButtonText = if (tenTicketCount > 0) {
-        "十连 · 用券（${tenTicketCount}张）"
-    } else {
-        "十连 · ${StudyRules.TEN_DRAW_COST}夸夸"
-    }
-    Card(
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0x55101427)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.14f)),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(650.dp)
-                .clip(RoundedCornerShape(28.dp)),
-        ) {
-            StarryLetterBackdrop(Modifier.fillMaxSize())
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            0f to Color.Transparent,
-                            0.62f to Color(0x22101427),
-                            1f to Color(0xEE0B0E1D),
-                        ),
-                    ),
-            )
-            Column(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 22.dp, vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(
-                        shape = RoundedCornerShape(999.dp),
-                        color = Color.White.copy(alpha = 0.12f),
-                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.22f)),
-                    ) {
-                        Text(
-                            "✦ 限定卡池",
-                            color = Color(0xFFF4E8C9),
-                            style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Text(
-                        "票券共 $ticketDrawCount 抽",
-                        color = Color.White.copy(alpha = 0.68f),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-                Surface(
-                    shape = RoundedCornerShape(18.dp),
-                    color = Color(0x22FFFFFF),
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.16f)),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(9.dp),
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("当前夸夸值", color = Color.White.copy(alpha = 0.72f))
-                            Spacer(Modifier.weight(1f))
-                            Text(
-                                state.wallet.kudos.toString(),
-                                color = Color(0xFFF4E8C9),
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Black,
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            FragmentWalletPill("单抽券", singleTicketCount, Color(0xFFC5A5FF))
-                            FragmentWalletPill("十连券", tenTicketCount, Color(0xFFF2D18A))
-                        }
-                        Text(
-                            "抽卡会优先扣对应券；没有券时才扣夸夸值",
-                            color = Color.White.copy(alpha = 0.62f),
-                            style = MaterialTheme.typography.labelSmall,
-                        )
-                    }
-                }
-                Text(
-                    "星夜来信",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Black,
-                )
-                Text(
-                    "把今天认真生活的痕迹，折进一封只属于你的信。",
-                    color = Color(0xFFD9D8EA),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StarryRarityPill("紫", "6%", Color(0xFFC5A5FF))
-                    StarryRarityPill("金", "1.5%", Color(0xFFF2D18A))
-                    StarryRarityPill("彩", "0.35%", Color(0xFF8DE0DC))
-                }
-                Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    StarryLetterSeal()
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    FragmentWalletPill("抖音20分", state.inventory.douyinFragments, Color(0xFFC5A5FF))
-                    FragmentWalletPill("剧场", state.inventory.theaterFragments, Color(0xFFD9B7FF))
-                    FragmentWalletPill("游戏120分", state.inventory.gameFragments, Color(0xFFF2D18A))
-                    FragmentWalletPill("视频卡", state.inventory.videoFragments, Color(0xFFFFDFA3))
-                    FragmentWalletPill("番剧3小时", state.inventory.animeFragments, Color(0xFF8DE0DC))
-                }
-                Text(
-                    "紫色：抖音20分钟 5% / 剧场 1% · 金色：游戏120分钟 / 视频",
-                    color = Color.White.copy(alpha = 0.64f),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                )
-                if (state.wallet.purpleDrawTickets > 0) {
-                    Button(
-                        onClick = onPurple,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF7D5BB3),
-                            contentColor = Color.White,
-                        ),
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                    ) {
-                        Text("今日零紫安全抽 · ${state.wallet.purpleDrawTickets}张", fontWeight = FontWeight.Bold)
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedButton(
-                        onClick = onSingle,
-                        border = BorderStroke(1.dp, Color(0xFFD7C8F1)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                        modifier = Modifier.weight(1f).height(52.dp),
-                    ) {
-                        Text(singleButtonText)
-                    }
-                    Button(
-                        onClick = onTen,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFE4C47F),
-                            contentColor = Color(0xFF211A2E),
-                        ),
-                        modifier = Modifier.weight(1f).height(52.dp),
-                    ) {
-                        Text(tenButtonText, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun SleepHabitRewardCard(
     state: StudyState,
     assistantName: String,
@@ -2400,75 +2222,6 @@ private fun SleepHabitRewardRow(
                 color = if (claimed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-    }
-}
-
-@Composable
-private fun StarryLetterBackdrop(modifier: Modifier = Modifier) {
-    Canvas(modifier = modifier.background(Brush.verticalGradient(listOf(Color(0xFF161B38), Color(0xFF34264E), Color(0xFF111427))))) {
-        drawCircle(Color(0x33FFF4D6), radius = size.minDimension * 0.22f, center = Offset(size.width * 0.82f, size.height * 0.18f))
-        val stars = listOf(
-            0.10f to 0.17f, 0.22f to 0.10f, 0.34f to 0.23f, 0.48f to 0.13f,
-            0.66f to 0.27f, 0.88f to 0.34f, 0.13f to 0.43f, 0.72f to 0.48f,
-            0.42f to 0.57f, 0.91f to 0.62f,
-        )
-        stars.forEachIndexed { index, (x, y) ->
-            drawCircle(
-                color = if (index % 3 == 0) Color(0xFFF4D99C) else Color.White.copy(alpha = 0.78f),
-                radius = if (index % 3 == 0) 3.2f else 2f,
-                center = Offset(size.width * x, size.height * y),
-            )
-        }
-        stars.zipWithNext().take(6).forEach { (from, to) ->
-            drawLine(
-                color = Color(0x335F7FE0),
-                start = Offset(size.width * from.first, size.height * from.second),
-                end = Offset(size.width * to.first, size.height * to.second),
-                strokeWidth = 1.4f,
-            )
-        }
-    }
-}
-
-@Composable
-private fun StarryLetterSeal() {
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = Color(0xFFF2E8DD).copy(alpha = 0.94f),
-        shadowElevation = 18.dp,
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.7f)),
-        modifier = Modifier.size(width = 236.dp, height = 146.dp).rotate(-3f),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Canvas(Modifier.fillMaxSize()) {
-                drawLine(Color(0x334A3658), Offset(0f, 0f), Offset(size.width / 2f, size.height * 0.62f), 2f)
-                drawLine(Color(0x334A3658), Offset(size.width, 0f), Offset(size.width / 2f, size.height * 0.62f), 2f)
-            }
-            Surface(
-                shape = CircleShape,
-                color = Color(0xFF7B3F63),
-                border = BorderStroke(2.dp, Color(0xFFE0B887)),
-                modifier = Modifier.size(58.dp),
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text("✦", color = Color(0xFFFFE4AA), style = MaterialTheme.typography.headlineSmall)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StarryRarityPill(label: String, chance: String, color: Color) {
-    Surface(shape = RoundedCornerShape(999.dp), color = color.copy(alpha = 0.14f), border = BorderStroke(1.dp, color.copy(alpha = 0.52f))) {
-        Text("$label $chance", color = color, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
-    }
-}
-
-@Composable
-private fun FragmentWalletPill(label: String, count: Int, color: Color) {
-    Surface(shape = RoundedCornerShape(12.dp), color = Color.Black.copy(alpha = 0.20f), border = BorderStroke(1.dp, color.copy(alpha = 0.32f))) {
-        Text("$label $count", color = Color.White.copy(alpha = 0.88f), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp))
     }
 }
 
@@ -2625,19 +2378,6 @@ private fun EntertainmentRewardRow(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun DrawPoolChip(label: String, value: String, color: Color) {
-    Surface(color = Color.White.copy(alpha = 0.78f), shape = CircleShape) {
-        Text(
-            text = "$label $value",
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-            color = color,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold,
-        )
     }
 }
 
@@ -3285,8 +3025,6 @@ private fun PomodoroThemePickerDialog(
 private object StudyColors {
     val page = Color(0xFFF7F3EA)
     val gachaPage = Color(0xFFFFE4C8)
-    val starryPage = Color(0xFF151831)
-    val starryPageDeep = Color(0xFF090C1B)
     val hero = Color(0xFFFFE6B8)
     val softBlue = Color(0xFFDCECF4)
     val blue = Color(0xFF3D7EA6)
@@ -3332,10 +3070,6 @@ private fun drawResultTitle(best: StudyRarity, count: Int): String {
 
 private fun superMomentBrush(): Brush = Brush.linearGradient(
     listOf(Color(0xFFFFC857), Color(0xFFFF7AA2), Color(0xFF7C6BFF))
-)
-
-private fun gachaBrush(): Brush = Brush.linearGradient(
-    listOf(Color(0xFF6F8FA6), Color(0xFF8067B7), Color(0xFFE0A72E))
 )
 
 private fun drawBrush(rarity: StudyRarity): Brush = when (rarity) {
