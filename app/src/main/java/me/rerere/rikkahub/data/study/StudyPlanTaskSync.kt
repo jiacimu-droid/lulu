@@ -5,13 +5,13 @@ import java.time.LocalDate
 /**
  * Bridges the composed study-plan catalog to the persisted Today task list.
  *
- * Catalog task ids use a dedicated prefix. Once today's catalog tasks have been
- * installed, repeated screen refreshes preserve the user's edits, including
- * deleting one or all system-planned tasks. A new day rebuilds the list from
- * that day's catalog plan while retaining manually added tasks for the day.
+ * Catalog task ids use a dedicated versioned prefix. Once today's current plan
+ * has been installed, repeated screen refreshes preserve the user's edits,
+ * including deleting one or all system-planned tasks. Bumping the version only
+ * happens when a shipped APK must replace an older built-in plan on the same day.
  */
 object StudyPlanTaskSync {
-    private const val ID_PREFIX = "catalog-plan"
+    private const val ID_PREFIX = "catalog-plan-v2"
 
     fun sync(state: StudyState, date: LocalDate = LocalDate.now()): StudyState {
         val dateText = date.toString()
