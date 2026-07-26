@@ -33,6 +33,11 @@ class StudyStore(
     private val backupStateKey = stringPreferencesKey("state_backup")
 
     init {
+        // Older study composables still read ExamStudyPlan directly. Install the
+        // approved summer plan before the first screen composition so those views,
+        // persisted tasks and AI schedule generation all resolve the same plan.
+        SummerCourseDeadlinePlan.installIntoLegacyExamPlanViews()
+
         scope.launch {
             context.studyDataStore.edit { prefs ->
                 val current = readState(prefs) ?: return@edit
@@ -129,20 +134,8 @@ private val studyJson = Json(JsonInstant) {
     coerceInputValues = true
 }
 
-private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState {
-    val dateText = date.toString()
-    return if (today == dateText && CurrentWeekStudyRecovery.planFor(date) != null) {
-        // Keep the already-visible recovery-plan task instances intact on same-day
-        // reads and writes so their checked state and stable ids are not replaced by
-        // the base ExamStudyPlan before the recovery overlay is reapplied.
-        CurrentWeekStudyRecovery.applyToState(this, date)
-    } else {
-        CurrentWeekStudyRecovery.applyToState(
-            StudyRules.rolloverToDate(this, date),
-            date,
-        )
-    }
-}
+private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState =
+    StudyPlanTaskSync.sync(this, date)
 
 private fun StudyState.preserveOfficialEconomy(): StudyState {
     return if (internalTestGrantVersion >= StudyRules.OFFICIAL_ECONOMY_RESET_VERSION) {
