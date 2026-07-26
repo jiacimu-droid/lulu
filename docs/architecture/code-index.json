@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-26T04:40:06.031316+00:00",
-  "commit": "a6b0b1aa8ce45d6bf83024115b7ed00cf1fe31a0",
+  "generatedAt": "2026-07-26T04:40:41.846057+00:00",
+  "commit": "76ff67dbb7a74491b5aca3e2382f7d9cf126d1d9",
   "branch": "master",
-  "sourceFingerprint": "8c2229b42327b77ef96549a6634bff479b34a704c25c29dd01f4261374de38a9",
+  "sourceFingerprint": "7cd170d4c14d62e8f79e627e3f18184c17e2669bc70322a36eaf2ac0cca10f0f",
   "summary": {
     "files": 1127,
-    "lines": 266100,
+    "lines": 266093,
     "symbols": 5546,
     "productionCodeFiles": 797,
     "testFiles": 137,
@@ -23345,8 +23345,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 162,
-      "sha256": "b2d6cb2798f3f6c2afa620322794262f2fefd809bdfc9231c746db44c4240f0b",
+      "lines": 155,
+      "sha256": "e4d911d50b14e35d1492ed46ebbd494f60aea13857a8220ac7aac0aa54d42a17",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -23360,52 +23360,52 @@
         {
           "name": "update",
           "kind": "function",
-          "line": 72
+          "line": 77
         },
         {
           "name": "set",
           "kind": "function",
-          "line": 92
+          "line": 97
         },
         {
           "name": "readState",
           "kind": "function",
-          "line": 104
+          "line": 109
         },
         {
           "name": "writeState",
           "kind": "function",
-          "line": 108
+          "line": 113
         },
         {
           "name": "decodeStudyStateOrNull",
           "kind": "function",
-          "line": 115
+          "line": 120
         },
         {
           "name": "ensureToday",
           "kind": "function",
-          "line": 132
+          "line": 137
         },
         {
           "name": "preserveOfficialEconomy",
           "kind": "function",
-          "line": 147
+          "line": 140
         },
         {
           "name": "grantDataLossCompensation",
           "kind": "function",
-          "line": 155
+          "line": 148
         },
         {
           "name": "grantPomodoroInterruptionCompensation",
           "kind": "function",
-          "line": 158
+          "line": 151
         },
         {
           "name": "grantGachaBadLuckCompensation",
           "kind": "function",
-          "line": 161
+          "line": 154
         }
       ],
       "localImportCount": 2,
@@ -79479,7 +79479,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 115
+        "line": 120
       }
     ],
     "me.rerere.rikkahub.data.study.defaultEnglishCoreTask": [
@@ -79587,7 +79587,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 132
+        "line": 137
       }
     ],
     "me.rerere.rikkahub.data.study.examAnalysisAndExamStructureDriveStudyPlanCadence": [
@@ -79648,7 +79648,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 155
+        "line": 148
       }
     ],
     "me.rerere.rikkahub.data.study.grantGachaBadLuckCompensation": [
@@ -79660,7 +79660,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 161
+        "line": 154
       }
     ],
     "me.rerere.rikkahub.data.study.grantInternalTestResources": [
@@ -79679,7 +79679,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 158
+        "line": 151
       }
     ],
     "me.rerere.rikkahub.data.study.hardCourseDeadlinesProtectThreeMonthsForRecitationAndOutput": [
@@ -80097,7 +80097,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 147
+        "line": 140
       }
     ],
     "me.rerere.rikkahub.data.study.professionalTrainingChainIncludesMultipleQuestionLayersAndThreeRecitationRounds": [
@@ -80118,7 +80118,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 104
+        "line": 109
       }
     ],
     "me.rerere.rikkahub.data.study.readingCatalogDoesNotMutateTheBasePlanCollections": [
@@ -80270,7 +80270,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 92
+        "line": 97
       }
     ],
     "me.rerere.rikkahub.data.study.sichuanUniversityTargetUsesASafetyMarginInsteadOfTheHistoricalMinimum": [
@@ -80424,7 +80424,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 72
+        "line": 77
       }
     ],
     "me.rerere.rikkahub.data.study.useUniversalNormalFragment": [
@@ -80506,7 +80506,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
-        "line": 108
+        "line": 113
       }
     ],
     "me.rerere.rikkahub.data.sync.S3BackupItem": [
