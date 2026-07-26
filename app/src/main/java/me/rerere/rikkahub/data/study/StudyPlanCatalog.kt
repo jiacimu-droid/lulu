@@ -12,6 +12,7 @@ import java.time.LocalDate
 object StudyPlanCatalog {
     private val overlays: List<StudyPlanOverlay> = listOf(
         SummerCourseDeadlinePlan,
+        July26StudyDayCorrection,
     )
 
     val dailyPlans: Map<LocalDate, DailyStudyPlan>
