@@ -11,7 +11,6 @@ import java.time.LocalDate
  */
 object StudyPlanCatalog {
     private val overlays: List<StudyPlanOverlay> = listOf(
-        CurrentWeekStudyRecovery,
         SummerCourseDeadlinePlan,
     )
 
