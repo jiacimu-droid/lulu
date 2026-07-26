@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-26T04:39:26.887132+00:00",
-  "commit": "14e84e0d6b75a41094b77e780a6be2c584586abf",
+  "generatedAt": "2026-07-26T04:39:46.939147+00:00",
+  "commit": "f3c8780522398a718fa9b583649425014eed18ba",
   "branch": "master",
-  "sourceFingerprint": "8740a201f6efa1d3a88afd375fba35390564e2b3cc1ea83f8734759e3711bf99",
+  "sourceFingerprint": "2e6be30705968169c4748373cad6c063397c5b67640f7a19a3da1d7f5e47df0e",
   "summary": {
     "files": 1127,
-    "lines": 266101,
+    "lines": 266100,
     "symbols": 5546,
     "productionCodeFiles": 797,
     "testFiles": 137,
@@ -22905,8 +22905,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 64,
-      "sha256": "374f07bf4c2a3d3abb6bcc626c2c50406f5ba43d08ed391b278bf8060c8191df",
+      "lines": 63,
+      "sha256": "cff9c705bbd70bb42bcdec78f94d829994b1f57d4c38978f3c3be22706e24def",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -22920,42 +22920,42 @@
         {
           "name": "dailyPlan",
           "kind": "function",
-          "line": 35
+          "line": 34
         },
         {
           "name": "plannedStudyMinutes",
           "kind": "function",
-          "line": 39
+          "line": 38
         },
         {
           "name": "weeklyPlan",
           "kind": "function",
-          "line": 43
+          "line": 42
         },
         {
           "name": "monthlyPlan",
           "kind": "function",
-          "line": 45
+          "line": 44
         },
         {
           "name": "mergeByKey",
           "kind": "function",
-          "line": 47
+          "line": 46
         },
         {
           "name": "StudyPlanOverlay",
           "kind": "interface",
-          "line": 59
+          "line": 58
         },
         {
           "name": "monthlyPlan",
           "kind": "function",
-          "line": 62
+          "line": 61
         },
         {
           "name": "plannedMinutesOverride",
           "kind": "function",
-          "line": 63
+          "line": 62
         }
       ],
       "localImportCount": 0,
@@ -79035,7 +79035,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "interface",
-        "line": 59
+        "line": 58
       }
     ],
     "me.rerere.rikkahub.data.study.StudyPlanSubject": [
@@ -79451,7 +79451,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
-        "line": 35
+        "line": 34
       }
     ],
     "me.rerere.rikkahub.data.study.dailyScheduleFrontLoadsRecitationAndProtectsReviewBuffer": [
@@ -79843,7 +79843,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
-        "line": 47
+        "line": 46
       }
     ],
     "me.rerere.rikkahub.data.study.migrateLegacyEntertainmentFragments": [
@@ -79883,12 +79883,12 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
-        "line": 45
+        "line": 44
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
-        "line": 62
+        "line": 61
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
@@ -80050,7 +80050,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
-        "line": 63
+        "line": 62
       }
     ],
     "me.rerere.rikkahub.data.study.plannedStudyMinutes": [
@@ -80062,7 +80062,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
-        "line": 39
+        "line": 38
       }
     ],
     "me.rerere.rikkahub.data.study.plus": [
@@ -80478,7 +80478,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
-        "line": 43
+        "line": 42
       }
     ],
     "me.rerere.rikkahub.data.study.weeklyReviewTitleDoesNotEraseTheDailyNewCourseMainLine": [
