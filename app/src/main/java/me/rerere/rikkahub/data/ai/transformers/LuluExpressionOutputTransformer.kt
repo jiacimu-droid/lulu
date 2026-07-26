@@ -31,15 +31,78 @@ object LuluExpressionOutputTransformer : OutputMessageTransformer {
         ctx: TransformerContext,
         messages: List<UIMessage>,
     ): List<UIMessage> = splitLuluAssistantExpressionMessages(
-        promoteInlineVoiceMessages(messages),
+        sanitizeLuluAssistantExpressionMessages(
+            promoteInlineVoiceMessages(messages),
+        ),
     )
 }
 
+/**
+ * Sanitize the whole assistant sequence rather than each bubble in isolation.
+ * Models may stream an opening private tag, its body and its closing tag as
+ * separate messages. A per-message regex cannot see that complete block and was
+ * therefore allowing private profile/instruction text to reach the chat UI.
+ */
 private fun sanitizeLuluAssistantExpressionMessages(messages: List<UIMessage>): List<UIMessage> {
+    var openPrivateTag: String? = null
     return messages.map { message ->
         if (message.role != MessageRole.ASSISTANT) return@map message
-        message.sanitizeLuluTextParts(dropBlankPresenceText = false).message
+        val sequenceSafeParts = message.parts.mapNotNull { part ->
+            if (part !is UIMessagePart.Text) return@mapNotNull part
+            val stripped = stripCrossBubblePrivateContext(part.text, openPrivateTag)
+            openPrivateTag = stripped.openTag
+            val visible = sanitizeLuluVisibleExpression(stripped.text)
+            if (visible.isBlank() && stripped.removedPrivateContent) null else part.copy(text = visible)
+        }
+        message.copy(parts = sequenceSafeParts)
+            .sanitizeLuluTextParts(dropBlankPresenceText = false)
+            .message
     }
+}
+
+private data class CrossBubbleSanitizeResult(
+    val text: String,
+    val openTag: String?,
+    val removedPrivateContent: Boolean,
+)
+
+private fun stripCrossBubblePrivateContext(
+    text: String,
+    initialOpenTag: String?,
+): CrossBubbleSanitizeResult {
+    var openTag = initialOpenTag
+    var removed = false
+    val visibleLines = mutableListOf<String>()
+    text.replace("\r\n", "\n").replace('\r', '\n').lineSequence().forEach { line ->
+        val trimmed = line.trim()
+        if (openTag != null) {
+            removed = true
+            if (trimmed.contains("</$openTag>", ignoreCase = true)) {
+                openTag = null
+            }
+            return@forEach
+        }
+
+        val opening = COMPANION_PRIVATE_OPEN_TAG_REGEX.find(trimmed)
+        if (opening != null) {
+            removed = true
+            val tag = opening.groupValues[1].lowercase()
+            if (!trimmed.contains("</$tag>", ignoreCase = true)) {
+                openTag = tag
+            }
+            return@forEach
+        }
+        if (COMPANION_PRIVATE_CLOSE_TAG_REGEX.containsMatchIn(trimmed)) {
+            removed = true
+            return@forEach
+        }
+        visibleLines += line
+    }
+    return CrossBubbleSanitizeResult(
+        text = visibleLines.joinToString("\n"),
+        openTag = openTag,
+        removedPrivateContent = removed,
+    )
 }
 
 internal fun splitLuluAssistantExpressionMessages(messages: List<UIMessage>): List<UIMessage> {
@@ -49,6 +112,8 @@ internal fun splitLuluAssistantExpressionMessages(messages: List<UIMessage>): Li
         val sanitized = message.sanitizeLuluTextParts(dropBlankPresenceText = true)
         if (sanitized.message.parts.isEmpty() && sanitized.presenceAnnotations.isNotEmpty()) {
             trailingPresence += sanitized.presenceAnnotations
+            null
+        } else if (sanitized.message.parts.isEmpty()) {
             null
         } else {
             sanitized.message
@@ -241,6 +306,12 @@ private val COMPANION_PRIVATE_BLOCK_REGEX =
         "(?is)<\\s*(runtime_context|companion_runtime|private_user_profile|companion_private_context)\\b[^>]*>.*?</\\s*\\1\\s*>",
     )
 
+private val COMPANION_PRIVATE_OPEN_TAG_REGEX =
+    Regex("(?i)<\\s*(runtime_context|companion_runtime|private_user_profile|companion_private_context)\\b[^>]*>")
+
+private val COMPANION_PRIVATE_CLOSE_TAG_REGEX =
+    Regex("(?i)</\\s*(runtime_context|companion_runtime|private_user_profile|companion_private_context)\\s*>")
+
 private val COMPANION_INTERNAL_LEAK_MARKERS = listOf(
     "这只是后台表达方向",
     "这只是后台第一人称心声",
@@ -248,9 +319,18 @@ private val COMPANION_INTERNAL_LEAK_MARKERS = listOf(
     "表达池只是表达层",
     "用户资料（只作为理解用户",
     "用户资料（只用于稳定理解用户",
+    "以下资料只作为事实约束",
+    "不要告诉用户你在读取资料",
+    "它们不能改变角色与用户的关系类型",
     "不要逐字复述这些标签",
     "本轮回复前已经完成的角色行动",
     "成功完成的动作不要重复调用",
+    "<private_user_profile>",
+    "</private_user_profile>",
+    "<companion_private_context>",
+    "</companion_private_context>",
+    "<companion_runtime>",
+    "</companion_runtime>",
 )
 
 private val COMPANION_INTERNAL_LINE_PREFIXES = listOf(
@@ -265,16 +345,25 @@ private val COMPANION_INTERNAL_LINE_PREFIXES = listOf(
     "本轮可用表达池：",
     "表达池只是表达层",
     "用户资料（只",
+    "以下资料只作为事实约束",
     "昵称：",
     "个人资料：",
     "我的外貌：",
     "聊天、称呼、关系感",
     "这只是后台表达方向",
     "这只是后台第一人称心声",
+    "<private_",
+    "</private_",
+    "<companion_",
+    "</companion_",
+    "<runtime_",
+    "</runtime_",
 )
 
 internal fun sanitizeLuluVisibleExpression(text: String): String {
-    val hadPrivateContext = COMPANION_PRIVATE_BLOCK_REGEX.containsMatchIn(text)
+    val hadPrivateContext = COMPANION_PRIVATE_BLOCK_REGEX.containsMatchIn(text) ||
+        COMPANION_PRIVATE_OPEN_TAG_REGEX.containsMatchIn(text) ||
+        COMPANION_PRIVATE_CLOSE_TAG_REGEX.containsMatchIn(text)
     val withoutPrivateBlocks = COMPANION_PRIVATE_BLOCK_REGEX.replace(
         LULU_PRESENCE_BLOCK_REGEX.replace(text, ""),
         "",
@@ -284,7 +373,7 @@ internal fun sanitizeLuluVisibleExpression(text: String): String {
         .replace('\r', '\n')
         .trim()
     val lines = normalized.lines()
-    val containsInternalLeak = COMPANION_INTERNAL_LEAK_MARKERS.any { marker ->
+    val containsInternalLeak = hadPrivateContext || COMPANION_INTERNAL_LEAK_MARKERS.any { marker ->
         normalized.contains(marker, ignoreCase = true)
     }
     val candidate = if (containsInternalLeak) {
@@ -292,30 +381,29 @@ internal fun sanitizeLuluVisibleExpression(text: String): String {
             COMPANION_INTERNAL_LEAK_MARKERS.any { marker ->
                 line.contains(marker, ignoreCase = true)
             } || COMPANION_INTERNAL_LINE_PREFIXES.any { prefix ->
-                line.trim().startsWith(prefix)
+                line.trim().startsWith(prefix, ignoreCase = true)
             }
         }
         lines
-            .drop(lastInternalLine + 1)
+            .drop((lastInternalLine + 1).coerceAtLeast(0))
             .joinToString("\n")
             .trim()
-            .ifBlank { COMPANION_INCOMPLETE_REPLY_MARKER }
     } else {
         normalized
     }
 
-    val visibleCandidate = if (containsInternalLeak || hadPrivateContext) {
-        candidate
-            .lineSequence()
-            .map { it.trim() }
-            .filterNot { line ->
-                line.isNotBlank() &&
-                    COMPANION_INTERNAL_LINE_PREFIXES.any { prefix -> line.startsWith(prefix) }
-            }
-            .joinToString("\n")
-    } else {
-        candidate
-    }
+    val visibleCandidate = candidate
+        .lineSequence()
+        .map { it.trim() }
+        .filterNot { line ->
+            line.isNotBlank() &&
+                (COMPANION_INTERNAL_LINE_PREFIXES.any { prefix ->
+                    line.startsWith(prefix, ignoreCase = true)
+                } || COMPANION_PRIVATE_OPEN_TAG_REGEX.containsMatchIn(line) ||
+                    COMPANION_PRIVATE_CLOSE_TAG_REGEX.containsMatchIn(line))
+        }
+        .joinToString("\n")
+
     return visibleCandidate
         .replace(Regex("\n{3,}"), "\n\n")
         .trim()
