@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`81dde8e1db549e005216a9dfffa3ca4d8b8cceb9`
+- 基准提交：`d866691b6798129e9e9e66ed32780ea3f8a8f9c9`
 - 分支：`master`
-- 源码指纹：`d5c5cd77bf4493ce…`
-- 已索引文件：1128
-- 已索引代码/文本行：265666
-- 已发现类、接口、对象、函数及 Composable：5527
+- 源码指纹：`a63558b76b2d99a2…`
+- 已索引文件：1127
+- 已索引代码/文本行：265378
+- 已发现类、接口、对象、函数及 Composable：5519
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 798 |
+| 生产代码文件 | 797 |
 | 测试文件 | 137 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -95,8 +95,8 @@
 
 | 文件 | 行数 | 符号 | 本地导入 |
 |---|---:|---:|---:|
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt` | 3398 | 88 | 51 |
 | `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 3143 | 90 | 126 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt` | 3132 | 81 | 51 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 2295 | 57 | 90 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt` | 1874 | 94 | 17 |
 | `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt` | 1579 | 14 | 18 |
@@ -119,7 +119,7 @@
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 90 | 2295 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt` | 90 | 612 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 89 | 1032 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt` | 51 | 3398 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt` | 51 | 3132 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt` | 46 | 1568 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 44 | 1166 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt` | 39 | 416 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 667 |
+| `app` | 666 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 735 |
+| `.kt` | 734 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -299,7 +299,6 @@
 ### 学习监督
 
 - `app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/CurrentWeekStudyRecovery.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyExecutionPolicy.kt`
@@ -539,8 +538,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1951
-- 可检索完整符号：4929
+- 已解析本地导入边：1952
+- 可检索完整符号：4923
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
