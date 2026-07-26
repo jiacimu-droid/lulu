@@ -23,6 +23,12 @@ internal class ConversationSessionRegistry(
     private val settingsStore: SettingsStore,
 ) {
     private val sessions = ConcurrentHashMap<Uuid, ConversationSession>()
+
+    // Keep the latest in-memory snapshot after a screen releases its session. A
+    // quick exit/re-entry must never recreate the same conversation from an empty
+    // Conversation.ofId and later overwrite the database with only the newest
+    // message while initializeConversation is still loading.
+    private val retainedSnapshots = ConcurrentHashMap<Uuid, Conversation>()
     private val version = MutableStateFlow(0L)
 
     fun getOrCreate(conversationId: Uuid): ConversationSession =
@@ -30,7 +36,7 @@ internal class ConversationSessionRegistry(
             val settings = settingsStore.settingsFlow.value
             ConversationSession(
                 id = id,
-                initial = Conversation.ofId(
+                initial = retainedSnapshots[id] ?: Conversation.ofId(
                     id = id,
                     assistantId = settings.getCurrentAssistant().id,
                 ),
@@ -90,6 +96,7 @@ internal class ConversationSessionRegistry(
     fun cleanup() {
         sessions.values.forEach(ConversationSession::cleanup)
         sessions.clear()
+        retainedSnapshots.clear()
         version.value++
     }
 
@@ -100,9 +107,10 @@ internal class ConversationSessionRegistry(
             return
         }
         if (sessions.remove(conversationId, session)) {
+            retainedSnapshots[conversationId] = session.state.value
             session.cleanup()
             version.value++
-            Log.i(TAG, "removeSession: $conversationId (remaining: ${sessions.size})")
+            Log.i(TAG, "removeSession: $conversationId (snapshot retained, remaining: ${sessions.size})")
         }
     }
 
