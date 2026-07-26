@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-26T06:39:39.451065+00:00",
-  "commit": "331e6166376d42bc01ba5a5b6733bd0e51c614b9",
+  "generatedAt": "2026-07-26T06:42:31.271542+00:00",
+  "commit": "288644e63c14330d12c99e58bf2ceda25f4a315b",
   "branch": "master",
-  "sourceFingerprint": "f3fb5e555eab7f850ac6d3ce0dc1f298293752fbec4bd68a5c4a66a4ebc5ac92",
+  "sourceFingerprint": "192c560d906e9699289c68163a2b36cdf4f6f5f769df46c4d42ecc49ebc0623f",
   "summary": {
     "files": 1128,
-    "lines": 265451,
+    "lines": 265457,
     "symbols": 5521,
     "productionCodeFiles": 798,
     "testFiles": 137,
@@ -22576,8 +22576,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 72,
-      "sha256": "1de549f9145e8b4206553f0b1b03b32d6bfcca67ce6293eae6aabf5d95c175b4",
+      "lines": 78,
+      "sha256": "847f6ad5ae5a87a15a8926f9f0b2f6ac089a22fe632525dcf070b6b69e0d1e11",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -22586,12 +22586,12 @@
         {
           "name": "July26StudyDayCorrection",
           "kind": "object",
-          "line": 9
+          "line": 11
         },
         {
           "name": "monthlyPlan",
           "kind": "function",
-          "line": 58
+          "line": 64
         }
       ],
       "localImportCount": 0,
@@ -78798,7 +78798,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
         "kind": "object",
-        "line": 9
+        "line": 11
       }
     ],
     "me.rerere.rikkahub.data.study.MonthlyStudyPlan": [
@@ -79707,7 +79707,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
         "kind": "function",
-        "line": 58
+        "line": 64
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
