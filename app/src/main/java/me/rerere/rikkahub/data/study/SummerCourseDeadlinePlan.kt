@@ -5,12 +5,12 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 /**
- * Hard monthly/weekly milestones with flexible daily execution.
+ * Hard monthly/weekly milestones with guided but flexible daily execution.
  *
  * Month plans define the non-negotiable month-end destination. Week plans define
- * exact chapter and recitation endpoints. Daily plans deliberately do not assign
- * chapters to individual dates because real course lengths differ: the learner
- * chooses how much of the week's remaining target to complete each day.
+ * exact chapter and recitation endpoints. Daily plans still suggest concrete
+ * chapters so the learner knows where to start, but those daily suggestions may
+ * be skipped, reduced or exceeded according to real course length and condition.
  */
 object SummerCourseDeadlinePlan : StudyPlanOverlay {
     private val criminalStart = LocalDate.of(2026, 7, 27)
@@ -32,16 +32,16 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
             end = "2026-07-26",
             courseTarget = "7月25日前完成刑法第3-7章合并题、主错因和正式连接框架；7月26日完整休息",
             recitationTarget = "法理第一轮背诵至少完成第1章闭卷验收",
-            acceptance = "刑法第3-7章不再残留听课任务；第7章闭环后，7月27日才能进入刑法第8章",
+            acceptance = "刑法第3-7章不再残留听课任务；第7章闭环后进入第8章",
         ),
         milestone(
             id = "2026-07-w5",
             title = "刑法听到第13章，法理背到第2章",
             start = "2026-07-27",
             end = "2026-07-31",
-            courseTarget = "刑法新课从第8章推进到第13章，7月31日结束时课程账本必须明确停在第13章",
+            courseTarget = "已确认刑法第8章课程和题目全部完成；本周从第9章推进到第13章，7月31日课程账本必须明确停在第13章",
             recitationTarget = "法理第一轮闭卷背诵完成第1-2章；达到约70%目录树和关键词复述后才能继续",
-            acceptance = "刑法第8-13章已听完章节留下关键词/目录树；至少把第8-10章的配套题入口、正式框架和主错因记入账本",
+            acceptance = "刑法第8章保持已完成状态，不再重复安排；第9-13章留下课程记录，至少把第9-10章的配套题入口、正式框架和主错因记入账本",
         ),
         milestone(
             id = "2026-08-w1",
@@ -49,7 +49,7 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
             start = "2026-08-01",
             end = "2026-08-07",
             courseTarget = "刑法第14-21章课程全部完成，周末课程终点固定为第21章",
-            recitationTarget = "法理第一轮背诵完成第3-5章；刑法第8-13章完成第一轮目录树和关键词抽背",
+            recitationTarget = "法理第一轮背诵完成第3-5章；刑法第9-13章完成第一轮目录树和关键词抽背",
             acceptance = "刑法第14-21章逐章留下课程完成记录；已听完章节完成最低可用框架、配套题入口和唯一主错因",
         ),
         milestone(
@@ -58,8 +58,8 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
             start = "2026-08-08",
             end = "2026-08-14",
             courseTarget = "8月12日前完成刑法第22-25章课程，刑法新课终点固定为第25章",
-            recitationTarget = "法理第一轮背诵完成第6-8章；刑法第8-25章完成第一轮关键词背诵登记",
-            acceptance = "8月13-14日集中验收刑法第8-25章课程账本、重点章题目、正式框架、主错因和D1/D3/D7回炉日期",
+            recitationTarget = "法理第一轮背诵完成第6-8章；刑法第14-25章完成第一轮关键词背诵登记",
+            acceptance = "8月13-14日集中验收刑法第9-25章课程账本、重点章题目、正式框架、主错因和D1/D3/D7回炉日期",
         ),
         milestone(
             id = "2026-08-w3",
@@ -76,8 +76,8 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
             start = "2026-08-22",
             end = "2026-08-31",
             courseTarget = "民法第11-27章课程全部完成，8月月末课程终点固定为第27章",
-            recitationTarget = "法理第一轮背诵完成第11-13章并完成全书一轮；民法第一轮背诵推进到第18章",
-            acceptance = "8月31日核对民法课程终点第27章、背诵终点第18章以及所有已听完章节的框架/题目/主错因账本",
+            recitationTarget = "法理第一轮背诵完成第11-13章并完成全书一轮；民法第一轮背诵完成第6-18章",
+            acceptance = "8月31日核对民法课程终点第27章、背诵累计终点第18章以及所有已听完章节的框架、题目和主错因账本",
         ),
         milestone(
             id = "2026-09-w1",
@@ -117,14 +117,45 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         ),
     )
 
+    private val dailyCourseSuggestions: Map<LocalDate, String> = buildMap {
+        addChapterSuggestions("2026-07-27", "2026-07-31", "刑法", 9, 13)
+        addChapterSuggestions("2026-08-01", "2026-08-07", "刑法", 14, 21)
+        addChapterSuggestions("2026-08-08", "2026-08-12", "刑法", 22, 25)
+        addChapterSuggestions("2026-08-17", "2026-08-21", "民法", 1, 10)
+        addChapterSuggestions("2026-08-22", "2026-08-31", "民法", 11, 27)
+        addChapterSuggestions("2026-09-01", "2026-09-07", "民法", 28, 40)
+        addChapterSuggestions("2026-09-08", "2026-09-15", "民法", 41, 54)
+        addChapterSuggestions("2026-09-16", "2026-09-21", "宪法", 1, 6)
+        put(LocalDate.of(2026, 9, 22), "宪法第7章")
+        addChapterSuggestions("2026-09-24", "2026-09-30", "法制史", 1, 7)
+    }
+
+    private val dailyRecitationSuggestions: Map<LocalDate, String> = buildMap {
+        addChapterSuggestions("2026-07-27", "2026-07-31", "法理第一轮", 1, 2)
+        addChapterSuggestions("2026-08-01", "2026-08-07", "法理第一轮", 3, 5)
+        addChapterSuggestions("2026-08-01", "2026-08-07", "刑法第一轮抽背", 9, 13)
+        addChapterSuggestions("2026-08-08", "2026-08-14", "法理第一轮", 6, 8)
+        addChapterSuggestions("2026-08-08", "2026-08-14", "刑法第一轮抽背", 14, 25)
+        addChapterSuggestions("2026-08-15", "2026-08-21", "法理第一轮", 9, 10)
+        addChapterSuggestions("2026-08-17", "2026-08-21", "民法第一轮", 1, 5)
+        addChapterSuggestions("2026-08-22", "2026-08-31", "法理第一轮", 11, 13)
+        addChapterSuggestions("2026-08-22", "2026-08-31", "民法第一轮", 6, 18)
+        addChapterSuggestions("2026-09-01", "2026-09-07", "民法第一轮", 19, 32)
+        addChapterSuggestions("2026-09-08", "2026-09-15", "民法第一轮", 33, 45)
+        addChapterSuggestions("2026-09-16", "2026-09-21", "民法第一轮", 46, 54)
+        addChapterSuggestions("2026-09-16", "2026-09-21", "法理第二轮", 1, 3)
+        addChapterSuggestions("2026-09-22", "2026-09-30", "法理第二轮", 4, 6)
+        addChapterSuggestions("2026-09-22", "2026-09-30", "刑法第二轮", 1, 5)
+    }
+
     override val dailyOverrides: Map<LocalDate, DailyStudyPlan> = buildMap {
         studyDatesBetween(criminalStart, criminalCourseEnd).forEach { date ->
             put(
                 date,
-                flexibleCourseDay(
+                guidedCourseDay(
                     date = date,
                     subject = "刑法",
-                    courseRule = "从刑法当前真实进度继续听众合法硕刑法课程。今天可以完成半章、一章或多个短章；只要不跳章，并保证本周硬终点即可。",
+                    courseRule = "从刑法当前真实进度继续听众合法硕刑法课程。第8章课程和题目已经完成，后续不再重复；长章未听完时次日先续本章，不跳章。",
                 ),
             )
         }
@@ -134,14 +165,15 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
             if (date.dayOfWeek == DayOfWeek.SUNDAY) {
                 put(date, restDay(date))
             } else {
+                val recitationSuggestion = dailyRecitationSuggestions[date]
                 put(
                     date,
                     daily(
                         date,
                         "刑法一轮收口：按缺口自由选择验收块",
                         review("本周新课硬目标已经到第25章；今天从课程账本、重点章配套题、正式框架、唯一主错因和D1/D3/D7中选择最大缺口集中完成"),
-                        review("刑法第一轮背诵按第8-25章账本验收：闭卷说目录树、构成要件和关键词，薄弱章登记回炉，不要求当天平均背完"),
-                        review("法理按本周硬终点继续闭卷背诵，不因刑法收口跳过背书"),
+                        review("今日建议背诵：${recitationSuggestion ?: "按本周剩余背诵章节选择一个块"}。这是推荐落点，可以因状态调整，但本周背诵硬终点不变"),
+                        review("刑法第一轮验收按已完成章节进行：闭卷说目录树、构成要件和关键词，薄弱章登记回炉，不要求当天平均背完"),
                         english(ExamStudyPlan.dailyVocabularyTaskTitle),
                         english(defaultEnglishTask(date)),
                     ),
@@ -152,10 +184,10 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         studyDatesBetween(civilStart, civilDeadline).forEach { date ->
             put(
                 date,
-                flexibleCourseDay(
+                guidedCourseDay(
                     date = date,
                     subject = "民法",
-                    courseRule = "从民法当前真实进度继续听众合法硕民法课程。短章可连续完成，长章可以跨日；今天不预设具体章节数，只对本周硬终点负责。",
+                    courseRule = "从民法当前真实进度继续听众合法硕民法课程。短章可连续完成，长章可以跨日；今日建议只提供起点和方向，不是硬性日验收。",
                 ),
             )
         }
@@ -164,10 +196,10 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         studyDatesBetween(constitutionStart, constitutionEnd).forEach { date ->
             put(
                 date,
-                flexibleCourseDay(
+                guidedCourseDay(
                     date = date,
                     subject = "宪法",
-                    courseRule = "从宪法当前真实进度继续听众合法硕宪法课程。按真实课时决定今天推进多少，不把每日均分当成完成标准。",
+                    courseRule = "从宪法当前真实进度继续听众合法硕宪法课程。按真实课时决定今天实际推进多少，不把今日建议当成必须清零的惩罚任务。",
                     includePolitics = true,
                 ),
             )
@@ -180,8 +212,8 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
                 transitionBuffer,
                 "宪法收口与法制史切换缓冲",
                 review("核对本月硬目标：宪法第1-7章必须全部完成；只补课程、正式框架、配套题入口和主错因中的最大缺口"),
-                review("按本周背诵硬目标完成法理第二轮与刑法第二轮当天份额，不新增无法验收的泛泛背书"),
-                review("写清法制史第1章明日入口；今天不提前制造新的日章节指标"),
+                review("今日建议背诵：${dailyRecitationSuggestions[transitionBuffer] ?: "法理第二轮与刑法第二轮各一个小块"}；可以按实际状态调整先后"),
+                review("写清法制史第1章明日入口；今日只做切换准备，不提前制造新的硬性日章节指标"),
                 english(ExamStudyPlan.dailyVocabularyTaskTitle),
                 english(defaultEnglishTask(transitionBuffer)),
                 politics("政治强化课/核心考案小节 + 1000题25-30道 + 主错因"),
@@ -191,10 +223,10 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         studyDatesBetween(legalHistoryStart, allCourseDeadline).forEach { date ->
             put(
                 date,
-                flexibleCourseDay(
+                guidedCourseDay(
                     date = date,
                     subject = "法制史",
-                    courseRule = "从法制史当前真实进度继续听众合法硕法制史课程。按朝代和制度连续推进，今天自由决定章节量，但9月30日必须到第7章。",
+                    courseRule = "从法制史当前真实进度继续听众合法硕法制史课程。按朝代和制度连续推进；今日建议可以调整，但9月30日必须到第7章。",
                     includePolitics = true,
                 ),
             )
@@ -212,7 +244,7 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
                     "【本周新课硬终点】${item.courseTarget}",
                     "【本周背诵硬终点】${item.recitationTarget}",
                     "【周末验收】${item.acceptance}",
-                    "【日内自由规则】每天不预先绑定具体章节数；根据长短章、身体状态和当天可用时长，自由选择半章、一章或多个短章，但周末硬终点不得变成‘继续推进’",
+                    "【每日建议规则】每日待办会给出建议章节，让你知道今天从哪里开始；建议可以不做、少做或多做，但周末硬终点不得变成泛泛的‘继续推进’",
                     "【英语保底】非完整休息日保持120词与真题主训练；英语、背诵和专业课都从当天总预算内切分",
                 ),
             )
@@ -222,19 +254,20 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         "2026-07" -> base.copy(
             focus = "月末硬目标：刑法听到第13章，法理背到第2章",
             tasks = listOf(
-                "【新课硬终点】7月31日前完成刑法第8-13章课程，课程账本明确停在第13章",
+                "【已确认进度】刑法第8章课程和题目已经全部完成，后续计划从第9章开始，不再重复第8章",
+                "【新课硬终点】7月31日前完成刑法第9-13章课程，课程账本明确停在第13章",
                 "【背诵硬终点】法理第一轮闭卷背诵完成第1-2章",
-                "【闭环验收】刑法第8-10章至少留下配套题入口、正式框架和唯一主错因；第11-13章留下课程与目录树记录",
-                "【执行方式】月目标固定、周目标固定；每天只决定当天完成多少，不再把章节按天机械均分",
+                "【闭环验收】刑法第9-10章至少留下配套题入口、正式框架和唯一主错因；第11-13章留下课程与目录树记录",
+                "【执行方式】月目标和周目标固定；每日给建议章节，但你可以根据真实课时和状态自行选择是否完成",
             ),
         )
         "2026-08" -> base.copy(
             focus = "月末硬目标：刑法全部收口，民法听到第27章",
             tasks = listOf(
                 "【新课硬终点】8月12日前听完刑法第25章，8月15日前完成刑法一轮总收口；8月31日前民法课程听到第27章",
-                "【背诵硬终点】法理第一轮完成第1-13章；民法第一轮目录树与关键词背诵完成第1-18章",
-                "【闭环验收】刑法第8-25章课程、重点章题目、正式框架、主错因和回炉日期可核对；民法已学章节留下最低可用闭环",
-                "【执行方式】每周写死章节终点，日计划根据真实课时自由安排，不用某一天没听完一章就判定整月失败",
+                "【背诵硬终点】法理第一轮完成第1-13章；民法第一轮目录树与关键词背诵累计完成第1-18章",
+                "【闭环验收】刑法第9-25章课程、重点章题目、正式框架、主错因和回炉日期可核对；民法已学章节留下最低可用闭环",
+                "【执行方式】每周写死章节终点，每日给出建议章节；某一天没有完成建议不算整月失败，但必须在周内重新分配",
             ),
         )
         "2026-09" -> base.copy(
@@ -272,33 +305,70 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         }
     }
 
-    private fun flexibleCourseDay(
+    private fun guidedCourseDay(
         date: LocalDate,
         subject: String,
         courseRule: String,
         includePolitics: Boolean = false,
     ): DailyStudyPlan {
         val target = milestoneFor(date)
+        val courseSuggestion = dailyCourseSuggestions[date]
+        val recitationSuggestion = dailyRecitationSuggestions[date]
         val tasks = buildList {
-            add(law("本周新课硬目标：${target?.courseTarget ?: "按当前月计划继续"}。$courseRule"))
+            add(
+                law(
+                    "今日建议进度：${courseSuggestion ?: "从当前未完成章节继续"}。这是今日导航，不是硬性日终点；你可以不做、少做或多做。" +
+                        " 本周新课硬目标：${target?.courseTarget ?: "按当前月计划继续"}。$courseRule",
+                ),
+            )
             add(review("今天只闭环实际完成的章节：整章听完后再集中做正式框架、配套题和唯一主错因；未听完的长章次日先续，不跳章"))
-            add(review("本周背诵硬目标：${target?.recitationTarget ?: "按当前轮次继续"}。今天从本周剩余章节中自由选择一个可完成背诵块，并留下闭卷复述痕迹"))
+            add(
+                review(
+                    "今日建议背诵：${recitationSuggestion ?: "从本周剩余背诵章节中选择一个块"}。这是建议落点，可以按状态调整；" +
+                        "本周背诵硬目标：${target?.recitationTarget ?: "按当前轮次继续"}。完成后留下闭卷复述痕迹",
+                ),
+            )
             add(english(ExamStudyPlan.dailyVocabularyTaskTitle))
             add(english(defaultEnglishTask(date)))
             if (includePolitics) {
                 add(politics("政治按本周固定题量完成当天一个课题绑定块；从当天总预算中切分，不挤掉专业课硬目标"))
             }
-            add(health("今天不设置强制章节终点；只要行动服务于本周硬目标即可。状态好可多推进，长章或不适时可少推进，但周末必须按硬终点验收"))
+            add(health("今日章节只是建议，不完成可以顺延或重新分配；状态好可多推进，长章或不适时可少推进，但周末必须按硬终点验收"))
         }
         return DailyStudyPlan(
             date = date,
-            title = "$subject：围绕本周硬目标自由安排今日进度",
+            title = "$subject｜今日建议：${courseSuggestion ?: "从当前章节继续"}",
             tasks = tasks,
         )
     }
 
     private fun milestoneFor(date: LocalDate): WeeklyMilestone? =
         milestones.firstOrNull { date >= it.start && date <= it.end }
+
+    private fun MutableMap<LocalDate, String>.addChapterSuggestions(
+        start: String,
+        end: String,
+        subject: String,
+        startChapter: Int,
+        endChapter: Int,
+    ) {
+        val dates = studyDatesBetween(LocalDate.parse(start), LocalDate.parse(end))
+        if (dates.isEmpty() || endChapter < startChapter) return
+        val chapterCount = endChapter - startChapter + 1
+        dates.forEachIndexed { index, date ->
+            val startOffset = index * chapterCount / dates.size
+            val endOffset = (((index + 1) * chapterCount / dates.size) - 1).coerceAtLeast(startOffset)
+            val suggestedStart = startChapter + startOffset
+            val suggestedEnd = (startChapter + endOffset).coerceAtMost(endChapter)
+            val chapterText = if (suggestedStart == suggestedEnd) {
+                "第${suggestedStart}章"
+            } else {
+                "第${suggestedStart}-${suggestedEnd}章"
+            }
+            val suggestion = "$subject$chapterText"
+            this[date] = listOfNotNull(this[date], suggestion).joinToString("；")
+        }
+    }
 
     private fun MutableMap<LocalDate, DailyStudyPlan>.addSundayRestDays(
         start: LocalDate,
