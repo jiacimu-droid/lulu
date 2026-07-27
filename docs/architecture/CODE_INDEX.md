@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`b36048219b297ff24840084c854720c041f8462f`
+- 基准提交：`eddf3d2f68066fb841f98fb0d1bd2ed8aac8639b`
 - 分支：`master`
-- 源码指纹：`211fd2c3b032ca3b…`
+- 源码指纹：`28f5510675bc449e…`
 - 已索引文件：1129
-- 已索引代码/文本行：265717
-- 已发现类、接口、对象、函数及 Composable：5526
+- 已索引代码/文本行：265425
+- 已发现类、接口、对象、函数及 Composable：5522
 
 ## 仓库健康信号
 
@@ -106,10 +106,10 @@
 | `plugins/橘市商业街/main.js` | 1369 | 0 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt` | 1358 | 31 | 36 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt` | 1311 | 51 | 0 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt` | 1266 | 25 | 27 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt` | 1234 | 21 | 28 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt` | 1211 | 14 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt` | 1191 | 33 | 39 |
+| `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt` | 1187 | 60 | 0 |
 
 ### 本地导入最多的生产文件
 
@@ -540,7 +540,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：1955
-- 可检索完整符号：4929
+- 可检索完整符号：4925
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|

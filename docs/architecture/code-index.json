@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T03:12:18.980058+00:00",
-  "commit": "b36048219b297ff24840084c854720c041f8462f",
+  "generatedAt": "2026-07-27T03:46:56.655406+00:00",
+  "commit": "eddf3d2f68066fb841f98fb0d1bd2ed8aac8639b",
   "branch": "master",
-  "sourceFingerprint": "211fd2c3b032ca3b60996e0d22ec9a9fd3bad0842ac50452d331a575d6f5e98a",
+  "sourceFingerprint": "28f5510675bc449e23b2d2ee603979c8f01fe9ff10693814d096dee8491151a9",
   "summary": {
     "files": 1129,
-    "lines": 265717,
-    "symbols": 5526,
+    "lines": 265425,
+    "symbols": 5522,
     "productionCodeFiles": 798,
     "testFiles": 138,
     "largeProductionFiles": 42,
@@ -210,13 +210,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
-        "lines": 1266,
-        "symbols": 25,
-        "localImportCount": 27,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "lines": 1234,
         "symbols": 21,
@@ -340,6 +333,13 @@
         "lines": 983,
         "symbols": 1,
         "localImportCount": 0,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
+        "lines": 974,
+        "symbols": 21,
+        "localImportCount": 23,
         "todoMarkers": 0
       }
     ],
@@ -760,9 +760,9 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
-        "lines": 1266,
-        "symbols": 25,
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
+        "lines": 820,
+        "symbols": 9,
         "localImportCount": 27,
         "todoMarkers": 0
       }
@@ -36089,8 +36089,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 1266,
-      "sha256": "da5efd99c45789f055edd8a1ccef02900fe86099b10d4a844df1dd020c4f6b0c",
+      "lines": 974,
+      "sha256": "ac6b7b39577af96e806fcb0eeb77b230e9af8f6f29f3ed0ff71b606eaa534fc0",
       "package": "me.rerere.rikkahub.ui.pages.cihai",
       "categories": [
         "界面"
@@ -36099,130 +36099,110 @@
         {
           "name": "CihaiPage",
           "kind": "composable",
-          "line": 79
+          "line": 74
         },
         {
           "name": "CihaiSection",
           "kind": "class",
-          "line": 479
+          "line": 399
         },
         {
           "name": "visibleCihaiSections",
           "kind": "function",
-          "line": 529
-        },
-        {
-          "name": "CommitmentCard",
-          "kind": "composable",
-          "line": 538
-        },
-        {
-          "name": "commitmentDisplayRank",
-          "kind": "function",
-          "line": 631
-        },
-        {
-          "name": "commitmentTitle",
-          "kind": "function",
-          "line": 643
-        },
-        {
-          "name": "commitmentStatusText",
-          "kind": "function",
-          "line": 650
-        },
-        {
-          "name": "commitmentScheduleText",
-          "kind": "function",
-          "line": 662
-        },
-        {
-          "name": "ResponsibilityAnchorCard",
-          "kind": "composable",
-          "line": 668
-        },
-        {
-          "name": "ResponsibilityLine",
-          "kind": "composable",
-          "line": 720
+          "line": 431
         },
         {
           "name": "entriesForCihaiSection",
           "kind": "function",
-          "line": 729
+          "line": 438
+        },
+        {
+          "name": "CommitmentCard",
+          "kind": "composable",
+          "line": 450
+        },
+        {
+          "name": "commitmentDisplayRank",
+          "kind": "function",
+          "line": 550
+        },
+        {
+          "name": "commitmentTitle",
+          "kind": "function",
+          "line": 562
+        },
+        {
+          "name": "commitmentStatusText",
+          "kind": "function",
+          "line": 570
+        },
+        {
+          "name": "commitmentScheduleText",
+          "kind": "function",
+          "line": 582
+        },
+        {
+          "name": "ResponsibilityAnchorCard",
+          "kind": "composable",
+          "line": 588
+        },
+        {
+          "name": "ResponsibilityLine",
+          "kind": "composable",
+          "line": 644
         },
         {
           "name": "ConcernCard",
           "kind": "composable",
-          "line": 741
-        },
-        {
-          "name": "RelationshipOverview",
-          "kind": "composable",
-          "line": 807
-        },
-        {
-          "name": "RelationshipTextCard",
-          "kind": "composable",
-          "line": 921
-        },
-        {
-          "name": "FavoriteCard",
-          "kind": "composable",
-          "line": 967
+          "line": 654
         },
         {
           "name": "LifeEventCard",
           "kind": "composable",
-          "line": 1007
+          "line": 727
         },
         {
           "name": "lifeEventLabel",
           "kind": "function",
-          "line": 1066
-        },
-        {
-          "name": "RelationshipTimelineEntry",
-          "kind": "composable",
-          "line": 1088
+          "line": 800
         },
         {
           "name": "EmptyCihaiSection",
           "kind": "composable",
-          "line": 1133
+          "line": 823
         },
         {
           "name": "AssistantSelector",
           "kind": "composable",
-          "line": 1161
+          "line": 851
         },
         {
           "name": "EntryCard",
           "kind": "composable",
-          "line": 1178
+          "line": 874
         },
         {
           "name": "formatTime",
           "kind": "function",
-          "line": 1218
+          "line": 922
         },
         {
           "name": "displayBody",
           "kind": "function",
-          "line": 1221
+          "line": 925
         },
         {
           "name": "extractTraceSection",
           "kind": "function",
-          "line": 1238
+          "line": 942
         },
         {
           "name": "cleanTraceForUser",
           "kind": "function",
-          "line": 1246
+          "line": 954
         }
       ],
-      "localImportCount": 27,
+      "localImportCount": 23,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -36237,12 +36217,8 @@
         "me.rerere.rikkahub.data.companion.CompanionAlwaysOnAnchorStatus",
         "me.rerere.rikkahub.data.companion.CompanionCommitment",
         "me.rerere.rikkahub.data.companion.CompanionCommitmentStatus",
-        "me.rerere.rikkahub.data.companion.CompanionFavorite",
         "me.rerere.rikkahub.data.companion.CompanionLifeEvent",
         "me.rerere.rikkahub.data.companion.CompanionLifeEventStatus",
-        "me.rerere.rikkahub.data.companion.CompanionPrivateImpression",
-        "me.rerere.rikkahub.data.companion.CompanionRelationshipEvent",
-        "me.rerere.rikkahub.data.companion.CompanionRelationshipState",
         "me.rerere.rikkahub.data.companion.CompanionRuntime",
         "me.rerere.rikkahub.data.companion.CompanionSnapshot",
         "me.rerere.rikkahub.data.companion.CompanionStore",
@@ -89205,14 +89181,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 1161
+        "line": 851
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.CihaiPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 79
+        "line": 74
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.CihaiPageEntryKindsTest": [
@@ -89233,14 +89209,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "class",
-        "line": 479
+        "line": 399
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.CommitmentCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 538
+        "line": 450
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.CompanionConcernCardModel": [
@@ -89275,70 +89251,42 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 741
+        "line": 654
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.EmptyCihaiSection": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 1133
+        "line": 823
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.EntryCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 1178
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.cihai.FavoriteCard": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
-        "kind": "composable",
-        "line": 967
+        "line": 874
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.LifeEventCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 1007
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.cihai.RelationshipOverview": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
-        "kind": "composable",
-        "line": 807
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.cihai.RelationshipTextCard": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
-        "kind": "composable",
-        "line": 921
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.cihai.RelationshipTimelineEntry": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
-        "kind": "composable",
-        "line": 1088
+        "line": 727
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.ResponsibilityAnchorCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 668
+        "line": 588
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.ResponsibilityLine": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "composable",
-        "line": 720
+        "line": 644
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.SortableConcernCard": [
@@ -89373,7 +89321,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 1246
+        "line": 954
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.collapseLegacyCommitments": [
@@ -89401,28 +89349,28 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 631
+        "line": 550
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.commitmentScheduleText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 662
+        "line": 582
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.commitmentStatusText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 650
+        "line": 570
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.commitmentTitle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 643
+        "line": 562
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.companionConcernFamily": [
@@ -89462,14 +89410,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 1221
+        "line": 925
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.entriesForCihaiSection": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 729
+        "line": 438
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.entry": [
@@ -89490,14 +89438,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 1238
+        "line": 942
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.formatTime": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 1218
+        "line": 922
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.humanRelationshipEvidence": [
@@ -89518,7 +89466,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 1066
+        "line": 800
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.normalizedSubjectKey": [
@@ -89591,7 +89539,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "kind": "function",
-        "line": 529
+        "line": 431
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.visiblePriority": [
