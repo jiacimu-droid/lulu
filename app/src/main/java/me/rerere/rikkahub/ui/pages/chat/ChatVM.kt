@@ -12,10 +12,15 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.FirebaseAnalytics
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -76,13 +81,19 @@ class ChatVM(
         .getConversationJobs()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
+    private lateinit var initialization: Deferred<Unit>
+    private val _conversationReady = MutableStateFlow(false)
+    val conversationReady: StateFlow<Boolean> = _conversationReady.asStateFlow()
+
     init {
         // 添加对话引用
         chatService.addConversationReference(_conversationId)
 
-        // 初始化对话
-        viewModelScope.launch {
+        // 初始化必须成为所有会修改对话的操作之前的屏障。否则旧会话仍在从数据库
+        // 加载时，发送动作会基于空 Conversation.ofId 保存，直接覆盖完整历史。
+        initialization = viewModelScope.async {
             chatService.initializeConversation(_conversationId)
+            _conversationReady.value = true
         }
 
         context.writeStringPreference("lastConversationId", _conversationId.toString())
@@ -92,6 +103,24 @@ class ChatVM(
         super.onCleared()
         // 移除对话引用
         chatService.removeConversationReference(_conversationId)
+    }
+
+    private fun launchAfterInitialization(
+        title: String = context.getString(R.string.error_title_operation),
+        block: suspend () -> Unit,
+    ): Job = viewModelScope.launch {
+        try {
+            initialization.await()
+            block()
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (error: Throwable) {
+            chatService.addError(
+                error = error,
+                conversationId = _conversationId,
+                title = title,
+            )
+        }
     }
 
     // 用户设置
@@ -168,25 +197,29 @@ class ChatVM(
         if (content.isEmptyInputMessage()) return
         analytics.logEvent("ai_send_message", null)
 
-        chatService.sendMessage(_conversationId, content, answer)
+        launchAfterInitialization(context.getString(R.string.error_title_send_message)) {
+            chatService.sendMessage(_conversationId, content, answer)
+        }
     }
 
     fun handleReplyRequest() {
         analytics.logEvent("ai_request_reply", null)
-        chatService.requestReply(_conversationId)
+        launchAfterInitialization(context.getString(R.string.error_title_generation)) {
+            chatService.requestReply(_conversationId)
+        }
     }
 
     fun handleMessageEdit(parts: List<UIMessagePart>, messageId: Uuid) {
         if (parts.isEmptyInputMessage()) return
         analytics.logEvent("ai_edit_message", null)
 
-        viewModelScope.launch {
+        launchAfterInitialization {
             chatService.editMessage(_conversationId, messageId, parts)
         }
     }
 
     fun handleCompressContext(additionalPrompt: String, targetTokens: Int, keepRecentMessages: Int): Job {
-        return viewModelScope.launch {
+        return launchAfterInitialization(context.getString(R.string.error_title_compress_conversation)) {
             chatService.compressConversation(
                 _conversationId,
                 conversation.value,
@@ -200,11 +233,12 @@ class ChatVM(
     }
 
     suspend fun forkMessage(message: UIMessage): Conversation {
+        initialization.await()
         return chatService.forkConversationAtMessage(_conversationId, message.id)
     }
 
     fun deleteMessage(message: UIMessage) {
-        viewModelScope.launch {
+        launchAfterInitialization {
             chatService.deleteMessage(_conversationId, message)
         }
     }
@@ -222,7 +256,9 @@ class ChatVM(
         regenerateAssistantMsg: Boolean = true
     ) {
         analytics.logEvent("ai_regenerate_at_message", null)
-        chatService.regenerateAtMessage(_conversationId, message, regenerateAssistantMsg)
+        launchAfterInitialization(context.getString(R.string.error_title_generation)) {
+            chatService.regenerateAtMessage(_conversationId, message, regenerateAssistantMsg)
+        }
     }
 
     fun handleToolApproval(
@@ -231,7 +267,9 @@ class ChatVM(
         reason: String = ""
     ) {
         analytics.logEvent("ai_tool_approval", null)
-        chatService.handleToolApproval(_conversationId, toolCallId, approved, reason)
+        launchAfterInitialization {
+            chatService.handleToolApproval(_conversationId, toolCallId, approved, reason)
+        }
     }
 
     fun handleToolAnswer(
@@ -239,7 +277,9 @@ class ChatVM(
         answer: String,
     ) {
         analytics.logEvent("ai_tool_answer", null)
-        chatService.handleToolApproval(_conversationId, toolCallId, approved = true, answer = answer)
+        launchAfterInitialization {
+            chatService.handleToolApproval(_conversationId, toolCallId, approved = true, answer = answer)
+        }
     }
 
     fun stopGeneration() {
@@ -249,13 +289,14 @@ class ChatVM(
     }
 
     fun saveConversationAsync() {
-        viewModelScope.launch {
+        launchAfterInitialization {
+            // 读取发生在初始化屏障之后，禁止把初始化前的空快照写回数据库。
             chatService.saveConversation(_conversationId, conversation.value)
         }
     }
 
     fun updateTitle(title: String) {
-        viewModelScope.launch {
+        launchAfterInitialization {
             val updatedConversation = conversation.value.copy(title = title)
             chatService.saveConversation(_conversationId, updatedConversation)
         }
@@ -274,8 +315,8 @@ class ChatVM(
     }
 
     fun moveConversationToAssistant(conversation: Conversation, targetAssistantId: Uuid) {
-        viewModelScope.launch {
-            val conversationFull = conversationRepo.getConversationById(conversation.id) ?: return@launch
+        launchAfterInitialization {
+            val conversationFull = conversationRepo.getConversationById(conversation.id) ?: return@launchAfterInitialization
             val updatedConversation = conversationFull.copy(assistantId = targetAssistantId)
             if (conversation.id == _conversationId) {
                 chatService.saveConversation(_conversationId, updatedConversation)
@@ -287,28 +328,39 @@ class ChatVM(
     }
 
     fun translateMessage(message: UIMessage, targetLanguage: Locale) {
-        chatService.translateMessage(_conversationId, message, targetLanguage)
+        launchAfterInitialization {
+            chatService.translateMessage(_conversationId, message, targetLanguage)
+        }
     }
 
     fun generateTitle(conversation: Conversation, force: Boolean = false) {
-        viewModelScope.launch {
-            val conversationFull = conversationRepo.getConversationById(conversation.id) ?: return@launch
+        launchAfterInitialization(context.getString(R.string.error_title_generate_title)) {
+            val conversationFull = conversationRepo.getConversationById(conversation.id) ?: return@launchAfterInitialization
             chatService.generateTitle(_conversationId, conversationFull, force)
         }
     }
 
     fun clearTranslationField(messageId: Uuid) {
-        chatService.clearTranslationField(_conversationId, messageId)
+        launchAfterInitialization {
+            chatService.clearTranslationField(_conversationId, messageId)
+        }
     }
 
     fun updateConversation(newConversation: Conversation) {
-        chatService.updateConversationState(_conversationId) {
-            newConversation
+        val baseConversation = conversation.value
+        launchAfterInitialization {
+            chatService.updateConversationState(_conversationId) { currentConversation ->
+                mergeConversationEdit(
+                    base = baseConversation,
+                    edited = newConversation,
+                    current = currentConversation,
+                )
+            }
         }
     }
 
     fun toggleMessageFavorite(node: MessageNode) {
-        viewModelScope.launch {
+        launchAfterInitialization {
             val currentlyFavorited = favoriteRepository.isNodeFavorited(_conversationId, node.id)
             if (currentlyFavorited) {
                 favoriteRepository.removeNodeFavorite(_conversationId, node.id)
@@ -341,6 +393,42 @@ class ChatVM(
             }
         }
     }
+}
+
+/**
+ * Applies only the fields that actually changed relative to the UI snapshot the
+ * edit started from. This keeps a late database load from being replaced by an
+ * earlier empty snapshot while still allowing intentional edits after loading.
+ */
+internal fun mergeConversationEdit(
+    base: Conversation,
+    edited: Conversation,
+    current: Conversation,
+): Conversation {
+    if (base.id != current.id || edited.id != current.id) return current
+    return current.copy(
+        assistantId = if (edited.assistantId != base.assistantId) edited.assistantId else current.assistantId,
+        title = if (edited.title != base.title) edited.title else current.title,
+        messageNodes = if (edited.messageNodes != base.messageNodes) edited.messageNodes else current.messageNodes,
+        chatSuggestions = if (edited.chatSuggestions != base.chatSuggestions) {
+            edited.chatSuggestions
+        } else {
+            current.chatSuggestions
+        },
+        isPinned = if (edited.isPinned != base.isPinned) edited.isPinned else current.isPinned,
+        createAt = if (edited.createAt != base.createAt) edited.createAt else current.createAt,
+        updateAt = if (edited.updateAt != base.updateAt) edited.updateAt else current.updateAt,
+        customSystemPrompt = if (edited.customSystemPrompt != base.customSystemPrompt) {
+            edited.customSystemPrompt
+        } else {
+            current.customSystemPrompt
+        },
+        newConversation = if (edited.newConversation != base.newConversation) {
+            edited.newConversation
+        } else {
+            current.newConversation
+        },
+    )
 }
 
 internal fun canRequestManualReply(conversation: Conversation): Boolean =
