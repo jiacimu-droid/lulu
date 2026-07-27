@@ -25,6 +25,24 @@ class CompanionHeartbeatTest {
     }
 
     @Test
+    fun `quiet interval opens an interaction rhythm decision without forcing a message`() {
+        val nowMillis = 10_000_000L
+        val decision = CompanionHeartbeatEvaluator.evaluate(
+            snapshot = CompanionSnapshot.empty("assistant-a").copy(
+                interactionTimeline = CompanionInteractionTimeline(
+                    lastUserActivityAt = nowMillis - 50L * 60_000L,
+                    lastOutboundAt = nowMillis - 50L * 60_000L,
+                ),
+            ),
+            nowMillis = nowMillis,
+        )
+
+        assertEquals(50L, decision.minutesSinceUserActivity)
+        assertTrue(decision.shouldRunDeepPerception)
+        assertEquals("interaction_rhythm_check", decision.reason)
+    }
+
+    @Test
     fun `outbound contact cannot hide a long user absence`() {
         val decision = CompanionHeartbeatEvaluator.evaluate(
             snapshot = CompanionSnapshot.empty("assistant-a").copy(
@@ -38,7 +56,7 @@ class CompanionHeartbeatTest {
 
         assertTrue(decision.minutesSinceUserActivity > 120L)
         assertTrue(decision.shouldRunDeepPerception)
-        assertEquals("meaningful_silence", decision.reason)
+        assertEquals("interaction_rhythm_check", decision.reason)
     }
 
     @Test
