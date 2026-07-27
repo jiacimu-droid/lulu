@@ -175,7 +175,9 @@ class StudyVM(
             after = result.state,
         )
         if (bonus.granted) {
-            emitReward("今日累计学习满4小时：抖音时长券 · 20分钟 x1")
+            emitReward(
+                "今日累计学习满4小时：抖音时长券 · 20分钟 x${StudyGachaRewardPolicy.FOUR_HOUR_DOUYIN_TICKETS}",
+            )
         }
         bonus.state
     }
