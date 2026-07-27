@@ -41,10 +41,10 @@ import me.rerere.rikkahub.ui.theme.CustomColors
 @Composable
 internal fun DisplayThemeSection(
     dynamicColor: Boolean,
-    themeId: Int,
+    themeId: String,
     amoledDarkMode: Boolean,
     onDynamicColorChange: (Boolean) -> Unit,
-    onThemeChange: (Int) -> Unit,
+    onThemeChange: (String) -> Unit,
     onAmoledDarkModeChange: (Boolean) -> Unit,
 ) {
     Column(
@@ -238,95 +238,59 @@ internal fun DisplayMessageSection(
         modifier = Modifier.padding(horizontal = 8.dp),
         title = { Text(stringResource(R.string.setting_page_message_display_settings)) },
     ) {
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_show_user_avatar_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_show_user_avatar_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.showUserAvatar,
-                    onCheckedChange = { onUpdate(displaySetting.copy(showUserAvatar = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_show_user_avatar_title),
+            description = stringResource(R.string.setting_display_page_show_user_avatar_desc),
+            checked = displaySetting.showUserAvatar,
+            onChecked = { onUpdate(displaySetting.copy(showUserAvatar = it)) },
         )
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_show_assistant_bubble_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_show_assistant_bubble_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.showAssistantBubble,
-                    onCheckedChange = { onUpdate(displaySetting.copy(showAssistantBubble = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_show_assistant_bubble_title),
+            description = stringResource(R.string.setting_display_page_show_assistant_bubble_desc),
+            checked = displaySetting.showAssistantBubble,
+            onChecked = { onUpdate(displaySetting.copy(showAssistantBubble = it)) },
         )
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_chat_list_model_icon_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_chat_list_model_icon_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.showModelIcon,
-                    onCheckedChange = { onUpdate(displaySetting.copy(showModelIcon = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_chat_list_model_icon_title),
+            description = stringResource(R.string.setting_display_page_chat_list_model_icon_desc),
+            checked = displaySetting.showModelIcon,
+            onChecked = { onUpdate(displaySetting.copy(showModelIcon = it)) },
         )
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_show_model_name_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_show_model_name_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.showModelName,
-                    onCheckedChange = { onUpdate(displaySetting.copy(showModelName = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_show_model_name_title),
+            description = stringResource(R.string.setting_display_page_show_model_name_desc),
+            checked = displaySetting.showModelName,
+            onChecked = { onUpdate(displaySetting.copy(showModelName = it)) },
         )
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_show_date_below_name_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_show_date_below_name_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.showDateBelowName,
-                    onCheckedChange = { onUpdate(displaySetting.copy(showDateBelowName = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_show_date_below_name_title),
+            description = stringResource(R.string.setting_display_page_show_date_below_name_desc),
+            checked = displaySetting.showDateBelowName,
+            onChecked = { onUpdate(displaySetting.copy(showDateBelowName = it)) },
         )
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_show_token_usage_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_show_token_usage_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.showTokenUsage,
-                    onCheckedChange = { onUpdate(displaySetting.copy(showTokenUsage = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_show_token_usage_title),
+            description = stringResource(R.string.setting_display_page_show_token_usage_desc),
+            checked = displaySetting.showTokenUsage,
+            onChecked = { onUpdate(displaySetting.copy(showTokenUsage = it)) },
         )
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_show_thinking_content_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_show_thinking_content_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.showThinkingContent,
-                    onCheckedChange = { onUpdate(displaySetting.copy(showThinkingContent = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_show_thinking_content_title),
+            description = stringResource(R.string.setting_display_page_show_thinking_content_desc),
+            checked = displaySetting.showThinkingContent,
+            onChecked = { onUpdate(displaySetting.copy(showThinkingContent = it)) },
         )
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_auto_collapse_thinking_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_auto_collapse_thinking_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.autoCloseThinking,
-                    onCheckedChange = { onUpdate(displaySetting.copy(autoCloseThinking = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_auto_collapse_thinking_title),
+            description = stringResource(R.string.setting_display_page_auto_collapse_thinking_desc),
+            checked = displaySetting.autoCloseThinking,
+            onChecked = { onUpdate(displaySetting.copy(autoCloseThinking = it)) },
         )
-        item(
-            headlineContent = { Text(stringResource(R.string.setting_display_page_enable_latex_rendering_title)) },
-            supportingContent = { Text(stringResource(R.string.setting_display_page_enable_latex_rendering_desc)) },
-            trailingContent = {
-                Switch(
-                    checked = displaySetting.enableLatexRendering,
-                    onCheckedChange = { onUpdate(displaySetting.copy(enableLatexRendering = it)) },
-                )
-            },
+        DisplayBooleanRow(
+            title = stringResource(R.string.setting_display_page_enable_latex_rendering_title),
+            description = stringResource(R.string.setting_display_page_enable_latex_rendering_desc),
+            checked = displaySetting.enableLatexRendering,
+            onChecked = { onUpdate(displaySetting.copy(enableLatexRendering = it)) },
         )
 
         val chatFontFamilyOptions = listOf(
@@ -364,20 +328,13 @@ internal fun DisplayMessageSection(
             headlineContent = { Text(stringResource(R.string.setting_display_page_font_size_title)) },
             supportingContent = {
                 Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Slider(
-                            value = displaySetting.fontSizeRatio,
-                            onValueChange = { onUpdate(displaySetting.copy(fontSizeRatio = it)) },
-                            valueRange = 0.5f..2f,
-                            steps = 11,
-                            modifier = Modifier.weight(1f),
-                        )
-                        Text(text = "${(displaySetting.fontSizeRatio * 100).toInt()}%")
-                    }
+                    DisplaySettingSlider(
+                        value = displaySetting.fontSizeRatio,
+                        onValueChange = { onUpdate(displaySetting.copy(fontSizeRatio = it)) },
+                        valueRange = 0.5f..2f,
+                        steps = 11,
+                        label = "${(displaySetting.fontSizeRatio * 100).toInt()}%",
+                    )
                     MarkdownBlock(
                         content = stringResource(R.string.setting_display_page_font_size_preview),
                         style = LocalTextStyle.current.copy(
@@ -431,6 +388,19 @@ internal fun DisplayMessageSection(
             },
         )
     }
+}
+
+private fun me.rerere.rikkahub.ui.components.ui.CardGroupScope.DisplayBooleanRow(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onChecked: (Boolean) -> Unit,
+) {
+    item(
+        headlineContent = { Text(title) },
+        supportingContent = { Text(description) },
+        trailingContent = { Switch(checked = checked, onCheckedChange = onChecked) },
+    )
 }
 
 @Composable
