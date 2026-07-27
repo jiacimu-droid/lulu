@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T06:59:25.729614+00:00",
-  "commit": "4f562f464174941f7edd3824996473c973a88555",
+  "generatedAt": "2026-07-27T07:00:31.891822+00:00",
+  "commit": "c05d3a89153f811f6179efebb42f3d0a2834ac18",
   "branch": "master",
-  "sourceFingerprint": "b68b96fd662bf77a0f6b01caefc2a3c481d6d8637b47d669f7c596e31e12db08",
+  "sourceFingerprint": "b826364865ed84c3a5c6a35feebd6bf41c391a4e070f577004a7c162f2a86e12",
   "summary": {
-    "files": 1136,
-    "lines": 266588,
-    "symbols": 5559,
-    "productionCodeFiles": 800,
+    "files": 1137,
+    "lines": 266721,
+    "symbols": 5562,
+    "productionCodeFiles": 801,
     "testFiles": 143,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 675,
+      "app": 676,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 743,
+      ".kt": 744,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 24,
+      "学习监督": 25,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
@@ -1373,6 +1373,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
@@ -23580,6 +23581,41 @@
           "name": "WeeklyMilestone",
           "kind": "class",
           "line": 431
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 133,
+      "sha256": "50b6e01d5db5e5986d30b1ec10853ef334d23e2aa5571ff58ddbad68126c3fa9",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "ThreeRoundRecitationPlan",
+          "kind": "object",
+          "line": 12
+        },
+        {
+          "name": "monthlyPlan",
+          "kind": "function",
+          "line": 87
+        },
+        {
+          "name": "week",
+          "kind": "function",
+          "line": 127
         }
       ],
       "localImportCount": 0,
@@ -79615,6 +79651,13 @@
         "line": 233
       }
     ],
+    "me.rerere.rikkahub.data.study.ThreeRoundRecitationPlan": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
+        "kind": "object",
+        "line": 12
+      }
+    ],
     "me.rerere.rikkahub.data.study.WeeklyMilestone": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
@@ -80264,6 +80307,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
         "line": 253
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
+        "kind": "function",
+        "line": 87
       }
     ],
     "me.rerere.rikkahub.data.study.movementPlanUsesMusicBasedIndoorOptionsForEnergyRecovery": [
@@ -80809,6 +80857,13 @@
         "path": "app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt",
         "kind": "function",
         "line": 316
+      }
+    ],
+    "me.rerere.rikkahub.data.study.week": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
+        "kind": "function",
+        "line": 127
       }
     ],
     "me.rerere.rikkahub.data.study.weekForDate": [
