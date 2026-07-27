@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:05:37.457565+00:00",
-  "commit": "5c40a71540a31b90414e23dc16e0600a92078136",
+  "generatedAt": "2026-07-27T05:08:14.667739+00:00",
+  "commit": "32616e9d37bdda4de6a4a73e44d4807690ce2c07",
   "branch": "master",
-  "sourceFingerprint": "2f2c2d1f16dd71a345577982b2ca0b5d3d9d5cea042d6a38c49fb07eb3bc241b",
+  "sourceFingerprint": "726883a4b1a0464da97ff9bc41cf6c713f6e76ff8126e309aa46d48df60d9471",
   "summary": {
     "files": 1130,
-    "lines": 265877,
-    "symbols": 5544,
+    "lines": 265913,
+    "symbols": 5547,
     "productionCodeFiles": 799,
     "testFiles": 138,
     "largeProductionFiles": 42,
@@ -931,8 +931,8 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
-        "lines": 295,
-        "symbols": 16,
+        "lines": 331,
+        "symbols": 19,
         "localImportCount": 8,
         "importedByCount": 48,
         "todoMarkers": 0
@@ -18390,8 +18390,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 295,
-      "sha256": "66368686b0a4769f3e3bc39056cddc867acb16584fb55d6dee3866aa6c74774a",
+      "lines": 331,
+      "sha256": "0f028deb86e65e62fb994c8e472550c85694ab59af952821cc185a8b207c722f",
       "package": "me.rerere.rikkahub.data.model",
       "categories": [],
       "symbols": [
@@ -18406,74 +18406,89 @@
           "line": 67
         },
         {
+          "name": "AssistantInitiativeLevel",
+          "kind": "class",
+          "line": 75
+        },
+        {
           "name": "isBlank",
           "kind": "function",
-          "line": 75
+          "line": 83
+        },
+        {
+          "name": "initiativeLevel",
+          "kind": "function",
+          "line": 91
         },
         {
           "name": "toPromptContext",
           "kind": "function",
-          "line": 82
+          "line": 115
+        },
+        {
+          "name": "hasAnyInteractionMarker",
+          "kind": "function",
+          "line": 129
         },
         {
           "name": "QuickMessage",
           "kind": "class",
-          "line": 97
+          "line": 133
         },
         {
           "name": "AssistantAffectScope",
           "kind": "class",
-          "line": 104
+          "line": 140
         },
         {
           "name": "AssistantRegex",
           "kind": "class",
-          "line": 110
+          "line": 146
         },
         {
           "name": "replaceRegexes",
           "kind": "function",
-          "line": 120
+          "line": 156
         },
         {
           "name": "InjectionPosition",
           "kind": "class",
-          "line": 151
+          "line": 187
         },
         {
           "name": "PromptInjection",
           "kind": "class",
-          "line": 175
+          "line": 211
         },
         {
           "name": "ModeInjection",
           "kind": "class",
-          "line": 190
+          "line": 226
         },
         {
           "name": "RegexInjection",
           "kind": "class",
-          "line": 206
+          "line": 242
         },
         {
           "name": "Lorebook",
           "kind": "class",
-          "line": 227
+          "line": 263
         },
         {
           "name": "isTriggered",
           "kind": "function",
-          "line": 242
+          "line": 278
         },
         {
           "name": "extractContextForMatching",
           "kind": "function",
-          "line": 272
+          "line": 308
         },
         {
           "name": "getTriggeredInjections",
           "kind": "function",
-          "line": 288
+          "line": 324
         }
       ],
       "localImportCount": 8,
@@ -74745,7 +74760,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
-        "line": 104
+        "line": 140
+      }
+    ],
+    "me.rerere.rikkahub.data.model.AssistantInitiativeLevel": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "kind": "class",
+        "line": 75
       }
     ],
     "me.rerere.rikkahub.data.model.AssistantInteractionProfile": [
@@ -74759,7 +74781,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
-        "line": 110
+        "line": 146
       }
     ],
     "me.rerere.rikkahub.data.model.Avatar": [
@@ -74815,7 +74837,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
-        "line": 151
+        "line": 187
       }
     ],
     "me.rerere.rikkahub.data.model.Leaderboard": [
@@ -74836,7 +74858,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
-        "line": 227
+        "line": 263
       }
     ],
     "me.rerere.rikkahub.data.model.MessageNode": [
@@ -74850,7 +74872,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
-        "line": 190
+        "line": 226
       }
     ],
     "me.rerere.rikkahub.data.model.NodeFavoriteRef": [
@@ -74871,21 +74893,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
-        "line": 175
+        "line": 211
       }
     ],
     "me.rerere.rikkahub.data.model.QuickMessage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
-        "line": 97
+        "line": 133
       }
     ],
     "me.rerere.rikkahub.data.model.RegexInjection": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
-        "line": 206
+        "line": 242
       }
     ],
     "me.rerere.rikkahub.data.model.Sponsor": [
@@ -74925,7 +74947,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "function",
-        "line": 272
+        "line": 308
       }
     ],
     "me.rerere.rikkahub.data.model.fileUri": [
@@ -74960,21 +74982,35 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "function",
-        "line": 288
+        "line": 324
+      }
+    ],
+    "me.rerere.rikkahub.data.model.hasAnyInteractionMarker": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "kind": "function",
+        "line": 129
+      }
+    ],
+    "me.rerere.rikkahub.data.model.initiativeLevel": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "kind": "function",
+        "line": 91
       }
     ],
     "me.rerere.rikkahub.data.model.isBlank": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "function",
-        "line": 75
+        "line": 83
       }
     ],
     "me.rerere.rikkahub.data.model.isTriggered": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "function",
-        "line": 242
+        "line": 278
       }
     ],
     "me.rerere.rikkahub.data.model.of": [
@@ -74995,7 +75031,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "function",
-        "line": 120
+        "line": 156
       }
     ],
     "me.rerere.rikkahub.data.model.toMessageNode": [
@@ -75009,7 +75045,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "function",
-        "line": 82
+        "line": 115
       }
     ],
     "me.rerere.rikkahub.data.model.updateCurrentMessages": [
