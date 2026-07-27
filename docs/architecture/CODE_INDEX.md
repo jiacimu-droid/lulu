@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`62634744dcb717bdab0977b615111195bc4a4bee`
+- 基准提交：`e9d6f52e00f4b09bd1603d47a6dc2eb5ec8e1f1b`
 - 分支：`master`
-- 源码指纹：`47521d0023eb0258…`
+- 源码指纹：`d9c31b4ec4cc9585…`
 - 已索引文件：1168
-- 已索引代码/文本行：268923
-- 已发现类、接口、对象、函数及 Composable：5629
+- 已索引代码/文本行：267483
+- 已发现类、接口、对象、函数及 Composable：5616
 
 ## 仓库健康信号
 
@@ -25,8 +25,8 @@
 |---|---:|
 | 生产代码文件 | 829 |
 | 测试文件 | 146 |
-| ≥800 行生产文件 | 39 |
-| ≥1500 行生产文件 | 5 |
+| ≥800 行生产文件 | 38 |
+| ≥1500 行生产文件 | 4 |
 | TODO/FIXME/HACK/XXX | 32 |
 
 ## 核心产品链路
@@ -99,7 +99,6 @@
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 2295 | 57 | 90 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt` | 1874 | 94 | 17 |
 | `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt` | 1579 | 14 | 18 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt` | 1568 | 14 | 46 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt` | 1496 | 41 | 6 |
 | `plugins/橘市商业街/main.js` | 1369 | 0 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt` | 1311 | 51 | 0 |
@@ -110,6 +109,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 1166 | 14 | 44 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt` | 1142 | 12 | 31 |
 | `web-ui/app/routes/conversations.tsx` | 1132 | 3 | 0 |
+| `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt` | 1124 | 23 | 6 |
 
 ### 本地导入最多的生产文件
 
@@ -119,7 +119,6 @@
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 90 | 2295 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt` | 90 | 612 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 89 | 1032 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt` | 46 | 1568 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 44 | 1166 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt` | 39 | 416 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt` | 39 | 784 |
@@ -130,6 +129,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt` | 33 | 1064 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 32 | 953 |
 | `ai/src/main/java/me/rerere/ai/provider/providers/GoogleProvider.kt` | 32 | 897 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt` | 31 | 1142 |
 
 ## 模块概览
 
@@ -548,15 +548,15 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2038
-- 可检索完整符号：5020
+- 已解析本地导入边：2023
+- 可检索完整符号：5009
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 129 | 812 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 128 | 812 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 109 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 61 | 19 |
-| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 59 | 62 |
+| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 58 | 62 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 55 | 296 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 49 | 191 |
@@ -565,8 +565,8 @@
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 34 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 34 | 248 |
-| `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 34 | 50 |
-| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 30 | 141 |
+| `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 33 | 50 |
+| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 29 | 141 |
 | `app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt` | 26 | 676 |
 <!-- reverse-index:end -->
 
