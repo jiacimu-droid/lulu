@@ -170,16 +170,7 @@ class StudyVM(
     fun completePomodoro(minutes: Int) = reduce { current ->
         val result = StudyRules.completePomodoro(current, minutes, Random.Default)
         emitReward(result.reward.title)
-        val bonus = StudyGachaRewardPolicy.grantFourHourDouyinBonus(
-            before = current,
-            after = result.state,
-        )
-        if (bonus.granted) {
-            emitReward(
-                "今日累计学习满4小时：抖音时长券 · 20分钟 x${StudyGachaRewardPolicy.FOUR_HOUR_DOUYIN_TICKETS}",
-            )
-        }
-        bonus.state
+        result.state
     }
 
     fun openMysteryBox(index: Int = 0) = reduce {
@@ -202,15 +193,12 @@ class StudyVM(
             var revealItems: List<StudyDrawReveal> = emptyList()
             var message: String? = null
             store.update { current ->
-                // The new pool uses literal per-pull rates. Reset the legacy streak
-                // before each 1/10-pull request so the retired 30-pull forced-purple
-                // path cannot inflate the requested 2%/2%/0.5% purple split.
                 val random = MoonlightGachaRandom(
                     delegate = Random.Default,
-                    initialDrawsSinceNonNormal = 0,
+                    initialDrawsSinceNonNormal = current.drawsSinceNonNormal,
                 )
                 val legacyResult = StudyRules.draw(
-                    state = current.copy(drawsSinceNonNormal = 0),
+                    state = current,
                     count = count,
                     random = random,
                 )
@@ -218,6 +206,8 @@ class StudyVM(
                     message = "夸夸值或抽卡券不够"
                     return@update current
                 }
+                // Keep only the real consecutive-30-pull purple pity. The older
+                // two-hour/30-pull safety-ticket giveaway is intentionally removed.
                 val legacyStateWithoutSafety = legacyResult.state
                     .suppressNewLegacyPurpleSafety(previousState = current)
                 val balanced = StudyGachaRewardPolicy.rebalance(
@@ -228,7 +218,7 @@ class StudyVM(
                 val updatedStudy = balanced.state.correctMoonlightSpecialTracking(
                     previousState = current,
                     results = balanced.results,
-                ).copy(drawsSinceNonNormal = 0)
+                )
                 revealItems = balanced.results.map(::StudyDrawReveal)
                 updatedStudy
             }
@@ -254,7 +244,7 @@ class StudyVM(
                 balanced.state
             }
             if (revealItems.isEmpty()) {
-                _effects.tryEmit(StudyEffect.Message("没有可用的今日安全抽"))
+                _effects.tryEmit(StudyEffect.Message("没有可用的紫色抽卡券"))
             } else {
                 _effects.tryEmit(StudyEffect.DrawResults(revealItems))
             }
@@ -353,9 +343,8 @@ class StudyVM(
 }
 
 /**
- * Rebalances only the regular-pool rarity roll while leaving StudyRules' payment,
- * persistence and reveal flow untouched. Its old cross-request pity is disabled by
- * always starting this adapter and StudyRules' legacy streak at zero.
+ * Rebalances the regular-pool rarity roll while preserving the old consecutive
+ * 30-pull purple pity tracked by StudyRules and drawsSinceNonNormal.
  */
 private class MoonlightGachaRandom(
     private val delegate: Random,
@@ -376,6 +365,8 @@ private class MoonlightGachaRandom(
             return delegate.nextDouble()
         }
 
+        // StudyRules calls drawRare directly on the guaranteed 30th pull, so this
+        // value is then used only for the purple subtype selection.
         if (drawsSinceNonNormal >= StudyRules.NON_NORMAL_PITY_DRAW_COUNT - 1) {
             drawsSinceNonNormal = 0
             return delegate.nextDouble()
