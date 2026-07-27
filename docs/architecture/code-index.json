@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:43:38.794165+00:00",
-  "commit": "d0cff98fb81ed9535a6c4879f14a366458cf469a",
+  "generatedAt": "2026-07-27T16:44:33.441767+00:00",
+  "commit": "cac3d99a3ed7432f8c5e92d582d9ece6f9428837",
   "branch": "master",
-  "sourceFingerprint": "2250aa05743420914e93892cab01ef9d3ed881e5876e34248b9ab2b490d55bf0",
+  "sourceFingerprint": "dd8c79a6a94d6979317b019c4cb9f7acf6cd4617ff8465bcfc7d7557e7111c8f",
   "summary": {
-    "files": 1170,
-    "lines": 267975,
-    "symbols": 5636,
-    "productionCodeFiles": 831,
+    "files": 1171,
+    "lines": 268181,
+    "symbols": 5642,
+    "productionCodeFiles": 832,
     "testFiles": 146,
     "largeProductionFiles": 38,
     "veryLargeProductionFiles": 4,
     "todoMarkers": 32,
     "byModule": {
-      "app": 709,
+      "app": 710,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 777,
+      ".kt": 778,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -61,14 +61,14 @@
       "娱乐与数字生活": 36,
       "学习监督": 35,
       "工具": 6,
-      "插件": 46,
+      "插件": 47,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
       "界面": 320,
       "记忆": 44
     },
-    "resolvedImportEdges": 2034
+    "resolvedImportEdges": 2035
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -1424,6 +1424,7 @@
       "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginViewModel.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/MusicPlayerService.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
+      "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewScripts.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
@@ -25143,6 +25144,7 @@
         "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginSandbox.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginUIDeclarativePage.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
+        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt"
       ]
     },
@@ -26627,6 +26629,60 @@
         "app/src/main/java/me/rerere/rikkahub/plugin/manager/PluginManager.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/model/PluginInfo.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/repository/PluginRepository.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 206,
+      "sha256": "3dad2220828e03ac0a58e3997fc1ae863608a596c99952c555d9421d7850aff6",
+      "package": "me.rerere.rikkahub.plugin.webview",
+      "categories": [
+        "插件"
+      ],
+      "symbols": [
+        {
+          "name": "PluginWebViewFileLaunchers",
+          "kind": "class",
+          "line": 20
+        },
+        {
+          "name": "rememberPluginWebViewFileLaunchers",
+          "kind": "composable",
+          "line": 30
+        },
+        {
+          "name": "evaluate",
+          "kind": "function",
+          "line": 43
+        },
+        {
+          "name": "uriToBase64",
+          "kind": "function",
+          "line": 199
+        },
+        {
+          "name": "escapeSingleQuotedJs",
+          "kind": "function",
+          "line": 204
+        },
+        {
+          "name": "escapeTextFileJs",
+          "kind": "function",
+          "line": 205
+        }
+      ],
+      "localImportCount": 1,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.plugin.data.PluginDataStore"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/plugin/data/PluginDataStore.kt"
       ],
       "importedBy": []
     },
@@ -84569,6 +84625,13 @@
         "line": 763
       }
     ],
+    "me.rerere.rikkahub.plugin.webview.PluginWebViewFileLaunchers": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
+        "kind": "class",
+        "line": 20
+      }
+    ],
     "me.rerere.rikkahub.plugin.webview.PluginWebViewPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
@@ -84657,6 +84720,25 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "kind": "function",
         "line": 353
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
+        "kind": "function",
+        "line": 204
+      }
+    ],
+    "me.rerere.rikkahub.plugin.webview.escapeTextFileJs": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
+        "kind": "function",
+        "line": 205
+      }
+    ],
+    "me.rerere.rikkahub.plugin.webview.evaluate": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
+        "kind": "function",
+        "line": 43
       }
     ],
     "me.rerere.rikkahub.plugin.webview.getNowPlaying": [
@@ -84860,6 +84942,13 @@
         "line": 178
       }
     ],
+    "me.rerere.rikkahub.plugin.webview.rememberPluginWebViewFileLaunchers": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
+        "kind": "composable",
+        "line": 30
+      }
+    ],
     "me.rerere.rikkahub.plugin.webview.respond": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
@@ -84995,6 +85084,11 @@
       }
     ],
     "me.rerere.rikkahub.plugin.webview.uriToBase64": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
+        "kind": "function",
+        "line": 199
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "kind": "function",

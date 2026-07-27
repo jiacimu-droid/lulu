@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`d0cff98fb81ed9535a6c4879f14a366458cf469a`
+- 基准提交：`cac3d99a3ed7432f8c5e92d582d9ece6f9428837`
 - 分支：`master`
-- 源码指纹：`2250aa0574342091…`
-- 已索引文件：1170
-- 已索引代码/文本行：267975
-- 已发现类、接口、对象、函数及 Composable：5636
+- 源码指纹：`dd8c79a6a94d6979…`
+- 已索引文件：1171
+- 已索引代码/文本行：268181
+- 已发现类、接口、对象、函数及 Composable：5642
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 831 |
+| 生产代码文件 | 832 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 38 |
 | ≥1500 行生产文件 | 4 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 709 |
+| `app` | 710 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 777 |
+| `.kt` | 778 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -359,6 +359,7 @@
 - `app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginViewModel.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/MusicPlayerService.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt`
+- `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewScripts.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt`
@@ -370,8 +371,7 @@
 - `plugins/moments/ui/index.html`
 - `plugins/supabase_memory/README.md`
 - `plugins/supabase_memory/main.js`
-- `plugins/supabase_memory/manifest.json`
-- ……另有 16 个文件，见 `code-index.json`
+- ……另有 17 个文件，见 `code-index.json`
 
 ### 数据库
 
@@ -548,8 +548,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2034
-- 可检索完整符号：5022
+- 已解析本地导入边：2035
+- 可检索完整符号：5026
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
