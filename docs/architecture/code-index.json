@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:15:48.275683+00:00",
-  "commit": "63eb7912da85cd651194c4920b5c1d43eb98e1c4",
+  "generatedAt": "2026-07-27T05:16:15.518751+00:00",
+  "commit": "65afb9b90de6b8e18afc8bec0ecb760c346eca82",
   "branch": "master",
-  "sourceFingerprint": "4c7c33ffdcecae7876bf6748a5f09217626a98f88f550272d24bc8cb884624cf",
+  "sourceFingerprint": "ebc96f5ee7ca8d52a07f7f8738b3635973b8b84698927445407d33e41dcfdd90",
   "summary": {
-    "files": 1130,
-    "lines": 266101,
-    "symbols": 5548,
+    "files": 1131,
+    "lines": 266153,
+    "symbols": 5549,
     "productionCodeFiles": 799,
-    "testFiles": 138,
+    "testFiles": 139,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 669,
+      "app": 670,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 737,
+      ".kt": 738,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -47278,6 +47278,29 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/model/AssistantInteractionProfileTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 52,
+      "sha256": "5caff667d5ae1795e8408b2ef5d54f4b1009db85b291db066597d3adc87a37ae",
+      "package": "me.rerere.rikkahub.data.model",
+      "categories": [],
+      "symbols": [
+        {
+          "name": "AssistantInteractionProfileTest",
+          "kind": "class",
+          "line": 7
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -74796,6 +74819,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "class",
         "line": 67
+      }
+    ],
+    "me.rerere.rikkahub.data.model.AssistantInteractionProfileTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/model/AssistantInteractionProfileTest.kt",
+        "kind": "class",
+        "line": 7
       }
     ],
     "me.rerere.rikkahub.data.model.AssistantRegex": [
