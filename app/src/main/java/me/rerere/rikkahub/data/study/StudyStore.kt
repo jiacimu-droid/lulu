@@ -33,10 +33,11 @@ class StudyStore(
     private val backupStateKey = stringPreferencesKey("state_backup")
 
     init {
-        // Older study composables still read ExamStudyPlan directly. Install the
-        // approved summer plan before the first screen composition so those views,
-        // persisted tasks and AI schedule generation all resolve the same plan.
+        // Older study composables still read ExamStudyPlan directly. Install every
+        // approved overlay before the first screen composition so visible plans,
+        // persisted tasks and AI scheduling all resolve the same milestones.
         SummerCourseDeadlinePlan.installIntoLegacyExamPlanViews()
+        ThreeRoundRecitationPlan.installIntoLegacyExamPlanViews()
 
         scope.launch {
             context.studyDataStore.edit { prefs ->
