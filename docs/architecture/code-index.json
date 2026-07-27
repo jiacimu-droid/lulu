@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:25:42.345662+00:00",
-  "commit": "5cc200b4f742bce4ae879c833bba3458b157e711",
+  "generatedAt": "2026-07-27T17:26:31.334645+00:00",
+  "commit": "07bd5491a9b7794fe65090e7a232031b1d9e3d82",
   "branch": "master",
-  "sourceFingerprint": "f0754c10e3fb7ad3ff4da1782c459a9f9989febc96ac7a371d1c1673e27bd303",
+  "sourceFingerprint": "687756662e9cf475e76ed47ed7915485a28efd1475d102a36ceab7225b2fd0e2",
   "summary": {
     "files": 1184,
-    "lines": 266910,
+    "lines": 266919,
     "symbols": 5661,
     "productionCodeFiles": 845,
     "testFiles": 146,
@@ -2242,6 +2242,11 @@
       "imports": 8
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.data.ai.prompts",
+      "imports": 8
+    },
+    {
       "from": "me.rerere.tts.provider.providers",
       "to": "me.rerere.tts.model.AudioChunk",
       "imports": 8
@@ -2824,11 +2829,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.hugeicons.stroke.Cancel01",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.data.ai.prompts",
       "imports": 4
     },
     {
@@ -41176,8 +41176,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 162,
-      "sha256": "a272068b3f71834d105a138f00f4b0b3ffb37a880200f10e184921a500a71076",
+      "lines": 171,
+      "sha256": "0484d2fdf2f7e86fa82149c0d682393bf1cf30659ad2083af30d22f505e87404",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -41196,37 +41196,37 @@
         {
           "name": "DefaultTheaterModelSetting",
           "kind": "composable",
-          "line": 51
+          "line": 55
         },
         {
-          "name": "DefaultImageModelSetting",
+          "name": "DefaultImageGenerationModelSetting",
           "kind": "composable",
-          "line": 65
+          "line": 72
         },
         {
-          "name": "DefaultVideoModelSetting",
+          "name": "DefaultVideoGenerationModelSetting",
           "kind": "composable",
-          "line": 78
+          "line": 85
         },
         {
           "name": "DefaultTranslationModelSetting",
           "kind": "composable",
-          "line": 91
+          "line": 98
         },
         {
           "name": "DefaultTitleModelSetting",
           "kind": "composable",
-          "line": 111
+          "line": 118
         },
         {
           "name": "DefaultOcrModelSetting",
           "kind": "composable",
-          "line": 129
+          "line": 138
         },
         {
           "name": "DefaultCompressModelSetting",
           "kind": "composable",
-          "line": 147
+          "line": 156
         }
       ],
       "localImportCount": 17,
@@ -41236,20 +41236,20 @@
       "localImports": [
         "me.rerere.ai.provider.ModelType",
         "me.rerere.hugeicons.HugeIcons",
-        "me.rerere.hugeicons.stroke.AiImage",
-        "me.rerere.hugeicons.stroke.AiVideo",
+        "me.rerere.hugeicons.stroke.BookOpen02",
+        "me.rerere.hugeicons.stroke.Chatting01",
         "me.rerere.hugeicons.stroke.Compress",
-        "me.rerere.hugeicons.stroke.FileZip",
-        "me.rerere.hugeicons.stroke.LanguageSkill",
-        "me.rerere.hugeicons.stroke.Message01",
+        "me.rerere.hugeicons.stroke.Earth",
+        "me.rerere.hugeicons.stroke.Image01",
+        "me.rerere.hugeicons.stroke.MessageMultiple01",
         "me.rerere.hugeicons.stroke.Notebook01",
-        "me.rerere.hugeicons.stroke.Sparkles",
+        "me.rerere.hugeicons.stroke.Video01",
         "me.rerere.hugeicons.stroke.View",
         "me.rerere.rikkahub.R",
-        "me.rerere.rikkahub.data.datastore.DEFAULT_COMPRESS_PROMPT",
-        "me.rerere.rikkahub.data.datastore.DEFAULT_OCR_PROMPT",
-        "me.rerere.rikkahub.data.datastore.DEFAULT_TITLE_PROMPT",
-        "me.rerere.rikkahub.data.datastore.DEFAULT_TRANSLATION_PROMPT",
+        "me.rerere.rikkahub.data.ai.prompts.DEFAULT_COMPRESS_PROMPT",
+        "me.rerere.rikkahub.data.ai.prompts.DEFAULT_OCR_PROMPT",
+        "me.rerere.rikkahub.data.ai.prompts.DEFAULT_TITLE_PROMPT",
+        "me.rerere.rikkahub.data.ai.prompts.DEFAULT_TRANSLATION_PROMPT",
         "me.rerere.rikkahub.data.datastore.Settings"
       ],
       "resolvedImports": [
@@ -94857,7 +94857,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
         "kind": "composable",
-        "line": 147
+        "line": 156
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -94867,16 +94867,14 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultImageGenerationModelSetting": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
+        "kind": "composable",
+        "line": 72
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
         "line": 488
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.setting.DefaultImageModelSetting": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
-        "kind": "composable",
-        "line": 65
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultLuluIntentModelSetting": [
@@ -94918,7 +94916,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
         "kind": "composable",
-        "line": 129
+        "line": 138
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -94930,7 +94928,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
         "kind": "composable",
-        "line": 51
+        "line": 55
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -94942,7 +94940,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
         "kind": "composable",
-        "line": 111
+        "line": 118
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -94954,7 +94952,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
         "kind": "composable",
-        "line": 91
+        "line": 98
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -94964,16 +94962,14 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultVideoGenerationModelSetting": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
+        "kind": "composable",
+        "line": 85
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
         "line": 523
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.setting.DefaultVideoModelSetting": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
-        "kind": "composable",
-        "line": 78
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DisplayAvatarFramesSection": [
