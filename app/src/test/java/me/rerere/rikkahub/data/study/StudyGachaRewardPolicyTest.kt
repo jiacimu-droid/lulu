@@ -90,9 +90,8 @@ class StudyGachaRewardPolicyTest {
         assertEquals(0.062, specialRate, 0.0000001)
     }
 
-    private class FixedDoubleRandom(
-        private vararg val values: Double,
-    ) : Random() {
+    private class FixedDoubleRandom(vararg values: Double) : Random() {
+        private val values = values.copyOf()
         private var index = 0
 
         override fun nextBits(bitCount: Int): Int = 0
