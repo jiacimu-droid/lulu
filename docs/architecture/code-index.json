@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T04:53:52.595512+00:00",
-  "commit": "8f331f960c5895303bbc716fd37d54f71c5fc3fd",
+  "generatedAt": "2026-07-27T04:56:25.041107+00:00",
+  "commit": "3b99bda6215cbb3f80232279ca52554a89e03d06",
   "branch": "master",
-  "sourceFingerprint": "febee5cce7a6986cbae36e5ea13f2dcd3f3509914d04731e98392b3f11bc5597",
+  "sourceFingerprint": "00277eded9831b231c157ebdce410aae146cb20794eba3e4b619144331bed9ef",
   "summary": {
     "files": 1130,
-    "lines": 265757,
+    "lines": 265765,
     "symbols": 5538,
     "productionCodeFiles": 799,
     "testFiles": 138,
@@ -34176,8 +34176,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantBasicPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 934,
-      "sha256": "2050e61450b88df35989b429520296ae1413e105668c8044e24ed21c756a9105",
+      "lines": 942,
+      "sha256": "dc257ac15a48b2aba3bdcc8453f6ed28ed4681a49634e6fdf6fb313a9698f804",
       "package": "me.rerere.rikkahub.ui.pages.assistant.detail",
       "categories": [
         "界面"
