@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:12:08.401342+00:00",
-  "commit": "87dfe8e0cb97ed69a2246fada10846c0d2ef60ca",
+  "generatedAt": "2026-07-27T05:12:45.063750+00:00",
+  "commit": "79a2db8d62cc039c42e0278fdc145a1f4dec3ef3",
   "branch": "master",
-  "sourceFingerprint": "c9b456c8664bc783fb2fea9cd12722c38b60b5bbfff0f3525b8fee896b3111c9",
+  "sourceFingerprint": "417ec2c3f83c4a3968a779f3e3e6d73f007ee1b0bcf70c390e22be3f2a64cdba",
   "summary": {
     "files": 1130,
-    "lines": 265987,
+    "lines": 266005,
     "symbols": 5548,
     "productionCodeFiles": 799,
     "testFiles": 138,
@@ -47471,8 +47471,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/service/CompanionHeartbeatTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 68,
-      "sha256": "dd54c78a5e4b47fdbbd30c526f31a4907abdd1d7c0f03f3d347017a13978aba8",
+      "lines": 86,
+      "sha256": "b5e7f3a8b2e29dc4dcab7e115191aa489712b9ac636c8aff0a2baab6317c23ff",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [],
       "symbols": [
