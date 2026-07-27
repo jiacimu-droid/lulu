@@ -274,7 +274,7 @@ class CompanionIntentPlannerTest {
     }
 
     @Test
-    fun `chat turn prompt uses unified perception without legacy thought state`() {
+    fun `chat turn prompt uses unified perception and editable interaction rules`() {
         val packet = CompanionPerceptionAssembler.assemble(
             input = CompanionPerceptionInput(
                 assistantId = "assistant-a",
@@ -303,15 +303,22 @@ class CompanionIntentPlannerTest {
             ),
         )
         val prompt = CompanionChatTurnModelPlanner.buildChatTurnPrompt(
-            CompanionChatTurnPlanInput(perception = packet),
+            input = CompanionChatTurnPlanInput(perception = packet),
+            interactionProfile = AssistantInteractionProfile(
+                initiative = "会主动延续重要话题。",
+                followUpStyle = "用户没有回复时只追问一次，然后停止。",
+            ),
         )
 
         assertTrue(prompt.contains("本轮聊天前的行动规划"))
         assertTrue(prompt.contains("如果当前角色决定稍后主动找用户"))
         assertTrue(prompt.contains("delayMinutes 永远是从 current_time 开始计算的相对分钟数"))
         assertTrue(prompt.contains("绝不能误排到第二天早晨"))
-        assertTrue(prompt.contains("沉默时长本身不是事件"))
+        assertTrue(prompt.contains("沉默时长是情境而不是自动指令"))
         assertTrue(prompt.contains("不能只写‘注意力还停在对话上’"))
+        assertTrue(prompt.contains("<interaction_profile"))
+        assertTrue(prompt.contains("会主动延续重要话题"))
+        assertTrue(prompt.contains("用户没有回复时只追问一次"))
         assertTrue(prompt.contains("<companion_runtime"))
         assertTrue(prompt.contains("安静留意"))
         assertTrue(prompt.contains("minutes_since_previous_interaction=45"))
@@ -322,6 +329,24 @@ class CompanionIntentPlannerTest {
         assertFalse(prompt.contains("她现在"))
         assertFalse(prompt.contains("如果她决定"))
         assertFalse(prompt.contains("露露"))
+    }
+
+    @Test
+    fun `interaction reason allows ordinary follow up while generic reason does not`() {
+        assertTrue(
+            shouldScheduleFollowUpForUserTurn(
+                userText = "那我先忙一会儿",
+                reason = "根据互动设定里的追问方式，稍后自然联系一次，然后停止。",
+                delayMinutes = 60,
+            ),
+        )
+        assertFalse(
+            shouldScheduleFollowUpForUserTurn(
+                userText = "那我先忙一会儿",
+                reason = "没有明确依据，随便再问问。",
+                delayMinutes = 60,
+            ),
+        )
     }
 
     @Test
