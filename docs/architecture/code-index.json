@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T14:12:59.199582+00:00",
-  "commit": "16d282a0e6b062d3e2452b4596387d112c8e9492",
+  "generatedAt": "2026-07-27T14:13:14.948425+00:00",
+  "commit": "1562ae59b2ce91011fd9d6446334434752824db0",
   "branch": "master",
-  "sourceFingerprint": "06eb48c0c5de79f6e6881c2eaebb18963cd2760c9db6b2e1dab6bc040f878857",
+  "sourceFingerprint": "a8d3247d442f91edf1f82f146fb2786f2823adedd7aeedce0d217d6ee8f1860f",
   "summary": {
-    "files": 1146,
-    "lines": 267483,
-    "symbols": 5584,
-    "productionCodeFiles": 807,
+    "files": 1147,
+    "lines": 267509,
+    "symbols": 5590,
+    "productionCodeFiles": 808,
     "testFiles": 146,
     "largeProductionFiles": 43,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 685,
+      "app": 686,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 753,
+      ".kt": 754,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,13 +59,13 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 34,
+      "学习监督": 35,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 298,
+      "界面": 299,
       "记忆": 44
     },
     "resolvedImportEdges": 1984
@@ -1381,6 +1381,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCollectionPanel.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
@@ -1811,6 +1812,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCollectionPanel.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
@@ -42553,6 +42555,57 @@
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt"
       ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 26,
+      "sha256": "47cab95d05b8d4435b1f360790e9437781e4094faf7060e8ee4a9feb2816d9bd",
+      "package": "me.rerere.rikkahub.ui.pages.study",
+      "categories": [
+        "学习监督",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "plus",
+          "kind": "function",
+          "line": 8
+        },
+        {
+          "name": "CombinedStudyPaddingValues",
+          "kind": "class",
+          "line": 11
+        },
+        {
+          "name": "calculateLeftPadding",
+          "kind": "function",
+          "line": 15
+        },
+        {
+          "name": "calculateTopPadding",
+          "kind": "function",
+          "line": 18
+        },
+        {
+          "name": "calculateRightPadding",
+          "kind": "function",
+          "line": 21
+        },
+        {
+          "name": "calculateBottomPadding",
+          "kind": "function",
+          "line": 24
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
       "importedBy": []
     },
     {
@@ -94430,6 +94483,13 @@
         "line": 290
       }
     ],
+    "me.rerere.rikkahub.ui.pages.study.CombinedStudyPaddingValues": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
+        "kind": "class",
+        "line": 11
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.study.CompanionPrepCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
@@ -94997,6 +95057,34 @@
         "line": 274
       }
     ],
+    "me.rerere.rikkahub.ui.pages.study.calculateBottomPadding": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
+        "kind": "function",
+        "line": 24
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.calculateLeftPadding": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
+        "kind": "function",
+        "line": 15
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.calculateRightPadding": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
+        "kind": "function",
+        "line": 21
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.calculateTopPadding": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
+        "kind": "function",
+        "line": 18
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.study.claimAchievement": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
@@ -95210,6 +95298,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt",
         "kind": "function",
         "line": 62
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.plus": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
+        "kind": "function",
+        "line": 8
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.rainbowOpeningTakesPriorityWhenDrawContainsRainbowAndEpic": [
