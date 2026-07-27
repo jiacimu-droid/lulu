@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:03:00.871670+00:00",
-  "commit": "be6353daff29b1cd741016384ccf06335d5ee669",
+  "generatedAt": "2026-07-27T05:04:49.314435+00:00",
+  "commit": "397edf891e16dad794995124d3bf0882776d1aef",
   "branch": "master",
-  "sourceFingerprint": "b0be5e653d2e685cdaee5cf9e4d12b5372e7760d4cf4b25eefb0cc4d4a504b86",
+  "sourceFingerprint": "951aea005d0decf3354ed7f06f603b68bb2aa36f559d34f50f0f266311e65ba8",
   "summary": {
     "files": 1130,
-    "lines": 265904,
+    "lines": 265907,
     "symbols": 5544,
     "productionCodeFiles": 799,
     "testFiles": 138,
@@ -20065,8 +20065,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionHeartbeat.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 89,
-      "sha256": "a1026f87f3b37b386d425bb90787b9bb595efe40e83505146de72b7b8dcbbb85",
+      "lines": 92,
+      "sha256": "3af0689bbdf4958845c2ba4218dd882c2231aeff3248b1e2199e52039db8181d",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [],
       "symbols": [
@@ -20088,7 +20088,7 @@
         {
           "name": "latestActivityAt",
           "kind": "function",
-          "line": 79
+          "line": 82
         }
       ],
       "localImportCount": 6,
@@ -77529,7 +77529,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionHeartbeat.kt",
         "kind": "function",
-        "line": 79
+        "line": 82
       }
     ],
     "me.rerere.rikkahub.data.service.latestForegroundUsageAt": [
