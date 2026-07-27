@@ -138,7 +138,7 @@ fun PluginWebViewPage(
                                 onImportAudioFile = fileLaunchers.importAudioFile,
                                 onSaveFileAs = fileLaunchers.saveFileAs,
                                 onClose = onNavigateBack,
-                                onStartTimer = { sourceWebView, seconds ->
+                                onStartTimer = startTimer@{ sourceWebView, seconds ->
                                     if (
                                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                                         !Settings.canDrawOverlays(context)
@@ -155,7 +155,7 @@ fun PluginWebViewPage(
                                                 null,
                                             )
                                         }
-                                        return@PluginBridgeWebViewClient
+                                        return@startTimer
                                     }
                                     if (
                                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
