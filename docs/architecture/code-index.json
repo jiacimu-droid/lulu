@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T04:51:02.908039+00:00",
-  "commit": "f2a18c707e40679bfc7cc3f14d89f387524b3e7a",
+  "generatedAt": "2026-07-27T04:52:22.239908+00:00",
+  "commit": "f1745d8f42e694a9d3e09ff61db8a3990835782b",
   "branch": "master",
-  "sourceFingerprint": "af699c9539c7db03e24ab4741c18a4f2ec80abf30151d9a143d54d6814d66443",
+  "sourceFingerprint": "e2718d6ea60aa7f3887a2cc2cd64b55bbacdb1e78f390873c9ccd6e3e16b16d8",
   "summary": {
     "files": 1129,
-    "lines": 265461,
-    "symbols": 5525,
+    "lines": 265599,
+    "symbols": 5534,
     "productionCodeFiles": 798,
     "testFiles": 138,
     "largeProductionFiles": 42,
@@ -68,7 +68,7 @@
       "界面": 291,
       "记忆": 44
     },
-    "resolvedImportEdges": 1955
+    "resolvedImportEdges": 1961
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 128,
+        "importedByCount": 129,
         "todoMarkers": 0
       },
       {
@@ -918,7 +918,7 @@
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
-        "importedByCount": 55,
+        "importedByCount": 56,
         "todoMarkers": 0
       },
       {
@@ -998,7 +998,7 @@
         "lines": 141,
         "symbols": 19,
         "localImportCount": 6,
-        "importedByCount": 29,
+        "importedByCount": 30,
         "todoMarkers": 1
       },
       {
@@ -1022,7 +1022,7 @@
         "lines": 57,
         "symbols": 4,
         "localImportCount": 3,
-        "importedByCount": 18,
+        "importedByCount": 19,
         "todoMarkers": 0
       },
       {
@@ -1030,7 +1030,7 @@
         "lines": 32,
         "symbols": 2,
         "localImportCount": 0,
-        "importedByCount": 18,
+        "importedByCount": 19,
         "todoMarkers": 0
       },
       {
@@ -1106,6 +1106,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
+        "lines": 138,
+        "symbols": 8,
+        "localImportCount": 3,
+        "importedByCount": 13,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
         "lines": 83,
         "symbols": 2,
@@ -1120,14 +1128,6 @@
         "localImportCount": 0,
         "importedByCount": 12,
         "todoMarkers": 1
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
-        "lines": 274,
-        "symbols": 25,
-        "localImportCount": 0,
-        "importedByCount": 12,
-        "todoMarkers": 0
       }
     ]
   },
@@ -3593,6 +3593,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ReasoningPicker.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -3835,6 +3836,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageReasoning.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantBasicPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
@@ -4002,6 +4004,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/PropertyEditor.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
@@ -4071,6 +4074,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ProviderBalanceText.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
@@ -6003,6 +6007,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/ChatInputState.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantImporter.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
@@ -8761,6 +8766,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -34347,8 +34353,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 223,
-      "sha256": "21b547c4b76605d695bfc30afaaac6b273a15657215fb2ac9f7c8da1a0d355b7",
+      "lines": 361,
+      "sha256": "e56e0dcd558453ec6979e6e1ced6080c9cc1680ac3e9eec8b8c0df3e1895bbff",
       "package": "me.rerere.rikkahub.ui.pages.assistant.detail",
       "categories": [
         "界面"
@@ -34357,90 +34363,152 @@
         {
           "name": "AssistantDetailVM",
           "kind": "class",
-          "line": 29
+          "line": 44
         },
         {
           "name": "updateTags",
           "kind": "function",
-          "line": 84
+          "line": 104
         },
         {
           "name": "cleanupUnusedTags",
           "kind": "function",
-          "line": 102
+          "line": 122
         },
         {
           "name": "update",
           "kind": "function",
-          "line": 142
+          "line": 162
+        },
+        {
+          "name": "generateInteractionProfile",
+          "kind": "function",
+          "line": 181
         },
         {
           "name": "clearAssistantHistory",
           "kind": "function",
-          "line": 161
+          "line": 232
         },
         {
           "name": "setFaceReferenceImage",
           "kind": "function",
-          "line": 174
+          "line": 245
         },
         {
           "name": "checkAvatarDelete",
           "kind": "function",
-          "line": 182
+          "line": 253
         },
         {
           "name": "checkBackgroundDelete",
           "kind": "function",
-          "line": 188
+          "line": 259
         },
         {
           "name": "checkFaceReferenceDelete",
           "kind": "function",
-          "line": 204
+          "line": 275
+        },
+        {
+          "name": "buildInteractionProfilePrompt",
+          "kind": "function",
+          "line": 296
+        },
+        {
+          "name": "parseAssistantInteractionProfile",
+          "kind": "function",
+          "line": 321
+        },
+        {
+          "name": "required",
+          "kind": "function",
+          "line": 333
         },
         {
           "name": "HistoryClearState",
           "kind": "interface",
-          "line": 218
+          "line": 349
         },
         {
           "name": "Idle",
           "kind": "object",
-          "line": 219
+          "line": 350
         },
         {
           "name": "Running",
           "kind": "object",
-          "line": 220
+          "line": 351
         },
         {
           "name": "Success",
           "kind": "object",
-          "line": 221
+          "line": 352
         },
         {
           "name": "Failed",
           "kind": "class",
-          "line": 222
+          "line": 353
+        },
+        {
+          "name": "InteractionGenerationState",
+          "kind": "interface",
+          "line": 356
+        },
+        {
+          "name": "Idle",
+          "kind": "object",
+          "line": 357
+        },
+        {
+          "name": "Running",
+          "kind": "object",
+          "line": 358
+        },
+        {
+          "name": "Success",
+          "kind": "object",
+          "line": 359
+        },
+        {
+          "name": "Failed",
+          "kind": "class",
+          "line": 360
         }
       ],
-      "localImportCount": 9,
+      "localImportCount": 20,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
+        "me.rerere.ai.core.ReasoningLevel",
+        "me.rerere.ai.provider.ModelType",
+        "me.rerere.ai.provider.ProviderManager",
+        "me.rerere.ai.provider.TextGenerationParams",
+        "me.rerere.ai.ui.UIMessage",
+        "me.rerere.rikkahub.data.ai.ApiUsageSource",
+        "me.rerere.rikkahub.data.ai.ApiUsageStore",
         "me.rerere.rikkahub.data.datastore.Settings",
         "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.findModelById",
+        "me.rerere.rikkahub.data.datastore.findProvider",
+        "me.rerere.rikkahub.data.datastore.getCurrentChatModel",
         "me.rerere.rikkahub.data.files.FilesManager",
         "me.rerere.rikkahub.data.files.SkillManager",
         "me.rerere.rikkahub.data.files.SkillMetadata",
         "me.rerere.rikkahub.data.model.Assistant",
+        "me.rerere.rikkahub.data.model.AssistantInteractionProfile",
         "me.rerere.rikkahub.data.model.Avatar",
         "me.rerere.rikkahub.data.model.Tag",
         "me.rerere.rikkahub.data.service.AssistantInteractionResetService"
       ],
       "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/Reasoning.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
+        "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt",
         "app/src/main/java/me/rerere/rikkahub/data/files/SkillManager.kt",
@@ -88145,7 +88213,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "class",
-        "line": 29
+        "line": 44
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.AssistantExtensionsPage": [
@@ -88264,28 +88332,50 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "class",
-        "line": 222
+        "line": 353
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "class",
+        "line": 360
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.HistoryClearState": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "interface",
-        "line": 218
+        "line": 349
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.Idle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 219
+        "line": 350
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "object",
+        "line": 357
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.InteractionGenerationState": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "interface",
+        "line": 356
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.Running": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 220
+        "line": 351
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "object",
+        "line": 358
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.SillyTavernImporter": [
@@ -88299,7 +88389,12 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 221
+        "line": 352
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "object",
+        "line": 359
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.TavernCardParser": [
@@ -88309,39 +88404,53 @@
         "line": 151
       }
     ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.buildInteractionProfilePrompt": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "function",
+        "line": 296
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.checkAvatarDelete": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 182
+        "line": 253
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.checkBackgroundDelete": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 188
+        "line": 259
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.checkFaceReferenceDelete": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 204
+        "line": 275
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.cleanupUnusedTags": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 102
+        "line": 122
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.clearAssistantHistory": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 161
+        "line": 232
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.generateInteractionProfile": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "function",
+        "line": 181
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.importAssistantFromUri": [
@@ -88375,11 +88484,25 @@
         "line": 238
       }
     ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.parseAssistantInteractionProfile": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "function",
+        "line": 321
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.required": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
+        "kind": "function",
+        "line": 333
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.setFaceReferenceImage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 174
+        "line": 245
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.toggleLocalTool": [
@@ -88393,7 +88516,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 142
+        "line": 162
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.updateCallSetting": [
@@ -88407,7 +88530,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 84
+        "line": 104
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.removeAssistant": [

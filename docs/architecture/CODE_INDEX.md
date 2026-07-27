@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`f2a18c707e40679bfc7cc3f14d89f387524b3e7a`
+- 基准提交：`f1745d8f42e694a9d3e09ff61db8a3990835782b`
 - 分支：`master`
-- 源码指纹：`af699c9539c7db03…`
+- 源码指纹：`e2718d6ea60aa7f3…`
 - 已索引文件：1129
-- 已索引代码/文本行：265461
-- 已发现类、接口、对象、函数及 Composable：5525
+- 已索引代码/文本行：265599
+- 已发现类、接口、对象、函数及 Composable：5534
 
 ## 仓库健康信号
 
@@ -539,15 +539,15 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1955
-- 可检索完整符号：4928
+- 已解析本地导入边：1961
+- 可检索完整符号：4933
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 128 | 812 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 129 | 812 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 101 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 61 | 19 |
-| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 55 | 62 |
+| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 56 | 62 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 46 | 295 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 44 | 191 |
@@ -557,7 +557,7 @@
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 35 | 50 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 32 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 30 | 248 |
-| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 29 | 141 |
+| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 30 | 141 |
 | `app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt` | 26 | 676 |
 <!-- reverse-index:end -->
 
