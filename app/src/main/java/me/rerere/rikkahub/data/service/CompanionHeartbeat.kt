@@ -63,7 +63,10 @@ object CompanionHeartbeatEvaluator {
         val reason = when {
             dueCommitmentIds.isNotEmpty() -> "due_commitment"
             dueConcernIds.isNotEmpty() -> "due_concern"
-            idleMinutes >= 120L && minutesSinceOutbound >= 90L && minutesSinceDeepState >= 45L -> "meaningful_silence"
+            // 这里只开放一次“是否联系”的判断机会，不代表一定发送。
+            // 具体是高冷地等待、普通节奏还是主动关心，由角色的互动设定在意图层决定。
+            idleMinutes >= 45L && minutesSinceOutbound >= 45L && minutesSinceDeepState >= 30L ->
+                "interaction_rhythm_check"
             else -> "local_heartbeat_only"
         }
         return CompanionHeartbeatDecision(
