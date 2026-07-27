@@ -54,7 +54,7 @@ class StudyGachaRewardPolicyTest {
     }
 
     @Test
-    fun `four hour study bonus grants one douyin ticket only once`() {
+    fun `four hour study bonus grants two douyin tickets only once`() {
         val date = "2026-07-27"
         val before = StudyState(
             today = date,
@@ -73,9 +73,9 @@ class StudyGachaRewardPolicyTest {
         )
 
         assertTrue(first.granted)
-        assertEquals(1, first.state.inventory.douyinFragments)
+        assertEquals(2, first.state.inventory.douyinFragments)
         assertFalse(second.granted)
-        assertEquals(1, second.state.inventory.douyinFragments)
+        assertEquals(2, second.state.inventory.douyinFragments)
     }
 
     @Test
