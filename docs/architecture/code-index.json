@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:20:00.057040+00:00",
-  "commit": "45c237948415d63206967266d59602cf23eb2754",
+  "generatedAt": "2026-07-27T16:20:22.135850+00:00",
+  "commit": "c67080de87cb3e07e85983793834e5986a413272",
   "branch": "master",
-  "sourceFingerprint": "593c86b4301d7275762bea8bf35b0884a43b7c26abfea79fdc4bf0c9ebc4cc84",
+  "sourceFingerprint": "2df3676604bcc2ff0e01646d165ade71a2b1e3581cacbfd5b67afd8e5f059083",
   "summary": {
-    "files": 1156,
-    "lines": 268264,
-    "symbols": 5604,
-    "productionCodeFiles": 817,
+    "files": 1157,
+    "lines": 268306,
+    "symbols": 5608,
+    "productionCodeFiles": 818,
     "testFiles": 146,
     "largeProductionFiles": 41,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 695,
+      "app": 696,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 763,
+      ".kt": 764,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,7 +65,7 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 308,
+      "界面": 309,
       "记忆": 44
     },
     "resolvedImportEdges": 2007
@@ -1769,6 +1769,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/NarrativeCompanionGames.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManModels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/SignalHuntFeature.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/YachtDiceGame.kt",
@@ -38464,6 +38465,46 @@
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
       ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManModels.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 42,
+      "sha256": "2a5aa7e0e6995893ba6971e1b83396a90b85df957660956954394dbfd22a2c22",
+      "package": "me.rerere.rikkahub.ui.pages.game",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "PerfectManVoiceInputTarget",
+          "kind": "class",
+          "line": 8
+        },
+        {
+          "name": "PerfectManRoundPhase",
+          "kind": "class",
+          "line": 13
+        },
+        {
+          "name": "PerfectManRoundResult",
+          "kind": "class",
+          "line": 18
+        },
+        {
+          "name": "perfectManActionTitle",
+          "kind": "function",
+          "line": 36
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
       "importedBy": []
     },
     {
@@ -91988,6 +92029,27 @@
         "line": 891
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.PerfectManRoundPhase": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManModels.kt",
+        "kind": "class",
+        "line": 13
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.PerfectManRoundResult": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManModels.kt",
+        "kind": "class",
+        "line": 18
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.PerfectManVoiceInputTarget": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManModels.kt",
+        "kind": "class",
+        "line": 8
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.QuickCompanionGame": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
@@ -92404,6 +92466,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 432
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.perfectManActionTitle": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManModels.kt",
+        "kind": "function",
+        "line": 36
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.play": [
