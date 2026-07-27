@@ -3,19 +3,14 @@ package me.rerere.rikkahub.data.study
 import kotlin.random.Random
 
 /**
- * Exact entertainment reward split requested for the regular gacha pool.
+ * Exact entertainment reward split for the regular gacha pool.
  *
  * Aggregate rates are applied by MoonlightGachaRandom in StudyVM:
  * blue 93.8%, purple 4.5%, gold 1.5%, rainbow 0.2%.
- * This policy converts the legacy purple/gold subtype results into the new exact
- * subtypes while correcting the already-persisted inventory from StudyRules.draw.
+ * The only extra protection is the legacy consecutive 30-pull purple pity.
  */
 object StudyGachaRewardPolicy {
     const val GAME_ROUNDS_PER_TICKET: Int = 4
-    const val ESTIMATED_ROUNDS_PER_UNLIMITED_TICKET: Int = 8
-    const val FIFTY_PULL_GAME_ROUND_FLOOR: Int = 8
-    const val FOUR_HOUR_STUDY_MINUTES: Int = 240
-    const val FOUR_HOUR_DOUYIN_TICKETS: Int = 2
 
     const val GAME_ROUND_RATE: Double = 0.02
     const val DOUYIN_RATE: Double = 0.02
@@ -32,33 +27,12 @@ object StudyGachaRewardPolicy {
         val results: List<StudyDrawResult>,
     )
 
-    data class StudyBonusResult(
-        val state: StudyState,
-        val granted: Boolean,
-    )
-
-    data class GameFloorResult(
-        val state: StudyState,
-        val bonusResults: List<StudyDrawResult>,
-    )
-
     fun rebalance(
         stateAfterLegacyDraw: StudyState,
         rawResults: List<StudyDrawResult>,
         random: Random = Random.Default,
     ): RebalancedDraw {
         var inventory = stateAfterLegacyDraw.inventory
-        val date = stateAfterLegacyDraw.today
-        var gameRoundWins = if (stateAfterLegacyDraw.dailyGameRewardDate == date) {
-            stateAfterLegacyDraw.dailyGameRoundTicketsWon
-        } else {
-            0
-        }
-        var unlimitedWins = if (stateAfterLegacyDraw.dailyGameRewardDate == date) {
-            stateAfterLegacyDraw.dailyGameUnlimitedTicketsWon
-        } else {
-            0
-        }
         val mapped = rawResults.map { raw ->
             if (raw.rarity != StudyRarity.Normal) {
                 inventory = inventory.removeLegacySpecial(raw)
@@ -78,89 +52,11 @@ object StudyGachaRewardPolicy {
             if (result.rarity != StudyRarity.Normal) {
                 inventory = inventory.addRequestedSpecial(result)
             }
-            when {
-                result.fragmentKey == GAME_ROUND_KEY -> gameRoundWins += 1
-                result.fragmentType == StudyFragmentType.Game -> unlimitedWins += 1
-            }
             result
         }
-        val trackedState = stateAfterLegacyDraw.copy(
-            inventory = inventory,
-            dailyGameRewardDate = date,
-            dailyGameRoundTicketsWon = gameRoundWins,
-            dailyGameUnlimitedTicketsWon = unlimitedWins,
-        )
-        val floor = grantFiftyPullGameFloor(trackedState)
         return RebalancedDraw(
-            state = floor.state,
-            results = mapped + floor.bonusResults,
-        )
-    }
-
-    /**
-     * At a 2% pool rate, 50 pulls yield one 20-minute Douyin ticket on average.
-     * The once-per-day four-hour study reward grants two more tickets (40 minutes),
-     * so a four-hour day has a guaranteed 40 minutes and a long-run expectation of
-     * about 60 minutes without making purple results common inside the pool.
-     */
-    fun grantFourHourDouyinBonus(
-        before: StudyState,
-        after: StudyState,
-    ): StudyBonusResult {
-        val date = after.today.ifBlank { return StudyBonusResult(after, false) }
-        val beforeMinutes = before.dailyStudyRecords[date]?.studyMinutes ?: 0
-        val afterMinutes = after.dailyStudyRecords[date]?.studyMinutes ?: 0
-        if (
-            beforeMinutes >= FOUR_HOUR_STUDY_MINUTES ||
-            afterMinutes < FOUR_HOUR_STUDY_MINUTES ||
-            date in after.fourHourDouyinRewardDates
-        ) {
-            return StudyBonusResult(after, false)
-        }
-        return StudyBonusResult(
-            state = after.copy(
-                inventory = after.inventory.copy(
-                    douyinFragments = after.inventory.douyinFragments + FOUR_HOUR_DOUYIN_TICKETS,
-                ),
-                fourHourDouyinRewardDates = after.fourHourDouyinRewardDates + date,
-            ),
-            granted = true,
-        )
-    }
-
-    /**
-     * The requested game rates average eight fifteen-minute rounds per 50 pulls,
-     * but the single-day variance is high. Once the regular-pool counter reaches 50,
-     * top up only the missing amount with four-round tickets. This is a separate
-     * activity floor and does not change the displayed pool probabilities.
-     */
-    fun grantFiftyPullGameFloor(state: StudyState): GameFloorResult {
-        val date = state.today.ifBlank { return GameFloorResult(state, emptyList()) }
-        if (state.dailyDrawCount < 50 || state.fiftyPullGameFloorGrantedDate == date) {
-            return GameFloorResult(state, emptyList())
-        }
-        val gameRoundWins = if (state.dailyGameRewardDate == date) state.dailyGameRoundTicketsWon else 0
-        val unlimitedWins = if (state.dailyGameRewardDate == date) state.dailyGameUnlimitedTicketsWon else 0
-        val earnedRoundEquivalent = gameRoundWins * GAME_ROUNDS_PER_TICKET +
-            unlimitedWins * ESTIMATED_ROUNDS_PER_UNLIMITED_TICKET
-        val missingRounds = (FIFTY_PULL_GAME_ROUND_FLOOR - earnedRoundEquivalent).coerceAtLeast(0)
-        val ticketsToGrant = (missingRounds + GAME_ROUNDS_PER_TICKET - 1) / GAME_ROUNDS_PER_TICKET
-        val bonusResults = List(ticketsToGrant) {
-            StudyDrawResult(
-                rarity = StudyRarity.Rare,
-                fragmentKey = GAME_ROUND_KEY,
-                title = "50抽游戏保底 · 游戏局数券 · ${GAME_ROUNDS_PER_TICKET}局",
-                fragmentType = null,
-            )
-        }
-        return GameFloorResult(
-            state = state.copy(
-                inventory = state.inventory.copy(
-                    gameRoundTickets = state.inventory.gameRoundTickets + ticketsToGrant,
-                ),
-                fiftyPullGameFloorGrantedDate = date,
-            ),
-            bonusResults = bonusResults,
+            state = stateAfterLegacyDraw.copy(inventory = inventory),
+            results = mapped,
         )
     }
 
