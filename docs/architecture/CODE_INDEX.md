@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`9e5fe938b3c29111e4e2511a6b57c1d4218d6ecf`
+- 基准提交：`8d87152b0f02e8b8178d70b82b873c4a3e284959`
 - 分支：`master`
-- 源码指纹：`51388beaa8f7b98d…`
-- 已索引文件：1168
-- 已索引代码/文本行：267484
+- 源码指纹：`3a6ca9a991a1159b…`
+- 已索引文件：1169
+- 已索引代码/文本行：267610
 - 已发现类、接口、对象、函数及 Composable：5616
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 829 |
+| 生产代码文件 | 830 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 38 |
 | ≥1500 行生产文件 | 4 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 707 |
+| `app` | 708 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 775 |
+| `.kt` | 776 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -359,6 +359,7 @@
 - `app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginViewModel.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/MusicPlayerService.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt`
+- `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewScripts.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt`
 - `plugins/example/weather/main.js`
 - `plugins/example/weather/manifest.json`
@@ -370,8 +371,7 @@
 - `plugins/supabase_memory/main.js`
 - `plugins/supabase_memory/manifest.json`
 - `plugins/supabase_memory/supabase_schema.sql`
-- `plugins/共读/main.js`
-- ……另有 14 个文件，见 `code-index.json`
+- ……另有 15 个文件，见 `code-index.json`
 
 ### 数据库
 

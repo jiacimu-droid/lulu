@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:39:40.633588+00:00",
-  "commit": "9e5fe938b3c29111e4e2511a6b57c1d4218d6ecf",
+  "generatedAt": "2026-07-27T16:42:02.021652+00:00",
+  "commit": "8d87152b0f02e8b8178d70b82b873c4a3e284959",
   "branch": "master",
-  "sourceFingerprint": "51388beaa8f7b98dad7baa987faeff3d5c91493ba0c5f5ba047627825517fbfd",
+  "sourceFingerprint": "3a6ca9a991a1159b341ac3ee14f7d272191159142184ac8b8dee1fa6a51127da",
   "summary": {
-    "files": 1168,
-    "lines": 267484,
+    "files": 1169,
+    "lines": 267610,
     "symbols": 5616,
-    "productionCodeFiles": 829,
+    "productionCodeFiles": 830,
     "testFiles": 146,
     "largeProductionFiles": 38,
     "veryLargeProductionFiles": 4,
     "todoMarkers": 32,
     "byModule": {
-      "app": 707,
+      "app": 708,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 775,
+      ".kt": 776,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -61,7 +61,7 @@
       "娱乐与数字生活": 36,
       "学习监督": 35,
       "工具": 6,
-      "插件": 44,
+      "插件": 45,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
@@ -1424,6 +1424,7 @@
       "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginViewModel.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/MusicPlayerService.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewScripts.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
       "plugins/example/weather/main.js",
       "plugins/example/weather/manifest.json",
@@ -26594,6 +26595,25 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewScripts.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 126,
+      "sha256": "a25a4ac2dee0ea4c994edb10a21fb3d5215139a74a0c8bafa069bff6f645213f",
+      "package": "me.rerere.rikkahub.plugin.webview",
+      "categories": [
+        "插件"
+      ],
+      "symbols": [],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
