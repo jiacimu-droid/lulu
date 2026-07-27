@@ -12,19 +12,19 @@
 
 ## 索引状态
 
-- 基准提交：`545e2caa9ed5764147dca82c25942b1e37bb39ab`
+- 基准提交：`bc0ce127aee054b686ec2d83066c43f5f0de515a`
 - 分支：`master`
-- 源码指纹：`dc07fa381229b92a…`
-- 已索引文件：1133
-- 已索引代码/文本行：266302
-- 已发现类、接口、对象、函数及 Composable：5551
+- 源码指纹：`d806064cbbb223ee…`
+- 已索引文件：1134
+- 已索引代码/文本行：266362
+- 已发现类、接口、对象、函数及 Composable：5552
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
 | 生产代码文件 | 799 |
-| 测试文件 | 141 |
+| 测试文件 | 142 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
 | TODO/FIXME/HACK/XXX | 32 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 672 |
+| `app` | 673 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 740 |
+| `.kt` | 741 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -539,8 +539,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1974
-- 可检索完整符号：4949
+- 已解析本地导入边：1975
+- 可检索完整符号：4950
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
@@ -552,7 +552,7 @@
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 45 | 191 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
-| `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 37 | 529 |
+| `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 38 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 35 | 50 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 32 | 1032 |
