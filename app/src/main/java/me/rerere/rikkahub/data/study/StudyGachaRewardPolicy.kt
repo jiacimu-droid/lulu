@@ -12,6 +12,8 @@ import kotlin.random.Random
  */
 object StudyGachaRewardPolicy {
     const val GAME_ROUNDS_PER_TICKET: Int = 4
+    const val ESTIMATED_ROUNDS_PER_UNLIMITED_TICKET: Int = 8
+    const val FIFTY_PULL_GAME_ROUND_FLOOR: Int = 8
     const val FOUR_HOUR_STUDY_MINUTES: Int = 240
     const val FOUR_HOUR_DOUYIN_TICKETS: Int = 2
 
@@ -35,12 +37,28 @@ object StudyGachaRewardPolicy {
         val granted: Boolean,
     )
 
+    data class GameFloorResult(
+        val state: StudyState,
+        val bonusResults: List<StudyDrawResult>,
+    )
+
     fun rebalance(
         stateAfterLegacyDraw: StudyState,
         rawResults: List<StudyDrawResult>,
         random: Random = Random.Default,
     ): RebalancedDraw {
         var inventory = stateAfterLegacyDraw.inventory
+        val date = stateAfterLegacyDraw.today
+        var gameRoundWins = if (stateAfterLegacyDraw.dailyGameRewardDate == date) {
+            stateAfterLegacyDraw.dailyGameRoundTicketsWon
+        } else {
+            0
+        }
+        var unlimitedWins = if (stateAfterLegacyDraw.dailyGameRewardDate == date) {
+            stateAfterLegacyDraw.dailyGameUnlimitedTicketsWon
+        } else {
+            0
+        }
         val mapped = rawResults.map { raw ->
             if (raw.rarity != StudyRarity.Normal) {
                 inventory = inventory.removeLegacySpecial(raw)
@@ -60,10 +78,19 @@ object StudyGachaRewardPolicy {
             if (result.rarity != StudyRarity.Normal) {
                 inventory = inventory.addRequestedSpecial(result)
             }
+            when {
+                result.fragmentKey == GAME_ROUND_KEY -> gameRoundWins += 1
+                result.fragmentType == StudyFragmentType.Game -> unlimitedWins += 1
+            }
             result
         }
         return RebalancedDraw(
-            state = stateAfterLegacyDraw.copy(inventory = inventory),
+            state = stateAfterLegacyDraw.copy(
+                inventory = inventory,
+                dailyGameRewardDate = date,
+                dailyGameRoundTicketsWon = gameRoundWins,
+                dailyGameUnlimitedTicketsWon = unlimitedWins,
+            ),
             results = mapped,
         )
     }
@@ -96,6 +123,42 @@ object StudyGachaRewardPolicy {
                 fourHourDouyinRewardDates = after.fourHourDouyinRewardDates + date,
             ),
             granted = true,
+        )
+    }
+
+    /**
+     * The requested game rates average eight fifteen-minute rounds per 50 pulls,
+     * but the single-day variance is high. Once the regular-pool counter reaches 50,
+     * top up only the missing amount with four-round tickets. This is a separate
+     * activity floor and does not change the displayed pool probabilities.
+     */
+    fun grantFiftyPullGameFloor(state: StudyState): GameFloorResult {
+        val date = state.today.ifBlank { return GameFloorResult(state, emptyList()) }
+        if (state.dailyDrawCount < 50 || state.fiftyPullGameFloorGrantedDate == date) {
+            return GameFloorResult(state, emptyList())
+        }
+        val gameRoundWins = if (state.dailyGameRewardDate == date) state.dailyGameRoundTicketsWon else 0
+        val unlimitedWins = if (state.dailyGameRewardDate == date) state.dailyGameUnlimitedTicketsWon else 0
+        val earnedRoundEquivalent = gameRoundWins * GAME_ROUNDS_PER_TICKET +
+            unlimitedWins * ESTIMATED_ROUNDS_PER_UNLIMITED_TICKET
+        val missingRounds = (FIFTY_PULL_GAME_ROUND_FLOOR - earnedRoundEquivalent).coerceAtLeast(0)
+        val ticketsToGrant = (missingRounds + GAME_ROUNDS_PER_TICKET - 1) / GAME_ROUNDS_PER_TICKET
+        val bonusResults = List(ticketsToGrant) {
+            StudyDrawResult(
+                rarity = StudyRarity.Rare,
+                fragmentKey = GAME_ROUND_KEY,
+                title = "50抽游戏保底 · 游戏局数券 · ${GAME_ROUNDS_PER_TICKET}局",
+                fragmentType = null,
+            )
+        }
+        return GameFloorResult(
+            state = state.copy(
+                inventory = state.inventory.copy(
+                    gameRoundTickets = state.inventory.gameRoundTickets + ticketsToGrant,
+                ),
+                fiftyPullGameFloorGrantedDate = date,
+            ),
+            bonusResults = bonusResults,
         )
     }
 
