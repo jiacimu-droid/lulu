@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:14:18.387606+00:00",
-  "commit": "d2862c20b39a204af5f350a65e6def6dfaa79225",
+  "generatedAt": "2026-07-27T05:15:48.275683+00:00",
+  "commit": "63eb7912da85cd651194c4920b5c1d43eb98e1c4",
   "branch": "master",
-  "sourceFingerprint": "d988fa4943055fb229842e19f9b8ee125085868a2ec91a9927db48087ab0a668",
+  "sourceFingerprint": "4c7c33ffdcecae7876bf6748a5f09217626a98f88f550272d24bc8cb884624cf",
   "summary": {
     "files": 1130,
-    "lines": 266078,
+    "lines": 266101,
     "symbols": 5548,
     "productionCodeFiles": 799,
     "testFiles": 138,
@@ -45867,8 +45867,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 213,
-      "sha256": "7bbcaf880825c4fcb3c4674a24b01b522d0b42beaad0348137491ebbd6f1cb47",
+      "lines": 236,
+      "sha256": "5312b52ce97a8249da26350caf78e466fc270629eb7208b8c7fcf851db6e6a60",
       "package": "me.rerere.rikkahub.data.ai",
       "categories": [
         "AI与上下文"
@@ -45877,10 +45877,10 @@
         {
           "name": "CompanionContextEnvelopeTest",
           "kind": "class",
-          "line": 11
+          "line": 12
         }
       ],
-      "localImportCount": 4,
+      "localImportCount": 5,
       "todoMarkers": 0,
       "isTest": true,
       "isProductionCode": false,
@@ -45888,7 +45888,8 @@
         "me.rerere.ai.core.MessageRole",
         "me.rerere.ai.ui.UIMessage",
         "me.rerere.ai.ui.UIMessagePart",
-        "me.rerere.rikkahub.data.model.Assistant"
+        "me.rerere.rikkahub.data.model.Assistant",
+        "me.rerere.rikkahub.data.model.AssistantInteractionProfile"
       ],
       "resolvedImports": [
         "ai/src/main/java/me/rerere/ai/core/MessageRole.kt",
@@ -66823,7 +66824,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
         "kind": "class",
-        "line": 11
+        "line": 12
       }
     ],
     "me.rerere.rikkahub.data.ai.CompanionContextOverflowException": [
