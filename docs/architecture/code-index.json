@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T07:10:00.088210+00:00",
-  "commit": "7977845f765db24aea8fbb4f004a0728c6cdc956",
+  "generatedAt": "2026-07-27T07:10:28.057466+00:00",
+  "commit": "daa111a89f4acb839c5080fefb705b45611891bb",
   "branch": "master",
-  "sourceFingerprint": "cbffecb9557503ef213755a5fb42add0d808a49c9abc1599fa1ca082ff0047c6",
+  "sourceFingerprint": "957767b2639e30552e6736f2b0c0937a8c98c77a4b82a15e8107720f8cab504d",
   "summary": {
-    "files": 1140,
-    "lines": 267025,
-    "symbols": 5579,
+    "files": 1141,
+    "lines": 267129,
+    "symbols": 5583,
     "productionCodeFiles": 802,
-    "testFiles": 145,
+    "testFiles": 146,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 679,
+      "app": 680,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 747,
+      ".kt": 748,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 28,
+      "学习监督": 29,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
@@ -1382,6 +1382,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyAchievementRewardsTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyPlanCatalogOverlayTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyRulesTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyStorePersistenceTest.kt",
@@ -48742,6 +48743,46 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 104,
+      "sha256": "99c366ca422ca2ecafd7ca68a487fc3bee9018596c09f9dcb1ca199b72b8214c",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "StudyGachaRewardPolicyTest",
+          "kind": "class",
+          "line": 9
+        },
+        {
+          "name": "FixedDoubleRandom",
+          "kind": "class",
+          "line": 93
+        },
+        {
+          "name": "nextBits",
+          "kind": "function",
+          "line": 98
+        },
+        {
+          "name": "nextDouble",
+          "kind": "function",
+          "line": 100
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyPlanCatalogOverlayTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -79488,6 +79529,13 @@
         "line": 11
       }
     ],
+    "me.rerere.rikkahub.data.study.FixedDoubleRandom": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt",
+        "kind": "class",
+        "line": 93
+      }
+    ],
     "me.rerere.rikkahub.data.study.FixedDrawRandom": [
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyRulesTest.kt",
@@ -79605,6 +79653,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "object",
         "line": 13
+      }
+    ],
+    "me.rerere.rikkahub.data.study.StudyGachaRewardPolicyTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt",
+        "kind": "class",
+        "line": 9
       }
     ],
     "me.rerere.rikkahub.data.study.StudyInventory": [
@@ -80573,6 +80628,11 @@
     ],
     "me.rerere.rikkahub.data.study.nextBits": [
       {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt",
+        "kind": "function",
+        "line": 98
+      },
+      {
         "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyRulesTest.kt",
         "kind": "function",
         "line": 339
@@ -80594,6 +80654,11 @@
       }
     ],
     "me.rerere.rikkahub.data.study.nextDouble": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt",
+        "kind": "function",
+        "line": 100
+      },
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyRulesTest.kt",
         "kind": "function",
