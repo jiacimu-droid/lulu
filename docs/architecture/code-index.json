@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:27:58.685132+00:00",
-  "commit": "45cec7557b5305123a4da33c7b9a4aa1b2096e4f",
+  "generatedAt": "2026-07-27T05:31:01.063660+00:00",
+  "commit": "e356503f6dba92c6dfd4b5911f885ef497f986d9",
   "branch": "master",
-  "sourceFingerprint": "4416db703eb96e769a0d2c31421df623c2c488fa42303d261292516ae35bce4c",
+  "sourceFingerprint": "a4f451a775827f8c1340c7375fc36e1d70fe0ac533fa1b7169456a020eebc122",
   "summary": {
     "files": 1132,
-    "lines": 266232,
+    "lines": 266237,
     "symbols": 5550,
     "productionCodeFiles": 799,
     "testFiles": 140,
@@ -27550,8 +27550,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 455,
-      "sha256": "d688a9c9396a4c97973f56f49a951a52e278a371853dc8ef398484165d8a3c8f",
+      "lines": 460,
+      "sha256": "90c0b88fced9ce90caedd4347c593ab8ae0123e61d627f57af43d95dc4a244d5",
       "package": "me.rerere.rikkahub.service",
       "categories": [],
       "symbols": [
@@ -27648,42 +27648,42 @@
         {
           "name": "toCompactBehaviorText",
           "kind": "function",
-          "line": 381
+          "line": 386
         },
         {
           "name": "hasExplicitDoNotDisturbSignal",
           "kind": "function",
-          "line": 389
+          "line": 394
         },
         {
           "name": "containsAny",
           "kind": "function",
-          "line": 403
+          "line": 408
         },
         {
           "name": "toCompanionIntent",
           "kind": "function",
-          "line": 405
+          "line": 410
         },
         {
           "name": "fallbackCompanionInnerThought",
           "kind": "function",
-          "line": 415
+          "line": 420
         },
         {
           "name": "cleanCompanionInnerThought",
           "kind": "function",
-          "line": 424
+          "line": 429
         },
         {
           "name": "sanitizeCompanionPlanText",
           "kind": "function",
-          "line": 437
+          "line": 442
         },
         {
           "name": "extractCompanionJsonPayload",
           "kind": "function",
-          "line": 443
+          "line": 448
         }
       ],
       "localImportCount": 14,
@@ -83773,7 +83773,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "kind": "function",
-        "line": 424
+        "line": 429
       }
     ],
     "me.rerere.rikkahub.service.cleanInnerThought": [
@@ -83904,7 +83904,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "kind": "function",
-        "line": 403
+        "line": 408
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/ProactiveReminderPlanner.kt",
@@ -84073,7 +84073,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "kind": "function",
-        "line": 443
+        "line": 448
       }
     ],
     "me.rerere.rikkahub.service.extractJsonPayload": [
@@ -84094,7 +84094,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "kind": "function",
-        "line": 415
+        "line": 420
       }
     ],
     "me.rerere.rikkahub.service.field": [
@@ -84323,7 +84323,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "kind": "function",
-        "line": 389
+        "line": 394
       }
     ],
     "me.rerere.rikkahub.service.hasExplicitReminderTime": [
@@ -84669,7 +84669,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "kind": "function",
-        "line": 437
+        "line": 442
       }
     ],
     "me.rerere.rikkahub.service.sanitizePlanReason": [
@@ -84870,14 +84870,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "kind": "function",
-        "line": 381
+        "line": 386
       }
     ],
     "me.rerere.rikkahub.service.toCompanionIntent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "kind": "function",
-        "line": 405
+        "line": 410
       }
     ],
     "me.rerere.rikkahub.service.toCompanionReminderKind": [
