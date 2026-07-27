@@ -4,6 +4,7 @@ import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.model.Assistant
+import me.rerere.rikkahub.data.model.AssistantInteractionProfile
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -62,10 +63,32 @@ class CompanionContextEnvelopeTest {
         )
 
         assertEquals(
-            listOf("角色核心", "全局世界书", "角色世界书", "最近消息", "滚动摘要", "记忆", "关系/状态", "承诺/关注", "其他提示词"),
+            listOf("角色核心", "互动设定", "全局世界书", "角色世界书", "最近消息", "滚动摘要", "记忆", "关系/状态", "承诺/关注", "其他提示词"),
             envelope.sections.map { it.label },
         )
         assertTrue(envelope.sections.first { it.label == "记忆" }.estimatedTokens > 0)
+    }
+
+    @Test
+    fun `editable interaction profile is injected into chat and phone context`() {
+        val envelope = buildCompanionContextEnvelope(
+            assistant = Assistant(
+                interactionProfile = AssistantInteractionProfile(
+                    initiative = "会主动联系并询问用户现在在做什么。",
+                    followUpStyle = "没有回复时只追问一次。",
+                ),
+            ),
+            source = ApiUsageSource.PHONE,
+            messages = listOf(UIMessage.user("hello")),
+            characterCore = "persona",
+            globalLorebook = "",
+            roleLorebook = "",
+            otherMandatoryPrompt = "",
+        )
+
+        assertTrue(envelope.messages.first().toText().contains("<interaction_profile"))
+        assertTrue(envelope.messages.first().toText().contains("会主动联系"))
+        assertTrue(envelope.sections.first { it.label == "互动设定" }.estimatedTokens > 0)
     }
 
     @Test
