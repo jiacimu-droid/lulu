@@ -13,6 +13,7 @@ import kotlin.random.Random
 object StudyGachaRewardPolicy {
     const val GAME_ROUNDS_PER_TICKET: Int = 4
     const val FOUR_HOUR_STUDY_MINUTES: Int = 240
+    const val FOUR_HOUR_DOUYIN_TICKETS: Int = 2
 
     const val GAME_ROUND_RATE: Double = 0.02
     const val DOUYIN_RATE: Double = 0.02
@@ -69,9 +70,10 @@ object StudyGachaRewardPolicy {
     }
 
     /**
-     * Keeping Douyin at 2% yields only one 20-minute ticket per 50 pulls on
-     * average. A once-per-day four-hour study bonus supplies the second ticket,
-     * making the practical expectation about 40 minutes without inflating purple.
+     * At a 2% pool rate, 50 pulls yield one 20-minute Douyin ticket on average.
+     * The once-per-day four-hour study reward grants two more tickets (40 minutes),
+     * so a four-hour day has a guaranteed 40 minutes and a long-run expectation of
+     * about 60 minutes without making purple results common inside the pool.
      */
     fun grantFourHourDouyinBonus(
         before: StudyState,
@@ -91,7 +93,7 @@ object StudyGachaRewardPolicy {
         return StudyBonusResult(
             state = after.copy(
                 inventory = after.inventory.copy(
-                    douyinFragments = after.inventory.douyinFragments + 1,
+                    douyinFragments = after.inventory.douyinFragments + FOUR_HOUR_DOUYIN_TICKETS,
                     rareFragments = after.inventory.rareFragments + (marker to 1),
                 ),
             ),
