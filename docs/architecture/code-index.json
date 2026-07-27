@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T03:46:56.655406+00:00",
-  "commit": "eddf3d2f68066fb841f98fb0d1bd2ed8aac8639b",
+  "generatedAt": "2026-07-27T03:47:18.657852+00:00",
+  "commit": "d05543af84b81b91cea27b4812780926596d65dd",
   "branch": "master",
-  "sourceFingerprint": "28f5510675bc449e23b2d2ee603979c8f01fe9ff10693814d096dee8491151a9",
+  "sourceFingerprint": "e7949a1dfd41403724183cd7d417dd7fed2719054bf10655979bd7e2af0460e2",
   "summary": {
     "files": 1129,
-    "lines": 265425,
+    "lines": 265424,
     "symbols": 5522,
     "productionCodeFiles": 798,
     "testFiles": 138,
@@ -48997,8 +48997,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPageEntryKindsTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 58,
-      "sha256": "571062c262df17e539cb3db1ad4fea4674c506a6cffc2d331c3a8c90232fa09a",
+      "lines": 57,
+      "sha256": "70f8ad717b041192cd7670912dbb8d650b4010d47cc985295af5f2b71f00e4aa",
       "package": "me.rerere.rikkahub.ui.pages.cihai",
       "categories": [
         "界面"
@@ -49012,7 +49012,7 @@
         {
           "name": "entry",
           "kind": "function",
-          "line": 50
+          "line": 49
         }
       ],
       "localImportCount": 2,
@@ -89424,7 +89424,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPageEntryKindsTest.kt",
         "kind": "function",
-        "line": 50
+        "line": 49
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.event": [
