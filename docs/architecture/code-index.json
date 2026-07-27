@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:29:03.537488+00:00",
-  "commit": "9e3834c128535cb2395bfbd152a956e017b4b24d",
+  "generatedAt": "2026-07-27T16:32:06.406493+00:00",
+  "commit": "20ac82ce9c3a9bc795f4236513ce543cfc339334",
   "branch": "master",
-  "sourceFingerprint": "dae8630a1d7e6060e5f93681389ba3c116d4670d297073b55aef66a03286bc79",
+  "sourceFingerprint": "2d1f34bf4ff47231b24bcd90e20ecb460e82ebc8ccb86c69a2947cffa3b7c7fc",
   "summary": {
     "files": 1164,
-    "lines": 269153,
-    "symbols": 5613,
+    "lines": 269123,
+    "symbols": 5614,
     "productionCodeFiles": 825,
     "testFiles": 146,
     "largeProductionFiles": 40,
@@ -40031,8 +40031,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 458,
-      "sha256": "92baf0c2ab4d4993140e363f892b2335cba3adf01dd005448fc17a04e05ab794",
+      "lines": 428,
+      "sha256": "2f5b57f4808cc1917fab77340c48fc84405354d8bf74a3fe0d4dbd840f3f6f38",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -40059,9 +40059,14 @@
           "line": 233
         },
         {
+          "name": "DisplayBooleanRow",
+          "kind": "function",
+          "line": 393
+        },
+        {
           "name": "DisplaySettingSlider",
           "kind": "composable",
-          "line": 437
+          "line": 407
         }
       ],
       "localImportCount": 11,
@@ -93892,6 +93897,13 @@
         "line": 239
       }
     ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayBooleanRow": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+        "kind": "function",
+        "line": 393
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.setting.DisplayCodeSection": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBehavior.kt",
@@ -93959,7 +93971,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "kind": "composable",
-        "line": 437
+        "line": 407
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DisplayThemeSection": [
