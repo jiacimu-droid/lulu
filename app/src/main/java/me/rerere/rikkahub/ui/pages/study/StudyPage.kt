@@ -211,8 +211,11 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
 
                     StudySection.Gacha -> {
                         item {
+                            val standardGachaState = state.copy(
+                                wallet = state.wallet.copy(purpleDrawTickets = 0),
+                            )
                             GachaCard(
-                                state = state,
+                                state = standardGachaState,
                                 onSingle = { vm.draw(1) },
                                 onTen = { vm.draw(10) },
                                 onPurple = vm::drawPurpleTicket,
@@ -227,10 +230,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                                 onUseUniversalNormalTarget = vm::applyUniversalNormal,
                                 onOpenMysteryBox = { vm.openMysteryBox(it) },
                                 onRedeemDouyin = { vm.redeemEntertainment(StudyEntertainmentReward.Douyin) },
-                                onRedeemGame = {
-                                    vm.redeemEntertainment(StudyEntertainmentReward.Game)
-                                    navController.navigate(Screen.GameHub)
-                                },
+                                onRedeemGame = { vm.redeemEntertainment(StudyEntertainmentReward.Game) },
                                 onRedeemAnime = { vm.redeemEntertainment(StudyEntertainmentReward.Anime) },
                                 onOpenStarWish = { navController.navigate(Screen.StarWish) },
                                 onOpenImageGen = { outfit ->
