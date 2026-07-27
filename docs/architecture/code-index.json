@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:16:36.953546+00:00",
-  "commit": "5592ca8883bbdea3158517afdd631777e8a5027d",
+  "generatedAt": "2026-07-27T17:17:28.768647+00:00",
+  "commit": "729fbb74dcd7ffeafcad88ae0361eb5cb5f87ad6",
   "branch": "master",
-  "sourceFingerprint": "2c1de913cd149363318dd2fc966faf9b7acdd158f01b5ad4b43cbb4d8458931b",
+  "sourceFingerprint": "da188f81b29e035a63f76947d36348b126cf260160063c9c3afeebe6ba18590b",
   "summary": {
     "files": 1182,
-    "lines": 266585,
+    "lines": 266558,
     "symbols": 5649,
     "productionCodeFiles": 843,
     "testFiles": 146,
@@ -68,7 +68,7 @@
       "界面": 330,
       "记忆": 44
     },
-    "resolvedImportEdges": 2052
+    "resolvedImportEdges": 2053
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -990,7 +990,7 @@
         "lines": 50,
         "symbols": 5,
         "localImportCount": 0,
-        "importedByCount": 34,
+        "importedByCount": 33,
         "todoMarkers": 0
       },
       {
@@ -2110,6 +2110,11 @@
       "imports": 13
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.data.ai.mcp",
+      "imports": 13
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.message",
       "to": "me.rerere.rikkahub.ui.components.ui",
       "imports": 12
@@ -2127,11 +2132,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.data.model.Assistant",
-      "imports": 11
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.data.ai.mcp",
       "imports": 11
     },
     {
@@ -2157,11 +2157,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.chat",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 10
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.utils.plus",
       "imports": 10
     },
     {
@@ -2192,6 +2187,11 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.ui.theme.CustomColors",
+      "imports": 9
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.utils.plus",
       "imports": 9
     },
     {
@@ -9502,6 +9502,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingVM.kt"
       ]
     },
@@ -9555,7 +9556,8 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt"
       ]
     },
     {
@@ -41064,8 +41066,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 194,
-      "sha256": "f037015f3fb760bb2e4fa526d0b0946e6f220f230f70b03c07d7ebd16b1d1540",
+      "lines": 167,
+      "sha256": "a10e03178643eee1bde2cce4178152232d820b30e4b8bbbb5fa147680ebc14c4",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -41074,10 +41076,10 @@
         {
           "name": "SettingMcpPage",
           "kind": "composable",
-          "line": 59
+          "line": 49
         }
       ],
-      "localImportCount": 9,
+      "localImportCount": 10,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -41086,18 +41088,20 @@
         "me.rerere.hugeicons.stroke.Add01",
         "me.rerere.hugeicons.stroke.FileImport",
         "me.rerere.rikkahub.R",
+        "me.rerere.rikkahub.data.ai.mcp.McpManager",
         "me.rerere.rikkahub.data.ai.mcp.McpServerConfig",
+        "me.rerere.rikkahub.data.ai.mcp.McpStatus",
         "me.rerere.rikkahub.ui.components.nav.BackButton",
         "me.rerere.rikkahub.ui.hooks.useEditState",
-        "me.rerere.rikkahub.ui.theme.CustomColors",
-        "me.rerere.rikkahub.utils.plus"
+        "me.rerere.rikkahub.ui.theme.CustomColors"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpConfig.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpManager.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpStatus.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/UseEditState.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt",
-        "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
@@ -45629,7 +45633,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchDetailPage.kt",
@@ -95138,7 +95141,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "composable",
-        "line": 59
+        "line": 49
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.SettingModelPage": [
