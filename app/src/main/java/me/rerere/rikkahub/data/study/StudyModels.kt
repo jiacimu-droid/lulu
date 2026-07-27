@@ -37,8 +37,6 @@ data class StudyState(
     val recentEvents: List<StudyEvent> = emptyList(),
     /** Daily role-confirmed sleep rewards, keyed as yyyy-MM-dd:habit. */
     val sleepHabitRewardClaims: Set<String> = emptySet(),
-    /** Dates on which the four-hour Douyin reward has already been granted. */
-    val fourHourDouyinRewardDates: Set<String> = emptySet(),
     val activePlanDate: String? = null,
     val generatedSchedules: Map<String, List<StudyScheduleBlock>> = emptyMap(),
     val selectedAssistantId: String? = null,
@@ -47,6 +45,8 @@ data class StudyState(
     val pomodoroInterruptionCompensationVersion: Int = 0,
     /** One-time compensation for the reported forty-draw all-normal experience. */
     val gachaBadLuckCompensationVersion: Int = 0,
+    /** Dates on which the four-hour Douyin reward has already been granted. */
+    val fourHourDouyinRewardDates: Set<String> = emptySet(),
 )
 
 @Serializable
@@ -81,11 +81,7 @@ data class StudyInventory(
     val rareFragments: Map<String, Int> = emptyMap(),
     val douyinFragments: Int = 0,
     val theaterFragments: Int = 0,
-    /** Each ticket grants four game rounds. */
-    val gameRoundTickets: Int = 0,
     val gameFragments: Int = 0,
-    /** Stored until the accessory catalog chooses the concrete item to unlock. */
-    val accessoryUnlockCards: Int = 0,
     val videoFragments: Int = 0,
     val animeFragments: Int = 0,
     val epicFragments: Int = 0,
@@ -98,6 +94,10 @@ data class StudyInventory(
     val unlockedOutfits: Set<String> = emptySet(),
     val unlockedTheaters: Set<String> = emptySet(),
     val unopenedMysteryBoxes: List<StudyMysteryBoxReward> = emptyList(),
+    /** Each ticket grants four game rounds. */
+    val gameRoundTickets: Int = 0,
+    /** Stored until the accessory catalog chooses the concrete item to unlock. */
+    val accessoryUnlockCards: Int = 0,
 )
 
 @Serializable
