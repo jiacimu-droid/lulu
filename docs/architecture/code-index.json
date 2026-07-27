@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:16:15.518751+00:00",
-  "commit": "65afb9b90de6b8e18afc8bec0ecb760c346eca82",
+  "generatedAt": "2026-07-27T05:16:37.405628+00:00",
+  "commit": "7e750157eb4813655ad56c6444ff8c86ace1eff0",
   "branch": "master",
-  "sourceFingerprint": "ebc96f5ee7ca8d52a07f7f8738b3635973b8b84698927445407d33e41dcfdd90",
+  "sourceFingerprint": "3c6d6fc092d3b1f4c917fa2643e130b7597feef40a523fe91170e50dd571f3cb",
   "summary": {
-    "files": 1131,
-    "lines": 266153,
-    "symbols": 5549,
+    "files": 1132,
+    "lines": 266214,
+    "symbols": 5550,
     "productionCodeFiles": 799,
-    "testFiles": 139,
+    "testFiles": 140,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 670,
+      "app": 671,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 738,
+      ".kt": 739,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -55,7 +55,7 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 141,
+      "AI与上下文": 142,
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 292,
+      "界面": 293,
       "记忆": 44
     },
-    "resolvedImportEdges": 1969
+    "resolvedImportEdges": 1970
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -926,7 +926,7 @@
         "lines": 331,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 51,
+        "importedByCount": 52,
         "todoMarkers": 0
       },
       {
@@ -1273,7 +1273,8 @@
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/TimeReminderTransformerTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryPromptPhilosophyTest.kt",
-      "app/src/test/java/me/rerere/rikkahub/service/TitleGenerationTest.kt"
+      "app/src/test/java/me/rerere/rikkahub/service/TitleGenerationTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionGenerationTest.kt"
     ],
     "主动代理": [
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentReducer.kt",
@@ -1816,6 +1817,7 @@
       "app/src/test/java/me/rerere/rikkahub/ui/SpeakableMessageTextTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/VoiceCallStateTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/components/message/LuluBubbleTimingTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionGenerationTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatConversationInitializationTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatVMInitTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/LuluStatusDialogTest.kt",
@@ -2058,6 +2060,11 @@
       "imports": 11
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.assistant",
+      "to": "me.rerere.rikkahub.data.model.Assistant",
+      "imports": 11
+    },
+    {
       "from": "me.rerere.rikkahub.data.db",
       "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 10
@@ -2075,11 +2082,6 @@
     {
       "from": "me.rerere.rikkahub.ui.components.ai",
       "to": "me.rerere.rikkahub.R",
-      "imports": 10
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.assistant",
-      "to": "me.rerere.rikkahub.data.model.Assistant",
       "imports": 10
     },
     {
@@ -18565,6 +18567,7 @@
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlannerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionGenerationTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt"
       ]
     },
@@ -49084,6 +49087,36 @@
       ],
       "resolvedImports": [
         "ai/src/main/java/me/rerere/ai/ui/Message.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionGenerationTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 61,
+      "sha256": "14cec8d5256acb76d6136b56aeb10d536ebf5ed567793e576ac0fa46b8540020",
+      "package": "me.rerere.rikkahub.ui.pages.assistant.detail",
+      "categories": [
+        "AI与上下文",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "AssistantInteractionGenerationTest",
+          "kind": "class",
+          "line": 8
+        }
+      ],
+      "localImportCount": 1,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [
+        "me.rerere.rikkahub.data.model.Assistant"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt"
       ],
       "importedBy": []
     },
@@ -88458,6 +88491,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantImporter.kt",
         "kind": "composable",
         "line": 49
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.AssistantInteractionGenerationTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionGenerationTest.kt",
+        "kind": "class",
+        "line": 8
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.AssistantInteractionSection": [
