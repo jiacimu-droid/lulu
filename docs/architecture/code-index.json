@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T06:31:30.200812+00:00",
-  "commit": "6d794e547a67c169666c3fb6206e4073297ef963",
+  "generatedAt": "2026-07-27T06:31:52.708787+00:00",
+  "commit": "dffd7faad300b28c27ebd7a1986447259ff86949",
   "branch": "master",
-  "sourceFingerprint": "21f89995560361ec9b381d3929fc8c86fa5784472b2a40c63bb27dc3042671c4",
+  "sourceFingerprint": "22b146ebe03674cb3621b3973832ea868372f50b4bc7c2e55a5615051691d1f3",
   "summary": {
     "files": 1135,
     "lines": 266534,
@@ -22981,7 +22981,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 81,
-      "sha256": "928cb8cec671de3fbeda4d694e26f320fb7ba3c8032c5ca70e875f892f597b31",
+      "sha256": "bb82461f843be13491528fe6eacaca2be8843783f281ddd9e29de193a9789493",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
