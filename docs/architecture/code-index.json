@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:22:41.785320+00:00",
-  "commit": "ccacf1d61c13ab52eaca7da6a87dd85a0dad07a1",
+  "generatedAt": "2026-07-27T16:23:05.016282+00:00",
+  "commit": "defa3e8942d3e16dd3a6435e8d8ce3f869bdceed",
   "branch": "master",
-  "sourceFingerprint": "aa9e259db1ae5d8c5538a8aff3c101196795cfa11373a2b0196ff000a3ddca14",
+  "sourceFingerprint": "0cfd8c530cc54d6f19703369bc5217c07306d4bb01a99e4fd6cac12ce0023723",
   "summary": {
     "files": 1159,
-    "lines": 267874,
-    "symbols": 5595,
+    "lines": 267864,
+    "symbols": 5594,
     "productionCodeFiles": 820,
     "testFiles": 146,
     "largeProductionFiles": 40,
@@ -628,8 +628,8 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
-        "lines": 465,
-        "symbols": 20,
+        "lines": 455,
+        "symbols": 19,
         "localImportCount": 34,
         "todoMarkers": 0
       },
@@ -41988,8 +41988,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 465,
-      "sha256": "a222449d30aa29f7729d0a1e63029b2a1a51df0c28062ca7fbca792e4e925906",
+      "lines": 455,
+      "sha256": "824b8c3c2a2aba5a833496198bdc68948f7c5f30ccced411e2d9d0e340c970e8",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
@@ -42089,11 +42089,6 @@
           "name": "addCustomTheater",
           "kind": "function",
           "line": 439
-        },
-        {
-          "name": "isPromptPlaceholder",
-          "kind": "function",
-          "line": 458
         }
       ],
       "localImportCount": 34,
@@ -94722,11 +94717,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishTheaterComponents.kt",
         "kind": "function",
         "line": 284
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
-        "kind": "function",
-        "line": 458
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.outfitProgress": [

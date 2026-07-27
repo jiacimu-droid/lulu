@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`ccacf1d61c13ab52eaca7da6a87dd85a0dad07a1`
+- 基准提交：`defa3e8942d3e16dd3a6435e8d8ce3f869bdceed`
 - 分支：`master`
-- 源码指纹：`aa9e259db1ae5d8c…`
+- 源码指纹：`0cfd8c530cc54d6f…`
 - 已索引文件：1159
-- 已索引代码/文本行：267874
-- 已发现类、接口、对象、函数及 Composable：5595
+- 已索引代码/文本行：267864
+- 已发现类、接口、对象、函数及 Composable：5594
 
 ## 仓库健康信号
 
@@ -125,7 +125,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt` | 39 | 784 |
 | `app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt` | 38 | 280 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt` | 37 | 1117 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt` | 34 | 465 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt` | 34 | 455 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt` | 33 | 732 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt` | 33 | 1064 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 32 | 953 |
