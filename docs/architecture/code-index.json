@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:12:34.993411+00:00",
-  "commit": "d6ab6c2999c4291169aa562d9bf0d1428ee9c756",
+  "generatedAt": "2026-07-27T17:13:49.533168+00:00",
+  "commit": "912ecb6757ffa64964f932c06eaab54d5e0cefe4",
   "branch": "master",
-  "sourceFingerprint": "8efb90ff9ca94de11baff0c20b5177b2e6e3d2b850e899c56dc52a065d17f03e",
+  "sourceFingerprint": "d6ddb7697e3ff55e180b3f0e7a295a26edb27361b1a0a4757b12a4ab0c3ae598",
   "summary": {
-    "files": 1178,
-    "lines": 266732,
-    "symbols": 5645,
-    "productionCodeFiles": 839,
+    "files": 1179,
+    "lines": 266802,
+    "symbols": 5649,
+    "productionCodeFiles": 840,
     "testFiles": 146,
     "largeProductionFiles": 35,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 717,
+      "app": 718,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 785,
+      ".kt": 786,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 326,
+      "界面": 327,
       "记忆": 44
     },
-    "resolvedImportEdges": 2042
+    "resolvedImportEdges": 2043
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -1809,6 +1809,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingFilesPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
@@ -2216,6 +2217,11 @@
       "imports": 8
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.data.ai.mcp",
+      "imports": 8
+    },
+    {
       "from": "me.rerere.tts.provider.providers",
       "to": "me.rerere.tts.model.AudioChunk",
       "imports": 8
@@ -2378,11 +2384,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.data.datastore.DisplaySetting",
-      "imports": 6
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.data.ai.mcp",
       "imports": 6
     },
     {
@@ -9351,6 +9352,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt"
       ]
     },
@@ -40834,6 +40836,51 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 70,
+      "sha256": "e1486df8c042648a5b0965642efd31d6a17745d61b3e183ebd2b49d5838b3a6f",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "normalizeMcdonaldsMcpAuthValue",
+          "kind": "function",
+          "line": 13
+        },
+        {
+          "name": "isMcdonaldsMcp",
+          "kind": "function",
+          "line": 18
+        },
+        {
+          "name": "upsertMcdonaldsMcpServer",
+          "kind": "function",
+          "line": 22
+        },
+        {
+          "name": "parseMcpServersFromJson",
+          "kind": "function",
+          "line": 54
+        }
+      ],
+      "localImportCount": 2,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.ai.mcp.McpCommonOptions",
+        "me.rerere.rikkahub.data.ai.mcp.McpServerConfig"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpConfig.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
@@ -95522,6 +95569,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.isMcdonaldsMcp": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
+        "kind": "function",
+        "line": 18
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "function",
         "line": 115
@@ -95536,12 +95588,22 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.normalizeMcdonaldsMcpAuthValue": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
+        "kind": "function",
+        "line": 13
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "function",
         "line": 110
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMcpServersFromJson": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
+        "kind": "function",
+        "line": 54
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "function",
@@ -95647,6 +95709,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.upsertMcdonaldsMcpServer": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
+        "kind": "function",
+        "line": 22
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "function",
