@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T07:22:25.202274+00:00",
-  "commit": "2a95cbf1bf005789555c54abb2b9c480cc855402",
+  "generatedAt": "2026-07-27T07:26:02.585632+00:00",
+  "commit": "6fb9792c69b25127dc4d9c1c39115fb089d9d9e2",
   "branch": "master",
-  "sourceFingerprint": "e58c4110513834a3791706d44bed71d98a29e5dafc1c0c275d3b40e13c835adb",
+  "sourceFingerprint": "18e80dbd140d444c61c4d5b3d29a85d5ededa30aadf3f48d9c21ee63ae299c8d",
   "summary": {
     "files": 1141,
-    "lines": 267122,
+    "lines": 267128,
     "symbols": 5583,
     "productionCodeFiles": 802,
     "testFiles": 146,
@@ -22849,8 +22849,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 279,
-      "sha256": "69daba99661a1bcfe9f1fe3dd70f9d6b8cf7e25b6172fbbe494fc4753ca287b9",
+      "lines": 285,
+      "sha256": "9459d5d5b8d6c19ee33be785da52255534a8a40a6367e8513ef702d92bfad08e",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -22864,122 +22864,122 @@
         {
           "name": "StudyWallet",
           "kind": "class",
-          "line": 53
+          "line": 59
         },
         {
           "name": "StudyTask",
           "kind": "class",
-          "line": 62
+          "line": 68
         },
         {
           "name": "StudyTaskSource",
           "kind": "class",
-          "line": 73
+          "line": 79
         },
         {
           "name": "StudyInventory",
           "kind": "class",
-          "line": 79
+          "line": 85
         },
         {
           "name": "StudyStats",
           "kind": "class",
-          "line": 104
+          "line": 110
         },
         {
           "name": "StudyDailyRecord",
           "kind": "class",
-          "line": 115
+          "line": 121
         },
         {
           "name": "StudyEvent",
           "kind": "class",
-          "line": 121
+          "line": 127
         },
         {
           "name": "StudyEventType",
           "kind": "class",
-          "line": 130
+          "line": 136
         },
         {
           "name": "StudySleepHabit",
           "kind": "class",
-          "line": 149
+          "line": 155
         },
         {
           "name": "StudyReward",
           "kind": "class",
-          "line": 155
+          "line": 161
         },
         {
           "name": "StudyMysteryBoxReward",
           "kind": "class",
-          "line": 173
+          "line": 179
         },
         {
           "name": "StudyActionResult",
           "kind": "class",
-          "line": 178
+          "line": 184
         },
         {
           "name": "StudySleepRewardResult",
           "kind": "class",
-          "line": 183
+          "line": 189
         },
         {
           "name": "StudyTimeOverview",
           "kind": "class",
-          "line": 191
+          "line": 197
         },
         {
           "name": "StudyDrawActionResult",
           "kind": "class",
-          "line": 198
+          "line": 204
         },
         {
           "name": "StudyDrawResult",
           "kind": "class",
-          "line": 204
+          "line": 210
         },
         {
           "name": "StudyRarity",
           "kind": "class",
-          "line": 214
+          "line": 220
         },
         {
           "name": "StudyFragmentType",
           "kind": "class",
-          "line": 222
+          "line": 228
         },
         {
           "name": "StudyEntertainmentReward",
           "kind": "class",
-          "line": 230
+          "line": 236
         },
         {
           "name": "SuperMomentChoice",
           "kind": "class",
-          "line": 239
+          "line": 245
         },
         {
           "name": "StudyLevel",
           "kind": "class",
-          "line": 244
+          "line": 250
         },
         {
           "name": "StudyAchievement",
           "kind": "class",
-          "line": 251
+          "line": 257
         },
         {
           "name": "StudyShopItem",
           "kind": "class",
-          "line": 263
+          "line": 269
         },
         {
           "name": "StudyShopItemType",
           "kind": "class",
-          "line": 271
+          "line": 277
         }
       ],
       "localImportCount": 0,
@@ -79568,7 +79568,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 251
+        "line": 257
       }
     ],
     "me.rerere.rikkahub.data.study.StudyAchievementRewards": [
@@ -79589,7 +79589,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 178
+        "line": 184
       }
     ],
     "me.rerere.rikkahub.data.study.StudyBonusResult": [
@@ -79603,49 +79603,49 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 115
+        "line": 121
       }
     ],
     "me.rerere.rikkahub.data.study.StudyDrawActionResult": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 198
+        "line": 204
       }
     ],
     "me.rerere.rikkahub.data.study.StudyDrawResult": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 204
+        "line": 210
       }
     ],
     "me.rerere.rikkahub.data.study.StudyEntertainmentReward": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 230
+        "line": 236
       }
     ],
     "me.rerere.rikkahub.data.study.StudyEvent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 121
+        "line": 127
       }
     ],
     "me.rerere.rikkahub.data.study.StudyEventType": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 130
+        "line": 136
       }
     ],
     "me.rerere.rikkahub.data.study.StudyFragmentType": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 222
+        "line": 228
       }
     ],
     "me.rerere.rikkahub.data.study.StudyGachaRewardPolicy": [
@@ -79666,21 +79666,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 79
+        "line": 85
       }
     ],
     "me.rerere.rikkahub.data.study.StudyLevel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 244
+        "line": 250
       }
     ],
     "me.rerere.rikkahub.data.study.StudyMysteryBoxReward": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 173
+        "line": 179
       }
     ],
     "me.rerere.rikkahub.data.study.StudyPlanCatalog": [
@@ -79729,14 +79729,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 214
+        "line": 220
       }
     ],
     "me.rerere.rikkahub.data.study.StudyReward": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 155
+        "line": 161
       }
     ],
     "me.rerere.rikkahub.data.study.StudyRules": [
@@ -79764,28 +79764,28 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 263
+        "line": 269
       }
     ],
     "me.rerere.rikkahub.data.study.StudyShopItemType": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 271
+        "line": 277
       }
     ],
     "me.rerere.rikkahub.data.study.StudySleepHabit": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 149
+        "line": 155
       }
     ],
     "me.rerere.rikkahub.data.study.StudySleepRewardResult": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 183
+        "line": 189
       }
     ],
     "me.rerere.rikkahub.data.study.StudyState": [
@@ -79799,7 +79799,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 104
+        "line": 110
       }
     ],
     "me.rerere.rikkahub.data.study.StudyStore": [
@@ -79820,21 +79820,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 62
+        "line": 68
       }
     ],
     "me.rerere.rikkahub.data.study.StudyTaskSource": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 73
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.data.study.StudyTimeOverview": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 191
+        "line": 197
       }
     ],
     "me.rerere.rikkahub.data.study.StudyTip": [
@@ -79862,7 +79862,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 53
+        "line": 59
       }
     ],
     "me.rerere.rikkahub.data.study.SummerCourseDeadlinePlan": [
@@ -79883,7 +79883,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "kind": "class",
-        "line": 239
+        "line": 245
       }
     ],
     "me.rerere.rikkahub.data.study.ThreeRoundRecitationPlan": [
