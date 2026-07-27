@@ -25,7 +25,7 @@ import me.rerere.rikkahub.data.study.CurrentWeekStudyRecovery
 import me.rerere.rikkahub.data.study.ExamStudyPlan
 import me.rerere.rikkahub.data.study.StudyDrawResult
 import me.rerere.rikkahub.data.study.StudyEntertainmentReward
-import me.rerere.rikkahub.data.study.StudyFragmentType
+import me.rerere.rikkahub.data.study.StudyGachaRewardPolicy
 import me.rerere.rikkahub.data.study.StudyMysteryBoxReward
 import me.rerere.rikkahub.data.study.StudyPlanTaskSync
 import me.rerere.rikkahub.data.study.StudyRarity
@@ -33,8 +33,8 @@ import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyShopItem
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyStore
+import me.rerere.rikkahub.data.study.StudyVocabularyPolicy
 import me.rerere.rikkahub.data.study.SuperMomentChoice
-import me.rerere.rikkahub.data.starwish.StarWishRules
 import me.rerere.rikkahub.data.starwish.StarWishStore
 import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import java.time.LocalDate
@@ -93,21 +93,24 @@ class StudyVM(
                     ?: error("当前主聊天模型没有找到对应提供商。")
                 val provider = providerManager.getProviderByType(providerSetting)
                 val presetPlan = StudyPlanTaskSync.visiblePlan(currentState, date)
-                val prompt = ExamStudyPlan.dynamicSchedulePrompt(
-                    date = date,
-                    presetPlan = presetPlan,
-                    defaultSchedule = emptyList(),
-                    tasks = currentState.tasks,
-                    currentTime = currentTime,
+                val prompt = StudyVocabularyPolicy.normalizeText(
+                    ExamStudyPlan.dynamicSchedulePrompt(
+                        date = date,
+                        presetPlan = presetPlan,
+                        defaultSchedule = emptyList(),
+                        tasks = currentState.tasks,
+                        currentTime = currentTime,
+                    ),
                 )
                 val scheduleSystemPrompt = buildString {
                     appendLine(ExamStudyPlan.dynamicScheduleSystemPrompt)
                     appendLine()
                     appendLine(CurrentWeekStudyRecovery.executionOrderReference)
                     appendLine()
-                    appendLine("暑期硬节点：8月15日前完成刑法，9月15日前完成民法，9月30日前完成宪法与法制史全部新课。")
+                    appendLine("新课与三轮硬节点：10月7日前全部常规新课结束；10月14日前第一轮全科结束；10月31日前第二轮全科结束；11月30日前第三轮全科结束。")
+                    appendLine("每日单词固定为${StudyVocabularyPolicy.dailyTarget}个（${StudyVocabularyPolicy.dailyGroups}组）；旧提示里的120词全部作废。")
                     appendLine("每周星期日完整休息；被用户删除的系统待办不得重新排回今日计划。")
-                    appendLine("背诵轮次：9月前第一轮目录树与关键词，9月下半月启动第二轮规范表述，11月进入第三轮限时输出。")
+                    appendLine("日计划可给建议章节，但不是强制日终点；周计划和月计划的章节终点必须硬验收。")
                 }
                 val chunk = provider.generateText(
                     providerSetting = providerSetting,
@@ -132,7 +135,9 @@ class StudyVM(
                         usage = usage,
                     )
                 }
-                val text = chunk.choices.firstOrNull()?.message?.toText().orEmpty()
+                val text = StudyVocabularyPolicy.normalizeText(
+                    chunk.choices.firstOrNull()?.message?.toText().orEmpty(),
+                )
                 val schedule = ExamStudyPlan.scheduleBlocksFromTime(
                     blocks = ExamStudyPlan.parseScheduleBlocks(text),
                     currentTime = currentTime,
@@ -162,10 +167,17 @@ class StudyVM(
         result.state
     }
 
-    fun completePomodoro(minutes: Int) = reduce {
-        val result = StudyRules.completePomodoro(it, minutes, Random.Default)
+    fun completePomodoro(minutes: Int) = reduce { current ->
+        val result = StudyRules.completePomodoro(current, minutes, Random.Default)
         emitReward(result.reward.title)
-        result.state
+        val bonus = StudyGachaRewardPolicy.grantFourHourDouyinBonus(
+            before = current,
+            after = result.state,
+        )
+        if (bonus.granted) {
+            emitReward("今日累计学习满4小时：抖音时长券 · 20分钟 x1")
+        }
+        bonus.state
     }
 
     fun openMysteryBox(index: Int = 0) = reduce {
@@ -187,38 +199,32 @@ class StudyVM(
         viewModelScope.launch {
             var revealItems: List<StudyDrawReveal> = emptyList()
             var message: String? = null
-            var updatedStarWish = starWishStore.state.value
             store.update { current ->
                 val random = MoonlightGachaRandom(
                     delegate = Random.Default,
                     initialDrawsSinceNonNormal = current.drawsSinceNonNormal,
                 )
-                val result = StudyRules.draw(current, count, random)
-                if (result.results.isEmpty()) {
+                val legacyResult = StudyRules.draw(current, count, random)
+                if (legacyResult.results.isEmpty()) {
                     message = "夸夸值或抽卡券不够"
-                    return@update result.state
+                    return@update legacyResult.state
                 }
-                var updatedStudy = result.state.correctMoonlightSpecialTracking(
-                    previousState = current,
-                    results = result.results,
+                val balanced = StudyGachaRewardPolicy.rebalance(
+                    stateAfterLegacyDraw = legacyResult.state,
+                    rawResults = legacyResult.results,
+                    random = Random.Default,
                 )
-                revealItems = result.results.map { drawResult ->
-                    if (drawResult.fragmentType != StudyFragmentType.Video) {
-                        StudyDrawReveal(drawResult)
-                    } else {
-                        val unlock = StarWishRules.unlockNextVideo(updatedStarWish, updatedStudy, Random.Default)
-                        updatedStarWish = unlock.starWishState
-                        updatedStudy = unlock.studyState
-                        StudyDrawReveal(drawResult, unlock.video)
-                    }
-                }
+                val updatedStudy = balanced.state.correctMoonlightSpecialTracking(
+                    previousState = current,
+                    results = balanced.results,
+                )
+                revealItems = balanced.results.map(::StudyDrawReveal)
                 updatedStudy
             }
             message?.let {
                 _effects.tryEmit(StudyEffect.Message(it))
                 return@launch
             }
-            starWishStore.update { updatedStarWish }
             _effects.tryEmit(StudyEffect.DrawResults(revealItems))
         }
     }
@@ -227,9 +233,14 @@ class StudyVM(
         viewModelScope.launch {
             var revealItems: List<StudyDrawReveal> = emptyList()
             store.update { current ->
-                val result = StudyRules.drawPurpleTicket(current, Random.Default)
-                revealItems = result.results.map { drawResult -> StudyDrawReveal(drawResult) }
-                result.state
+                val legacyResult = StudyRules.drawPurpleTicket(current, Random.Default)
+                val balanced = StudyGachaRewardPolicy.rebalance(
+                    stateAfterLegacyDraw = legacyResult.state,
+                    rawResults = legacyResult.results,
+                    random = Random.Default,
+                )
+                revealItems = balanced.results.map(::StudyDrawReveal)
+                balanced.state
             }
             if (revealItems.isEmpty()) {
                 _effects.tryEmit(StudyEffect.Message("没有可用的今日安全抽"))
@@ -271,6 +282,28 @@ class StudyVM(
         result.state
     }
 
+    fun redeemGameRoundTicket() = reduce {
+        val next = StudyGachaRewardPolicy.consumeGameRoundTicket(it)
+        if (next == null) {
+            emitReward("还没有游戏局数券")
+            it
+        } else {
+            emitReward("游戏局数券已使用 · 可玩${StudyGachaRewardPolicy.GAME_ROUNDS_PER_TICKET}局")
+            next
+        }
+    }
+
+    fun redeemAccessoryCard() = reduce {
+        val next = StudyGachaRewardPolicy.consumeAccessoryCard(it)
+        if (next == null) {
+            emitReward("还没有饰品解锁卡")
+            it
+        } else {
+            emitReward("饰品解锁卡已使用")
+            next
+        }
+    }
+
     fun applyUniversalNormal(key: String) = reduce {
         val result = StudyRules.useUniversalNormalFragment(it, key)
         emitReward(result.reward.title)
@@ -309,9 +342,8 @@ class StudyVM(
 }
 
 /**
- * Rebalances only the regular-pool rarity roll while leaving StudyRules' inventory,
- * pity, fragment and reveal behavior untouched. The persisted five-minute reward
- * cadence is deliberately not changed.
+ * Rebalances only the regular-pool rarity roll while leaving StudyRules' payment,
+ * persistence and reveal flow untouched.
  */
 private class MoonlightGachaRandom(
     private val delegate: Random,
@@ -332,8 +364,8 @@ private class MoonlightGachaRandom(
             return delegate.nextDouble()
         }
 
-        // On the guaranteed 30th pull StudyRules calls drawRare directly, so this
-        // double is the purple subtype roll rather than a rarity roll.
+        // On the guaranteed pull StudyRules calls drawRare directly, so this
+        // double is the legacy subtype roll rather than a rarity roll.
         if (drawsSinceNonNormal >= StudyRules.NON_NORMAL_PITY_DRAW_COUNT - 1) {
             drawsSinceNonNormal = 0
             return delegate.nextDouble()
@@ -374,14 +406,14 @@ private class MoonlightGachaRandom(
     }
 
     private companion object {
-        // Regular-pool rates: blue 93.5%, purple 4.8%, gold 1.5%, rainbow 0.2%.
-        // Gold keeps StudyRules' original 80/20 split: game 1.2%, video 0.3%.
-        const val MOONLIGHT_NORMAL_END = 0.935
+        // Requested regular-pool rates:
+        // blue 93.8%, purple 4.5%, gold 1.5%, rainbow 0.2%.
+        const val MOONLIGHT_NORMAL_END = 0.938
         const val MOONLIGHT_RARE_END = 0.983
         const val MOONLIGHT_EPIC_END = 0.998
 
-        // Current StudyRules thresholds. Mapping into these intervals lets us keep
-        // all existing reward construction and persistence code in one place.
+        // Legacy StudyRules thresholds. Mapping into these intervals keeps payment,
+        // inventory persistence and the reveal animation in one existing path.
         const val LEGACY_NORMAL_END = 0.9215
         const val LEGACY_RARE_END = 0.9815
         const val LEGACY_EPIC_END = 0.9965
