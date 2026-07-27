@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`cac3d99a3ed7432f8c5e92d582d9ece6f9428837`
+- 基准提交：`639aa73bba3dcdd445c6ac00044057060cb48e7a`
 - 分支：`master`
-- 源码指纹：`dd8c79a6a94d6979…`
-- 已索引文件：1171
-- 已索引代码/文本行：268181
-- 已发现类、接口、对象、函数及 Composable：5642
+- 源码指纹：`cbbee16f4dc3b4a5…`
+- 已索引文件：1172
+- 已索引代码/文本行：268392
+- 已发现类、接口、对象、函数及 Composable：5655
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 832 |
+| 生产代码文件 | 833 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 38 |
 | ≥1500 行生产文件 | 4 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 710 |
+| `app` | 711 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 778 |
+| `.kt` | 779 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -359,6 +359,7 @@
 - `app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginViewModel.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/MusicPlayerService.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt`
+- `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewScripts.kt`
@@ -370,8 +371,7 @@
 - `plugins/moments/supabase_schema.sql`
 - `plugins/moments/ui/index.html`
 - `plugins/supabase_memory/README.md`
-- `plugins/supabase_memory/main.js`
-- ……另有 17 个文件，见 `code-index.json`
+- ……另有 18 个文件，见 `code-index.json`
 
 ### 数据库
 
@@ -548,14 +548,14 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2035
-- 可检索完整符号：5026
+- 已解析本地导入边：2041
+- 可检索完整符号：5035
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 129 | 812 |
-| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 110 | 953 |
-| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 130 | 812 |
+| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 111 | 953 |
+| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 63 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 58 | 62 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 55 | 296 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
@@ -566,7 +566,7 @@
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 34 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 34 | 248 |
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 33 | 50 |
-| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 30 | 141 |
+| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 31 | 141 |
 | `app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt` | 26 | 676 |
 <!-- reverse-index:end -->
 
