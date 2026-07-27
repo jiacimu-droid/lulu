@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`3889f4e2925f30c4dc382e738cbb63b1ee56cd93`
+- 基准提交：`f190185df17c69759b1b89c9ff6af3ea4aba097e`
 - 分支：`master`
-- 源码指纹：`ae57e0e2cae92de1…`
-- 已索引文件：1141
-- 已索引代码/文本行：267106
-- 已发现类、接口、对象、函数及 Composable：5582
+- 源码指纹：`92d5131da508437d…`
+- 已索引文件：1142
+- 已索引代码/文本行：267317
+- 已发现类、接口、对象、函数及 Composable：5588
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 802 |
+| 生产代码文件 | 803 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 680 |
+| `app` | 681 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 748 |
+| `.kt` | 749 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -316,6 +316,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt`
+- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/StudyAchievementRewardsTest.kt`
@@ -487,7 +488,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 263 个文件，见 `code-index.json`
+- ……另有 264 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -546,8 +547,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1976
-- 可检索完整符号：4974
+- 已解析本地导入边：1978
+- 可检索完整符号：4980
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
