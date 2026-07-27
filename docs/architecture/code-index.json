@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T03:07:28.874357+00:00",
-  "commit": "84335e07f6b9725788af610508d639359fbec783",
+  "generatedAt": "2026-07-27T03:07:49.917063+00:00",
+  "commit": "643de3672e66d3210b430b6326fd0df75d3c6323",
   "branch": "master",
-  "sourceFingerprint": "b90606cd828c264a2e470b907802fbee1ccfe77e1a0bd486ffd9a0792fa7601b",
+  "sourceFingerprint": "518f87013c45c08ac07e7944123d0b4c6f6286417ba638313c088da93ba70a04",
   "summary": {
-    "files": 1128,
-    "lines": 265641,
-    "symbols": 5525,
+    "files": 1129,
+    "lines": 265698,
+    "symbols": 5526,
     "productionCodeFiles": 798,
-    "testFiles": 137,
+    "testFiles": 138,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 667,
+      "app": 668,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 735,
+      ".kt": 736,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 290,
+      "界面": 291,
       "记忆": 44
     },
-    "resolvedImportEdges": 1952
+    "resolvedImportEdges": 1954
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 127,
+        "importedByCount": 128,
         "todoMarkers": 0
       },
       {
@@ -962,19 +962,19 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
+        "lines": 148,
+        "symbols": 10,
+        "localImportCount": 5,
+        "importedByCount": 35,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt",
         "lines": 50,
         "symbols": 5,
         "localImportCount": 0,
         "importedByCount": 35,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
-        "lines": 148,
-        "symbols": 10,
-        "localImportCount": 5,
-        "importedByCount": 34,
         "todoMarkers": 0
       },
       {
@@ -1815,6 +1815,7 @@
       "app/src/test/java/me/rerere/rikkahub/ui/SpeakableMessageTextTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/VoiceCallStateTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/components/message/LuluBubbleTimingTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatConversationInitializationTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatVMInitTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/LuluStatusDialogTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/TTSAutoPlayTest.kt",
@@ -2141,6 +2142,11 @@
       "imports": 8
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.chat",
+      "to": "me.rerere.rikkahub.data.model.Conversation",
+      "imports": 8
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.memory",
       "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 8
@@ -2212,7 +2218,7 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.chat",
-      "to": "me.rerere.rikkahub.data.model.Conversation",
+      "to": "me.rerere.ai.ui.UIMessage",
       "imports": 7
     },
     {
@@ -2258,11 +2264,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.chat",
       "to": "me.rerere.rikkahub.data.datastore.Settings",
-      "imports": 6
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.chat",
-      "to": "me.rerere.ai.ui.UIMessage",
       "imports": 6
     },
     {
@@ -6035,6 +6036,7 @@
         "app/src/test/java/me/rerere/rikkahub/service/VoiceCallChatSyncTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/SpeakableMessageTextTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/components/message/LuluBubbleTimingTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatConversationInitializationTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatVMInitTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/TTSAutoPlayTest.kt"
       ]
@@ -18677,6 +18679,7 @@
         "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/VoiceCallChatSyncTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatConversationInitializationTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatVMInitTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/TTSAutoPlayTest.kt"
       ]
@@ -48873,6 +48876,38 @@
       ],
       "resolvedImports": [
         "ai/src/main/java/me/rerere/ai/ui/Message.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatConversationInitializationTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 57,
+      "sha256": "7bf2c2a93689d7ef175c91e1a5c93b5a6cb88f4d2a0058a4a46401fa12622373",
+      "package": "me.rerere.rikkahub.ui.pages.chat",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "ChatConversationInitializationTest",
+          "kind": "class",
+          "line": 11
+        }
+      ],
+      "localImportCount": 3,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [
+        "me.rerere.ai.ui.UIMessage",
+        "me.rerere.rikkahub.data.model.Conversation",
+        "me.rerere.rikkahub.data.model.toMessageNode"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt"
       ],
       "importedBy": []
     },
@@ -88593,6 +88628,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Background.kt",
         "kind": "composable",
         "line": 19
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.chat.ChatConversationInitializationTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/ChatConversationInitializationTest.kt",
+        "kind": "class",
+        "line": 11
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ChatExportSheet": [

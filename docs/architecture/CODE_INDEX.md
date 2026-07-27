@@ -12,19 +12,19 @@
 
 ## 索引状态
 
-- 基准提交：`84335e07f6b9725788af610508d639359fbec783`
+- 基准提交：`643de3672e66d3210b430b6326fd0df75d3c6323`
 - 分支：`master`
-- 源码指纹：`b90606cd828c264a…`
-- 已索引文件：1128
-- 已索引代码/文本行：265641
-- 已发现类、接口、对象、函数及 Composable：5525
+- 源码指纹：`518f87013c45c08a…`
+- 已索引文件：1129
+- 已索引代码/文本行：265698
+- 已发现类、接口、对象、函数及 Composable：5526
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
 | 生产代码文件 | 798 |
-| 测试文件 | 137 |
+| 测试文件 | 138 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
 | TODO/FIXME/HACK/XXX | 32 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 667 |
+| `app` | 668 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 735 |
+| `.kt` | 736 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -480,7 +480,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 260 个文件，见 `code-index.json`
+- ……另有 261 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -539,12 +539,12 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1952
-- 可检索完整符号：4928
+- 已解析本地导入边：1954
+- 可检索完整符号：4929
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 127 | 812 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 128 | 812 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 101 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 60 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 55 | 62 |
@@ -553,8 +553,8 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 44 | 191 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 36 | 529 |
+| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 35 | 50 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 34 | 148 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 32 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 30 | 248 |
 | `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 29 | 141 |
