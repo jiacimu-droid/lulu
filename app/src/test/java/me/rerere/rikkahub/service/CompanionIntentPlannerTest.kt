@@ -10,6 +10,7 @@ import me.rerere.rikkahub.data.companion.CompanionRelationshipState
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import me.rerere.rikkahub.data.companion.CompanionState
 import me.rerere.rikkahub.data.companion.CompanionTurnRole
+import me.rerere.rikkahub.data.model.AssistantInteractionProfile
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -33,18 +34,82 @@ class CompanionIntentPlannerTest {
     }
 
     @Test
-    fun `background fallback does not treat long silence as an event`() {
+    fun `background fallback stays conservative when interaction is unspecified`() {
         val decision = CompanionIntentFallbackPlanner.plan(
             CompanionIntentInput(
                 perception = perception(availableTools = setOf("get_battery_info", "get_app_usage")),
                 mode = CompanionDecisionMode.BACKGROUND,
                 minutesSinceLastChat = 180L,
             ),
+            interactionProfile = AssistantInteractionProfile(),
         )
 
         assertEquals(CompanionIntent.WAIT, decision.intent)
         assertFalse(decision.shouldMessageNow)
         assertTrue(decision.toolNames.isEmpty())
+    }
+
+    @Test
+    fun `high initiative profile may reach out after a natural quiet interval`() {
+        val decision = CompanionIntentFallbackPlanner.plan(
+            CompanionIntentInput(
+                perception = perception(),
+                mode = CompanionDecisionMode.BACKGROUND,
+                minutesSinceLastChat = 60L,
+            ),
+            interactionProfile = AssistantInteractionProfile(
+                initiative = "会主动联系并询问用户现在在做什么。",
+                sharingDesire = "分享欲强，会主动分享自己的发现。",
+            ),
+        )
+
+        assertEquals(CompanionIntent.REACH_OUT, decision.intent)
+        assertTrue(decision.shouldMessageNow)
+        assertEquals("interaction_profile", decision.category)
+    }
+
+    @Test
+    fun `low initiative profile waits until its sparse rhythm`() {
+        val profile = AssistantInteractionProfile(
+            initiative = "很少主动，通常等待用户先开口。",
+        )
+        val early = CompanionIntentFallbackPlanner.plan(
+            CompanionIntentInput(
+                perception = perception(),
+                mode = CompanionDecisionMode.BACKGROUND,
+                minutesSinceLastChat = 179L,
+            ),
+            interactionProfile = profile,
+        )
+        val due = CompanionIntentFallbackPlanner.plan(
+            CompanionIntentInput(
+                perception = perception(),
+                mode = CompanionDecisionMode.BACKGROUND,
+                minutesSinceLastChat = 180L,
+            ),
+            interactionProfile = profile,
+        )
+
+        assertEquals(CompanionIntent.WAIT, early.intent)
+        assertEquals(CompanionIntent.REACH_OUT, due.intent)
+        assertTrue(due.shouldMessageNow)
+    }
+
+    @Test
+    fun `never initiate profile refuses ordinary proactive contact`() {
+        val decision = CompanionIntentFallbackPlanner.plan(
+            CompanionIntentInput(
+                perception = perception(),
+                mode = CompanionDecisionMode.BACKGROUND,
+                minutesSinceLastChat = 24L * 60L,
+            ),
+            interactionProfile = AssistantInteractionProfile(
+                initiative = "绝不主动联系，除非存在用户明确交代的到期责任。",
+            ),
+        )
+
+        assertEquals(CompanionIntent.WAIT, decision.intent)
+        assertFalse(decision.shouldMessageNow)
     }
 
     @Test
@@ -55,6 +120,7 @@ class CompanionIntentPlannerTest {
                 mode = CompanionDecisionMode.BACKGROUND,
                 minutesSinceLastChat = 60L,
             ),
+            interactionProfile = AssistantInteractionProfile(),
         )
 
         assertEquals(CompanionIntent.SELF_ACTIVITY, decision.intent)
@@ -64,7 +130,7 @@ class CompanionIntentPlannerTest {
     }
 
     @Test
-    fun `background fallback respects unresolved relationship tension`() {
+    fun `background fallback does not invent initiative from relationship tension`() {
         val tenseSnapshot = CompanionSnapshot.empty("assistant-a").copy(
             relationship = CompanionRelationshipState(unresolvedTension = 0.8f),
         )
@@ -84,6 +150,7 @@ class CompanionIntentPlannerTest {
                 mode = CompanionDecisionMode.BACKGROUND,
                 minutesSinceLastChat = 180L,
             ),
+            interactionProfile = AssistantInteractionProfile(),
         )
 
         assertEquals(CompanionIntent.WAIT, decision.intent)
@@ -113,9 +180,9 @@ class CompanionIntentPlannerTest {
     }
 
     @Test
-    fun `model prompt contains persona and unified runtime truth`() {
+    fun `model prompt contains persona runtime and editable interaction profile`() {
         val prompt = CompanionIntentModelPlanner.buildPrompt(
-            CompanionIntentInput(
+            input = CompanionIntentInput(
                 perception = perception(
                     persona = "A restrained housekeeper persona",
                     memoryContext = "用户曾明确说过早晨很难醒。",
@@ -123,13 +190,19 @@ class CompanionIntentPlannerTest {
                 mode = CompanionDecisionMode.BACKGROUND,
                 minutesSinceLastChat = 45L,
             ),
+            interactionProfile = AssistantInteractionProfile(
+                initiative = "会主动确认用户的学习和休息状态。",
+                followUpStyle = "未回复时只温和追问一次。",
+            ),
         )
 
         assertTrue(prompt.contains("A restrained housekeeper persona"))
         assertTrue(prompt.contains("<companion_runtime"))
+        assertTrue(prompt.contains("<interaction_profile"))
+        assertTrue(prompt.contains("会主动确认用户的学习和休息状态"))
         assertTrue(prompt.contains("FOLLOW_UP, STAY_AVAILABLE, REACH_OUT, OBSERVE, SELF_ACTIVITY, WAIT"))
         assertTrue(prompt.contains("用户曾明确说过早晨很难醒。"))
-        assertTrue(prompt.contains("Elapsed silence is context, not an event"))
+        assertTrue(prompt.contains("Elapsed silence is context. It may be a valid reason"))
         assertFalse(prompt.contains("study-supervisor"))
     }
 
@@ -151,24 +224,24 @@ class CompanionIntentPlannerTest {
     }
 
     @Test
-    fun `high relationship tension suppresses unsolicited reach out`() {
+    fun `hidden relationship tension cannot erase configured reach out or follow up`() {
         val constrained = CompanionIntentDecision(
             intent = CompanionIntent.REACH_OUT,
             shouldMessageNow = true,
             delayMinutes = null,
             toolNames = listOf("get_notifications"),
-            reason = "Say something casual.",
-            tone = "warm",
+            reason = "Interaction profile says to check in.",
+            tone = "persona consistent",
             followUps = listOf(CompanionFollowUpPlan(10, "Try again")),
             fromModel = true,
         ).enforceRelationshipPolicy(
             CompanionRelationshipState(unresolvedTension = 0.8f),
         )
 
-        assertEquals(CompanionIntent.WAIT, constrained.intent)
-        assertFalse(constrained.shouldMessageNow)
+        assertEquals(CompanionIntent.REACH_OUT, constrained.intent)
+        assertTrue(constrained.shouldMessageNow)
         assertTrue(constrained.toolNames.isEmpty())
-        assertTrue(constrained.followUps.isEmpty())
+        assertEquals(1, constrained.followUps.size)
     }
 
     @Test
