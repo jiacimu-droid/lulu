@@ -370,6 +370,11 @@ private fun AssistantInteractionProfile.initiativeBand(): InteractionInitiativeB
         )
     ) return InteractionInitiativeBand.LOW
     if (text.containsAny(
+            "通常主动", "通常会主动", "适度主动", "有时主动", "有时会主动", "按情况主动",
+            "normal initiative", "sometimes initiates", "moderate initiative",
+        )
+    ) return InteractionInitiativeBand.NORMAL
+    if (text.containsAny(
             "经常主动", "会主动联系", "主动关心", "主动询问", "主动确认", "频繁联系", "分享欲强",
             "主动分享", "及时跟进", "会继续追问", "积极照看", "主动监督", "high initiative",
             "often initiates", "frequently reaches out",
