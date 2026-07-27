@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,14 +35,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import me.rerere.ai.core.ReasoningLevel
+import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelType
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Tools
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.ui.components.ai.ModelSelector
+import me.rerere.rikkahub.ui.components.ai.ReasoningButton
 import me.rerere.rikkahub.ui.components.ui.FormItem
-import me.rerere.rikkahub.ui.pages.assistant.detail.ReasoningButton
 import me.rerere.rikkahub.ui.theme.CustomColors
 import kotlin.uuid.Uuid
 
@@ -89,7 +91,7 @@ internal fun SimpleModelFeature(
     type: ModelType,
     settings: Settings,
     allowClear: Boolean = false,
-    onSelect: (Uuid) -> Unit,
+    onSelect: (Model) -> Unit,
 ) {
     ModelFeatureCard(
         title = { Text(title, maxLines = 1) },
@@ -100,9 +102,10 @@ internal fun SimpleModelFeature(
                 ModelSelector(
                     modelId = modelId,
                     type = type,
-                    onSelect = { onSelect(it.id) },
+                    onSelect = onSelect,
                     providers = settings.providers,
                     allowClear = allowClear,
+                    modifier = Modifier.wrapContentWidth(),
                 )
             }
         },
@@ -121,7 +124,7 @@ internal fun PromptModelFeature(
     prompt: String,
     promptDescription: String,
     defaultPrompt: String,
-    onSelect: (Uuid) -> Unit,
+    onSelect: (Model) -> Unit,
     onPromptChange: (String) -> Unit,
     thinkingBudget: Int? = null,
     onThinkingBudgetChange: ((Int) -> Unit)? = null,
@@ -136,9 +139,10 @@ internal fun PromptModelFeature(
                 ModelSelector(
                     modelId = modelId,
                     type = type,
-                    onSelect = { onSelect(it.id) },
+                    onSelect = onSelect,
                     providers = settings.providers,
                     allowClear = allowClear,
+                    modifier = Modifier.wrapContentWidth(),
                 )
             }
             IconButton(
