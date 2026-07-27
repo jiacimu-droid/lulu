@@ -124,6 +124,34 @@ object ThreeRoundRecitationPlan : StudyPlanOverlay {
         else -> base
     }
 
+    /** Keep old composables that still read ExamStudyPlan directly on the same plan. */
+    @Suppress("UNCHECKED_CAST")
+    internal fun installIntoLegacyExamPlanViews() {
+        val dailyPlans = ExamStudyPlan.dailyPlans as MutableMap<java.time.LocalDate, DailyStudyPlan>
+        dailyPlans.keys.toList().forEach { date ->
+            dailyPlans[date] = StudyVocabularyPolicy.normalize(dailyPlans.getValue(date))
+        }
+
+        val weeklyPlans = ExamStudyPlan.weeklyPlans as MutableList<WeeklyStudyPlan>
+        val replacements = weeklyOverrides
+        val firstReplacementIndex = weeklyPlans
+            .indexOfFirst { it.id in replacements.keys }
+            .let { index -> if (index >= 0) index else weeklyPlans.size }
+        weeklyPlans.removeAll { it.id in replacements.keys }
+        weeklyPlans.addAll(
+            firstReplacementIndex.coerceAtMost(weeklyPlans.size),
+            replacements.values.map(StudyVocabularyPolicy::normalize),
+        )
+        weeklyPlans.indices.forEach { index ->
+            weeklyPlans[index] = StudyVocabularyPolicy.normalize(weeklyPlans[index])
+        }
+
+        val monthlyPlans = ExamStudyPlan.monthlyPlans as MutableList<MonthlyStudyPlan>
+        monthlyPlans.indices.forEach { index ->
+            monthlyPlans[index] = StudyVocabularyPolicy.normalize(monthlyPlan(monthlyPlans[index]))
+        }
+    }
+
     private fun week(
         id: String,
         title: String,
