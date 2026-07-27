@@ -8,17 +8,16 @@ import org.junit.Test
 
 class CihaiPageEntryKindsTest {
     @Test
-    fun `cihai page exposes five distinct user facing sections`() {
+    fun `cihai page exposes four useful user facing sections`() {
         val sections = visibleCihaiSections()
 
         assertEquals(
-            listOf("生活", "挂心", "约定", "关系", "日记"),
+            listOf("生活", "挂心", "约定", "日记"),
             sections.map { it.label },
         )
         assertEquals(null, CihaiSection.CONCERNS.entryKind)
-        assertEquals(null, CihaiSection.RESPONSIBILITIES.entryKind)
-        assertEquals(null, CihaiSection.RELATIONSHIP.entryKind)
         assertEquals(null, CihaiSection.LIFE.entryKind)
+        assertEquals(null, CihaiSection.COMMITMENTS.entryKind)
         assertEquals(CihaiEntryKind.DIARY, CihaiSection.DIARY.entryKind)
         assertFalse(sections.any { it.entryKind == CihaiEntryKind.INNER_JOURNAL })
         assertFalse(sections.any { it.entryKind == CihaiEntryKind.ACTION_LOG })
@@ -55,4 +54,4 @@ class CihaiPageEntryKindsTest {
             title = id,
             content = id,
         )
-    }
+}
