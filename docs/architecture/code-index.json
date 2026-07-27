@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:06:20.885916+00:00",
-  "commit": "88396cfc00fd5e94acb0c76a429003adf35b6890",
+  "generatedAt": "2026-07-27T17:12:34.993411+00:00",
+  "commit": "d6ab6c2999c4291169aa562d9bf0d1428ee9c756",
   "branch": "master",
-  "sourceFingerprint": "da420f0e779f478c30d9cdd8c89dde4de6cb4e5d42b6593e18876403f81fa014",
+  "sourceFingerprint": "8efb90ff9ca94de11baff0c20b5177b2e6e3d2b850e899c56dc52a065d17f03e",
   "summary": {
     "files": 1178,
     "lines": 266732,
@@ -26803,7 +26803,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 215,
-      "sha256": "2c5f16e6d4744fe67d4ca463c8d24fec17a5e65ae85ec4c9f9de9a54d0d4f507",
+      "sha256": "464037586ec9aae3b5b1cfaba4835129a95edcb8961d9a58eb26fa1111837974",
       "package": "me.rerere.rikkahub.plugin.webview",
       "categories": [
         "界面",
