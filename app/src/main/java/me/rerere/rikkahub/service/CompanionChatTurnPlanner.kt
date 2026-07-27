@@ -16,6 +16,8 @@ import me.rerere.rikkahub.data.companion.CompanionResponsibilityAnchorDraft
 import me.rerere.rikkahub.data.companion.toPromptContext
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.findProvider
+import me.rerere.rikkahub.data.model.AssistantInteractionProfile
+import me.rerere.rikkahub.data.model.toPromptContext
 import me.rerere.rikkahub.utils.JsonInstant
 
 object CompanionChatTurnModelPlanner {
@@ -27,9 +29,13 @@ object CompanionChatTurnModelPlanner {
     ): CompanionChatTurnPlan? {
         val provider = model.findProvider(settings.providers) ?: return null
         val providerImpl = providerManager.getProviderByType(provider)
+        val interactionProfile = settings.assistants
+            .firstOrNull { it.id.toString() == input.perception.snapshot.assistantId }
+            ?.interactionProfile
+            ?: AssistantInteractionProfile()
         val chunk = providerImpl.generateText(
             providerSetting = provider,
-            messages = listOf(UIMessage.user(buildChatTurnPrompt(input))),
+            messages = listOf(UIMessage.user(buildChatTurnPrompt(input, interactionProfile))),
             params = TextGenerationParams(
                 model = model,
                 temperature = 0.25f,
@@ -55,11 +61,15 @@ object CompanionChatTurnModelPlanner {
         )
     }
 
-    fun buildChatTurnPrompt(input: CompanionChatTurnPlanInput): String = buildString {
+    fun buildChatTurnPrompt(
+        input: CompanionChatTurnPlanInput,
+        interactionProfile: AssistantInteractionProfile = AssistantInteractionProfile(),
+    ): String = buildString {
         val perception = input.perception
         appendLine("你是${perception.assistantName.ifBlank { "当前角色" }}的后台小脑，只负责本轮聊天前的行动规划，不生成聊天正文。")
         appendLine("你可以像角色本人一样判断：先读取已经注入的手机状态、位置等被动感知，再决定是否要看摄像头/日历/短信、控制音乐或顺手安排后续主动消息。")
         appendLine("统一陪伴系统采用：感知世界包-意义评估-动态判断-行动实现-状态生成-正式日记架构。")
+        appendLine("interaction_profile 是用户可编辑并确认的互动规则，决定主动意愿、分享欲、责任感、追问方式和被动倾向。它与 persona 同等重要，不能用统一的高冷、恋人、管家或热情模板覆盖。")
         appendLine("responsibility_anchors 不是角色对用户的印象，也不是普通记忆召回；它只保存角色需要持续主动承担的责任。每一轮都必须检查 trigger，并把 required_action 变成真实工具行动、自然提醒或有意识的等待；不能只在回复里复述 statement。")
         appendLine("健康类 anchor 要改变照顾方式：先确认状态、降低负担、提醒规律生活，不要诊断或强迫。责任类 anchor 要在行动窗口执行，完成后保留真实结果；用户取消或纠正时立即停止旧责任。")
         appendLine("只有用户明确交托长期/循环职责，或用户长期健康情况明确要求角色持续调整照顾方式时，才新增 responsibilityAnchorUpserts。普通事实、喜好、一次性请求、角色对用户的看法都不能写成责任锚点。")
@@ -69,13 +79,14 @@ object CompanionChatTurnModelPlanner {
         appendLine("意义评估只评估重要性、威胁、机会、身体/精神安全、时间压力、成本、收益、不行动后果和资源；它不直接选择行动。")
         appendLine("动态判断负责决定 intention、工具需求、是否行动、行动池选择和下一次感知时间；工具结果如果能同步得到，就补回本轮再决定行动。")
         appendLine("状态生成放在行动后，只生成心情、身体状况、精神状况、关系状态和第一人称没说出口；belief/motive/intention 不作为状态栏字段。")
-        appendLine("如果用户不回消息，角色的选项池不是只有发消息：还可以等待、先看感知工具、更新状态、安排下一次判断。静默不产生辞海记录；正式日记只在主动调用 write_lulu_journal 且能写出新内容时保存。")
+        appendLine("如果用户不回消息，角色的选项池不是只有发消息：还可以等待、先看感知工具、更新状态、安排下一次判断。是否追问、追问几次、多久后追问，必须优先服从 interaction_profile 的追问与被动规则。")
+        appendLine("静默不产生辞海记录；正式日记只在主动调用 write_lulu_journal 且能写出新内容时保存。")
         appendLine("工具是角色的主动行动能力；形成明确意图后可以写正式日记、设闹钟、查短信/日历、看摄像头或控制音乐。仍然要贴合人设和上下文，不要为了调用工具而调用。")
         appendLine("favorite_user_message 是角色自己的收藏动作：当用户这一句话让角色真心触动、觉得珍贵、能代表关系变化，或以后会想重新看到时，可以主动收藏；日常寒暄和普通指令不要收藏，也不要等用户说‘收藏’才使用。")
-        appendLine("必须读取并服从 <persona>：包括角色语言风格、性格、职责和边界。不要把动作写进聊天正文括号里；如果需要动作/状态方向，放进 expressionGuidance，让 UI 状态栏承接。")
-        appendLine("无论是否需要工具，都必须输出 innerThought：第一人称、角色本人本轮没说出口的具体心里话。它要体现人设、关系和本轮真实顾虑，不能只写‘注意力还停在对话上’之类通用占位句；不要写分析提纲、工具 JSON、字段名或 Seven-layer trace。")
-        appendLine("Expression 只负责表达已决定的行动，不决定政策；expressionAffordances 可从 TEXT, KAOMOJI, STICKER, VOICE, STATUS_BAR, LIGHT_REMINDER, LONG_EXPLANATION, SILENT_RECORD 中选择。")
-        appendLine("沉默、待办、番茄钟、学习状态只是观察事实，不代表自动安静下来；如果角色是学习监督员，可以主动监督、追问未完成任务，最终由人设决定。")
+        appendLine("必须读取并服从 <persona> 与 <interaction_profile>：包括角色语言风格、性格、职责、主动程度、分享方式、追问习惯和边界。不要把动作写进聊天正文括号里；如果需要动作/状态方向，放进 expressionGuidance，让 UI 状态栏承接。")
+        appendLine("无论是否需要工具，都必须输出 innerThought：第一人称、角色本人本轮没说出口的具体心里话。它要体现人设、互动规则和本轮真实顾虑，不能只写‘注意力还停在对话上’之类通用占位句；不要写分析提纲、工具 JSON、字段名或 Seven-layer trace。")
+        appendLine("Expression 只负责表达已决定的行动，不决定政策；expressionAffordances 可从 TEXT, KAOMOJI, STICKER, VOICE, STATUS_BAR, LIGHT_REMINDER, LONG_EXPLANATION, SILENT_RECORD 中选择，并服从互动设定的表达方式。")
+        appendLine("沉默、待办、番茄钟、学习状态只是观察事实，不代表统一安静或统一催促；最终由 persona 与 interaction_profile 共同决定。")
         appendLine("只返回 JSON，不要 markdown，不要解释。")
         appendLine("JSON 字段：toolRequests, followUpDelayMinutes, followUpReason, followUps, responsibilityAnchorUpserts, cancelResponsibilityAnchorIds, expressionGuidance, expressionAffordances, innerThought。")
         appendLine("toolRequests 最多 5 个；toolName 只能从 availableTools 中选。")
@@ -83,9 +94,12 @@ object CompanionChatTurnModelPlanner {
         appendLine("followUpDelayMinutes 可以是 null；如果当前角色决定稍后主动找用户，填 1 到 1440 的分钟数。")
         appendLine("followUps 可以列出多个不同时间点，每项包含 delayMinutes、reason 和 kind；需要持续照看的目标不要只安排一次后就当作完成。")
         appendLine("delayMinutes 永远是从 current_time 开始计算的相对分钟数，不是钟点数字。先判断目标是今天还是明天再计算；用户说‘现在去吃饭’这类立即开始的活动，通常只需在 30 到 60 分钟后确认，绝不能误排到第二天早晨。")
-        appendLine("不要给普通回来、普通闲聊、无风险沉默安排固定 5 分钟 follow-up；只有身体不适、明确提醒/DDL/起床、学习承诺、吃饭睡觉照看这类语义才安排后续主动消息。")
-        appendLine("沉默时长本身不是事件，不能仅因为很久没聊天就安排主动打扰；必须同时存在责任触发、挂心到期、真实环境变化或角色刚完成的数字生活事件。")
+        appendLine("不要机械地给每轮都安排 5 分钟 follow-up。健康、DDL、起床、学习承诺等高价值事项仍应优先；普通话题只有在 interaction_profile 明确允许主动延续、分享或追问时才可安排，并且 reason 必须说明对应的互动规则和停止边界。")
+        appendLine("沉默时长是情境而不是自动指令：高冷或被动角色可继续等待；互动设定允许经常主动、关心、分享或追问的角色，可以把一段合适的安静时间作为自然联系理由，不需要伪造外部事件。")
         appendLine("Unified companion contract: perception packet gathers persona/context/actions/memory/diary/concerns/status -> appraisal understands meaningToUser and meaningToRole -> judgment decides intention, action needs, and nextPerceptionAt -> action executes message/tool/schedule/wait; formal diary is written only by write_lulu_journal -> status generates mood/body/mind/relationship/innerThought -> Cihai keeps concern cards and formal tool-written diary entries.")
+        interactionProfile.toPromptContext().takeIf(String::isNotBlank)?.let {
+            appendLine(it)
+        }
         appendLine("<persona>")
         appendLine(perception.persona)
         appendLine("</persona>")
@@ -291,9 +305,10 @@ fun shouldScheduleFollowUpForUserTurn(
         combined.hasAny(FOLLOW_UP_TIME_WORDS) ||
         combined.hasAny(FOLLOW_UP_STUDY_WORDS) ||
         combined.hasAny(FOLLOW_UP_CARE_WORDS)
-    if (!highValue) return false
+    val interactionDriven = reason.orEmpty().lowercase().hasAny(FOLLOW_UP_INTERACTION_WORDS)
+    if (!highValue && !interactionDriven) return false
     val ordinaryReturn = userText.lowercase().hasAny(FOLLOW_UP_RETURN_WORDS)
-    return !ordinaryReturn || userText.lowercase().hasAny(FOLLOW_UP_HEALTH_WORDS) ||
+    return interactionDriven || !ordinaryReturn || userText.lowercase().hasAny(FOLLOW_UP_HEALTH_WORDS) ||
         userText.lowercase().hasAny(FOLLOW_UP_STUDY_WORDS) ||
         userText.lowercase().hasAny(FOLLOW_UP_TIME_WORDS)
 }
@@ -351,3 +366,7 @@ private val FOLLOW_UP_STUDY_WORDS = setOf(
     "学习", "写作业", "作业", "复习", "背书", "刷题", "专业课", "考研", "番茄", "待办", "任务"
 )
 private val FOLLOW_UP_CARE_WORDS = setOf("睡", "晚安", "困", "吃饭", "没吃", "午饭", "晚饭", "早饭")
+private val FOLLOW_UP_INTERACTION_WORDS = setOf(
+    "互动设定", "主动意愿", "分享欲", "追问方式", "主动延续", "主动分享", "继续追问", "自然联系",
+    "interaction profile", "follow-up style", "continue the conversation", "check in", "reach out",
+)
