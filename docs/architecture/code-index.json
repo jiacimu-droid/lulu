@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:32:06.406493+00:00",
-  "commit": "20ac82ce9c3a9bc795f4236513ce543cfc339334",
+  "generatedAt": "2026-07-27T16:33:01.624959+00:00",
+  "commit": "54b07eccc91960ccf05994ef8835c084d9cc5f82",
   "branch": "master",
-  "sourceFingerprint": "2d1f34bf4ff47231b24bcd90e20ecb460e82ebc8ccb86c69a2947cffa3b7c7fc",
+  "sourceFingerprint": "59a1e980c8267ecefaf441b1b9ac8fd9531dc0fc7ee91a15e77818389fa682ed",
   "summary": {
     "files": 1164,
-    "lines": 269123,
+    "lines": 269127,
     "symbols": 5614,
     "productionCodeFiles": 825,
     "testFiles": 146,
@@ -40148,8 +40148,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 136,
-      "sha256": "ca6480c458fc0829b9477e051e0a78df29413eea23e677e929fc4201abd8b0f3",
+      "lines": 140,
+      "sha256": "6af8c7f5923dfe9770d446eda9d15637a124450dfd23e6144bb96aa444643169",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -40163,27 +40163,27 @@
         {
           "name": "DisplayColorActions",
           "kind": "composable",
-          "line": 68
+          "line": 72
         },
         {
           "name": "DisplayColorTarget",
           "kind": "class",
-          "line": 90
+          "line": 94
         },
         {
           "name": "defaultColor",
           "kind": "composable",
-          "line": 104
+          "line": 108
         },
         {
           "name": "current",
           "kind": "function",
-          "line": 115
+          "line": 119
         },
         {
           "name": "apply",
           "kind": "function",
-          "line": 126
+          "line": 130
         }
       ],
       "localImportCount": 4,
@@ -93915,7 +93915,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "kind": "composable",
-        "line": 68
+        "line": 72
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DisplayColorSection": [
@@ -93929,7 +93929,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "kind": "class",
-        "line": 90
+        "line": 94
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DisplayGeneralSection": [
@@ -94426,7 +94426,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "kind": "function",
-        "line": 126
+        "line": 130
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.avatarFrameItems": [
@@ -94706,14 +94706,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "kind": "function",
-        "line": 115
+        "line": 119
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.defaultColor": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "kind": "composable",
-        "line": 104
+        "line": 108
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.defaultModelSettingSections": [
