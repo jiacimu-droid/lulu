@@ -69,13 +69,16 @@ class ChatVM(
     val inputState = ChatInputState()
 
     private val _initializationJob = MutableStateFlow<Job?>(null)
+    private val generationJob: StateFlow<Job?> = chatService
+        .getGenerationJobStateFlow(_conversationId)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     // 初始化期间沿用现有 loading 通道禁用输入；加载完成后再切回模型生成任务。
     val conversationJob: StateFlow<Job?> = combine(
-        chatService.getGenerationJobStateFlow(_conversationId),
+        generationJob,
         _initializationJob,
-    ) { generationJob, initializationJob ->
-        initializationJob?.takeIf { it.isActive } ?: generationJob
+    ) { activeGenerationJob, initializationJob ->
+        initializationJob?.takeIf { it.isActive } ?: activeGenerationJob
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val processingStatus: StateFlow<String?> =
@@ -294,7 +297,8 @@ class ChatVM(
 
     fun stopGeneration() {
         viewModelScope.launch {
-            conversationJob.value?.cancel()
+            // 只停止模型生成，绝不能取消仍在读取数据库的初始化任务。
+            generationJob.value?.cancel()
         }
     }
 
