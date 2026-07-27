@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:27:35.740765+00:00",
-  "commit": "8e4b0f790a666722199f413f3fa43aee0421aa19",
+  "generatedAt": "2026-07-27T16:28:02.952706+00:00",
+  "commit": "5ba13b15a33596f52f6daaef270590f1518384b9",
   "branch": "master",
-  "sourceFingerprint": "37450fb2f8f2f21f7b6d91767b0450ce03f8f58bada65988171b67503426552e",
+  "sourceFingerprint": "48fc1ccc53833e2f977a3275ef5b441b939f933a02514a6491c8e91cfe7bde23",
   "summary": {
-    "files": 1162,
-    "lines": 268676,
-    "symbols": 5606,
-    "productionCodeFiles": 823,
+    "files": 1163,
+    "lines": 268893,
+    "symbols": 5609,
+    "productionCodeFiles": 824,
     "testFiles": 146,
     "largeProductionFiles": 40,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 701,
+      "app": 702,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 769,
+      ".kt": 770,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 314,
+      "界面": 315,
       "记忆": 44
     },
-    "resolvedImportEdges": 2017
+    "resolvedImportEdges": 2019
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 107,
+        "importedByCount": 108,
         "todoMarkers": 0
       },
       {
@@ -1022,7 +1022,7 @@
         "lines": 196,
         "symbols": 6,
         "localImportCount": 1,
-        "importedByCount": 19,
+        "importedByCount": 20,
         "todoMarkers": 0
       },
       {
@@ -1788,6 +1788,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayAvatarFrames.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayMediaAssets.kt",
@@ -1964,7 +1965,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 66
+      "imports": 67
     },
     {
       "from": "me.rerere.rikkahub.data.service",
@@ -2473,6 +2474,11 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.data.datastore.DisplaySetting",
+      "imports": 5
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.context.LocalToaster",
       "imports": 5
     },
@@ -2739,11 +2745,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.Screen",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.data.datastore.DisplaySetting",
       "imports": 4
     },
     {
@@ -14808,6 +14809,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayAvatarFrames.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayMediaAssets.kt",
@@ -31518,6 +31520,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/backup/tabs/WebDavTab.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/ExtensionsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayAvatarFrames.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayMediaAssets.kt",
@@ -39979,6 +39982,47 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayAvatarFrames.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 217,
+      "sha256": "5caf2b71d7570325b0629658e4f7532b41c4bf4fda3e824ca6cfc6089ce7f54f",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "DisplayAvatarFramesSection",
+          "kind": "composable",
+          "line": 36
+        },
+        {
+          "name": "avatarFrameItems",
+          "kind": "function",
+          "line": 100
+        },
+        {
+          "name": "AvatarFrameSlider",
+          "kind": "composable",
+          "line": 198
+        }
+      ],
+      "localImportCount": 2,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.datastore.DisplaySetting",
+        "me.rerere.rikkahub.ui.components.ui.CardGroup"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
@@ -93658,6 +93702,13 @@
         "line": 450
       }
     ],
+    "me.rerere.rikkahub.ui.pages.setting.AvatarFrameSlider": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayAvatarFrames.kt",
+        "kind": "composable",
+        "line": 198
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.setting.BochaOptions": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchDetailPage.kt",
@@ -93775,6 +93826,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
         "line": 523
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayAvatarFramesSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayAvatarFrames.kt",
+        "kind": "composable",
+        "line": 36
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DisplayColorActions": [
@@ -94279,6 +94337,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "kind": "function",
         "line": 126
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.avatarFrameItems": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayAvatarFrames.kt",
+        "kind": "function",
+        "line": 100
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.buildMemoryEngineDiagnostics": [
