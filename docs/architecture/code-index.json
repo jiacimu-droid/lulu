@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T15:16:28.734672+00:00",
-  "commit": "173bfdc9f366a2c94d1e1fabe1ca5bd1e31d7458",
+  "generatedAt": "2026-07-27T16:19:03.982982+00:00",
+  "commit": "a9721163bcc25eb5f77dfba803207e5c43471f60",
   "branch": "master",
-  "sourceFingerprint": "f5dba99d9500a826d9ea5a6a57b1c9dff1e6d3a98c86f271d7014764b9fbb2e2",
+  "sourceFingerprint": "ba71e161246422279d39a1221fc6606778b66a0c745833242f8648cc029d0e9a",
   "summary": {
-    "files": 1154,
-    "lines": 267698,
-    "symbols": 5590,
-    "productionCodeFiles": 815,
+    "files": 1155,
+    "lines": 267968,
+    "symbols": 5596,
+    "productionCodeFiles": 816,
     "testFiles": 146,
     "largeProductionFiles": 41,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 693,
+      "app": 694,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 761,
+      ".kt": 762,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 306,
+      "界面": 307,
       "记忆": 44
     },
-    "resolvedImportEdges": 1999
+    "resolvedImportEdges": 2003
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -942,7 +942,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 46,
+        "importedByCount": 47,
         "todoMarkers": 0
       },
       {
@@ -958,7 +958,15 @@
         "lines": 529,
         "symbols": 39,
         "localImportCount": 0,
-        "importedByCount": 38,
+        "importedByCount": 39,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "lines": 1032,
+        "symbols": 77,
+        "localImportCount": 89,
+        "importedByCount": 35,
         "todoMarkers": 0
       },
       {
@@ -967,14 +975,6 @@
         "symbols": 10,
         "localImportCount": 5,
         "importedByCount": 35,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
-        "lines": 1032,
-        "symbols": 77,
-        "localImportCount": 89,
-        "importedByCount": 34,
         "todoMarkers": 0
       },
       {
@@ -1765,6 +1765,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/SkillsVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoritePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoriteVM.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/NarrativeCompanionGames.kt",
@@ -2449,6 +2450,11 @@
       "imports": 5
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.game",
+      "to": "me.rerere.hugeicons.HugeIcons",
+      "imports": 5
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.context.LocalToaster",
       "imports": 5
@@ -2695,7 +2701,7 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.game",
-      "to": "me.rerere.hugeicons.HugeIcons",
+      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 4
     },
     {
@@ -2946,11 +2952,6 @@
     {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.ai.provider.ProviderManager",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.datastore.findModelById",
       "imports": 3
     }
   ],
@@ -8589,6 +8590,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/ExtensionsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/SkillsPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/history/HistoryPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
@@ -13424,6 +13426,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CompanionConcernCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CompanionRelationshipTimeline.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -14308,6 +14311,7 @@
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt"
       ]
     },
@@ -38000,6 +38004,74 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 270,
+      "sha256": "c19407701d14a9babc545a279b693b7abe63720b355e760ebac54c05dba81cc2",
+      "package": "me.rerere.rikkahub.ui.pages.game",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "GameHubFeaturePage",
+          "kind": "composable",
+          "line": 60
+        },
+        {
+          "name": "SignalHuntRecordCard",
+          "kind": "composable",
+          "line": 169
+        },
+        {
+          "name": "GameHubHero",
+          "kind": "composable",
+          "line": 187
+        },
+        {
+          "name": "GameHubTileCard",
+          "kind": "composable",
+          "line": 219
+        },
+        {
+          "name": "GameHubTile",
+          "kind": "class",
+          "line": 259
+        },
+        {
+          "name": "GameHubColors",
+          "kind": "object",
+          "line": 266
+        }
+      ],
+      "localImportCount": 12,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.ArrowLeft02",
+        "me.rerere.hugeicons.stroke.MagicWand01",
+        "me.rerere.hugeicons.stroke.Puzzle",
+        "me.rerere.rikkahub.Screen",
+        "me.rerere.rikkahub.data.companion.CompanionLifeEvent",
+        "me.rerere.rikkahub.data.companion.CompanionLifeEventStatus",
+        "me.rerere.rikkahub.data.companion.CompanionLifeEventType",
+        "me.rerere.rikkahub.data.companion.CompanionStore",
+        "me.rerere.rikkahub.ui.context.LocalNavController",
+        "me.rerere.rikkahub.ui.context.LocalSettings",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
       "module": "app",
       "extension": ".kt",
@@ -43900,6 +43972,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/SkillDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/SkillsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoritePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/NarrativeCompanionGames.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
@@ -91721,11 +91794,46 @@
         "line": 805
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.GameHubColors": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
+        "kind": "object",
+        "line": 266
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.GameHubFeaturePage": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
+        "kind": "composable",
+        "line": 60
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.GameHubHero": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
+        "kind": "composable",
+        "line": 187
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.GameHubPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "composable",
         "line": 116
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.GameHubTile": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
+        "kind": "class",
+        "line": 259
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.GameHubTileCard": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
+        "kind": "composable",
+        "line": 219
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameResultText": [
@@ -91897,6 +92005,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.SignalHuntRecordCard": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
+        "kind": "composable",
+        "line": 169
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "composable",
