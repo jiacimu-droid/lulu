@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T04:52:51.823022+00:00",
-  "commit": "844862dfd00ea0af3b67daebb6f3205e5e3c8bf4",
+  "generatedAt": "2026-07-27T04:53:52.595512+00:00",
+  "commit": "8f331f960c5895303bbc716fd37d54f71c5fc3fd",
   "branch": "master",
-  "sourceFingerprint": "3eb8b4e06aa36bf16b81c75d01933b806b7980b2712d632053e30df6dc7820ca",
+  "sourceFingerprint": "febee5cce7a6986cbae36e5ea13f2dcd3f3509914d04731e98392b3f11bc5597",
   "summary": {
-    "files": 1129,
-    "lines": 265601,
-    "symbols": 5534,
-    "productionCodeFiles": 798,
+    "files": 1130,
+    "lines": 265757,
+    "symbols": 5538,
+    "productionCodeFiles": 799,
     "testFiles": 138,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 668,
+      "app": 669,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 736,
+      ".kt": 737,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 291,
+      "界面": 292,
       "记忆": 44
     },
-    "resolvedImportEdges": 1961
+    "resolvedImportEdges": 1964
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -934,7 +934,7 @@
         "lines": 295,
         "symbols": 16,
         "localImportCount": 8,
-        "importedByCount": 46,
+        "importedByCount": 47,
         "todoMarkers": 0
       },
       {
@@ -942,7 +942,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 44,
+        "importedByCount": 45,
         "todoMarkers": 0
       },
       {
@@ -1090,6 +1090,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
+        "lines": 83,
+        "symbols": 2,
+        "localImportCount": 0,
+        "importedByCount": 14,
+        "todoMarkers": 0
+      },
+      {
         "path": "ai/src/main/java/me/rerere/ai/core/Usage.kt",
         "lines": 36,
         "symbols": 2,
@@ -1110,14 +1118,6 @@
         "lines": 138,
         "symbols": 8,
         "localImportCount": 3,
-        "importedByCount": 13,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
-        "lines": 83,
-        "symbols": 2,
-        "localImportCount": 0,
         "importedByCount": 13,
         "todoMarkers": 0
       },
@@ -1705,6 +1705,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantExtensionsPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantImporter.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantLocalToolPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantMcpPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
@@ -1957,6 +1958,11 @@
       "imports": 18
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.assistant",
+      "to": "me.rerere.rikkahub.ui.components.ui",
+      "imports": 18
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.R",
       "imports": 18
@@ -1965,11 +1971,6 @@
       "from": "me.rerere.search",
       "to": "me.rerere.ai.core.InputSchema",
       "imports": 18
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.assistant",
-      "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 17
     },
     {
       "from": "me.rerere.rikkahub.data.ai.transformers",
@@ -2072,6 +2073,11 @@
       "imports": 10
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.assistant",
+      "to": "me.rerere.rikkahub.data.model.Assistant",
+      "imports": 10
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.chat",
       "to": "me.rerere.rikkahub.ui.components.ui",
       "imports": 10
@@ -2103,12 +2109,12 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
-      "to": "me.rerere.rikkahub.data.model.Assistant",
+      "to": "me.rerere.rikkahub.ui.components.nav",
       "imports": 9
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
-      "to": "me.rerere.rikkahub.ui.components.nav",
+      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 9
     },
     {
@@ -2129,11 +2135,6 @@
     {
       "from": "me.rerere.rikkahub.ui.components.message",
       "to": "me.rerere.rikkahub.ui.components.richtext",
-      "imports": 8
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.assistant",
-      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 8
     },
     {
@@ -18526,6 +18527,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantImporter.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantLocalToolPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantRequestPage.kt",
@@ -31735,6 +31737,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/AssistantPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantBasicPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/BackgroundPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
@@ -34650,6 +34653,55 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/AssistantPage.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 156,
+      "sha256": "930836a6bb39b3d1ea45f3ad589b085ef923b8170b06ac1fde6da8b0cd224b46",
+      "package": "me.rerere.rikkahub.ui.pages.assistant.detail",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "AssistantInteractionSection",
+          "kind": "composable",
+          "line": 24
+        },
+        {
+          "name": "InteractionField",
+          "kind": "composable",
+          "line": 124
+        },
+        {
+          "name": "withInteractionProfile",
+          "kind": "function",
+          "line": 147
+        },
+        {
+          "name": "isEmptyForUi",
+          "kind": "function",
+          "line": 151
+        }
+      ],
+      "localImportCount": 4,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.model.Assistant",
+        "me.rerere.rikkahub.data.model.AssistantInteractionProfile",
+        "me.rerere.rikkahub.ui.components.ui.FormItem",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantLocalToolPage.kt",
@@ -43122,6 +43174,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantCallSettingsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantExtensionsPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantLocalToolPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantRequestPage.kt",
@@ -88237,6 +88290,13 @@
         "line": 49
       }
     ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.AssistantInteractionSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
+        "kind": "composable",
+        "line": 24
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.AssistantLocalToolContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantLocalToolPage.kt",
@@ -88359,6 +88419,13 @@
         "line": 357
       }
     ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.InteractionField": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
+        "kind": "composable",
+        "line": 124
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.InteractionGenerationState": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
@@ -88460,6 +88527,13 @@
         "line": 251
       }
     ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.isEmptyForUi": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
+        "kind": "function",
+        "line": 151
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.parse": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantImporter.kt",
@@ -88531,6 +88605,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
         "line": 104
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.assistant.detail.withInteractionProfile": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
+        "kind": "function",
+        "line": 147
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.removeAssistant": [

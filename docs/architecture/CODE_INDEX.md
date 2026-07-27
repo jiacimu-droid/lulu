@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`844862dfd00ea0af3b67daebb6f3205e5e3c8bf4`
+- 基准提交：`8f331f960c5895303bbc716fd37d54f71c5fc3fd`
 - 分支：`master`
-- 源码指纹：`3eb8b4e06aa36bf1…`
-- 已索引文件：1129
-- 已索引代码/文本行：265601
-- 已发现类、接口、对象、函数及 Composable：5534
+- 源码指纹：`febee5cce7a6986c…`
+- 已索引文件：1130
+- 已索引代码/文本行：265757
+- 已发现类、接口、对象、函数及 Composable：5538
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 798 |
+| 生产代码文件 | 799 |
 | 测试文件 | 138 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 668 |
+| `app` | 669 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 736 |
+| `.kt` | 737 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -480,7 +480,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 261 个文件，见 `code-index.json`
+- ……另有 262 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -539,8 +539,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1961
-- 可检索完整符号：4933
+- 已解析本地导入边：1964
+- 可检索完整符号：4937
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
@@ -549,8 +549,8 @@
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 61 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 56 | 62 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 46 | 295 |
-| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 44 | 191 |
+| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 47 | 295 |
+| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 45 | 191 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 36 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
