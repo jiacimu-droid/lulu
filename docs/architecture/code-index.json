@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:21:16.439367+00:00",
-  "commit": "f052cfa0e6bdb7a629c6bc241df2698560f9ac79",
+  "generatedAt": "2026-07-27T16:22:25.671502+00:00",
+  "commit": "b68900a56e128288abf0bd11f3061acd5f579ba4",
   "branch": "master",
-  "sourceFingerprint": "cdf26fd7074d9082c4cedc594cadf33c4aef747bcaea1467df05aa9705fa547f",
+  "sourceFingerprint": "c2bd7533de4b09173e12e456ace2aa8b8f73c7b25ae268cc28f3bd6a2651aa9b",
   "summary": {
-    "files": 1158,
-    "lines": 268634,
-    "symbols": 5615,
-    "productionCodeFiles": 819,
+    "files": 1159,
+    "lines": 269041,
+    "symbols": 5625,
+    "productionCodeFiles": 820,
     "testFiles": 146,
     "largeProductionFiles": 41,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 697,
+      "app": 698,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 765,
+      ".kt": 766,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 310,
+      "界面": 311,
       "记忆": 44
     },
-    "resolvedImportEdges": 2009
+    "resolvedImportEdges": 2021
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -746,6 +746,13 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "lines": 407,
+        "symbols": 10,
+        "localImportCount": 27,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "lines": 820,
         "symbols": 9,
@@ -756,13 +763,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt",
         "lines": 496,
         "symbols": 2,
-        "localImportCount": 27,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ModelList.kt",
-        "lines": 757,
-        "symbols": 6,
         "localImportCount": 27,
         "todoMarkers": 0
       }
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 129,
+        "importedByCount": 130,
         "todoMarkers": 0
       },
       {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 104,
+        "importedByCount": 105,
         "todoMarkers": 0
       },
       {
@@ -914,18 +914,18 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
-        "lines": 296,
-        "symbols": 19,
-        "localImportCount": 8,
-        "importedByCount": 56,
-        "todoMarkers": 0
-      },
-      {
         "path": "ai/src/main/java/me/rerere/ai/provider/Model.kt",
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
+        "importedByCount": 57,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "lines": 296,
+        "symbols": 19,
+        "localImportCount": 8,
         "importedByCount": 56,
         "todoMarkers": 0
       },
@@ -958,7 +958,7 @@
         "lines": 529,
         "symbols": 39,
         "localImportCount": 0,
-        "importedByCount": 40,
+        "importedByCount": 41,
         "todoMarkers": 0
       },
       {
@@ -986,20 +986,20 @@
         "todoMarkers": 0
       },
       {
+        "path": "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
+        "lines": 141,
+        "symbols": 19,
+        "localImportCount": 6,
+        "importedByCount": 31,
+        "todoMarkers": 1
+      },
+      {
         "path": "ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt",
         "lines": 248,
         "symbols": 26,
         "localImportCount": 0,
         "importedByCount": 30,
         "todoMarkers": 0
-      },
-      {
-        "path": "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
-        "lines": 141,
-        "symbols": 19,
-        "localImportCount": 6,
-        "importedByCount": 30,
-        "todoMarkers": 1
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt",
@@ -1022,7 +1022,7 @@
         "lines": 57,
         "symbols": 4,
         "localImportCount": 3,
-        "importedByCount": 19,
+        "importedByCount": 20,
         "todoMarkers": 0
       },
       {
@@ -1030,7 +1030,7 @@
         "lines": 32,
         "symbols": 2,
         "localImportCount": 0,
-        "importedByCount": 19,
+        "importedByCount": 20,
         "todoMarkers": 0
       },
       {
@@ -1066,6 +1066,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
+        "lines": 1311,
+        "symbols": 51,
+        "localImportCount": 0,
+        "importedByCount": 15,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/RikkaHubApp.kt",
         "lines": 335,
         "symbols": 14,
@@ -1090,10 +1098,18 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
-        "lines": 1311,
-        "symbols": 51,
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
+        "lines": 321,
+        "symbols": 13,
         "localImportCount": 0,
+        "importedByCount": 14,
+        "todoMarkers": 1
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
+        "lines": 138,
+        "symbols": 8,
+        "localImportCount": 3,
         "importedByCount": 14,
         "todoMarkers": 0
       },
@@ -1112,22 +1128,6 @@
         "localImportCount": 0,
         "importedByCount": 14,
         "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
-        "lines": 3143,
-        "symbols": 90,
-        "localImportCount": 126,
-        "importedByCount": 13,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
-        "lines": 321,
-        "symbols": 13,
-        "localImportCount": 0,
-        "importedByCount": 13,
-        "todoMarkers": 1
       }
     ]
   },
@@ -1770,6 +1770,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/NarrativeCompanionGames.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManComponents.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManModels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/SignalHuntFeature.kt",
@@ -2183,6 +2184,11 @@
       "imports": 8
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.game",
+      "to": "me.rerere.hugeicons.HugeIcons",
+      "imports": 8
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.memory",
       "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 8
@@ -2258,11 +2264,6 @@
       "imports": 7
     },
     {
-      "from": "me.rerere.rikkahub.ui.pages.game",
-      "to": "me.rerere.hugeicons.HugeIcons",
-      "imports": 7
-    },
-    {
       "from": "me.rerere.ai.provider.providers",
       "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 6
@@ -2320,6 +2321,11 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.game",
       "to": "me.rerere.rikkahub.ui.theme.CustomColors",
+      "imports": 6
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.game",
+      "to": "me.rerere.hugeicons.stroke.Refresh03",
       "imports": 6
     },
     {
@@ -2464,7 +2470,22 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.game",
-      "to": "me.rerere.hugeicons.stroke.Refresh03",
+      "to": "me.rerere.hugeicons.stroke.ArrowLeft02",
+      "imports": 5
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.game",
+      "to": "me.rerere.rikkahub.data.companion.CompanionLifeEvent",
+      "imports": 5
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.game",
+      "to": "me.rerere.rikkahub.ui.context.LocalNavController",
+      "imports": 5
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.game",
+      "to": "me.rerere.rikkahub.ui.context.LocalSettings",
       "imports": 5
     },
     {
@@ -2714,22 +2735,12 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.game",
-      "to": "me.rerere.hugeicons.stroke.ArrowLeft02",
+      "to": "me.rerere.rikkahub.data.companion.CompanionLifeEventStatus",
       "imports": 4
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.game",
-      "to": "me.rerere.rikkahub.data.companion.CompanionLifeEvent",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.game",
-      "to": "me.rerere.rikkahub.ui.context.LocalNavController",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.game",
-      "to": "me.rerere.rikkahub.ui.context.LocalSettings",
+      "to": "me.rerere.rikkahub.data.companion.CompanionLifeEventType",
       "imports": 4
     },
     {
@@ -2945,16 +2956,6 @@
     {
       "from": "me.rerere.rikkahub.data.model",
       "to": "me.rerere.ai.ui.UIMessage",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.companion.CompanionPrivateImpression",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.cihai.CihaiStore",
       "imports": 3
     }
   ],
@@ -3631,6 +3632,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ReasoningPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -3877,6 +3879,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
@@ -4043,6 +4046,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/PropertyEditor.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
@@ -4112,6 +4116,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ProviderBalanceText.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
@@ -6054,6 +6059,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
@@ -8808,6 +8814,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
@@ -11787,6 +11794,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt"
       ]
@@ -13431,6 +13439,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CompanionRelationshipTimeline.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/SignalHuntFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -13540,6 +13549,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/CompanionWakeGoalTest.kt",
@@ -14014,6 +14024,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt"
@@ -14799,6 +14810,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/QuickMessagesVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/SignalHuntFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/health/HealthVM.kt",
@@ -38538,6 +38550,117 @@
       "importedBy": []
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 407,
+      "sha256": "17e8d8dd5aaf3e21fd9fec03f7d57cc634d63c3fb60f3968860cee94928c4531",
+      "package": "me.rerere.rikkahub.ui.pages.game",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "PerfectManGameFeaturePage",
+          "kind": "composable",
+          "line": 62
+        },
+        {
+          "name": "speak",
+          "kind": "function",
+          "line": 89
+        },
+        {
+          "name": "stopVoiceInput",
+          "kind": "function",
+          "line": 99
+        },
+        {
+          "name": "startVoiceInput",
+          "kind": "function",
+          "line": 104
+        },
+        {
+          "name": "nextRound",
+          "kind": "function",
+          "line": 120
+        },
+        {
+          "name": "generatePerfectManText",
+          "kind": "function",
+          "line": 138
+        },
+        {
+          "name": "recordCompletedRound",
+          "kind": "function",
+          "line": 215
+        },
+        {
+          "name": "startUserGuessRound",
+          "kind": "function",
+          "line": 250
+        },
+        {
+          "name": "submitPartnerGuessRound",
+          "kind": "function",
+          "line": 268
+        },
+        {
+          "name": "submitGuess",
+          "kind": "function",
+          "line": 314
+        }
+      ],
+      "localImportCount": 27,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.core.ReasoningLevel",
+        "me.rerere.ai.provider.ModelType",
+        "me.rerere.ai.provider.ProviderManager",
+        "me.rerere.ai.provider.TextGenerationParams",
+        "me.rerere.ai.ui.UIMessage",
+        "me.rerere.asr.ASRStatus",
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.ArrowLeft02",
+        "me.rerere.hugeicons.stroke.Refresh03",
+        "me.rerere.rikkahub.data.ai.ApiUsageSource",
+        "me.rerere.rikkahub.data.ai.ApiUsageStore",
+        "me.rerere.rikkahub.data.ai.transformers.transformMessages",
+        "me.rerere.rikkahub.data.companion.CompanionLifeEvent",
+        "me.rerere.rikkahub.data.companion.CompanionLifeEventSource",
+        "me.rerere.rikkahub.data.companion.CompanionLifeEventStatus",
+        "me.rerere.rikkahub.data.companion.CompanionLifeEventType",
+        "me.rerere.rikkahub.data.companion.CompanionPerceptionInput",
+        "me.rerere.rikkahub.data.companion.CompanionRuntime",
+        "me.rerere.rikkahub.data.companion.CompanionTurnMutation",
+        "me.rerere.rikkahub.data.companion.toPromptContext",
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.findModelById",
+        "me.rerere.rikkahub.data.datastore.findProvider",
+        "me.rerere.rikkahub.ui.context.LocalASRState",
+        "me.rerere.rikkahub.ui.context.LocalNavController",
+        "me.rerere.rikkahub.ui.context.LocalSettings",
+        "me.rerere.rikkahub.ui.context.LocalTTSState"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/Reasoning.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
+        "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "speech/src/main/java/me/rerere/asr/ASRState.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManModels.kt",
       "module": "app",
       "extension": ".kt",
@@ -57466,6 +57589,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/ASR.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/VoiceCallStateTest.kt",
@@ -92091,6 +92215,13 @@
         "line": 324
       }
     ],
+    "me.rerere.rikkahub.ui.pages.game.PerfectManGameFeaturePage": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "composable",
+        "line": 62
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.game.PerfectManGamePage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
@@ -92519,6 +92650,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 535
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 138
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.gomokuIndex": [
@@ -92561,6 +92697,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 517
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 120
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.parseAdventureChoices": [
@@ -92610,6 +92751,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 610
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 215
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.recordSharedGame": [
@@ -92680,6 +92826,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 486
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 89
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.startGame": [
@@ -92699,6 +92850,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 645
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 250
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.startVoiceInput": [
@@ -92706,6 +92862,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 501
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 104
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.stopVoiceInput": [
@@ -92713,6 +92874,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 496
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 99
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.submitGuess": [
@@ -92720,6 +92886,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 709
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 314
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.submitPartnerGuessRound": [
@@ -92727,6 +92898,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "kind": "function",
         "line": 663
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
+        "kind": "function",
+        "line": 268
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.takeAction": [
