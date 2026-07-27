@@ -104,6 +104,11 @@ fun AssistantInteractionProfile.initiativeLevel(): AssistantInitiativeLevel {
         )
     ) return AssistantInitiativeLevel.LOW
     if (text.hasAnyInteractionMarker(
+            "通常主动", "通常会主动", "适度主动", "有时主动", "有时会主动", "按情况主动",
+            "normal initiative", "sometimes initiates", "moderate initiative",
+        )
+    ) return AssistantInitiativeLevel.NORMAL
+    if (text.hasAnyInteractionMarker(
             "经常主动", "会主动联系", "主动关心", "主动询问", "主动确认", "频繁联系", "分享欲强",
             "主动分享", "及时跟进", "会继续追问", "积极照看", "主动监督", "high initiative",
             "often initiates", "frequently reaches out",
@@ -167,11 +172,9 @@ fun String.replaceRegexes(
                     regex = Regex(regex.findRegex),
                     replacement = regex.replaceString,
                 )
-                // println("Regex: ${regex.findRegex} -> ${result}")
                 result
             } catch (e: Exception) {
                 e.printStackTrace()
-                // 如果正则表达式格式错误，返回原字符串
                 acc
             }
         } else {
@@ -180,33 +183,24 @@ fun String.replaceRegexes(
     }
 }
 
-/**
- * 注入位置
- */
 @Serializable
 enum class InjectionPosition {
     @SerialName("before_system_prompt")
-    BEFORE_SYSTEM_PROMPT,   // 系统提示词之前
+    BEFORE_SYSTEM_PROMPT,
 
     @SerialName("after_system_prompt")
-    AFTER_SYSTEM_PROMPT,    // 系统提示词之后（最常用）
+    AFTER_SYSTEM_PROMPT,
 
     @SerialName("top_of_chat")
-    TOP_OF_CHAT,            // 对话最开头（第一条用户消息之前）
+    TOP_OF_CHAT,
 
     @SerialName("bottom_of_chat")
-    BOTTOM_OF_CHAT,         // 最新消息之前（当前用户输入之前）
+    BOTTOM_OF_CHAT,
 
     @SerialName("at_depth")
-    AT_DEPTH,               // 在指定深度位置插入（从最新消息往前数）
+    AT_DEPTH,
 }
 
-/**
- * 提示词注入
- *
- * - ModeInjection: 基于模式开关的注入（如学习模式）
- * - RegexInjection: 基于正则匹配的注入（Lorebook）
- */
 @Serializable
 sealed class PromptInjection {
     abstract val id: Uuid
@@ -215,12 +209,9 @@ sealed class PromptInjection {
     abstract val priority: Int
     abstract val position: InjectionPosition
     abstract val content: String
-    abstract val injectDepth: Int  // 当 position 为 AT_DEPTH 时使用，表示从最新消息往前数的位置
-    abstract val role: MessageRole  // 注入角色：USER 或 ASSISTANT
+    abstract val injectDepth: Int
+    abstract val role: MessageRole
 
-    /**
-     * 模式注入 - 基于开关状态触发
-     */
     @Serializable
     @SerialName("mode")
     data class ModeInjection(
@@ -234,9 +225,6 @@ sealed class PromptInjection {
         override val role: MessageRole = MessageRole.USER,
     ) : PromptInjection()
 
-    /**
-     * 正则注入 - 基于内容匹配触发（Lorebook）
-     */
     @Serializable
     @SerialName("regex")
     data class RegexInjection(
@@ -248,17 +236,14 @@ sealed class PromptInjection {
         override val content: String = "",
         override val injectDepth: Int = 4,
         override val role: MessageRole = MessageRole.USER,
-        val keywords: List<String> = emptyList(),  // 触发关键词
-        val useRegex: Boolean = false,             // 使用正则匹配
-        val caseSensitive: Boolean = false,        // 大小写敏感
-        val scanDepth: Int = 4,                    // 扫描最近N条消息
-        val constantActive: Boolean = false,       // 常驻激活（无需匹配）
+        val keywords: List<String> = emptyList(),
+        val useRegex: Boolean = false,
+        val caseSensitive: Boolean = false,
+        val scanDepth: Int = 4,
+        val constantActive: Boolean = false,
     ) : PromptInjection()
 }
 
-/**
- * Lorebook - 组织管理多个 RegexInjection
- */
 @Serializable
 data class Lorebook(
     val id: Uuid = Uuid.random(),
@@ -269,12 +254,6 @@ data class Lorebook(
     val entries: List<PromptInjection.RegexInjection> = emptyList(),
 )
 
-/**
- * 检查 RegexInjection 是否被触发
- *
- * @param context 要扫描的上下文文本
- * @return 是否触发
- */
 fun PromptInjection.RegexInjection.isTriggered(context: String): Boolean {
     if (!enabled) return false
     if (constantActive) return true
@@ -298,13 +277,6 @@ fun PromptInjection.RegexInjection.isTriggered(context: String): Boolean {
     }
 }
 
-/**
- * 从消息列表中提取用于匹配的上下文文本
- *
- * @param messages 消息列表
- * @param scanDepth 扫描深度（最近N条消息）
- * @return 拼接的文本内容
- */
 fun extractContextForMatching(
     messages: List<UIMessage>,
     scanDepth: Int
@@ -314,13 +286,6 @@ fun extractContextForMatching(
         .joinToString("\n") { it.toText() }
 }
 
-/**
- * 获取所有被触发的注入，按优先级排序
- *
- * @param injections 所有注入规则
- * @param context 上下文文本
- * @return 被触发的注入列表，按优先级降序排列
- */
 fun getTriggeredInjections(
     injections: List<PromptInjection.RegexInjection>,
     context: String
