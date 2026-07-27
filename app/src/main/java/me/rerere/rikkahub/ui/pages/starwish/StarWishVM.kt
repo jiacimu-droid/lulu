@@ -452,14 +452,4 @@ class StarWishVM(
             }
         }
     }
-
-}
-
-private fun StarWishTheaterChapter.isPromptPlaceholder(seed: StarWishTheaterSeed): Boolean {
-    val clean = content.trim()
-    return clean == seed.prompt.trim() ||
-        clean.startsWith("总设定：") ||
-        clean.startsWith("你是一个擅长") ||
-        clean.contains("硬性要求：") ||
-        clean.contains("请根据下面设定生成")
 }
