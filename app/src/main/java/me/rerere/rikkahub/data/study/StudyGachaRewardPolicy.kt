@@ -16,11 +16,10 @@ object StudyGachaRewardPolicy {
     const val DOUYIN_RATE: Double = 0.02
     const val THEATER_RATE: Double = 0.005
     const val GAME_UNLIMITED_RATE: Double = 0.01
-    const val ACCESSORY_RATE: Double = 0.005
+    const val VIDEO_RATE: Double = 0.005
     const val ANIME_RATE: Double = 0.002
 
     private const val GAME_ROUND_KEY = "reward:game-round-ticket"
-    private const val ACCESSORY_KEY = "reward:accessory-unlock-card"
 
     data class RebalancedDraw(
         val state: StudyState,
@@ -62,21 +61,11 @@ object StudyGachaRewardPolicy {
 
     fun gameRoundTicketCount(state: StudyState): Int = state.inventory.gameRoundTickets
 
-    fun accessoryCardCount(state: StudyState): Int = state.inventory.accessoryUnlockCards
-
     fun consumeGameRoundTicket(state: StudyState): StudyState? {
         val count = gameRoundTicketCount(state)
         if (count <= 0) return null
         return state.copy(
             inventory = state.inventory.copy(gameRoundTickets = count - 1),
-        )
-    }
-
-    fun consumeAccessoryCard(state: StudyState): StudyState? {
-        val count = accessoryCardCount(state)
-        if (count <= 0) return null
-        return state.copy(
-            inventory = state.inventory.copy(accessoryUnlockCards = count - 1),
         )
     }
 
@@ -119,9 +108,9 @@ object StudyGachaRewardPolicy {
         } else {
             StudyDrawResult(
                 rarity = StudyRarity.Epic,
-                fragmentKey = ACCESSORY_KEY,
-                title = "饰品解锁卡",
-                fragmentType = null,
+                fragmentKey = "epic:video",
+                title = "视频解锁卡",
+                fragmentType = StudyFragmentType.Video,
                 alreadyFull = raw.alreadyFull,
             )
         }
@@ -137,7 +126,6 @@ object StudyGachaRewardPolicy {
 
     private fun StudyInventory.addRequestedSpecial(result: StudyDrawResult): StudyInventory = when {
         result.fragmentKey == GAME_ROUND_KEY -> copy(gameRoundTickets = gameRoundTickets + 1)
-        result.fragmentKey == ACCESSORY_KEY -> copy(accessoryUnlockCards = accessoryUnlockCards + 1)
         result.fragmentType == StudyFragmentType.Douyin -> copy(douyinFragments = douyinFragments + 1)
         result.fragmentType == StudyFragmentType.Theater -> copy(theaterFragments = theaterFragments + 1)
         result.fragmentType == StudyFragmentType.Game -> copy(gameFragments = gameFragments + 1)
