@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:55:33.424804+00:00",
-  "commit": "248e97938cd6f2c30e154c8808a72fe5f5f848ac",
+  "generatedAt": "2026-07-27T16:58:34.146484+00:00",
+  "commit": "c844af9b49078036edf085433076e5f5eeb2ea71",
   "branch": "master",
-  "sourceFingerprint": "55add0ed1ea86050acd653d0060d3809af04596fbff6c9f1d7ed64db8b59f931",
+  "sourceFingerprint": "8735896ab15df9e0b252a2c1910e8ce13c9c4685e22d0b42787227a6186127f4",
   "summary": {
     "files": 1175,
-    "lines": 266865,
+    "lines": 266843,
     "symbols": 5644,
     "productionCodeFiles": 836,
     "testFiles": 146,
@@ -25236,8 +25236,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 214,
-      "sha256": "60b51f4c46e972c962aaf8846611c3ee899435b00d9feff0e9f102a18b2e59fd",
+      "lines": 192,
+      "sha256": "71f12730fa8f26a720ef7deae1c28e62e9408c63927c6cc43ca2d9cf71555120",
       "package": "me.rerere.rikkahub.plugin.loader",
       "categories": [
         "插件"
@@ -25246,76 +25246,75 @@
         {
           "name": "PluginLoader",
           "kind": "class",
-          "line": 27
+          "line": 26
         },
         {
           "name": "loadPlugin",
           "kind": "function",
-          "line": 49
+          "line": 42
         },
         {
           "name": "doUnloadPlugin",
           "kind": "function",
-          "line": 101
+          "line": 91
         },
         {
           "name": "unloadPlugin",
           "kind": "function",
-          "line": 108
+          "line": 98
         },
         {
           "name": "reloadPlugin",
           "kind": "function",
-          "line": 112
+          "line": 102
         },
         {
           "name": "getLoadedPlugin",
           "kind": "function",
-          "line": 114
+          "line": 104
         },
         {
           "name": "getAllLoadedPlugins",
           "kind": "function",
-          "line": 116
+          "line": 106
         },
         {
           "name": "getEnabledPlugins",
           "kind": "function",
-          "line": 118
+          "line": 108
         },
         {
           "name": "callTool",
           "kind": "function",
-          "line": 123
+          "line": 110
         },
         {
           "name": "callEvent",
           "kind": "function",
-          "line": 145
+          "line": 126
         },
         {
           "name": "getPluginsWithDailyCron",
           "kind": "function",
-          "line": 166
+          "line": 147
         },
         {
           "name": "resolveModelConfig",
           "kind": "function",
-          "line": 174
+          "line": 155
         },
         {
           "name": "unloadAll",
           "kind": "function",
-          "line": 211
+          "line": 189
         }
       ],
-      "localImportCount": 8,
+      "localImportCount": 7,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
         "me.rerere.ai.provider.ProviderSetting",
-        "me.rerere.rikkahub.data.datastore.Settings",
         "me.rerere.rikkahub.data.datastore.SettingsStore",
         "me.rerere.rikkahub.data.datastore.findModelById",
         "me.rerere.rikkahub.data.datastore.findProvider",
@@ -83671,7 +83670,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "class",
-        "line": 27
+        "line": 26
       }
     ],
     "me.rerere.rikkahub.plugin.loader.PluginSandbox": [
@@ -83685,7 +83684,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 145
+        "line": 126
       }
     ],
     "me.rerere.rikkahub.plugin.loader.callFunction": [
@@ -83699,7 +83698,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 123
+        "line": 110
       }
     ],
     "me.rerere.rikkahub.plugin.loader.destroy": [
@@ -83713,7 +83712,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 101
+        "line": 91
       }
     ],
     "me.rerere.rikkahub.plugin.loader.error": [
@@ -83741,14 +83740,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 116
+        "line": 106
       }
     ],
     "me.rerere.rikkahub.plugin.loader.getEnabledPlugins": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 118
+        "line": 108
       }
     ],
     "me.rerere.rikkahub.plugin.loader.getExportedFunctionNames": [
@@ -83762,14 +83761,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 114
+        "line": 104
       }
     ],
     "me.rerere.rikkahub.plugin.loader.getPluginsWithDailyCron": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 166
+        "line": 147
       }
     ],
     "me.rerere.rikkahub.plugin.loader.getTool": [
@@ -83818,7 +83817,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 49
+        "line": 42
       }
     ],
     "me.rerere.rikkahub.plugin.loader.log": [
@@ -83860,14 +83859,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 112
+        "line": 102
       }
     ],
     "me.rerere.rikkahub.plugin.loader.resolveModelConfig": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 174
+        "line": 155
       }
     ],
     "me.rerere.rikkahub.plugin.loader.setMemoryBankService": [
@@ -83881,14 +83880,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 211
+        "line": 189
       }
     ],
     "me.rerere.rikkahub.plugin.loader.unloadPlugin": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "kind": "function",
-        "line": 108
+        "line": 98
       }
     ],
     "me.rerere.rikkahub.plugin.loader.warn": [
