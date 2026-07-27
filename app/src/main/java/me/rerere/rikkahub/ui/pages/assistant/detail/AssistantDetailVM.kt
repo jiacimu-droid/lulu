@@ -187,6 +187,7 @@ class AssistantDetailVM(
                     ?.let { currentSettings.findModelById(it) }
                     ?.takeIf { it.type == ModelType.CHAT }
                     ?: currentSettings.getCurrentChatModel()
+                    ?: error("请先在设置中配置一个可用的聊天模型。")
                 val providerSetting = model.findProvider(currentSettings.providers)
                     ?: error("当前聊天模型没有找到对应提供商。")
                 val provider = providerManager.getProviderByType(providerSetting)
