@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:13:49.533168+00:00",
-  "commit": "912ecb6757ffa64964f932c06eaab54d5e0cefe4",
+  "generatedAt": "2026-07-27T17:14:30.140274+00:00",
+  "commit": "3d91356721520a8fca05ebf738943d595fb09e5e",
   "branch": "master",
-  "sourceFingerprint": "d6ddb7697e3ff55e180b3f0e7a295a26edb27361b1a0a4757b12a4ab0c3ae598",
+  "sourceFingerprint": "56f3dc4300088b6980e7e33d9eff6bbaceabc1cf02add0c9d57b8ef662a8431c",
   "summary": {
-    "files": 1179,
-    "lines": 266802,
-    "symbols": 5649,
-    "productionCodeFiles": 840,
+    "files": 1180,
+    "lines": 267011,
+    "symbols": 5651,
+    "productionCodeFiles": 841,
     "testFiles": 146,
     "largeProductionFiles": 35,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 718,
+      "app": 719,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 786,
+      ".kt": 787,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 327,
+      "界面": 328,
       "记忆": 44
     },
-    "resolvedImportEdges": 2043
+    "resolvedImportEdges": 2048
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -934,7 +934,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 51,
+        "importedByCount": 52,
         "todoMarkers": 0
       },
       {
@@ -1809,6 +1809,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingFilesPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -1984,7 +1985,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 64
+      "imports": 66
     },
     {
       "from": "me.rerere.rikkahub.data.service",
@@ -2019,7 +2020,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.hugeicons.HugeIcons",
-      "imports": 19
+      "imports": 20
     },
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
@@ -2082,6 +2083,11 @@
       "imports": 15
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
+      "imports": 15
+    },
+    {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 14
@@ -2094,11 +2100,6 @@
     {
       "from": "me.rerere.rikkahub.ui.components.ui",
       "to": "me.rerere.rikkahub.R",
-      "imports": 14
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 14
     },
     {
@@ -2124,6 +2125,11 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.data.model.Assistant",
+      "imports": 11
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.data.ai.mcp",
       "imports": 11
     },
     {
@@ -2218,7 +2224,7 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.data.ai.mcp",
+      "to": "me.rerere.hugeicons.stroke.Delete01",
       "imports": 8
     },
     {
@@ -2299,11 +2305,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.game",
       "to": "me.rerere.hugeicons.HugeIcons",
-      "imports": 7
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.hugeicons.stroke.Delete01",
       "imports": 7
     },
     {
@@ -2504,6 +2505,11 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.context.LocalToaster",
+      "imports": 5
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.hugeicons.stroke.Cancel01",
       "imports": 5
     },
     {
@@ -2799,11 +2805,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.Screen",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.hugeicons.stroke.Cancel01",
       "imports": 4
     },
     {
@@ -9352,6 +9353,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt"
       ]
@@ -9494,6 +9496,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/FilesPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingVM.kt"
       ]
@@ -9548,6 +9551,7 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt"
       ]
     },
@@ -32962,6 +32966,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptLorebook.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelDialogs.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt",
@@ -40838,6 +40843,57 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 209,
+      "sha256": "164f93f1ddf8322bda1558224a0b99891f30f867928c7c26ab70add09f7edce4",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "McDonaldsMcpShortcutCard",
+          "kind": "composable",
+          "line": 52
+        },
+        {
+          "name": "McpServerItem",
+          "kind": "composable",
+          "line": 128
+        }
+      ],
+      "localImportCount": 14,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.AlertCircle",
+        "me.rerere.hugeicons.stroke.Cancel01",
+        "me.rerere.hugeicons.stroke.Delete01",
+        "me.rerere.hugeicons.stroke.McpServer",
+        "me.rerere.hugeicons.stroke.MessageBlocked",
+        "me.rerere.hugeicons.stroke.Settings03",
+        "me.rerere.rikkahub.data.ai.mcp.McpManager",
+        "me.rerere.rikkahub.data.ai.mcp.McpServerConfig",
+        "me.rerere.rikkahub.data.ai.mcp.McpStatus",
+        "me.rerere.rikkahub.ui.components.ui.Tag",
+        "me.rerere.rikkahub.ui.components.ui.TagType",
+        "me.rerere.rikkahub.ui.theme.CustomColors",
+        "me.rerere.rikkahub.ui.theme.extendColors"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpConfig.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpManager.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpStatus.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Tag.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
       "module": "app",
       "extension": ".kt",
@@ -44950,6 +45006,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingFilesPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
@@ -94834,6 +94891,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.McDonaldsMcpShortcutCard": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+        "kind": "composable",
+        "line": 52
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "composable",
         "line": 300
@@ -94861,6 +94923,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.McpServerItem": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+        "kind": "composable",
+        "line": 128
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "composable",
