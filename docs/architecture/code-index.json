@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:04:36.712535+00:00",
-  "commit": "0a7abf9ecc52ea74037f6499cc94a111dfd5dc17",
+  "generatedAt": "2026-07-27T17:06:20.885916+00:00",
+  "commit": "88396cfc00fd5e94acb0c76a429003adf35b6890",
   "branch": "master",
-  "sourceFingerprint": "909b38656978f8d13a7b8eae73f6309b781b2708a7001cf481ec62ef29f508d7",
+  "sourceFingerprint": "da420f0e779f478c30d9cdd8c89dde4de6cb4e5d42b6593e18876403f81fa014",
   "summary": {
-    "files": 1177,
-    "lines": 266721,
-    "symbols": 5644,
-    "productionCodeFiles": 838,
+    "files": 1178,
+    "lines": 266732,
+    "symbols": 5645,
+    "productionCodeFiles": 839,
     "testFiles": 146,
     "largeProductionFiles": 35,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 716,
+      "app": 717,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 784,
+      ".kt": 785,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -55,7 +55,7 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 144,
+      "AI与上下文": 145,
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
@@ -65,7 +65,7 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 325,
+      "界面": 326,
       "记忆": 44
     },
     "resolvedImportEdges": 2042
@@ -1256,6 +1256,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ConversationSystemPromptCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptLorebook.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPaddingValues.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptVM.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/AILoggingManagerTest.kt",
@@ -1766,6 +1767,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/ExtensionsPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptLorebook.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPaddingValues.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/QuickMessagesPage.kt",
@@ -37858,6 +37860,32 @@
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/UseEditState.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
       ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPaddingValues.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 11,
+      "sha256": "07e3fd14be88019889b2dd4c5022fbf3abe4daa9ef5a51a5ab9630bce25023a4",
+      "package": "me.rerere.rikkahub.ui.pages.extensions",
+      "categories": [
+        "AI与上下文",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "plus",
+          "kind": "function",
+          "line": 6
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
       "importedBy": []
     },
     {
@@ -92725,6 +92753,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/SkillsVM.kt",
         "kind": "function",
         "line": 149
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.extensions.plus": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPaddingValues.kt",
+        "kind": "function",
+        "line": 6
       }
     ],
     "me.rerere.rikkahub.ui.pages.extensions.readFile": [
