@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T04:52:22.239908+00:00",
-  "commit": "f1745d8f42e694a9d3e09ff61db8a3990835782b",
+  "generatedAt": "2026-07-27T04:52:51.823022+00:00",
+  "commit": "844862dfd00ea0af3b67daebb6f3205e5e3c8bf4",
   "branch": "master",
-  "sourceFingerprint": "e2718d6ea60aa7f3887a2cc2cd64b55bbacdb1e78f390873c9ccd6e3e16b16d8",
+  "sourceFingerprint": "3eb8b4e06aa36bf16b81c75d01933b806b7980b2712d632053e30df6dc7820ca",
   "summary": {
     "files": 1129,
-    "lines": 265599,
+    "lines": 265601,
     "symbols": 5534,
     "productionCodeFiles": 798,
     "testFiles": 138,
@@ -24727,8 +24727,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/di/ViewModelModule.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 76,
-      "sha256": "6e4824c72204f8753ae108ed105b5b71efb17e057ecad5105919eb3761f80ec7",
+      "lines": 78,
+      "sha256": "7161cc97fcebb61f304cf820d96c610c8212a149f838c08a8bba8b05d655cd29",
       "package": "me.rerere.rikkahub.di",
       "categories": [
         "界面"
