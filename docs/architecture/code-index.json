@@ -1,17 +1,17 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:45:30.494181+00:00",
-  "commit": "639aa73bba3dcdd445c6ac00044057060cb48e7a",
+  "generatedAt": "2026-07-27T16:46:05.157506+00:00",
+  "commit": "8e0f0577cd07be7844db11a04a14efb0ca286ac8",
   "branch": "master",
-  "sourceFingerprint": "cbbee16f4dc3b4a55ba2b03aeff41e86f81a734e62fe558bcd1b0bc385aae7da",
+  "sourceFingerprint": "de7ae8b7091f39773829f631cc7650351e7b74a3a1b4f4aafd14d169b000c9d1",
   "summary": {
     "files": 1172,
-    "lines": 268392,
-    "symbols": 5655,
+    "lines": 267028,
+    "symbols": 5644,
     "productionCodeFiles": 833,
     "testFiles": 146,
-    "largeProductionFiles": 38,
-    "veryLargeProductionFiles": 4,
+    "largeProductionFiles": 37,
+    "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
       "app": 711,
@@ -68,7 +68,7 @@
       "界面": 320,
       "记忆": 44
     },
-    "resolvedImportEdges": 2041
+    "resolvedImportEdges": 2033
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -151,13 +151,6 @@
         "lines": 1874,
         "symbols": 94,
         "localImportCount": 17,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "lines": 1579,
-        "symbols": 14,
-        "localImportCount": 18,
         "todoMarkers": 0
       },
       {
@@ -340,6 +333,13 @@
         "lines": 894,
         "symbols": 7,
         "localImportCount": 25,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
+        "lines": 860,
+        "symbols": 22,
+        "localImportCount": 4,
         "todoMarkers": 0
       }
     ],
@@ -894,7 +894,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 130,
+        "importedByCount": 129,
         "todoMarkers": 0
       },
       {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 111,
+        "importedByCount": 110,
         "todoMarkers": 0
       },
       {
@@ -910,7 +910,7 @@
         "lines": 19,
         "symbols": 1,
         "localImportCount": 0,
-        "importedByCount": 63,
+        "importedByCount": 62,
         "todoMarkers": 0
       },
       {
@@ -998,7 +998,7 @@
         "lines": 141,
         "symbols": 19,
         "localImportCount": 6,
-        "importedByCount": 31,
+        "importedByCount": 30,
         "todoMarkers": 1
       },
       {
@@ -1007,14 +1007,6 @@
         "symbols": 37,
         "localImportCount": 9,
         "importedByCount": 26,
-        "todoMarkers": 0
-      },
-      {
-        "path": "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
-        "lines": 57,
-        "symbols": 4,
-        "localImportCount": 3,
-        "importedByCount": 21,
         "todoMarkers": 0
       },
       {
@@ -1030,6 +1022,14 @@
         "lines": 196,
         "symbols": 6,
         "localImportCount": 1,
+        "importedByCount": 20,
+        "todoMarkers": 0
+      },
+      {
+        "path": "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
+        "lines": 57,
+        "symbols": 4,
+        "localImportCount": 3,
         "importedByCount": 20,
         "todoMarkers": 0
       },
@@ -3576,7 +3576,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/sync/importer/ChatboxImporter.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt",
@@ -4056,7 +4055,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
@@ -4126,7 +4124,6 @@
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
@@ -6054,7 +6051,6 @@
         "app/src/main/java/me/rerere/rikkahub/plugin/provider/PluginToolProvider.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionChatPort.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt",
@@ -14786,7 +14782,6 @@
         "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
@@ -25231,8 +25226,7 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/plugin/provider/PluginToolProvider.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt"
       ]
     },
     {
@@ -25610,8 +25604,7 @@
         "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginManagePage.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginViewModel.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt"
       ]
     },
     {
@@ -25675,8 +25668,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/plugin/provider/PluginToolProvider.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/scanner/PluginScanner.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginDetailPage.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginDetailPage.kt"
       ]
     },
     {
@@ -26799,8 +26791,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 1579,
-      "sha256": "88d1da15f02706a39427f2d82546b442aba2917132f7df11dda5b20257c46021",
+      "lines": 215,
+      "sha256": "2c5f16e6d4744fe67d4ca463c8d24fec17a5e65ae85ec4c9f9de9a54d0d4f507",
       "package": "me.rerere.rikkahub.plugin.webview",
       "categories": [
         "界面",
@@ -26810,110 +26802,35 @@
         {
           "name": "PluginWebViewPage",
           "kind": "composable",
-          "line": 83
+          "line": 49
         },
         {
           "name": "onReceive",
           "kind": "function",
-          "line": 130
-        },
-        {
-          "name": "onPageFinished",
-          "kind": "function",
-          "line": 530
-        },
-        {
-          "name": "shouldOverrideUrlLoading",
-          "kind": "function",
-          "line": 540
+          "line": 78
         },
         {
           "name": "onShowFileChooser",
           "kind": "function",
-          "line": 695
-        },
-        {
-          "name": "PluginWebViewClient",
-          "kind": "class",
-          "line": 763
-        },
-        {
-          "name": "shouldOverrideUrlLoading",
-          "kind": "function",
-          "line": 782
-        },
-        {
-          "name": "onPageFinished",
-          "kind": "function",
-          "line": 804
-        },
-        {
-          "name": "handleBridgeCall",
-          "kind": "function",
-          "line": 809
-        },
-        {
-          "name": "callAI",
-          "kind": "function",
-          "line": 1226
-        },
-        {
-          "name": "handleHookTrigger",
-          "kind": "function",
-          "line": 1292
-        },
-        {
-          "name": "escapeJsString",
-          "kind": "function",
-          "line": 1341
-        },
-        {
-          "name": "callPluginTool",
-          "kind": "function",
-          "line": 1351
-        },
-        {
-          "name": "uriToBase64",
-          "kind": "function",
-          "line": 1574
+          "line": 176
         }
       ],
-      "localImportCount": 18,
+      "localImportCount": 6,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
-        "me.rerere.ai.core.MessageRole",
-        "me.rerere.ai.provider.ProviderManager",
-        "me.rerere.ai.provider.TextGenerationParams",
-        "me.rerere.ai.ui.UIMessage",
-        "me.rerere.ai.ui.UIMessagePart",
         "me.rerere.hugeicons.HugeIcons",
         "me.rerere.hugeicons.stroke.ArrowLeft01",
-        "me.rerere.rikkahub.data.datastore.SettingsStore",
-        "me.rerere.rikkahub.data.datastore.findModelById",
-        "me.rerere.rikkahub.data.datastore.findProvider",
-        "me.rerere.rikkahub.data.datastore.getCurrentChatModel",
         "me.rerere.rikkahub.plugin.data.PluginDataStore",
-        "me.rerere.rikkahub.plugin.loader.LoadedPlugin",
         "me.rerere.rikkahub.plugin.loader.PluginLoader",
         "me.rerere.rikkahub.plugin.manager.PluginManager",
-        "me.rerere.rikkahub.plugin.model.PluginHookConfig",
-        "me.rerere.rikkahub.plugin.model.PluginInfo",
         "me.rerere.rikkahub.plugin.repository.PluginRepository"
       ],
       "resolvedImports": [
-        "ai/src/main/java/me/rerere/ai/core/MessageRole.kt",
-        "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
-        "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
-        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/data/PluginDataStore.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/loader/LoadedPlugin.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/loader/PluginLoader.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/manager/PluginManager.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/model/PluginInfo.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/model/PluginManifest.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/repository/PluginRepository.kt"
       ],
       "importedBy": [
@@ -84734,13 +84651,6 @@
         "line": 29
       }
     ],
-    "me.rerere.rikkahub.plugin.webview.PluginWebViewClient": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "class",
-        "line": 763
-      }
-    ],
     "me.rerere.rikkahub.plugin.webview.PluginWebViewFileLaunchers": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
@@ -84752,7 +84662,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "kind": "composable",
-        "line": 83
+        "line": 49
       }
     ],
     "me.rerere.rikkahub.plugin.webview.PomodoroTimerService": [
@@ -84779,11 +84689,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "kind": "function",
         "line": 251
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 1226
       }
     ],
     "me.rerere.rikkahub.plugin.webview.callAi": [
@@ -84805,11 +84710,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "kind": "function",
         "line": 327
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 1351
       }
     ],
     "me.rerere.rikkahub.plugin.webview.callTool": [
@@ -84838,11 +84738,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "kind": "function",
         "line": 360
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 1341
       }
     ],
     "me.rerere.rikkahub.plugin.webview.escapeSingleQuotedJs": [
@@ -84897,11 +84792,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "kind": "function",
         "line": 75
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 809
       }
     ],
     "me.rerere.rikkahub.plugin.webview.handleHookTrigger": [
@@ -84909,11 +84799,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "kind": "function",
         "line": 295
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 1292
       }
     ],
     "me.rerere.rikkahub.plugin.webview.hide": [
@@ -85018,23 +84903,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
         "kind": "function",
         "line": 112
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 530
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 804
       }
     ],
     "me.rerere.rikkahub.plugin.webview.onReceive": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "kind": "function",
-        "line": 130
+        "line": 78
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
@@ -85046,7 +84921,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "kind": "function",
-        "line": 695
+        "line": 176
       }
     ],
     "me.rerere.rikkahub.plugin.webview.onStartCommand": [
@@ -85181,16 +85056,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
         "kind": "function",
         "line": 121
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 540
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 782
       }
     ],
     "me.rerere.rikkahub.plugin.webview.show": [
@@ -85280,11 +85145,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewFileLaunchers.kt",
         "kind": "function",
         "line": 199
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
-        "kind": "function",
-        "line": 1574
       }
     ],
     "me.rerere.rikkahub.plugin.webview.writePluginFile": [
