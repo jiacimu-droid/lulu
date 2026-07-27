@@ -50,7 +50,11 @@ internal fun DisplayColorSection(
         DisplayColorTarget.entries.forEach { target ->
             item(
                 headlineContent = { Text(target.title) },
-                supportingContent = target.description?.let { description -> { Text(description) } },
+                supportingContent = if (target.description != null) {
+                    { Text(target.description) }
+                } else {
+                    null
+                },
                 trailingContent = {
                     DisplayColorActions(
                         color = target.current(displaySetting)?.toComposeColor() ?: target.defaultColor(),
@@ -112,7 +116,7 @@ private enum class DisplayColorTarget(
         InputField -> MaterialTheme.colorScheme.surfaceContainerLowest
     }
 
-    fun current(setting: DisplaySetting): String? = when (this) {
+    fun current(setting: DisplaySetting): Long? = when (this) {
         ChatText -> setting.chatTextColor
         GlobalText -> setting.globalTextColor
         UserBubble -> setting.userBubbleColor
@@ -123,7 +127,7 @@ private enum class DisplayColorTarget(
         InputField -> setting.inputFieldColor
     }
 
-    fun apply(setting: DisplaySetting, value: String?): DisplaySetting = when (this) {
+    fun apply(setting: DisplaySetting, value: Long?): DisplaySetting = when (this) {
         ChatText -> setting.copy(chatTextColor = value)
         GlobalText -> setting.copy(globalTextColor = value)
         UserBubble -> setting.copy(userBubbleColor = value)
