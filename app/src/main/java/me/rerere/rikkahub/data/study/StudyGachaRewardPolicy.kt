@@ -84,14 +84,16 @@ object StudyGachaRewardPolicy {
             }
             result
         }
+        val trackedState = stateAfterLegacyDraw.copy(
+            inventory = inventory,
+            dailyGameRewardDate = date,
+            dailyGameRoundTicketsWon = gameRoundWins,
+            dailyGameUnlimitedTicketsWon = unlimitedWins,
+        )
+        val floor = grantFiftyPullGameFloor(trackedState)
         return RebalancedDraw(
-            state = stateAfterLegacyDraw.copy(
-                inventory = inventory,
-                dailyGameRewardDate = date,
-                dailyGameRoundTicketsWon = gameRoundWins,
-                dailyGameUnlimitedTicketsWon = unlimitedWins,
-            ),
-            results = mapped,
+            state = floor.state,
+            results = mapped + floor.bonusResults,
         )
     }
 
