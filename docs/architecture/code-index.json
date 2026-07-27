@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T07:49:40.073698+00:00",
-  "commit": "bcd5902ca4f366cc69bb11bebc0d528a6b84f3d8",
+  "generatedAt": "2026-07-27T10:05:21.309205+00:00",
+  "commit": "6ea414b2b55e7b202a0858b6180539fa49f647a6",
   "branch": "master",
-  "sourceFingerprint": "2773cebd5d06e9f1220a366eefc222b5f312bafa113d0cc7897c7c542ab843e4",
+  "sourceFingerprint": "450fbe51b5b9889178aca44377c3253475b7969a21e0eb31fb620cb13146baa1",
   "summary": {
     "files": 1141,
-    "lines": 267114,
-    "symbols": 5583,
+    "lines": 267102,
+    "symbols": 5581,
     "productionCodeFiles": 802,
     "testFiles": 146,
     "largeProductionFiles": 42,
@@ -22762,8 +22762,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 148,
-      "sha256": "b3b92713fcf6edae63c6196aea0bfc08e14f33dd97797b099d012e90e11cc049",
+      "lines": 136,
+      "sha256": "fac7108e71929ccc6177eaa443495fe67ee664d29b44070d4a5cb121d50b160e",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -22777,52 +22777,42 @@
         {
           "name": "RebalancedDraw",
           "kind": "class",
-          "line": 25
+          "line": 24
         },
         {
           "name": "rebalance",
           "kind": "function",
-          "line": 30
+          "line": 29
         },
         {
           "name": "gameRoundTicketCount",
           "kind": "function",
-          "line": 63
-        },
-        {
-          "name": "accessoryCardCount",
-          "kind": "function",
-          "line": 65
+          "line": 62
         },
         {
           "name": "consumeGameRoundTicket",
           "kind": "function",
-          "line": 67
-        },
-        {
-          "name": "consumeAccessoryCard",
-          "kind": "function",
-          "line": 75
+          "line": 64
         },
         {
           "name": "mapPurple",
           "kind": "function",
-          "line": 83
+          "line": 72
         },
         {
           "name": "mapGold",
           "kind": "function",
-          "line": 110
+          "line": 99
         },
         {
           "name": "removeLegacySpecial",
           "kind": "function",
-          "line": 129
+          "line": 118
         },
         {
           "name": "addRequestedSpecial",
           "kind": "function",
-          "line": 138
+          "line": 127
         }
       ],
       "localImportCount": 0,
@@ -79561,7 +79551,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "class",
-        "line": 25
+        "line": 24
       }
     ],
     "me.rerere.rikkahub.data.study.StudyAchievement": [
@@ -79907,13 +79897,6 @@
         "line": 1148
       }
     ],
-    "me.rerere.rikkahub.data.study.accessoryCardCount": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
-        "kind": "function",
-        "line": 65
-      }
-    ],
     "me.rerere.rikkahub.data.study.add": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
@@ -79939,7 +79922,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "function",
-        "line": 138
+        "line": 127
       }
     ],
     "me.rerere.rikkahub.data.study.addReward": [
@@ -80061,18 +80044,11 @@
         "line": 234
       }
     ],
-    "me.rerere.rikkahub.data.study.consumeAccessoryCard": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
-        "kind": "function",
-        "line": 75
-      }
-    ],
     "me.rerere.rikkahub.data.study.consumeGameRoundTicket": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "function",
-        "line": 67
+        "line": 64
       }
     ],
     "me.rerere.rikkahub.data.study.countdownUsesAConservativePlanningAnchorUntilTheOfficialDateIsPublished": [
@@ -80301,7 +80277,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "function",
-        "line": 63
+        "line": 62
       }
     ],
     "me.rerere.rikkahub.data.study.generatedDailyPlansFollowTheHardCourseCutoffs": [
@@ -80517,14 +80493,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "function",
-        "line": 110
+        "line": 99
       }
     ],
     "me.rerere.rikkahub.data.study.mapPurple": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "function",
-        "line": 83
+        "line": 72
       }
     ],
     "me.rerere.rikkahub.data.study.menstrualDiscomfortMovesCurrentWeekRestDayToJulySeven": [
@@ -80854,7 +80830,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "function",
-        "line": 30
+        "line": 29
       }
     ],
     "me.rerere.rikkahub.data.study.recoveryDayStillGivesAtLeastOneHourOfConcreteStudy": [
@@ -80896,7 +80872,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
         "kind": "function",
-        "line": 129
+        "line": 118
       }
     ],
     "me.rerere.rikkahub.data.study.resetEconomyForOfficialStart": [
