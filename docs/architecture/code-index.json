@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:38:33.931014+00:00",
-  "commit": "e9d6f52e00f4b09bd1603d47a6dc2eb5ec8e1f1b",
+  "generatedAt": "2026-07-27T16:39:40.633588+00:00",
+  "commit": "9e5fe938b3c29111e4e2511a6b57c1d4218d6ecf",
   "branch": "master",
-  "sourceFingerprint": "d9c31b4ec4cc9585d01dc7a7236f8569279062a68d210451319b03ec9aa6b78f",
+  "sourceFingerprint": "51388beaa8f7b98dad7baa987faeff3d5c91493ba0c5f5ba047627825517fbfd",
   "summary": {
     "files": 1168,
-    "lines": 267483,
+    "lines": 267484,
     "symbols": 5616,
     "productionCodeFiles": 829,
     "testFiles": 146,
@@ -41058,8 +41058,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelList.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 204,
-      "sha256": "73562166ef75d3cd12b6025d33d6cdc11c680050ad776225779d9592a970f387",
+      "lines": 205,
+      "sha256": "3ba3fcd4e091e16c66f79c31dbcbfe678e69f7934ca1ad05e20a1084ee3945fa",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -41068,12 +41068,12 @@
         {
           "name": "SettingProviderModelList",
           "kind": "composable",
-          "line": 46
+          "line": 47
         },
         {
           "name": "SettingProviderAddCustomModelButton",
           "kind": "composable",
-          "line": 173
+          "line": 174
         }
       ],
       "localImportCount": 7,
@@ -94373,7 +94373,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelList.kt",
         "kind": "composable",
-        "line": 173
+        "line": 174
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.SettingProviderBuiltInTools": [
@@ -94436,7 +94436,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelList.kt",
         "kind": "composable",
-        "line": 46
+        "line": 47
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.SettingProviderModelModalitySelector": [
