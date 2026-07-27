@@ -122,6 +122,7 @@ internal fun AssistantBasicContent(
 ) {
     val context = LocalContext.current
     val historyClearState by vm.historyClearState.collectAsStateWithLifecycle()
+    val interactionGenerationState by vm.interactionGenerationState.collectAsStateWithLifecycle()
     var showClearHistoryDialog by remember { mutableStateOf(false) }
     var memoryIntervalInput by remember(assistant.memoryExtractionInterval) {
         mutableStateOf(assistant.memoryExtractionInterval.toString())
@@ -144,7 +145,7 @@ internal fun AssistantBasicContent(
         },
         onDismiss = { showClearHistoryDialog = false },
         text = {
-            Text("会不可撤销地清除这个角色的聊天与电话、收藏、长期记忆、辞海日记、关系、挂心、承诺和未触发的主动提醒。人设、头像、模型设置、世界书及考研计划会保留。")
+            Text("会不可撤销地清除这个角色的聊天与电话、收藏、长期记忆、辞海日记、挂心、承诺和未触发的主动提醒。人设、互动设定、头像、模型设置、世界书及考研计划会保留。")
         },
     )
 
@@ -345,6 +346,13 @@ internal fun AssistantBasicContent(
                 }
             )
         }
+
+        AssistantInteractionSection(
+            assistant = assistant,
+            generationState = interactionGenerationState,
+            onUpdate = onUpdate,
+            onGenerate = vm::generateInteractionProfile,
+        )
 
         Card(
             colors = CustomColors.cardColorsOnSurfaceContainer
@@ -701,7 +709,7 @@ internal fun AssistantBasicContent(
             FormItem(
                 modifier = Modifier.padding(8.dp),
                 label = { Text("主动消息") },
-                description = { Text("每个角色独立设置。开启后，这个角色会按自己的节奏主动来找你。") },
+                description = { Text("每个角色独立设置。开启后，会优先按照上方互动设定中的主动意愿、分享欲、责任感、追问和被动倾向决定是否联系你。") },
                 tail = {
                     Switch(
                         checked = proactiveSetting.enabled,
@@ -721,7 +729,7 @@ internal fun AssistantBasicContent(
             FormItem(
                 modifier = Modifier.padding(8.dp),
                 label = { Text("自然节奏") },
-                description = { Text("根据最近聊天、角色挂心、承诺和关系状态决定下一次判断，不按固定分钟循环发消息。") },
+                description = { Text("根据互动设定、最近聊天、角色挂心和承诺决定下一次判断，不按固定分钟机械发消息。") },
                 tail = {
                     Switch(
                         checked = proactiveSetting.naturalScheduling,
@@ -860,9 +868,9 @@ internal fun AssistantBasicContent(
                 description = {
                     Text(
                         when (val state = historyClearState) {
-                            HistoryClearState.Idle -> "清除这个角色产生的全部交互记录，保留人设、世界书与考研计划。"
+                            HistoryClearState.Idle -> "清除这个角色产生的全部交互记录，保留人设、互动设定、世界书与考研计划。"
                             HistoryClearState.Running -> "正在清除角色记录…"
-                            HistoryClearState.Success -> "角色记录已清除，人设、世界书与考研计划均已保留。"
+                            HistoryClearState.Success -> "角色记录已清除，人设、互动设定、世界书与考研计划均已保留。"
                             is HistoryClearState.Failed -> state.message
                         }
                     )
