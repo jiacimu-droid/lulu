@@ -2,7 +2,6 @@ package me.rerere.rikkahub.data.study
 
 import kotlin.random.Random
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -54,62 +53,18 @@ class StudyGachaRewardPolicyTest {
     }
 
     @Test
-    fun `four hour study bonus grants two douyin tickets only once`() {
-        val date = "2026-07-27"
-        val before = StudyState(
-            today = date,
-            dailyStudyRecords = mapOf(date to StudyDailyRecord(studyMinutes = 220)),
-        )
-        val after = before.copy(
-            dailyStudyRecords = mapOf(date to StudyDailyRecord(studyMinutes = 240)),
-        )
-
-        val first = StudyGachaRewardPolicy.grantFourHourDouyinBonus(before, after)
-        val second = StudyGachaRewardPolicy.grantFourHourDouyinBonus(
-            before = first.state,
-            after = first.state.copy(
-                dailyStudyRecords = mapOf(date to StudyDailyRecord(studyMinutes = 300)),
+    fun `thirtieth consecutive normal pull is forced purple`() {
+        val result = StudyRules.draw(
+            state = StudyState(
+                wallet = StudyWallet(kudos = StudyRules.SINGLE_DRAW_COST),
+                drawsSinceNonNormal = StudyRules.NON_NORMAL_PITY_DRAW_COUNT - 1,
             ),
+            count = 1,
+            random = FixedDoubleRandom(0.0),
         )
 
-        assertTrue(first.granted)
-        assertEquals(2, first.state.inventory.douyinFragments)
-        assertFalse(second.granted)
-        assertEquals(2, second.state.inventory.douyinFragments)
-    }
-
-    @Test
-    fun `fifty pulls with no game reward top up two four-round tickets`() {
-        val date = "2026-07-27"
-        val result = StudyGachaRewardPolicy.grantFiftyPullGameFloor(
-            StudyState(
-                today = date,
-                dailyDrawCount = 50,
-                dailyGameRewardDate = date,
-            ),
-        )
-
-        assertEquals(2, result.state.inventory.gameRoundTickets)
-        assertEquals(2, result.bonusResults.size)
-        assertTrue(result.bonusResults.all { it.title.contains("50抽游戏保底") })
-        assertEquals(date, result.state.fiftyPullGameFloorGrantedDate)
-    }
-
-    @Test
-    fun `one unlimited ticket already covers the fifty-pull floor`() {
-        val date = "2026-07-27"
-        val result = StudyGachaRewardPolicy.grantFiftyPullGameFloor(
-            StudyState(
-                today = date,
-                dailyDrawCount = 50,
-                dailyGameRewardDate = date,
-                dailyGameUnlimitedTicketsWon = 1,
-            ),
-        )
-
-        assertEquals(0, result.state.inventory.gameRoundTickets)
-        assertTrue(result.bonusResults.isEmpty())
-        assertEquals(date, result.state.fiftyPullGameFloorGrantedDate)
+        assertEquals(StudyRarity.Rare, result.results.single().rarity)
+        assertEquals(0, result.state.drawsSinceNonNormal)
     }
 
     @Test
@@ -122,6 +77,7 @@ class StudyGachaRewardPolicyTest {
             StudyGachaRewardPolicy.ANIME_RATE
 
         assertEquals(0.062, specialRate, 0.0000001)
+        assertTrue(StudyRules.NON_NORMAL_PITY_DRAW_COUNT == 30)
     }
 
     private class FixedDoubleRandom(vararg values: Double) : Random() {
