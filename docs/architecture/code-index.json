@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:31:21.394255+00:00",
-  "commit": "8a7f6723db2c6e73303b7d9ae49324de2a07f7d5",
+  "generatedAt": "2026-07-27T05:41:27.059203+00:00",
+  "commit": "545e2caa9ed5764147dca82c25942b1e37bb39ab",
   "branch": "master",
-  "sourceFingerprint": "4ba23ac23125c7e98fbcfd0b5487c4088ffff6cb8820e118b6f738647deb0101",
+  "sourceFingerprint": "dc07fa381229b92abc79f7347ba5062d66a906929e0d78c528eed7da8c64e635",
   "summary": {
     "files": 1133,
-    "lines": 266287,
+    "lines": 266302,
     "symbols": 5551,
     "productionCodeFiles": 799,
     "testFiles": 141,
@@ -27776,8 +27776,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionRelationshipPolicy.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 109,
-      "sha256": "28aefe6b526b2c546ed492bd1456143fb820d544e70b6c6925eaf0cc70b5df26",
+      "lines": 124,
+      "sha256": "f3f2087fc0376995e3daf7255c7aeeb2b321df8500f2d1b7060e413e94bcd601",
       "package": "me.rerere.rikkahub.service",
       "categories": [
         "关系与承诺"
@@ -27786,32 +27786,32 @@
         {
           "name": "enforceRelationshipPolicy",
           "kind": "function",
-          "line": 9
+          "line": 12
         },
         {
           "name": "enforceRelationshipPolicy",
           "kind": "function",
-          "line": 30
+          "line": 33
         },
         {
           "name": "allowsUnpromptedTool",
           "kind": "function",
-          "line": 49
+          "line": 52
         },
         {
           "name": "allowsAutonomousAction",
           "kind": "function",
-          "line": 56
+          "line": 64
         },
         {
           "name": "explicitlyRequestsTool",
           "kind": "function",
-          "line": 61
+          "line": 69
         },
         {
           "name": "hasAny",
           "kind": "function",
-          "line": 78
+          "line": 86
         }
       ],
       "localImportCount": 1,
@@ -83621,14 +83621,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionRelationshipPolicy.kt",
         "kind": "function",
-        "line": 56
+        "line": 64
       }
     ],
     "me.rerere.rikkahub.service.allowsUnpromptedTool": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionRelationshipPolicy.kt",
         "kind": "function",
-        "line": 49
+        "line": 52
       }
     ],
     "me.rerere.rikkahub.service.appendVoiceCallVisibleTurn": [
@@ -84082,12 +84082,12 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionRelationshipPolicy.kt",
         "kind": "function",
-        "line": 9
+        "line": 12
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionRelationshipPolicy.kt",
         "kind": "function",
-        "line": 30
+        "line": 33
       }
     ],
     "me.rerere.rikkahub.service.ensureWakeAlarmExecution": [
@@ -84108,7 +84108,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionRelationshipPolicy.kt",
         "kind": "function",
-        "line": 61
+        "line": 69
       }
     ],
     "me.rerere.rikkahub.service.extractCompanionJsonPayload": [
@@ -84351,7 +84351,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionRelationshipPolicy.kt",
         "kind": "function",
-        "line": 78
+        "line": 86
       }
     ],
     "me.rerere.rikkahub.service.hasExplicitActionConsent": [
