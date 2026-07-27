@@ -1,16 +1,16 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:33:01.624959+00:00",
-  "commit": "54b07eccc91960ccf05994ef8835c084d9cc5f82",
+  "generatedAt": "2026-07-27T16:33:17.635584+00:00",
+  "commit": "aa44421943d6e703ddd33c0cd6e2e5a51c76e683",
   "branch": "master",
-  "sourceFingerprint": "59a1e980c8267ecefaf441b1b9ac8fd9531dc0fc7ee91a15e77818389fa682ed",
+  "sourceFingerprint": "1fd3252c6ff0f82cc386ef411a5cfab89acb1b23d058d80f2b1003669455f563",
   "summary": {
     "files": 1164,
-    "lines": 269127,
+    "lines": 267729,
     "symbols": 5614,
     "productionCodeFiles": 825,
     "testFiles": 146,
-    "largeProductionFiles": 40,
+    "largeProductionFiles": 39,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
@@ -68,7 +68,7 @@
       "界面": 316,
       "记忆": 44
     },
-    "resolvedImportEdges": 2021
+    "resolvedImportEdges": 2015
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -172,13 +172,6 @@
         "lines": 1496,
         "symbols": 41,
         "localImportCount": 6,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
-        "lines": 1482,
-        "symbols": 2,
-        "localImportCount": 16,
         "todoMarkers": 0
       },
       {
@@ -340,6 +333,13 @@
         "lines": 902,
         "symbols": 14,
         "localImportCount": 30,
+        "todoMarkers": 0
+      },
+      {
+        "path": "ai/src/main/java/me/rerere/ai/provider/providers/GoogleProvider.kt",
+        "lines": 897,
+        "symbols": 25,
+        "localImportCount": 32,
         "todoMarkers": 0
       }
     ],
@@ -1010,18 +1010,18 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
-        "lines": 196,
-        "symbols": 6,
-        "localImportCount": 1,
-        "importedByCount": 21,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
         "lines": 519,
         "symbols": 33,
         "localImportCount": 14,
+        "importedByCount": 20,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
+        "lines": 196,
+        "symbols": 6,
+        "localImportCount": 1,
         "importedByCount": 20,
         "todoMarkers": 0
       },
@@ -1966,7 +1966,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 68
+      "imports": 62
     },
     {
       "from": "me.rerere.rikkahub.data.service",
@@ -30781,8 +30781,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/table/DataTable.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugPage.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt"
       ]
     },
     {
@@ -31527,7 +31526,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBehavior.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayMediaAssets.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProactiveMessagePage.kt",
@@ -31717,7 +31715,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Background.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Theme.kt"
       ]
     },
@@ -32955,7 +32952,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/FilesPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSystemToolsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingWebPage.kt"
       ]
@@ -34026,8 +34022,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/activity/SafeModeActivity.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt"
       ]
     },
     {
@@ -40239,8 +40234,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 1482,
-      "sha256": "d9d9a0ac94fd31765b560f6902fc70a9ac7058e6320aacf0a9a4c7a59dc34e06",
+      "lines": 84,
+      "sha256": "114122c25d820c6c148233ead3c021eae69454f3e4dad71358ee1302c59b2265",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -40249,46 +40244,30 @@
         {
           "name": "SettingDisplayPage",
           "kind": "composable",
-          "line": 78
+          "line": 34
         },
         {
           "name": "updateDisplaySetting",
           "kind": "function",
-          "line": 83
+          "line": 39
         }
       ],
-      "localImportCount": 16,
+      "localImportCount": 6,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
         "me.rerere.rikkahub.R",
-        "me.rerere.rikkahub.data.datastore.ChatFontFamily",
         "me.rerere.rikkahub.data.datastore.DisplaySetting",
         "me.rerere.rikkahub.ui.components.nav.BackButton",
-        "me.rerere.rikkahub.ui.components.richtext.MarkdownBlock",
-        "me.rerere.rikkahub.ui.components.ui.CardGroup",
-        "me.rerere.rikkahub.ui.components.ui.ColorPickerDialog",
-        "me.rerere.rikkahub.ui.components.ui.permission.PermissionManager",
-        "me.rerere.rikkahub.ui.components.ui.permission.PermissionNotification",
-        "me.rerere.rikkahub.ui.components.ui.permission.rememberPermissionState",
-        "me.rerere.rikkahub.ui.components.ui.toComposeColor",
         "me.rerere.rikkahub.ui.hooks.rememberAmoledDarkMode",
-        "me.rerere.rikkahub.ui.hooks.rememberSharedPreferenceBoolean",
-        "me.rerere.rikkahub.ui.pages.setting.components.PresetThemeButtonGroup",
         "me.rerere.rikkahub.ui.theme.CustomColors",
         "me.rerere.rikkahub.utils.plus"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/ColorPickerDialog.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/permission/PermissionManager.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/ColorMode.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/hooks/SharedPreferences.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/PresetThemeButton.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt"
       ],
@@ -41703,8 +41682,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/theme/PresetTheme.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt"
       ]
     },
     {
@@ -94272,7 +94250,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "kind": "composable",
-        "line": 78
+        "line": 34
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.SettingDonatePage": [
@@ -94853,7 +94831,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "kind": "function",
-        "line": 83
+        "line": 39
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.updateSettings": [

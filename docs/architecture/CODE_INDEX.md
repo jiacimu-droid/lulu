@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`54b07eccc91960ccf05994ef8835c084d9cc5f82`
+- 基准提交：`aa44421943d6e703ddd33c0cd6e2e5a51c76e683`
 - 分支：`master`
-- 源码指纹：`59a1e980c8267ece…`
+- 源码指纹：`1fd3252c6ff0f82c…`
 - 已索引文件：1164
-- 已索引代码/文本行：269127
+- 已索引代码/文本行：267729
 - 已发现类、接口、对象、函数及 Composable：5614
 
 ## 仓库健康信号
@@ -25,7 +25,7 @@
 |---|---:|
 | 生产代码文件 | 825 |
 | 测试文件 | 146 |
-| ≥800 行生产文件 | 40 |
+| ≥800 行生产文件 | 39 |
 | ≥1500 行生产文件 | 5 |
 | TODO/FIXME/HACK/XXX | 32 |
 
@@ -101,7 +101,6 @@
 | `app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt` | 1579 | 14 | 18 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt` | 1568 | 14 | 46 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt` | 1496 | 41 | 6 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt` | 1482 | 2 | 16 |
 | `plugins/橘市商业街/main.js` | 1369 | 0 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt` | 1311 | 51 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt` | 1211 | 14 | 31 |
@@ -110,6 +109,7 @@
 | `plugins/共读/reader.js` | 1175 | 0 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 1166 | 14 | 44 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt` | 1142 | 12 | 31 |
+| `web-ui/app/routes/conversations.tsx` | 1132 | 3 | 0 |
 
 ### 本地导入最多的生产文件
 
@@ -548,7 +548,7 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2021
+- 已解析本地导入边：2015
 - 可检索完整符号：5007
 
 | 文件 | 被本地文件导入 | 行数 |
