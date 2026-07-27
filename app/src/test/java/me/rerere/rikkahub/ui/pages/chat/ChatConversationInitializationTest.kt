@@ -1,6 +1,8 @@
 package me.rerere.rikkahub.ui.pages.chat
 
+import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
+import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.toMessageNode
 import org.junit.Assert.assertEquals
@@ -19,7 +21,10 @@ class ChatConversationInitializationTest {
             title = "重要聊天",
             messageNodes = listOf(
                 UIMessage.user("旧消息一").toMessageNode(),
-                UIMessage.assistant("旧回复一").toMessageNode(),
+                UIMessage(
+                    role = MessageRole.ASSISTANT,
+                    parts = listOf(UIMessagePart.Text("旧回复一")),
+                ).toMessageNode(),
             ),
         )
 
@@ -51,7 +56,7 @@ class ChatConversationInitializationTest {
             current = loaded,
         )
 
-        assertEquals(emptyList<Any>(), merged.messageNodes)
+        assertEquals(0, merged.messageNodes.size)
         assertNull(merged.customSystemPrompt)
     }
 }
