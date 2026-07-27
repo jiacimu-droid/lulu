@@ -35,6 +35,7 @@ data class Assistant(
     val ttsVoiceId: String = "",
     val proactiveMessageSetting: ProactiveMessageSetting = ProactiveMessageSetting(),
     val proactiveCallSetting: ProactiveCallSetting = ProactiveCallSetting(),
+    val interactionProfile: AssistantInteractionProfile = AssistantInteractionProfile(),
     val enableRecentChatsReference: Boolean = false,
     val messageTemplate: String = "{{ message }}",
     val presetMessages: List<UIMessage> = emptyList(),
@@ -55,6 +56,42 @@ data class Assistant(
     val allowConversationSystemPrompt: Boolean = false, // 允许对话单独重写 system prompt
     val allowSkipReply: Boolean = false,
 )
+
+/**
+ * 用户可见、可编辑的角色互动规则。
+ *
+ * 这些字段不用固定数值约束角色，而是让人设生成器写出具体、可执行的行为描述，
+ * 再作为聊天、电话、主动消息和后续追问的共同依据。
+ */
+@Serializable
+data class AssistantInteractionProfile(
+    val initiative: String = "",
+    val sharingDesire: String = "",
+    val responsibility: String = "",
+    val followUpStyle: String = "",
+    val passivity: String = "",
+)
+
+fun AssistantInteractionProfile.isBlank(): Boolean =
+    initiative.isBlank() &&
+        sharingDesire.isBlank() &&
+        responsibility.isBlank() &&
+        followUpStyle.isBlank() &&
+        passivity.isBlank()
+
+fun AssistantInteractionProfile.toPromptContext(): String {
+    if (isBlank()) return ""
+    return buildString {
+        appendLine("<interaction_profile priority=\"authoritative\">")
+        appendLine("以下是用户确认过的角色互动设定。它决定角色是否主动联系、分享、承担责任、追问或保持被动；不得用统一的热情、冷淡、恋人或管家默认值覆盖。")
+        initiative.trim().takeIf(String::isNotBlank)?.let { appendLine("主动意愿：$it") }
+        sharingDesire.trim().takeIf(String::isNotBlank)?.let { appendLine("分享欲：$it") }
+        responsibility.trim().takeIf(String::isNotBlank)?.let { appendLine("责任感：$it") }
+        followUpStyle.trim().takeIf(String::isNotBlank)?.let { appendLine("追问方式：$it") }
+        passivity.trim().takeIf(String::isNotBlank)?.let { appendLine("被动倾向：$it") }
+        append("</interaction_profile>")
+    }
+}
 
 @Serializable
 data class QuickMessage(
@@ -176,7 +213,7 @@ sealed class PromptInjection {
         override val injectDepth: Int = 4,
         override val role: MessageRole = MessageRole.USER,
         val keywords: List<String> = emptyList(),  // 触发关键词
-        val useRegex: Boolean = false,             // 是否使用正则匹配
+        val useRegex: Boolean = false,             // 使用正则匹配
         val caseSensitive: Boolean = false,        // 大小写敏感
         val scanDepth: Int = 4,                    // 扫描最近N条消息
         val constantActive: Boolean = false,       // 常驻激活（无需匹配）
