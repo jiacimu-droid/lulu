@@ -3,8 +3,11 @@ package me.rerere.rikkahub.service
 import me.rerere.rikkahub.data.companion.CompanionRelationshipState
 
 /**
- * Relationship measurements may still protect sensitive tools, but they must not silently
- * override the user-editable interaction profile that defines initiative, follow-up and expression.
+ * Relationship measurements may still protect especially sensitive tools, but they must not
+ * silently override the user-editable interaction profile or permissions the user already granted.
+ *
+ * SMS and location access are trusted capabilities in this app: their real boundary is the Android
+ * permission / feature switch. Hidden relationship scores must not revoke them after authorization.
  */
 internal fun CompanionIntentDecision.enforceRelationshipPolicy(
     relationship: CompanionRelationshipState,
@@ -47,6 +50,11 @@ internal fun CompanionChatTurnPlan.enforceRelationshipPolicy(
 }
 
 private fun CompanionRelationshipState.allowsUnpromptedTool(toolName: String): Boolean {
+    // These capabilities are explicitly trusted by product policy. Their tool implementations still
+    // enforce Android permission and feature-toggle checks, so relationship heuristics must not add
+    // a second invisible denial after the user has already granted access.
+    if (toolName in USER_AUTHORIZED_TRUSTED_TOOLS) return true
+
     if (unresolvedTension >= HIGH_TENSION && toolName in USER_AFFECTING_TOOLS) return false
     if (trust < LOW_TRUST && toolName in USER_AFFECTING_TOOLS) return false
     if (boundaryConfidence < LOW_BOUNDARY_CONFIDENCE && toolName in INTRUSIVE_OBSERVATION_TOOLS) return false
@@ -80,13 +88,20 @@ private fun String.hasAny(vararg markers: String): Boolean {
     return markers.any { marker -> marker.lowercase() in normalized }
 }
 
-private val INTRUSIVE_OBSERVATION_TOOLS = setOf(
-    "camera_capture",
+/**
+ * These tools are allowed by the user's explicit Android/app authorization rather than by an
+ * inferred relationship score. Camera deliberately stays out of this set.
+ */
+private val USER_AUTHORIZED_TRUSTED_TOOLS = setOf(
     "read_sms",
-    "get_notifications",
-    "clipboard_tool",
     "get_location",
     "explore_nearby",
+)
+
+private val INTRUSIVE_OBSERVATION_TOOLS = setOf(
+    "camera_capture",
+    "get_notifications",
+    "clipboard_tool",
     "get_app_usage",
     "get_gadgetbridge_data",
 )
