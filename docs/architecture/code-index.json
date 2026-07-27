@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:10:20.398131+00:00",
-  "commit": "761ab1b6c6318c37131055cf525f72de2913bf72",
+  "generatedAt": "2026-07-27T05:10:57.298812+00:00",
+  "commit": "8cd4493d13b8863877e1b054a6686de154440860",
   "branch": "master",
-  "sourceFingerprint": "1a10350179b8050e28f7ea085d0481db8fce3ef20f70c3f698cd636aa0733f64",
+  "sourceFingerprint": "f3340d2e4266063d788988afe75b2b9adf574ab1a06c490ad220b6b2a13c0b76",
   "summary": {
     "files": 1130,
-    "lines": 265934,
+    "lines": 265930,
     "symbols": 5548,
     "productionCodeFiles": 799,
     "testFiles": 138,
@@ -34723,8 +34723,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 156,
-      "sha256": "930836a6bb39b3d1ea45f3ad589b085ef923b8170b06ac1fde6da8b0cd224b46",
+      "lines": 152,
+      "sha256": "59f2be85dc1e9286eab3663c913a765a4271d9c4c93c8b3941696496e2dafa73",
       "package": "me.rerere.rikkahub.ui.pages.assistant.detail",
       "categories": [
         "界面"
@@ -34733,22 +34733,22 @@
         {
           "name": "AssistantInteractionSection",
           "kind": "composable",
-          "line": 24
+          "line": 22
         },
         {
           "name": "InteractionField",
           "kind": "composable",
-          "line": 124
+          "line": 121
         },
         {
           "name": "withInteractionProfile",
           "kind": "function",
-          "line": 147
+          "line": 143
         },
         {
           "name": "isEmptyForUi",
           "kind": "function",
-          "line": 151
+          "line": 147
         }
       ],
       "localImportCount": 4,
@@ -88427,7 +88427,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
         "kind": "composable",
-        "line": 24
+        "line": 22
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.AssistantLocalToolContent": [
@@ -88556,7 +88556,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
         "kind": "composable",
-        "line": 124
+        "line": 121
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.InteractionGenerationState": [
@@ -88664,7 +88664,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
         "kind": "function",
-        "line": 151
+        "line": 147
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.parse": [
@@ -88744,7 +88744,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
         "kind": "function",
-        "line": 147
+        "line": 143
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.removeAssistant": [
