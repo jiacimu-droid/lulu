@@ -4,6 +4,12 @@ import me.rerere.rikkahub.data.companion.CompanionConcernStatus
 import me.rerere.rikkahub.data.companion.CompanionOutboundStatus
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
+import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.model.AssistantInitiativeLevel
+import me.rerere.rikkahub.data.model.AssistantInteractionProfile
+import me.rerere.rikkahub.data.model.initiativeLevel
+import me.rerere.rikkahub.data.model.isBlank
+import org.koin.core.context.GlobalContext
 import java.util.concurrent.TimeUnit
 
 data class CompanionAutonomousPulseInput(
@@ -12,6 +18,7 @@ data class CompanionAutonomousPulseInput(
     val minutesSinceLastChat: Long,
     val activeTargetedTriggerMillis: Long = 0L,
     val nowMillis: Long = System.currentTimeMillis(),
+    val interactionProfile: AssistantInteractionProfile = AssistantInteractionProfile(),
 )
 
 data class CompanionAutonomousPulsePlan(
@@ -34,6 +41,10 @@ object CompanionAutonomousPulsePlanner {
         }
 
         val activeWorkCount = input.snapshot.activeWorkCount(input.nowMillis)
+        val interactionProfile = input.interactionProfile
+            .takeUnless { it.isBlank() }
+            ?: resolveInteractionProfile(input.snapshot.assistantId)
+        val initiativeLevel = interactionProfile.initiativeLevel()
         if (input.setting.naturalScheduling) {
             val latestFeedback = input.snapshot.interactionTimeline.outboundContacts
                 .maxByOrNull { it.generatedAt }
@@ -41,22 +52,30 @@ object CompanionAutonomousPulsePlanner {
             val naturalDelay = when {
                 latestFeedback == CompanionOutboundStatus.DECLINED -> 360..720
                 latestFeedback == CompanionOutboundStatus.USER_BUSY -> 180..360
-                latestFeedback == CompanionOutboundStatus.UNANSWERED -> 120..240
-                input.snapshot.relationship.unresolvedTension >= 0.6f -> 180..300
+                latestFeedback == CompanionOutboundStatus.UNANSWERED -> when (initiativeLevel) {
+                    AssistantInitiativeLevel.HIGH -> 90..180
+                    AssistantInitiativeLevel.NORMAL -> 120..240
+                    AssistantInitiativeLevel.LOW,
+                    AssistantInitiativeLevel.NEVER,
+                    AssistantInitiativeLevel.UNSPECIFIED -> 180..360
+                }
                 activeWorkCount > 0 && input.minutesSinceLastChat >= 45 -> 8..18
                 activeWorkCount > 0 -> 18..35
-                input.minutesSinceLastChat >= 360 -> 25..50
-                input.minutesSinceLastChat >= 120 -> 18..40
-                input.minutesSinceLastChat >= 45 -> 55..100
+                initiativeLevel == AssistantInitiativeLevel.NEVER -> 360..720
+                initiativeLevel == AssistantInitiativeLevel.LOW -> 180..360
+                initiativeLevel == AssistantInitiativeLevel.HIGH && input.minutesSinceLastChat >= 45 -> 20..45
+                initiativeLevel == AssistantInitiativeLevel.HIGH -> 35..70
+                initiativeLevel == AssistantInitiativeLevel.NORMAL && input.minutesSinceLastChat >= 90 -> 45..90
+                initiativeLevel == AssistantInitiativeLevel.NORMAL -> 75..150
+                input.minutesSinceLastChat >= 120 -> 60..120
                 else -> 100..180
             }.stableMinute(input)
             return CompanionAutonomousPulsePlan(
                 delayMinutes = naturalDelay,
-                reason = "natural;feedback=${latestFeedback?.name ?: "none"};${buildReason(input, activeWorkCount)}",
+                reason = "natural;initiative=${initiativeLevel.name};feedback=${latestFeedback?.name ?: "none"};${buildReason(input, activeWorkCount)}",
             )
         }
         val desired = when {
-            input.snapshot.relationship.unresolvedTension >= 0.6f -> maxMinutes
             activeWorkCount > 0 -> when {
                 input.minutesSinceLastChat >= 45 -> minMinutes - 12
                 else -> minMinutes - 5
@@ -77,7 +96,6 @@ object CompanionAutonomousPulsePlanner {
 
     private fun buildReason(input: CompanionAutonomousPulseInput, activeWorkCount: Int): String = buildList {
         when {
-            input.snapshot.relationship.unresolvedTension >= 0.6f -> add("relationship_tension")
             activeWorkCount > 0 -> add("active_work")
             input.minutesSinceLastChat >= 120 -> add("long_silence")
             else -> add("steady_background")
@@ -100,4 +118,13 @@ object CompanionAutonomousPulsePlanner {
         return first + Math.floorMod(seed, (last - first + 1).toLong()).toInt()
     }
 
+    private fun resolveInteractionProfile(assistantId: String): AssistantInteractionProfile = runCatching {
+        GlobalContext.get()
+            .get<SettingsStore>()
+            .settingsFlow
+            .value
+            .assistants
+            .firstOrNull { it.id.toString() == assistantId }
+            ?.interactionProfile
+    }.getOrNull() ?: AssistantInteractionProfile()
 }
