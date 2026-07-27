@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:20:55.347074+00:00",
-  "commit": "81d277f53b2ff082d72067bbf654286a99c82227",
+  "generatedAt": "2026-07-27T17:25:42.345662+00:00",
+  "commit": "5cc200b4f742bce4ae879c833bba3458b157e711",
   "branch": "master",
-  "sourceFingerprint": "d87772832dd8c480d375abd2ed96ff1d38e613c0c1d9342a323a37f2b6271128",
+  "sourceFingerprint": "f0754c10e3fb7ad3ff4da1782c459a9f9989febc96ac7a371d1c1673e27bd303",
   "summary": {
     "files": 1184,
-    "lines": 266906,
+    "lines": 266910,
     "symbols": 5661,
     "productionCodeFiles": 845,
     "testFiles": 146,
@@ -68,7 +68,7 @@
       "界面": 332,
       "记忆": 44
     },
-    "resolvedImportEdges": 2061
+    "resolvedImportEdges": 2062
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -2197,6 +2197,11 @@
       "imports": 9
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.ui.components.ai",
+      "imports": 9
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.message",
       "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 8
@@ -2234,11 +2239,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.hugeicons.stroke.Add01",
-      "imports": 8
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.ui.components.ai",
       "imports": 8
     },
     {
@@ -2514,6 +2514,11 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.context.LocalToaster",
+      "imports": 5
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.ai.provider.Model",
       "imports": 5
     },
     {
@@ -2824,11 +2829,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.data.ai.prompts",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.ai.provider.Model",
       "imports": 4
     },
     {
@@ -29770,6 +29770,7 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantBasicPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt"
       ]
     },
@@ -41120,8 +41121,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 186,
-      "sha256": "0bdc47ec29dd9451c57a3de038cd888d275505873464e5c19206a6156f54cb1f",
+      "lines": 190,
+      "sha256": "903982e97e320cf7608e65872d6f0f76a0b8ad5145c4f5d89cc4816a04d18405",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -41130,33 +41131,34 @@
         {
           "name": "ModelFeatureCard",
           "kind": "composable",
-          "line": 49
+          "line": 51
         },
         {
           "name": "SimpleModelFeature",
           "kind": "composable",
-          "line": 84
+          "line": 86
         },
         {
           "name": "PromptModelFeature",
           "kind": "composable",
-          "line": 113
+          "line": 116
         }
       ],
-      "localImportCount": 10,
+      "localImportCount": 11,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
         "me.rerere.ai.core.ReasoningLevel",
+        "me.rerere.ai.provider.Model",
         "me.rerere.ai.provider.ModelType",
         "me.rerere.hugeicons.HugeIcons",
         "me.rerere.hugeicons.stroke.Tools",
         "me.rerere.rikkahub.R",
         "me.rerere.rikkahub.data.datastore.Settings",
         "me.rerere.rikkahub.ui.components.ai.ModelSelector",
+        "me.rerere.rikkahub.ui.components.ai.ReasoningButton",
         "me.rerere.rikkahub.ui.components.ui.FormItem",
-        "me.rerere.rikkahub.ui.pages.assistant.detail.ReasoningButton",
         "me.rerere.rikkahub.ui.theme.CustomColors"
       ],
       "resolvedImports": [
@@ -41164,6 +41166,7 @@
         "ai/src/main/java/me/rerere/ai/provider/Model.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ModelList.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ReasoningPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
       ],
@@ -95222,7 +95225,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
         "kind": "composable",
-        "line": 49
+        "line": 51
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -95255,7 +95258,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
         "kind": "composable",
-        "line": 113
+        "line": 116
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.ProviderConfigWarningCard": [
@@ -95528,7 +95531,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
         "kind": "composable",
-        "line": 84
+        "line": 86
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.TTSProviderItem": [
