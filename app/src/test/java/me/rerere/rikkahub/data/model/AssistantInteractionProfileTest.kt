@@ -36,6 +36,15 @@ class AssistantInteractionProfileTest {
     }
 
     @Test
+    fun `normal initiative wording is not promoted to high`() {
+        val profile = AssistantInteractionProfile(
+            initiative = "通常会主动联系，但只在有合适话题或明确关心理由时开口。",
+        )
+
+        assertEquals(AssistantInitiativeLevel.NORMAL, profile.initiativeLevel())
+    }
+
+    @Test
     fun `active caring profile becomes high initiative`() {
         val profile = AssistantInteractionProfile(
             initiative = "会主动联系并关心用户现在的状态。",
