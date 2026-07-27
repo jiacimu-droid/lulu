@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`f190185df17c69759b1b89c9ff6af3ea4aba097e`
+- 基准提交：`2d3e01501080a6a2f667ec3b3323f3d21a070e17`
 - 分支：`master`
-- 源码指纹：`92d5131da508437d…`
-- 已索引文件：1142
-- 已索引代码/文本行：267317
-- 已发现类、接口、对象、函数及 Composable：5588
+- 源码指纹：`011e61b43eab3dd7…`
+- 已索引文件：1143
+- 已索引代码/文本行：267829
+- 已发现类、接口、对象、函数及 Composable：5597
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 803 |
+| 生产代码文件 | 804 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 42 |
 | ≥1500 行生产文件 | 6 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 681 |
+| `app` | 682 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 749 |
+| `.kt` | 750 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -315,6 +315,7 @@
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt`
+- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCollectionPanel.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
@@ -327,7 +328,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicyTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/SummerCourseMilestonePlanTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlanTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlowTest.kt`
+- ……另有 1 个文件，见 `code-index.json`
 
 ### 工具
 
@@ -488,7 +489,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 264 个文件，见 `code-index.json`
+- ……另有 265 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -547,8 +548,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1978
-- 可检索完整符号：4980
+- 已解析本地导入边：1980
+- 可检索完整符号：4988
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
