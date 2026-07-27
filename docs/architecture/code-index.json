@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:50:54.436546+00:00",
-  "commit": "419a96eab012612c0b8861e0580bb66e74e3d8b8",
+  "generatedAt": "2026-07-27T16:51:47.968092+00:00",
+  "commit": "23273aaf816ac4ecb8989b2667748831c8eb2eae",
   "branch": "master",
-  "sourceFingerprint": "46036edb3502321af0b61553abdf1c193d939761dcff29a4613ec7810eba2949",
+  "sourceFingerprint": "f2c62560c8a27494be255ca0be356e5baaeaf727a1d47456e4fd9e85678ef3cb",
   "summary": {
-    "files": 1173,
-    "lines": 267527,
-    "symbols": 5658,
-    "productionCodeFiles": 834,
+    "files": 1174,
+    "lines": 267879,
+    "symbols": 5667,
+    "productionCodeFiles": 835,
     "testFiles": 146,
     "largeProductionFiles": 37,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 712,
+      "app": 713,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 780,
+      ".kt": 781,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,7 +65,7 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 321,
+      "界面": 322,
       "记忆": 44
     },
     "resolvedImportEdges": 2035
@@ -1645,6 +1645,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewBlocks.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownWeb.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MathBlock.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Mermaid.kt",
@@ -2448,6 +2449,11 @@
       "imports": 5
     },
     {
+      "from": "me.rerere.rikkahub.ui.components.richtext",
+      "to": "me.rerere.rikkahub.ui.context.LocalSettings",
+      "imports": 5
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.ui",
       "to": "me.rerere.rikkahub.ui.components.ai",
       "imports": 5
@@ -2714,7 +2720,7 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.components.richtext",
-      "to": "me.rerere.rikkahub.ui.context.LocalSettings",
+      "to": "me.rerere.rikkahub.ui.theme.JetbrainsMono",
       "imports": 4
     },
     {
@@ -2965,11 +2971,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai.transformers",
       "to": "me.rerere.ai.ui.UIMessageAnnotation",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.rikkahub.data.ai.tools",
       "imports": 3
     }
   ],
@@ -31388,6 +31389,74 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/table/DataTable.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt"
       ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 352,
+      "sha256": "1bd3a4731ffdfc36bc03045a5ad9d2f72e1641ad0e40bb8af67070e449350a58",
+      "package": "me.rerere.rikkahub.ui.components.richtext",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "HtmlInlineGroup",
+          "kind": "composable",
+          "line": 48
+        },
+        {
+          "name": "HtmlInlineAsComposable",
+          "kind": "composable",
+          "line": 86
+        },
+        {
+          "name": "appendHtmlInlineNode",
+          "kind": "function",
+          "line": 147
+        },
+        {
+          "name": "appendHtmlInlineElement",
+          "kind": "function",
+          "line": 170
+        },
+        {
+          "name": "recurseChildren",
+          "kind": "function",
+          "line": 187
+        },
+        {
+          "name": "appendStyledChildren",
+          "kind": "function",
+          "line": 199
+        },
+        {
+          "name": "appendElementChildren",
+          "kind": "function",
+          "line": 203
+        },
+        {
+          "name": "asTextStyle",
+          "kind": "function",
+          "line": 325
+        },
+        {
+          "name": "buildFontTagStyle",
+          "kind": "function",
+          "line": 336
+        }
+      ],
+      "localImportCount": 2,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.ui.context.LocalSettings",
+        "me.rerere.rikkahub.ui.theme.JetbrainsMono"
+      ],
+      "resolvedImports": [],
       "importedBy": []
     },
     {
@@ -88256,6 +88325,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "composable",
         "line": 748
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "composable",
+        "line": 86
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.HtmlInlineGroup": [
@@ -88263,6 +88337,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "composable",
         "line": 704
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "composable",
+        "line": 48
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.HtmlList": [
@@ -88534,6 +88613,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "function",
         "line": 874
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "function",
+        "line": 203
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.appendHtmlInlineElement": [
@@ -88541,6 +88625,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "function",
         "line": 841
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "function",
+        "line": 170
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.appendHtmlInlineNode": [
@@ -88548,6 +88637,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "function",
         "line": 818
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "function",
+        "line": 147
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.appendMarkdownNodeContent": [
@@ -88562,6 +88656,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "function",
         "line": 870
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "function",
+        "line": 199
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.asTextStyle": [
@@ -88569,6 +88668,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "function",
         "line": 1018
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "function",
+        "line": 325
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.assumeLatexSize": [
@@ -88597,6 +88701,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "function",
         "line": 1031
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "function",
+        "line": 336
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.buildMarkdownPreviewHtml": [
@@ -88839,6 +88948,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "function",
         "line": 858
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNewInline.kt",
+        "kind": "function",
+        "line": 187
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.regex": [
