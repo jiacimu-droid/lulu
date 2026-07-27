@@ -7,6 +7,7 @@ import me.rerere.rikkahub.data.companion.CompanionOutboundStatus
 import me.rerere.rikkahub.data.companion.CompanionRelationshipState
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
+import me.rerere.rikkahub.data.model.AssistantInteractionProfile
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -69,7 +70,7 @@ class CompanionAutonomousPulsePlannerTest {
     }
 
     @Test
-    fun `long silence schedules an earlier perception without assuming attachment`() {
+    fun `long silence schedules an earlier fixed perception without assuming attachment`() {
         val plan = CompanionAutonomousPulsePlanner.planNext(
             input = CompanionAutonomousPulseInput(
                 setting = setting,
@@ -109,7 +110,7 @@ class CompanionAutonomousPulsePlannerTest {
     }
 
     @Test
-    fun `unresolved relationship tension slows the background pulse`() {
+    fun `hidden relationship tension no longer slows configured interaction rhythm`() {
         val plan = CompanionAutonomousPulsePlanner.planNext(
             input = CompanionAutonomousPulseInput(
                 setting = setting,
@@ -120,8 +121,8 @@ class CompanionAutonomousPulsePlannerTest {
             ),
         )
 
-        assertEquals(90, plan.delayMinutes)
-        assertTrue(plan.reason.contains("relationship_tension"))
+        assertEquals(12, plan.delayMinutes)
+        assertTrue(plan.reason.contains("long_silence"))
     }
 
     @Test
@@ -178,6 +179,7 @@ class CompanionAutonomousPulsePlannerTest {
                 snapshot = snapshot,
                 minutesSinceLastChat = 180,
                 nowMillis = 1_700_000_000_000L,
+                interactionProfile = AssistantInteractionProfile(initiative = "会主动联系并关心用户"),
             ),
         )
 
@@ -188,7 +190,7 @@ class CompanionAutonomousPulsePlannerTest {
     }
 
     @Test
-    fun `natural scheduling uses context ranges instead of configured minute window`() {
+    fun `natural scheduling stays conservative when interaction is unspecified`() {
         val plan = CompanionAutonomousPulsePlanner.planNext(
             input = CompanionAutonomousPulseInput(
                 setting = setting.copy(
@@ -202,7 +204,62 @@ class CompanionAutonomousPulsePlannerTest {
             ),
         )
 
-        assertTrue(plan.delayMinutes in 18..40)
-        assertTrue(plan.reason.startsWith("natural;"))
+        assertTrue(plan.delayMinutes in 60..120)
+        assertTrue(plan.reason.contains("initiative=UNSPECIFIED"))
+    }
+
+    @Test
+    fun `high initiative role gets frequent natural perception opportunities`() {
+        val plan = CompanionAutonomousPulsePlanner.planNext(
+            input = CompanionAutonomousPulseInput(
+                setting = setting.copy(naturalScheduling = true),
+                snapshot = CompanionSnapshot.empty("assistant-a"),
+                minutesSinceLastChat = 60,
+                nowMillis = 1_700_000_000_000L,
+                interactionProfile = AssistantInteractionProfile(
+                    initiative = "会主动联系并询问用户正在做什么。",
+                    sharingDesire = "分享欲强，会主动分享自己的发现。",
+                ),
+            ),
+        )
+
+        assertTrue(plan.delayMinutes in 20..45)
+        assertTrue(plan.reason.contains("initiative=HIGH"))
+    }
+
+    @Test
+    fun `low initiative role receives sparse natural checks`() {
+        val plan = CompanionAutonomousPulsePlanner.planNext(
+            input = CompanionAutonomousPulseInput(
+                setting = setting.copy(naturalScheduling = true),
+                snapshot = CompanionSnapshot.empty("assistant-a"),
+                minutesSinceLastChat = 200,
+                nowMillis = 1_700_000_000_000L,
+                interactionProfile = AssistantInteractionProfile(
+                    initiative = "很少主动，通常等用户先提起话题。",
+                ),
+            ),
+        )
+
+        assertTrue(plan.delayMinutes in 180..360)
+        assertTrue(plan.reason.contains("initiative=LOW"))
+    }
+
+    @Test
+    fun `never initiate role keeps only a sparse maintenance pulse`() {
+        val plan = CompanionAutonomousPulsePlanner.planNext(
+            input = CompanionAutonomousPulseInput(
+                setting = setting.copy(naturalScheduling = true),
+                snapshot = CompanionSnapshot.empty("assistant-a"),
+                minutesSinceLastChat = 600,
+                nowMillis = 1_700_000_000_000L,
+                interactionProfile = AssistantInteractionProfile(
+                    initiative = "绝不主动联系，除非用户明确交代了到期责任。",
+                ),
+            ),
+        )
+
+        assertTrue(plan.delayMinutes in 360..720)
+        assertTrue(plan.reason.contains("initiative=NEVER"))
     }
 }
