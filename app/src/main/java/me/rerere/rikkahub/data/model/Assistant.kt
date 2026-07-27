@@ -72,12 +72,45 @@ data class AssistantInteractionProfile(
     val passivity: String = "",
 )
 
+enum class AssistantInitiativeLevel {
+    UNSPECIFIED,
+    NEVER,
+    LOW,
+    NORMAL,
+    HIGH,
+}
+
 fun AssistantInteractionProfile.isBlank(): Boolean =
     initiative.isBlank() &&
         sharingDesire.isBlank() &&
         responsibility.isBlank() &&
         followUpStyle.isBlank() &&
         passivity.isBlank()
+
+/** Converts editable prose into a scheduling band without replacing the prose itself. */
+fun AssistantInteractionProfile.initiativeLevel(): AssistantInitiativeLevel {
+    val text = listOf(initiative, sharingDesire, responsibility, followUpStyle, passivity)
+        .joinToString("\n")
+        .lowercase()
+    if (text.isBlank()) return AssistantInitiativeLevel.UNSPECIFIED
+    if (text.hasAnyInteractionMarker(
+            "绝不主动", "从不主动", "不会主动联系", "不主动找", "只等用户", "等待用户先开口",
+            "用户先开口才", "never initiate", "never reach out", "will not initiate",
+        )
+    ) return AssistantInitiativeLevel.NEVER
+    if (text.hasAnyInteractionMarker(
+            "很少主动", "极少主动", "偶尔才主动", "不轻易主动", "通常不主动", "克制地主动",
+            "rarely initiates", "seldom initiates", "low initiative",
+        )
+    ) return AssistantInitiativeLevel.LOW
+    if (text.hasAnyInteractionMarker(
+            "经常主动", "会主动联系", "主动关心", "主动询问", "主动确认", "频繁联系", "分享欲强",
+            "主动分享", "及时跟进", "会继续追问", "积极照看", "主动监督", "high initiative",
+            "often initiates", "frequently reaches out",
+        )
+    ) return AssistantInitiativeLevel.HIGH
+    return AssistantInitiativeLevel.NORMAL
+}
 
 fun AssistantInteractionProfile.toPromptContext(): String {
     if (isBlank()) return ""
@@ -92,6 +125,9 @@ fun AssistantInteractionProfile.toPromptContext(): String {
         append("</interaction_profile>")
     }
 }
+
+private fun String.hasAnyInteractionMarker(vararg markers: String): Boolean =
+    markers.any { marker -> marker.lowercase() in this }
 
 @Serializable
 data class QuickMessage(
@@ -199,7 +235,7 @@ sealed class PromptInjection {
     ) : PromptInjection()
 
     /**
-     * 正则注入 - 基于内容匹配触发（世界书）
+     * 正则注入 - 基于内容匹配触发（Lorebook）
      */
     @Serializable
     @SerialName("regex")
