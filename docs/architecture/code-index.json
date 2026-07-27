@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:31:01.063660+00:00",
-  "commit": "e356503f6dba92c6dfd4b5911f885ef497f986d9",
+  "generatedAt": "2026-07-27T05:31:21.394255+00:00",
+  "commit": "8a7f6723db2c6e73303b7d9ae49324de2a07f7d5",
   "branch": "master",
-  "sourceFingerprint": "a4f451a775827f8c1340c7375fc36e1d70fe0ac533fa1b7169456a020eebc122",
+  "sourceFingerprint": "4ba23ac23125c7e98fbcfd0b5487c4088ffff6cb8820e118b6f738647deb0101",
   "summary": {
-    "files": 1132,
-    "lines": 266237,
-    "symbols": 5550,
+    "files": 1133,
+    "lines": 266287,
+    "symbols": 5551,
     "productionCodeFiles": 799,
-    "testFiles": 140,
+    "testFiles": 141,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 671,
+      "app": 672,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 739,
+      ".kt": 740,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -68,7 +68,7 @@
       "界面": 293,
       "记忆": 44
     },
-    "resolvedImportEdges": 1971
+    "resolvedImportEdges": 1974
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -926,7 +926,7 @@
         "lines": 296,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 53,
+        "importedByCount": 54,
         "todoMarkers": 0
       },
       {
@@ -958,7 +958,7 @@
         "lines": 529,
         "symbols": 39,
         "localImportCount": 0,
-        "importedByCount": 36,
+        "importedByCount": 37,
         "todoMarkers": 0
       },
       {
@@ -1114,20 +1114,20 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
+        "lines": 321,
+        "symbols": 13,
+        "localImportCount": 0,
+        "importedByCount": 13,
+        "todoMarkers": 1
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
         "lines": 138,
         "symbols": 8,
         "localImportCount": 3,
         "importedByCount": 13,
         "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
-        "lines": 321,
-        "symbols": 13,
-        "localImportCount": 0,
-        "importedByCount": 12,
-        "todoMarkers": 1
       }
     ]
   },
@@ -2575,6 +2575,11 @@
       "imports": 4
     },
     {
+      "from": "me.rerere.rikkahub.service",
+      "to": "me.rerere.rikkahub.data.model.AssistantInteractionProfile",
+      "imports": 4
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.ai",
       "to": "me.rerere.rikkahub.Screen",
       "imports": 4
@@ -2917,11 +2922,6 @@
     {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.companion.CompanionActionType",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.companion.CompanionCommitment",
       "imports": 3
     }
   ],
@@ -13404,6 +13404,7 @@
         "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveMessageAssemblyTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveMessageContextTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveMessageWorkerTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/service/AssistantInteractionIntentCadenceTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/chat/LuluStatusDialogTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/cihai/CompanionConcernCardsTest.kt",
@@ -13502,6 +13503,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/CompanionWakeGoalTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/service/AssistantInteractionIntentCadenceTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/ProactiveToolPlannerTest.kt"
       ]
@@ -18567,6 +18569,7 @@
         "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlannerTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/service/AssistantInteractionIntentCadenceTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionGenerationTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt"
@@ -48756,6 +48759,38 @@
       "isProductionCode": false,
       "localImports": [],
       "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/test/java/me/rerere/rikkahub/service/AssistantInteractionIntentCadenceTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 50,
+      "sha256": "b442c7850acc799542797bb0a3acae1d91c1b8468a04034e7235bfffb2ae7400",
+      "package": "me.rerere.rikkahub.service",
+      "categories": [],
+      "symbols": [
+        {
+          "name": "AssistantInteractionIntentCadenceTest",
+          "kind": "class",
+          "line": 12
+        }
+      ],
+      "localImportCount": 4,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [
+        "me.rerere.rikkahub.data.companion.CompanionPerceptionAssembler",
+        "me.rerere.rikkahub.data.companion.CompanionPerceptionInput",
+        "me.rerere.rikkahub.data.companion.CompanionSnapshot",
+        "me.rerere.rikkahub.data.model.AssistantInteractionProfile"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt"
+      ],
       "importedBy": []
     },
     {
@@ -83198,6 +83233,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/RikkaHubApp.kt",
         "kind": "function",
         "line": 201
+      }
+    ],
+    "me.rerere.rikkahub.service.AssistantInteractionIntentCadenceTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/service/AssistantInteractionIntentCadenceTest.kt",
+        "kind": "class",
+        "line": 12
       }
     ],
     "me.rerere.rikkahub.service.ChatError": [
