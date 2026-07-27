@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T07:07:09.887610+00:00",
-  "commit": "322a76d1eeb97d31497016578f37d3c9236dac7b",
+  "generatedAt": "2026-07-27T07:10:00.088210+00:00",
+  "commit": "7977845f765db24aea8fbb4f004a0728c6cdc956",
   "branch": "master",
-  "sourceFingerprint": "50ed9336206f5b58dc1252a01374f55d706e9dbfe97e5e89fd0d77cf87380604",
+  "sourceFingerprint": "cbffecb9557503ef213755a5fb42add0d808a49c9abc1599fa1ca082ff0047c6",
   "summary": {
-    "files": 1138,
-    "lines": 266955,
-    "symbols": 5577,
+    "files": 1140,
+    "lines": 267025,
+    "symbols": 5579,
     "productionCodeFiles": 802,
-    "testFiles": 143,
+    "testFiles": 145,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 677,
+      "app": 679,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 745,
+      ".kt": 747,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 26,
+      "学习监督": 28,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
@@ -1385,7 +1385,9 @@
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyPlanCatalogOverlayTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyRulesTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyStorePersistenceTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicyTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/SummerCourseMilestonePlanTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlanTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlowTest.kt"
     ],
     "工具": [
@@ -48895,6 +48897,31 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicyTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 26,
+      "sha256": "8827fd345e41484a5e464e8b444b5445cac5529b3d5e3854f16e055403cc79e7",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "StudyVocabularyPolicyTest",
+          "kind": "class",
+          "line": 8
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/study/SummerCourseMilestonePlanTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -48909,6 +48936,31 @@
           "name": "SummerCourseMilestonePlanTest",
           "kind": "class",
           "line": 9
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlanTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 44,
+      "sha256": "b304db449b0efe5a0fcc7478908d9751d23697cc6cafe2cf859a4d3a55bf423b",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "ThreeRoundRecitationPlanTest",
+          "kind": "class",
+          "line": 6
         }
       ],
       "localImportCount": 0,
@@ -79744,6 +79796,13 @@
         "line": 10
       }
     ],
+    "me.rerere.rikkahub.data.study.StudyVocabularyPolicyTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicyTest.kt",
+        "kind": "class",
+        "line": 8
+      }
+    ],
     "me.rerere.rikkahub.data.study.StudyWallet": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
@@ -79777,6 +79836,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
         "kind": "object",
         "line": 12
+      }
+    ],
+    "me.rerere.rikkahub.data.study.ThreeRoundRecitationPlanTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlanTest.kt",
+        "kind": "class",
+        "line": 6
       }
     ],
     "me.rerere.rikkahub.data.study.WeeklyMilestone": [
