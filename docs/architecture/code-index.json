@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:12:45.063750+00:00",
-  "commit": "79a2db8d62cc039c42e0278fdc145a1f4dec3ef3",
+  "generatedAt": "2026-07-27T05:14:18.387606+00:00",
+  "commit": "d2862c20b39a204af5f350a65e6def6dfaa79225",
   "branch": "master",
-  "sourceFingerprint": "417ec2c3f83c4a3968a779f3e3e6d73f007ee1b0bcf70c390e22be3f2a64cdba",
+  "sourceFingerprint": "d988fa4943055fb229842e19f9b8ee125085868a2ec91a9927db48087ab0a668",
   "summary": {
     "files": 1130,
-    "lines": 266005,
+    "lines": 266078,
     "symbols": 5548,
     "productionCodeFiles": 799,
     "testFiles": 138,
@@ -68,7 +68,7 @@
       "界面": 292,
       "记忆": 44
     },
-    "resolvedImportEdges": 1968
+    "resolvedImportEdges": 1969
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -922,19 +922,19 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "lines": 331,
+        "symbols": 19,
+        "localImportCount": 8,
+        "importedByCount": 51,
+        "todoMarkers": 0
+      },
+      {
         "path": "ai/src/main/java/me/rerere/ai/core/Tool.kt",
         "lines": 29,
         "symbols": 3,
         "localImportCount": 3,
         "importedByCount": 51,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
-        "lines": 331,
-        "symbols": 19,
-        "localImportCount": 8,
-        "importedByCount": 50,
         "todoMarkers": 0
       },
       {
@@ -18564,6 +18564,7 @@
         "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlannerTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt"
       ]
     },
@@ -48767,23 +48768,23 @@
       "path": "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 304,
-      "sha256": "6de517da2ba561c2f0fac2f1d135399b73e7fe271548e474b90a15dd665199d3",
+      "lines": 377,
+      "sha256": "0a8712860f94bc488eb7d638908b7e69cf80c1336e55834493e913d911695fde",
       "package": "me.rerere.rikkahub.service",
       "categories": [],
       "symbols": [
         {
           "name": "CompanionIntentPlannerTest",
           "kind": "class",
-          "line": 18
+          "line": 19
         },
         {
           "name": "perception",
           "kind": "function",
-          "line": 289
+          "line": 362
         }
       ],
-      "localImportCount": 10,
+      "localImportCount": 11,
       "todoMarkers": 0,
       "isTest": true,
       "isProductionCode": false,
@@ -48797,11 +48798,13 @@
         "me.rerere.rikkahub.data.companion.CompanionRelationshipState",
         "me.rerere.rikkahub.data.companion.CompanionSnapshot",
         "me.rerere.rikkahub.data.companion.CompanionState",
-        "me.rerere.rikkahub.data.companion.CompanionTurnRole"
+        "me.rerere.rikkahub.data.companion.CompanionTurnRole",
+        "me.rerere.rikkahub.data.model.AssistantInteractionProfile"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt"
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt"
       ],
       "importedBy": []
     },
@@ -83259,7 +83262,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
         "kind": "class",
-        "line": 18
+        "line": 19
       }
     ],
     "me.rerere.rikkahub.service.CompanionPassivePerceptionTest": [
@@ -84427,7 +84430,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
         "kind": "function",
-        "line": 289
+        "line": 362
       }
     ],
     "me.rerere.rikkahub.service.periodLabel": [
