@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -67,11 +68,15 @@ class ChatVM(
     // 聊天输入状态 - 保存在 ViewModel 中避免 TransactionTooLargeException
     val inputState = ChatInputState()
 
-    // 异步任务 (从ChatService获取，响应式)
-    val conversationJob: StateFlow<Job?> =
-        chatService
-            .getGenerationJobStateFlow(_conversationId)
-            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    private val _initializationJob = MutableStateFlow<Job?>(null)
+
+    // 初始化期间沿用现有 loading 通道禁用输入；加载完成后再切回模型生成任务。
+    val conversationJob: StateFlow<Job?> = combine(
+        chatService.getGenerationJobStateFlow(_conversationId),
+        _initializationJob,
+    ) { generationJob, initializationJob ->
+        initializationJob?.takeIf { it.isActive } ?: generationJob
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val processingStatus: StateFlow<String?> =
         chatService
@@ -92,9 +97,14 @@ class ChatVM(
         // 初始化必须成为所有会修改对话的操作之前的屏障。否则旧会话仍在从数据库
         // 加载时，发送动作会基于空 Conversation.ofId 保存，直接覆盖完整历史。
         initialization = viewModelScope.async {
-            chatService.initializeConversation(_conversationId)
-            _conversationReady.value = true
+            try {
+                chatService.initializeConversation(_conversationId)
+                _conversationReady.value = true
+            } finally {
+                _initializationJob.value = null
+            }
         }
+        _initializationJob.value = initialization
 
         context.writeStringPreference("lastConversationId", _conversationId.toString())
     }
