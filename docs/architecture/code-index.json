@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:08:48.944922+00:00",
-  "commit": "248f035bd2df839cf653a9624e2151f97938d836",
+  "generatedAt": "2026-07-27T05:10:20.398131+00:00",
+  "commit": "761ab1b6c6318c37131055cf525f72de2913bf72",
   "branch": "master",
-  "sourceFingerprint": "0481ddee251fc53386eb1a52048129b3e0e9f553b992f536c2ce96aea2817d4f",
+  "sourceFingerprint": "1a10350179b8050e28f7ea085d0481db8fce3ef20f70c3f698cd636aa0733f64",
   "summary": {
     "files": 1130,
-    "lines": 265940,
+    "lines": 265934,
     "symbols": 5548,
     "productionCodeFiles": 799,
     "testFiles": 138,
@@ -34421,8 +34421,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 361,
-      "sha256": "e56e0dcd558453ec6979e6e1ced6080c9cc1680ac3e9eec8b8c0df3e1895bbff",
+      "lines": 355,
+      "sha256": "85ed03200d39d810ffca26be32310a0665666238fdfdac00d8ceeba6e4096be5",
       "package": "me.rerere.rikkahub.ui.pages.assistant.detail",
       "categories": [
         "界面"
@@ -34446,102 +34446,102 @@
         {
           "name": "update",
           "kind": "function",
-          "line": 162
+          "line": 157
         },
         {
           "name": "generateInteractionProfile",
           "kind": "function",
-          "line": 181
+          "line": 176
         },
         {
           "name": "clearAssistantHistory",
           "kind": "function",
-          "line": 232
+          "line": 227
         },
         {
           "name": "setFaceReferenceImage",
           "kind": "function",
-          "line": 245
+          "line": 240
         },
         {
           "name": "checkAvatarDelete",
           "kind": "function",
-          "line": 253
+          "line": 248
         },
         {
           "name": "checkBackgroundDelete",
           "kind": "function",
-          "line": 259
+          "line": 254
         },
         {
           "name": "checkFaceReferenceDelete",
           "kind": "function",
-          "line": 275
+          "line": 270
         },
         {
           "name": "buildInteractionProfilePrompt",
           "kind": "function",
-          "line": 296
+          "line": 291
         },
         {
           "name": "parseAssistantInteractionProfile",
           "kind": "function",
-          "line": 321
+          "line": 316
         },
         {
           "name": "required",
           "kind": "function",
-          "line": 333
+          "line": 327
         },
         {
           "name": "HistoryClearState",
           "kind": "interface",
-          "line": 349
+          "line": 343
         },
         {
           "name": "Idle",
           "kind": "object",
-          "line": 350
+          "line": 344
         },
         {
           "name": "Running",
           "kind": "object",
-          "line": 351
+          "line": 345
         },
         {
           "name": "Success",
           "kind": "object",
-          "line": 352
+          "line": 346
         },
         {
           "name": "Failed",
           "kind": "class",
-          "line": 353
+          "line": 347
         },
         {
           "name": "InteractionGenerationState",
           "kind": "interface",
-          "line": 356
+          "line": 350
         },
         {
           "name": "Idle",
           "kind": "object",
-          "line": 357
+          "line": 351
         },
         {
           "name": "Running",
           "kind": "object",
-          "line": 358
+          "line": 352
         },
         {
           "name": "Success",
           "kind": "object",
-          "line": 359
+          "line": 353
         },
         {
           "name": "Failed",
           "kind": "class",
-          "line": 360
+          "line": 354
         }
       ],
       "localImportCount": 20,
@@ -88525,31 +88525,31 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "class",
-        "line": 353
+        "line": 347
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "class",
-        "line": 360
+        "line": 354
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.HistoryClearState": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "interface",
-        "line": 349
+        "line": 343
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.Idle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 350
+        "line": 344
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 357
+        "line": 351
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.InteractionField": [
@@ -88563,19 +88563,19 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "interface",
-        "line": 356
+        "line": 350
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.Running": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 351
+        "line": 345
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 358
+        "line": 352
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.SillyTavernImporter": [
@@ -88589,12 +88589,12 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 352
+        "line": 346
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "object",
-        "line": 359
+        "line": 353
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.TavernCardParser": [
@@ -88608,28 +88608,28 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 296
+        "line": 291
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.checkAvatarDelete": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 253
+        "line": 248
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.checkBackgroundDelete": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 259
+        "line": 254
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.checkFaceReferenceDelete": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 275
+        "line": 270
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.cleanupUnusedTags": [
@@ -88643,14 +88643,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 232
+        "line": 227
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.generateInteractionProfile": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 181
+        "line": 176
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.importAssistantFromUri": [
@@ -88695,21 +88695,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 321
+        "line": 316
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.required": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 333
+        "line": 327
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.setFaceReferenceImage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 245
+        "line": 240
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.toggleLocalTool": [
@@ -88723,7 +88723,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "kind": "function",
-        "line": 162
+        "line": 157
       }
     ],
     "me.rerere.rikkahub.ui.pages.assistant.detail.updateCallSetting": [
