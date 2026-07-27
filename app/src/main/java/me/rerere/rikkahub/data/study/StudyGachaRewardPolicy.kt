@@ -24,7 +24,6 @@ object StudyGachaRewardPolicy {
 
     private const val GAME_ROUND_KEY = "reward:game-round-ticket"
     private const val ACCESSORY_KEY = "reward:accessory-unlock-card"
-    private const val FOUR_HOUR_BONUS_PREFIX = "system:four-hour-douyin:"
 
     data class RebalancedDraw(
         val state: StudyState,
@@ -80,13 +79,12 @@ object StudyGachaRewardPolicy {
         after: StudyState,
     ): StudyBonusResult {
         val date = after.today.ifBlank { return StudyBonusResult(after, false) }
-        val marker = "$FOUR_HOUR_BONUS_PREFIX$date"
         val beforeMinutes = before.dailyStudyRecords[date]?.studyMinutes ?: 0
         val afterMinutes = after.dailyStudyRecords[date]?.studyMinutes ?: 0
         if (
             beforeMinutes >= FOUR_HOUR_STUDY_MINUTES ||
             afterMinutes < FOUR_HOUR_STUDY_MINUTES ||
-            marker in after.inventory.rareFragments
+            date in after.fourHourDouyinRewardDates
         ) {
             return StudyBonusResult(after, false)
         }
@@ -94,26 +92,22 @@ object StudyGachaRewardPolicy {
             state = after.copy(
                 inventory = after.inventory.copy(
                     douyinFragments = after.inventory.douyinFragments + FOUR_HOUR_DOUYIN_TICKETS,
-                    rareFragments = after.inventory.rareFragments + (marker to 1),
                 ),
+                fourHourDouyinRewardDates = after.fourHourDouyinRewardDates + date,
             ),
             granted = true,
         )
     }
 
-    fun gameRoundTicketCount(state: StudyState): Int =
-        state.inventory.rareFragments[GAME_ROUND_KEY] ?: 0
+    fun gameRoundTicketCount(state: StudyState): Int = state.inventory.gameRoundTickets
 
-    fun accessoryCardCount(state: StudyState): Int =
-        state.inventory.rareFragments[ACCESSORY_KEY] ?: 0
+    fun accessoryCardCount(state: StudyState): Int = state.inventory.accessoryUnlockCards
 
     fun consumeGameRoundTicket(state: StudyState): StudyState? {
         val count = gameRoundTicketCount(state)
         if (count <= 0) return null
         return state.copy(
-            inventory = state.inventory.copy(
-                rareFragments = state.inventory.rareFragments.withCount(GAME_ROUND_KEY, count - 1),
-            ),
+            inventory = state.inventory.copy(gameRoundTickets = count - 1),
         )
     }
 
@@ -121,9 +115,7 @@ object StudyGachaRewardPolicy {
         val count = accessoryCardCount(state)
         if (count <= 0) return null
         return state.copy(
-            inventory = state.inventory.copy(
-                rareFragments = state.inventory.rareFragments.withCount(ACCESSORY_KEY, count - 1),
-            ),
+            inventory = state.inventory.copy(accessoryUnlockCards = count - 1),
         )
     }
 
@@ -183,12 +175,8 @@ object StudyGachaRewardPolicy {
     }
 
     private fun StudyInventory.addRequestedSpecial(result: StudyDrawResult): StudyInventory = when {
-        result.fragmentKey == GAME_ROUND_KEY -> copy(
-            rareFragments = rareFragments.withCount(GAME_ROUND_KEY, (rareFragments[GAME_ROUND_KEY] ?: 0) + 1),
-        )
-        result.fragmentKey == ACCESSORY_KEY -> copy(
-            rareFragments = rareFragments.withCount(ACCESSORY_KEY, (rareFragments[ACCESSORY_KEY] ?: 0) + 1),
-        )
+        result.fragmentKey == GAME_ROUND_KEY -> copy(gameRoundTickets = gameRoundTickets + 1)
+        result.fragmentKey == ACCESSORY_KEY -> copy(accessoryUnlockCards = accessoryUnlockCards + 1)
         result.fragmentType == StudyFragmentType.Douyin -> copy(douyinFragments = douyinFragments + 1)
         result.fragmentType == StudyFragmentType.Theater -> copy(theaterFragments = theaterFragments + 1)
         result.fragmentType == StudyFragmentType.Game -> copy(gameFragments = gameFragments + 1)
@@ -196,7 +184,4 @@ object StudyGachaRewardPolicy {
         result.fragmentType == StudyFragmentType.Anime -> copy(animeFragments = animeFragments + 1)
         else -> this
     }
-
-    private fun Map<String, Int>.withCount(key: String, count: Int): Map<String, Int> =
-        if (count <= 0) this - key else this + (key to count)
 }
