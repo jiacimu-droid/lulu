@@ -30,7 +30,7 @@ class StudyGachaRewardPolicyTest {
     }
 
     @Test
-    fun `gold result can become an accessory unlock card`() {
+    fun `gold result can remain a video unlock card`() {
         val afterLegacy = StudyState(
             inventory = StudyInventory(videoFragments = 1),
         )
@@ -47,9 +47,9 @@ class StudyGachaRewardPolicyTest {
             random = FixedDoubleRandom(0.99),
         )
 
-        assertEquals("饰品解锁卡", result.results.single().title)
-        assertEquals(1, StudyGachaRewardPolicy.accessoryCardCount(result.state))
-        assertEquals(0, result.state.inventory.videoFragments)
+        assertEquals("视频解锁卡", result.results.single().title)
+        assertEquals(1, result.state.inventory.videoFragments)
+        assertEquals(0, result.state.inventory.accessoryUnlockCards)
     }
 
     @Test
@@ -73,7 +73,7 @@ class StudyGachaRewardPolicyTest {
             StudyGachaRewardPolicy.DOUYIN_RATE +
             StudyGachaRewardPolicy.THEATER_RATE +
             StudyGachaRewardPolicy.GAME_UNLIMITED_RATE +
-            StudyGachaRewardPolicy.ACCESSORY_RATE +
+            StudyGachaRewardPolicy.VIDEO_RATE +
             StudyGachaRewardPolicy.ANIME_RATE
 
         assertEquals(0.062, specialRate, 0.0000001)
