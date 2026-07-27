@@ -20,7 +20,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -43,33 +42,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.Delete01
 import me.rerere.rikkahub.data.cihai.CihaiEntry
 import me.rerere.rikkahub.data.cihai.CihaiEntryKind
 import me.rerere.rikkahub.data.cihai.CihaiStore
-import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import me.rerere.rikkahub.data.companion.CompanionAlwaysOnAnchor
 import me.rerere.rikkahub.data.companion.CompanionAlwaysOnAnchorKind
 import me.rerere.rikkahub.data.companion.CompanionAlwaysOnAnchorStatus
 import me.rerere.rikkahub.data.companion.CompanionCommitment
 import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
-import me.rerere.rikkahub.data.companion.CompanionFavorite
 import me.rerere.rikkahub.data.companion.CompanionLifeEvent
 import me.rerere.rikkahub.data.companion.CompanionLifeEventStatus
-import me.rerere.rikkahub.data.companion.CompanionPrivateImpression
-import me.rerere.rikkahub.data.companion.CompanionRelationshipEvent
-import me.rerere.rikkahub.data.companion.CompanionRelationshipState
-import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.companion.CompanionRuntime
+import me.rerere.rikkahub.data.companion.CompanionSnapshot
+import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.companion.isMeaningfulDigitalLifeEvidence
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
-import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.service.MemoryBankService
+import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.service.syncCompanionPrivateImpression
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
-import me.rerere.hugeicons.HugeIcons
-import me.rerere.hugeicons.stroke.Delete01
 import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -101,20 +96,15 @@ fun CihaiPage(onBack: () -> Unit) {
     val meaningfulLifeEvents = selectedSnapshot.lifeEvents
         .filter { it.isMeaningfulDigitalLifeEvidence() }
         .sortedByDescending { it.endedAt ?: it.startedAt }
-    val deliberateFavorites = selectedSnapshot.favorites.sortedByDescending { it.createdAt }
-    val recentActivityEvents = selectedSnapshot.lifeEvents
-        .filter { event ->
-            event.status != CompanionLifeEventStatus.CANCELLED &&
-                event.type != me.rerere.rikkahub.data.companion.CompanionLifeEventType.CONVERSATION
-        }
-        .sortedByDescending { it.endedAt ?: it.startedAt }
-        .take(30)
     val activeResponsibilityAnchors = selectedSnapshot.alwaysOnAnchors
         .filter { anchor ->
             anchor.status == CompanionAlwaysOnAnchorStatus.ACTIVE &&
                 (anchor.expiresAt == null || anchor.expiresAt > System.currentTimeMillis())
         }
-        .sortedWith(compareByDescending<CompanionAlwaysOnAnchor> { it.importance }.thenByDescending { it.updatedAt })
+        .sortedWith(
+            compareByDescending<CompanionAlwaysOnAnchor> { it.importance }
+                .thenByDescending { it.updatedAt },
+        )
     val activeCommitments = selectedSnapshot.commitments
         .filter { commitment ->
             commitment.status !in setOf(
@@ -172,7 +162,7 @@ fun CihaiPage(onBack: () -> Unit) {
                 )
             }
             Text(
-                text = "挂心、责任、关系与真实生活，都各自留在这里。",
+                text = "挂心、约定、日记与真实生活，都各自留在这里。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -192,9 +182,12 @@ fun CihaiPage(onBack: () -> Unit) {
                         modifier = Modifier.size(48.dp),
                     )
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(selectedAssistant.name.ifBlank { "当前角色" }, fontWeight = FontWeight.SemiBold)
                         Text(
-                            text = "当前查看这个角色的辞海：她在挂心什么、没说出口什么、准备怎样继续感知。",
+                            selectedAssistant.name.ifBlank { "当前角色" },
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = "当前查看这个角色的辞海：她在挂心什么、答应了什么，以及真实留下了哪些生活记录。",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -217,42 +210,19 @@ fun CihaiPage(onBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 when (selectedSection) {
-                    CihaiSection.ACTIVITY -> {
-                        item(key = "activity-intro") {
-                            Text(
-                                text = "这里只记录角色实际完成、正在处理或认真放下的一件事；没有真实动作，就不会编一条动态。",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        if (deliberateFavorites.isNotEmpty()) {
-                            item(key = "favorite-title") {
-                                Text(
-                                    text = "角色自己留下的消息",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                            }
-                            items(deliberateFavorites, key = { "favorite-" + it.id }) { favorite ->
-                                FavoriteCard(
-                                    favorite = favorite,
-                                    onDelete = {
-                                        scope.launch {
-                                            companionStore.deleteFavorite(selectedAssistantId, favorite.id)
-                                        }
-                                    },
-                                )
-                            }
-                        }
-                        if (recentActivityEvents.isEmpty() && deliberateFavorites.isEmpty()) {
-                            item(key = "empty-activity") {
+                    CihaiSection.LIFE -> {
+                        if (meaningfulLifeEvents.isEmpty()) {
+                            item(key = "empty-life") {
                                 EmptyCihaiSection(
-                                    title = "还没有新的角色动态",
-                                    body = "角色完成游戏、设置提醒、整理记忆或写下日记后，会在这里留下时间线。",
+                                    title = "数字生活还没有留下轨迹",
+                                    body = "角色真正完成的游戏、日记、音乐操作、设备提醒、日程写入和记忆整理会留在这里；聊天流水账、读取数据和没有证据的经历不会被写进来。",
                                 )
                             }
                         } else {
-                            items(recentActivityEvents, key = { "activity-${it.id}" }) { event ->
+                            items(
+                                meaningfulLifeEvents,
+                                key = { it.id },
+                            ) { event ->
                                 LifeEventCard(
                                     event = event,
                                     onDelete = {
@@ -264,80 +234,7 @@ fun CihaiPage(onBack: () -> Unit) {
                             }
                         }
                     }
-                    CihaiSection.COMMITMENTS -> {
-                        item(key = "commitment-intro") {
-                            Text(
-                                text = "这是他明确答应过你、仍在记得的事。长期照看和下一次具体行动都会放在这里。",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        if (activeResponsibilityAnchors.isNotEmpty()) {
-                            item(key = "commitment-responsibility-title") {
-                                Text(
-                                    text = "长期记得",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                            }
-                            items(activeResponsibilityAnchors, key = { "commitment-anchor-${it.id}" }) { anchor ->
-                                ResponsibilityAnchorCard(
-                                    anchor = anchor,
-                                    onCancel = {
-                                        scope.launch {
-                                            companionStore.deleteAlwaysOnAnchor(selectedAssistantId, anchor.id)
-                                        }
-                                    },
-                                )
-                            }
-                        }
-                        if (activeCommitments.isNotEmpty()) {
-                            item(key = "commitment-action-title") {
-                                Text(
-                                    text = "正在兑现",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                            }
-                            items(activeCommitments, key = { "commitment-${it.id}" }) { commitment ->
-                                CommitmentCard(
-                                    commitment = commitment,
-                                    onDelete = {
-                                        scope.launch {
-                                            companionStore.deleteCommitment(selectedAssistantId, commitment.id)
-                                        }
-                                    },
-                                )
-                            }
-                        }
-                        if (fulfilledCommitments.isNotEmpty()) {
-                            item(key = "commitment-history-title") {
-                                Text(
-                                    text = "已经做到的记录",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                            }
-                            items(fulfilledCommitments, key = { "fulfilled-commitment-${it.id}" }) { commitment ->
-                                CommitmentCard(
-                                    commitment = commitment,
-                                    onDelete = {
-                                        scope.launch {
-                                            companionStore.deleteCommitment(selectedAssistantId, commitment.id)
-                                        }
-                                    },
-                                )
-                            }
-                        }
-                        if (activeResponsibilityAnchors.isEmpty() && activeCommitments.isEmpty() && fulfilledCommitments.isEmpty()) {
-                            item(key = "empty-commitments") {
-                                EmptyCihaiSection(
-                                    title = "还没有写下的承诺",
-                                    body = "当角色明确答应提醒、陪伴、照看或替你完成一件事后，会在这里留下可见的履约记录。",
-                                )
-                            }
-                        }
-                    }
+
                     CihaiSection.CONCERNS -> {
                         if (concernCards.isEmpty()) {
                             item(key = "empty-concerns") {
@@ -363,99 +260,122 @@ fun CihaiPage(onBack: () -> Unit) {
                                                 assistantId = selectedAssistantId,
                                                 subjectKeys = card.subjectKeys,
                                             )
-                                            ProactiveMessageService.reconcileDurableCommitments(context, settings)
+                                            ProactiveMessageService.reconcileDurableCommitments(
+                                                context,
+                                                settings,
+                                            )
                                         }
                                     },
                                 )
                             }
                         }
                     }
-                    CihaiSection.RESPONSIBILITIES -> {
-                        if (activeResponsibilityAnchors.isEmpty()) {
-                            item(key = "empty-responsibilities") {
-                                EmptyCihaiSection(
-                                    title = "角色现在没有长期责任",
-                                    body = "还没有角色主动承担的长期照看或循环职责。",
-                                )
-                            }
-                        } else {
-                            item(key = "responsibility-title") {
+
+                    CihaiSection.COMMITMENTS -> {
+                        item(key = "commitment-intro") {
+                            Text(
+                                text = "这是他明确答应过你、仍在记得的事。长期照看和下一次具体行动都会放在这里。",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        if (activeResponsibilityAnchors.isNotEmpty()) {
+                            item(key = "commitment-responsibility-title") {
                                 Text(
-                                    text = "角色正在承担",
+                                    text = "长期记得",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                 )
                             }
-                            items(activeResponsibilityAnchors, key = { it.id }) { anchor ->
+                            items(
+                                activeResponsibilityAnchors,
+                                key = { "commitment-anchor-${it.id}" },
+                            ) { anchor ->
                                 ResponsibilityAnchorCard(
                                     anchor = anchor,
                                     onCancel = {
                                         scope.launch {
-                                            companionStore.deleteAlwaysOnAnchor(selectedAssistantId, anchor.id)
+                                            companionStore.deleteAlwaysOnAnchor(
+                                                selectedAssistantId,
+                                                anchor.id,
+                                            )
                                         }
                                     },
                                 )
                             }
                         }
-                    }
-                    CihaiSection.RELATIONSHIP -> {
-                        item(key = "relationship-overview") {
-                            RelationshipOverview(
-                                relationship = selectedSnapshot.relationship,
-                                history = selectedSnapshot.relationshipHistory,
-                                privateImpression = selectedSnapshot.privateImpression,
-                                onDeleteNarrative = {
-                                    scope.launch { companionStore.clearRelationshipNarrative(selectedAssistantId) }
-                                },
-                                onDeletePortrait = {
-                                    scope.launch { companionStore.clearUserPortrait(selectedAssistantId) }
-                                },
-                                onDeleteInteraction = {
-                                    scope.launch { companionStore.clearInteractionUnderstanding(selectedAssistantId) }
-                                },
-                                onDeleteUnresolved = {
-                                    scope.launch { companionStore.clearUnresolvedRelationshipMatters(selectedAssistantId) }
-                                },
-                                onDeleteTimelineEvent = { eventId ->
-                                    scope.launch {
-                                        companionStore.deleteRelationshipEvent(selectedAssistantId, eventId)
-                                    }
-                                },
-                            )
-                        }
-                    }
-                    CihaiSection.LIFE -> {
-                        if (meaningfulLifeEvents.isEmpty()) {
-                            item(key = "empty-life") {
-                                EmptyCihaiSection(
-                                    title = "数字生活还没有留下轨迹",
-                                    body = "角色真正完成的游戏、日记、音乐操作、设备提醒、日程写入和记忆整理会留在这里；聊天流水账、读取数据和没有证据的经历不会被写进来。",
+                        if (activeCommitments.isNotEmpty()) {
+                            item(key = "commitment-action-title") {
+                                Text(
+                                    text = "正在兑现",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
                                 )
                             }
-                        } else {
                             items(
-                                meaningfulLifeEvents,
-                                key = { it.id },
-                            ) { event ->
-                                LifeEventCard(
-                                    event = event,
+                                activeCommitments,
+                                key = { "commitment-${it.id}" },
+                            ) { commitment ->
+                                CommitmentCard(
+                                    commitment = commitment,
                                     onDelete = {
                                         scope.launch {
-                                            companionStore.deleteLifeEvent(selectedAssistantId, event.id)
+                                            companionStore.deleteCommitment(
+                                                selectedAssistantId,
+                                                commitment.id,
+                                            )
                                         }
                                     },
                                 )
                             }
                         }
+                        if (fulfilledCommitments.isNotEmpty()) {
+                            item(key = "commitment-history-title") {
+                                Text(
+                                    text = "已经做到的记录",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            }
+                            items(
+                                fulfilledCommitments,
+                                key = { "fulfilled-commitment-${it.id}" },
+                            ) { commitment ->
+                                CommitmentCard(
+                                    commitment = commitment,
+                                    onDelete = {
+                                        scope.launch {
+                                            companionStore.deleteCommitment(
+                                                selectedAssistantId,
+                                                commitment.id,
+                                            )
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                        if (
+                            activeResponsibilityAnchors.isEmpty() &&
+                            activeCommitments.isEmpty() &&
+                            fulfilledCommitments.isEmpty()
+                        ) {
+                            item(key = "empty-commitments") {
+                                EmptyCihaiSection(
+                                    title = "还没有写下的约定",
+                                    body = "当角色明确答应提醒、陪伴、照看或替你完成一件事后，会在这里留下可见的履约记录。",
+                                )
+                            }
+                        }
                     }
-                    else -> {
+
+                    CihaiSection.DIARY -> {
                         val entries = entriesForCihaiSection(
                             entries = state.entries,
                             selectedAssistantId = selectedAssistantId,
                             section = selectedSection,
                         )
                         if (entries.isEmpty()) {
-                            item(key = "empty-${selectedSection.name}") {
+                            item(key = "empty-diary") {
                                 EmptyCihaiSection(
                                     title = selectedSection.emptyTitle,
                                     body = selectedSection.emptyBody,
@@ -482,17 +402,11 @@ internal enum class CihaiSection(
     val emptyTitle: String,
     val emptyBody: String,
 ) {
-    ACTIVITY(
-        label = "动态",
+    LIFE(
+        label = "生活",
         entryKind = null,
-        emptyTitle = "还没有新的角色动态",
-        emptyBody = "角色真实完成的数字行动、记忆整理、游戏和提醒都会出现在这里。",
-    ),
-    COMMITMENTS(
-        label = "约定",
-        entryKind = null,
-        emptyTitle = "还没有写下的约定",
-        emptyBody = "角色答应持续照看或替你完成的事，会在这里具象化展示。",
+        emptyTitle = "数字生活还没有留下轨迹",
+        emptyBody = "只有角色在 App 内真实完成的行动才会出现在这里。",
     ),
     CONCERNS(
         label = "挂心",
@@ -500,23 +414,11 @@ internal enum class CihaiSection(
         emptyTitle = "现在没有挂心任务",
         emptyBody = "这里以后只放持续照看的事，比如考试、起床、身体状态、DDL 或学习节奏。",
     ),
-    RESPONSIBILITIES(
-        label = "责任",
+    COMMITMENTS(
+        label = "约定",
         entryKind = null,
-        emptyTitle = "角色现在没有长期责任",
-        emptyBody = "还没有角色主动承担的长期照看或循环职责。",
-    ),
-    RELATIONSHIP(
-        label = "关系",
-        entryKind = null,
-        emptyTitle = "关系还在形成",
-        emptyBody = "这里会呈现信任、亲近、履约和边界默契。",
-    ),
-    LIFE(
-        label = "生活",
-        entryKind = null,
-        emptyTitle = "数字生活还没有留下轨迹",
-        emptyBody = "只有角色在 App 内真实完成的行动才会出现在这里。",
+        emptyTitle = "还没有写下的约定",
+        emptyBody = "角色答应持续照看或替你完成的事，会在这里具象化展示。",
     ),
     DIARY(
         label = "日记",
@@ -530,9 +432,19 @@ internal fun visibleCihaiSections(): List<CihaiSection> = listOf(
     CihaiSection.LIFE,
     CihaiSection.CONCERNS,
     CihaiSection.COMMITMENTS,
-    CihaiSection.RELATIONSHIP,
     CihaiSection.DIARY,
 )
+
+internal fun entriesForCihaiSection(
+    entries: List<CihaiEntry>,
+    selectedAssistantId: String,
+    section: CihaiSection,
+): List<CihaiEntry> {
+    val kind = section.entryKind ?: return emptyList()
+    return entries.filter { entry ->
+        entry.assistantId == selectedAssistantId && entry.kind == kind
+    }
+}
 
 @Composable
 private fun CommitmentCard(
@@ -589,7 +501,10 @@ private fun CommitmentCard(
             Text(
                 text = commitment.dueAt.commitmentScheduleText(now),
                 style = MaterialTheme.typography.bodySmall,
-                color = if (commitment.dueAt <= now && commitment.status != CompanionCommitmentStatus.FULFILLED) {
+                color = if (
+                    commitment.dueAt <= now &&
+                    commitment.status != CompanionCommitmentStatus.FULFILLED
+                ) {
                     MaterialTheme.colorScheme.error
                 } else {
                     MaterialTheme.colorScheme.primary
@@ -615,7 +530,11 @@ private fun CommitmentCard(
                 )
             }
             if (commitment.history.isNotEmpty()) {
-                Text("履约记录", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    "履约记录",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
                 commitment.history.takeLast(4).asReversed().forEach { entry ->
                     Text(
                         text = "${formatTime(entry.occurredAt)} · ${entry.toStatus.name} · ${entry.reason}",
@@ -641,7 +560,8 @@ private fun CompanionCommitment.commitmentDisplayRank(): Int = when (status) {
 }
 
 private fun CompanionCommitment.commitmentTitle(): String = when {
-    actionPlan.category.contains("wake", ignoreCase = true) || actionPlan.type.name == "ALARM" -> "起床与睡眠约定"
+    actionPlan.category.contains("wake", ignoreCase = true) ||
+        actionPlan.type.name == "ALARM" -> "起床与睡眠约定"
     actionPlan.category.contains("study", ignoreCase = true) -> "学习约定"
     actionPlan.category.contains("health", ignoreCase = true) -> "健康照看"
     else -> "答应你的事"
@@ -680,7 +600,11 @@ private fun ResponsibilityAnchorCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = if (anchor.kind == CompanionAlwaysOnAnchorKind.HEALTH) "健康照看" else "长期责任",
+                    text = if (anchor.kind == CompanionAlwaysOnAnchorKind.HEALTH) {
+                        "健康照看"
+                    } else {
+                        "长期责任"
+                    },
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -726,19 +650,11 @@ private fun ResponsibilityLine(label: String, values: List<String>) {
     )
 }
 
-internal fun entriesForCihaiSection(
-    entries: List<CihaiEntry>,
-    selectedAssistantId: String,
-    section: CihaiSection,
-): List<CihaiEntry> {
-    val kind = section.entryKind ?: return emptyList()
-    return entries.filter { entry ->
-        entry.assistantId == selectedAssistantId && entry.kind == kind
-    }
-}
-
 @Composable
-private fun ConcernCard(card: CompanionConcernCardModel, onDelete: () -> Unit) {
+private fun ConcernCard(
+    card: CompanionConcernCardModel,
+    onDelete: () -> Unit,
+) {
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
@@ -779,7 +695,11 @@ private fun ConcernCard(card: CompanionConcernCardModel, onDelete: () -> Unit) {
             Text(
                 text = card.nextPerceptionText,
                 style = MaterialTheme.typography.labelMedium,
-                color = if (card.overdue) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                color = if (card.overdue) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
             )
             Text(
                 text = card.eventText,
@@ -799,206 +719,6 @@ private fun ConcernCard(card: CompanionConcernCardModel, onDelete: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun RelationshipOverview(
-    relationship: CompanionRelationshipState,
-    history: List<CompanionRelationshipEvent>,
-    privateImpression: CompanionPrivateImpression,
-    onDeleteNarrative: () -> Unit,
-    onDeletePortrait: () -> Unit,
-    onDeleteInteraction: () -> Unit,
-    onDeleteUnresolved: () -> Unit,
-    onDeleteTimelineEvent: (String) -> Unit,
-) {
-    val timeline = buildCompanionRelationshipTimeline(history, limit = 8)
-    val relationshipTitle = privateImpression.relationshipTitle
-        .ifBlank { relationship.roleLabel }
-        .ifBlank { "还在形成只属于我们的相处方式" }
-    val relationshipNarrative = privateImpression.relationshipNarrative.ifBlank {
-        "我还没有足够证据替我们的关系下定义。等真正重要的袒露、兑现、边界或修复发生后，我会用自己的口吻写下理解。"
-    }
-    val portrait = privateImpression.userPortrait
-        .ifBlank { privateImpression.summary }
-        .ifBlank {
-            (
-                privateImpression.observedTraits.takeLast(2) +
-                    privateImpression.preferences.takeLast(2) +
-                    privateImpression.boundaries.takeLast(1)
-                ).distinct().joinToString("；")
-        }
-        .ifBlank { "我还在认识你，不想拿几句普通聊天草率地定义你。" }
-
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        RelationshipTextCard(
-            eyebrow = "我们现在",
-            heading = relationshipTitle,
-            body = relationshipNarrative,
-            onDelete = onDeleteNarrative.takeIf {
-                privateImpression.relationshipTitle.isNotBlank() ||
-                    privateImpression.relationshipNarrative.isNotBlank()
-            },
-        )
-        val declaredFacts = buildList {
-            relationship.knownDuration.takeIf(String::isNotBlank)?.let { add("认识时长：$it") }
-            relationship.stage.takeIf(String::isNotBlank)?.let { add("当前阶段：$it") }
-            relationship.sharedExperiences.takeIf(List<String>::isNotEmpty)
-                ?.let { add("共同经历：${it.joinToString("；")}") }
-            relationship.securityContext.takeIf(String::isNotBlank)?.let { add("安全感：$it") }
-            relationship.attachmentExpression.takeIf(String::isNotBlank)?.let { add("依恋表达：$it") }
-        }
-        if (declaredFacts.isNotEmpty()) {
-            RelationshipTextCard("角色卡中的关系事实", declaredFacts.joinToString("\n"))
-        }
-        val interactionFacts = buildList {
-            relationship.interactionPatterns.takeIf(List<String>::isNotEmpty)
-                ?.let { add("互动习惯：${it.joinToString("；")}") }
-            relationship.declaredBoundaries.takeIf(List<String>::isNotEmpty)
-                ?.let { add("边界：${it.joinToString("；")}") }
-            relationship.potentialTensions.takeIf(List<String>::isNotEmpty)
-                ?.let { add("潜在矛盾：${it.joinToString("；")}") }
-            relationship.lastChangeReason.takeIf(String::isNotBlank)
-                ?.let { add("最近变化：$it（置信度 ${relationship.lastChangeConfidence}）") }
-        }
-        if (interactionFacts.isNotEmpty()) {
-            RelationshipTextCard("相处依据", interactionFacts.joinToString("\n"))
-        }
-        RelationshipTextCard(
-            eyebrow = "我眼中的你",
-            body = portrait,
-            onDelete = onDeletePortrait.takeIf {
-                privateImpression.userPortrait.isNotBlank() ||
-                    privateImpression.summary.isNotBlank() ||
-                    privateImpression.observedTraits.isNotEmpty() ||
-                    privateImpression.preferences.isNotEmpty() ||
-                    privateImpression.boundaries.isNotEmpty()
-            },
-        )
-        privateImpression.interactionUnderstanding.takeIf(String::isNotBlank)?.let { understanding ->
-            RelationshipTextCard(
-                eyebrow = "我学会怎样和你相处",
-                body = understanding,
-                onDelete = onDeleteInteraction,
-            )
-        }
-
-        Text(
-            text = "我们之间的重要片段",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 4.dp),
-        )
-        if (timeline.isEmpty()) {
-            Text(
-                text = "还没有真正改变我们关系的片段。普通寒暄和聊天次数不会被拿来假装关系升级。",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        } else {
-            timeline.forEach { item ->
-                RelationshipTimelineEntry(
-                    item = item,
-                    onDelete = { onDeleteTimelineEvent(item.id) },
-                )
-            }
-        }
-
-        privateImpression.unresolvedMatters.takeIf(List<String>::isNotEmpty)?.let { matters ->
-            RelationshipTextCard(
-                eyebrow = "还没有说开的事",
-                body = matters.takeLast(3).joinToString("；"),
-                onDelete = onDeleteUnresolved,
-                warning = true,
-            )
-        }
-    }
-}
-
-@Composable
-private fun RelationshipTextCard(
-    eyebrow: String,
-    body: String,
-    heading: String = "",
-    onDelete: (() -> Unit)? = null,
-    warning: Boolean = false,
-) {
-    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = eyebrow,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = if (warning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f),
-                )
-                onDelete?.let { delete ->
-                    IconButton(onClick = delete) {
-                        Icon(
-                            imageVector = HugeIcons.Delete01,
-                            contentDescription = "删除$eyebrow",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
-            heading.takeIf(String::isNotBlank)?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }
-}
-
-@Composable
-private fun FavoriteCard(
-    favorite: CompanionFavorite,
-    onDelete: () -> Unit,
-) {
-    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "收藏的消息",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f),
-                )
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = HugeIcons.Delete01,
-                        contentDescription = "删除这条收藏",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            Text("为什么留下：${favorite.reason}", style = MaterialTheme.typography.bodyMedium)
-            Text(
-                text = "当时的感受：${favorite.feeling}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = "消息 ID：${favorite.messageId} · ${formatTime(favorite.createdAt)}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
@@ -1025,15 +745,25 @@ private fun LifeEventCard(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 Text(
                     text = event.title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f),
                 )
-                Surface(shape = RoundedCornerShape(999.dp), color = statusColor) {
-                    Text(statusText, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                Surface(
+                    shape = RoundedCornerShape(999.dp),
+                    color = statusColor,
+                ) {
+                    Text(
+                        statusText,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
                 }
                 IconButton(onClick = onDelete) {
                     Icon(
@@ -1044,7 +774,11 @@ private fun LifeEventCard(
                 }
             }
             event.summary.takeIf(String::isNotBlank)?.let { summary ->
-                Text(summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    summary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -1063,71 +797,27 @@ private fun LifeEventCard(
     }
 }
 
-private fun me.rerere.rikkahub.data.companion.CompanionLifeEventType.lifeEventLabel(): String = when (this) {
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.CONVERSATION -> "对话"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.PROACTIVE_MESSAGE -> "主动联系"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.TOOL_ACTION -> "数字行动"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.MEMORY_REVIEW -> "记忆"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.STUDY_REVIEW -> "学习计划"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.JOURNAL -> "日记"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.MUSIC -> "音乐"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.GAME -> "游戏"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.REFLECTION -> "整理想法"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.UNSENT_NOTE -> "未发送便签"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.FAVORITE_ORGANIZATION -> "整理收藏"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.EXPERIENCE_REVIEW -> "回顾经历"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.CONCERN_ORGANIZATION -> "整理关注"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.REPLAY_REVIEW -> "观看回放"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.SHARED_PLAN -> "共同计划"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.COMMITMENT_REVIEW -> "承诺复盘"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.STATE_REVIEW -> "状态整理"
-    me.rerere.rikkahub.data.companion.CompanionLifeEventType.WAITING -> "自主等待"
-}
-
-@Composable
-private fun RelationshipTimelineEntry(
-    item: CompanionRelationshipTimelineItem,
-    onDelete: () -> Unit,
-) {
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(
-                    text = formatTime(item.createdAt),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = HugeIcons.Delete01,
-                        contentDescription = "删除这段关系记录",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            item.detail?.let { detail ->
-                Text(
-                    text = detail,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
+private fun me.rerere.rikkahub.data.companion.CompanionLifeEventType.lifeEventLabel(): String =
+    when (this) {
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.CONVERSATION -> "对话"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.PROACTIVE_MESSAGE -> "主动联系"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.TOOL_ACTION -> "数字行动"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.MEMORY_REVIEW -> "记忆"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.STUDY_REVIEW -> "学习计划"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.JOURNAL -> "日记"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.MUSIC -> "音乐"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.GAME -> "游戏"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.REFLECTION -> "整理想法"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.UNSENT_NOTE -> "未发送便签"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.FAVORITE_ORGANIZATION -> "整理收藏"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.EXPERIENCE_REVIEW -> "回顾经历"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.CONCERN_ORGANIZATION -> "整理关注"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.REPLAY_REVIEW -> "观看回放"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.SHARED_PLAN -> "共同计划"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.COMMITMENT_REVIEW -> "承诺复盘"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.STATE_REVIEW -> "状态整理"
+        me.rerere.rikkahub.data.companion.CompanionLifeEventType.WAITING -> "自主等待"
     }
-}
 
 @Composable
 private fun EmptyCihaiSection(
@@ -1168,14 +858,23 @@ private fun AssistantSelector(
             FilterChip(
                 selected = assistant.id.toString() == selectedAssistantId,
                 onClick = { onSelect(assistant.id.toString()) },
-                label = { Text(assistant.name.ifBlank { "角色" }, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                label = {
+                    Text(
+                        assistant.name.ifBlank { "角色" },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
             )
         }
     }
 }
 
 @Composable
-private fun EntryCard(entry: CihaiEntry, onDelete: () -> Unit) {
+private fun EntryCard(
+    entry: CihaiEntry,
+    onDelete: () -> Unit,
+) {
     val displayBody = remember(entry.content, entry.kind) { entry.displayBody() }
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
@@ -1183,7 +882,12 @@ private fun EntryCard(entry: CihaiEntry, onDelete: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(entry.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                Text(
+                    entry.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f),
+                )
                 IconButton(onClick = onDelete) {
                     Icon(HugeIcons.Delete01, contentDescription = "删除")
                 }
@@ -1239,7 +943,11 @@ private fun String.extractTraceSection(start: String, end: String): String {
     val startIndex = indexOf(start, ignoreCase = true)
     if (startIndex < 0) return ""
     val bodyStart = startIndex + start.length
-    val endIndex = indexOf(end, startIndex = bodyStart, ignoreCase = true).takeIf { it >= 0 } ?: length
+    val endIndex = indexOf(
+        end,
+        startIndex = bodyStart,
+        ignoreCase = true,
+    ).takeIf { it >= 0 } ?: length
     return substring(bodyStart, endIndex).trim()
 }
 
