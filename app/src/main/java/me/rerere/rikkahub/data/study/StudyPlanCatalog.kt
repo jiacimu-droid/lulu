@@ -13,28 +13,30 @@ object StudyPlanCatalog {
     private val overlays: List<StudyPlanOverlay> = listOf(
         SummerCourseDeadlinePlan,
         July26StudyDayCorrection,
+        ThreeRoundRecitationPlan,
     )
 
     val dailyPlans: Map<LocalDate, DailyStudyPlan>
         get() = overlays.fold(ExamStudyPlan.dailyPlans.toMap()) { current, overlay ->
             current + overlay.dailyOverrides
-        }
+        }.mapValues { (_, plan) -> StudyVocabularyPolicy.normalize(plan) }
 
     val weeklyPlans: List<WeeklyStudyPlan>
         get() = mergeByKey(
             base = ExamStudyPlan.weeklyPlans,
             overlays = overlays.flatMap { it.weeklyOverrides.values },
             key = WeeklyStudyPlan::id,
-        )
+        ).map(StudyVocabularyPolicy::normalize)
 
     val monthlyPlans: List<MonthlyStudyPlan>
         get() = ExamStudyPlan.monthlyPlans.map { base ->
             overlays.fold(base) { current, overlay -> overlay.monthlyPlan(current) }
-        }
+        }.map(StudyVocabularyPolicy::normalize)
 
-    fun dailyPlan(date: LocalDate): DailyStudyPlan? =
+    fun dailyPlan(date: LocalDate): DailyStudyPlan? = (
         overlays.asReversed().firstNotNullOfOrNull { it.dailyOverrides[date] }
             ?: ExamStudyPlan.todayPlan(date)
+        )?.let(StudyVocabularyPolicy::normalize)
 
     fun plannedStudyMinutes(date: LocalDate): Int =
         overlays.asReversed().firstNotNullOfOrNull { it.plannedMinutesOverride(date) }
