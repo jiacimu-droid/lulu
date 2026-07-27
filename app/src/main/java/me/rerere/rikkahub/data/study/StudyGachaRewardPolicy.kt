@@ -69,6 +69,10 @@ object StudyGachaRewardPolicy {
         )
     }
 
+    /** Kept only until the obsolete VM entry point is removed; accessories are never awarded. */
+    @Deprecated("Accessory cards are no longer part of the gacha pool")
+    fun consumeAccessoryCard(@Suppress("UNUSED_PARAMETER") state: StudyState): StudyState? = null
+
     private fun mapPurple(raw: StudyDrawResult, random: Random): StudyDrawResult {
         val roll = random.nextDouble()
         return when {
