@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`3d91356721520a8fca05ebf738943d595fb09e5e`
+- 基准提交：`a78d952b02cc81857f036f58abe01e5b858def6d`
 - 分支：`master`
-- 源码指纹：`56f3dc4300088b69…`
-- 已索引文件：1180
-- 已索引代码/文本行：267011
-- 已发现类、接口、对象、函数及 Composable：5651
+- 源码指纹：`4d8808adbce57b9c…`
+- 已索引文件：1182
+- 已索引代码/文本行：267533
+- 已发现类、接口、对象、函数及 Composable：5660
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 841 |
+| 生产代码文件 | 843 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 35 |
 | ≥1500 行生产文件 | 3 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 719 |
+| `app` | 721 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 787 |
+| `.kt` | 789 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -489,7 +489,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 298 个文件，见 `code-index.json`
+- ……另有 300 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -548,8 +548,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2048
-- 可检索完整符号：5035
+- 已解析本地导入边：2057
+- 可检索完整符号：5039
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
@@ -558,8 +558,8 @@
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 58 | 62 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 56 | 296 |
-| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 52 | 191 |
-| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
+| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 53 | 191 |
+| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 52 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 40 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |

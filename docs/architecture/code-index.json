@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:14:30.140274+00:00",
-  "commit": "3d91356721520a8fca05ebf738943d595fb09e5e",
+  "generatedAt": "2026-07-27T17:16:05.739676+00:00",
+  "commit": "a78d952b02cc81857f036f58abe01e5b858def6d",
   "branch": "master",
-  "sourceFingerprint": "56f3dc4300088b6980e7e33d9eff6bbaceabc1cf02add0c9d57b8ef662a8431c",
+  "sourceFingerprint": "4d8808adbce57b9ca1fcd43e19af1f435bb6ae0e0d37b31058fa28c9ac4c57bc",
   "summary": {
-    "files": 1180,
-    "lines": 267011,
-    "symbols": 5651,
-    "productionCodeFiles": 841,
+    "files": 1182,
+    "lines": 267533,
+    "symbols": 5660,
+    "productionCodeFiles": 843,
     "testFiles": 146,
     "largeProductionFiles": 35,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 719,
+      "app": 721,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 787,
+      ".kt": 789,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 328,
+      "界面": 330,
       "记忆": 44
     },
-    "resolvedImportEdges": 2048
+    "resolvedImportEdges": 2057
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -934,7 +934,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 52,
+        "importedByCount": 53,
         "todoMarkers": 0
       },
       {
@@ -942,7 +942,7 @@
         "lines": 29,
         "symbols": 3,
         "localImportCount": 3,
-        "importedByCount": 51,
+        "importedByCount": 52,
         "todoMarkers": 0
       },
       {
@@ -1066,6 +1066,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
+        "lines": 83,
+        "symbols": 2,
+        "localImportCount": 0,
+        "importedByCount": 16,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/RikkaHubApp.kt",
         "lines": 335,
         "symbols": 14,
@@ -1077,14 +1085,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/utils/StringUtils.kt",
         "lines": 132,
         "symbols": 14,
-        "localImportCount": 0,
-        "importedByCount": 15,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
-        "lines": 83,
-        "symbols": 2,
         "localImportCount": 0,
         "importedByCount": 15,
         "todoMarkers": 0
@@ -1810,7 +1810,9 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingFilesPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpImport.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
@@ -1985,12 +1987,17 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 66
+      "imports": 71
     },
     {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.ai.tools",
       "imports": 27
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.R",
+      "imports": 26
     },
     {
       "from": "me.rerere.rikkahub.data.ai.transformers",
@@ -2000,11 +2007,6 @@
     {
       "from": "me.rerere.rikkahub.ui.components.ai",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 24
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.R",
       "imports": 24
     },
     {
@@ -2020,7 +2022,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.hugeicons.HugeIcons",
-      "imports": 20
+      "imports": 21
     },
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
@@ -2045,6 +2047,11 @@
     {
       "from": "me.rerere.rikkahub.di",
       "to": "me.rerere.rikkahub.data.db.migrations",
+      "imports": 16
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 16
     },
     {
@@ -2084,7 +2091,7 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
+      "to": "me.rerere.rikkahub.data.ai.mcp",
       "imports": 15
     },
     {
@@ -2125,11 +2132,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.data.model.Assistant",
-      "imports": 11
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.data.ai.mcp",
       "imports": 11
     },
     {
@@ -2193,6 +2195,11 @@
       "imports": 9
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.hugeicons.stroke.Delete01",
+      "imports": 9
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.message",
       "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 8
@@ -2224,7 +2231,7 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.hugeicons.stroke.Delete01",
+      "to": "me.rerere.hugeicons.stroke.Add01",
       "imports": 8
     },
     {
@@ -2305,11 +2312,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.game",
       "to": "me.rerere.hugeicons.HugeIcons",
-      "imports": 7
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.hugeicons.stroke.Add01",
       "imports": 7
     },
     {
@@ -3734,6 +3736,7 @@
         "app/src/main/java/me/rerere/rikkahub/plugin/provider/PluginToolProvider.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/tools/HumanLikeToolPromptTest.kt",
@@ -9354,7 +9357,9 @@
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpImport.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt"
       ]
     },
@@ -9497,6 +9502,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/FilesPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingVM.kt"
       ]
@@ -32417,6 +32423,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptLorebook.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchDetailPage.kt",
@@ -32881,6 +32888,7 @@
       "localImports": [],
       "resolvedImports": [],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt"
       ]
     },
@@ -32967,6 +32975,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptLorebook.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelDialogs.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt",
@@ -34638,6 +34647,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/AssistantPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptLorebook.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelDialogs.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt"
@@ -40894,6 +40904,94 @@
       "importedBy": []
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 434,
+      "sha256": "55fb9181ade0ba3e7a8db341aa0ecc182acfdf9fc0af2765ff608785c5e0a550",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "McpServerConfigModal",
+          "kind": "composable",
+          "line": 73
+        },
+        {
+          "name": "McpCommonOptionsConfigure",
+          "kind": "composable",
+          "line": 125
+        },
+        {
+          "name": "McpHeadersConfigure",
+          "kind": "composable",
+          "line": 240
+        },
+        {
+          "name": "McpToolsConfigure",
+          "kind": "composable",
+          "line": 311
+        },
+        {
+          "name": "McpToolCard",
+          "kind": "composable",
+          "line": 339
+        },
+        {
+          "name": "urlValue",
+          "kind": "function",
+          "line": 417
+        },
+        {
+          "name": "withUrl",
+          "kind": "function",
+          "line": 422
+        },
+        {
+          "name": "updateTool",
+          "kind": "function",
+          "line": 427
+        }
+      ],
+      "localImportCount": 18,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.core.InputSchema",
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.Add01",
+        "me.rerere.hugeicons.stroke.ArrowDown01",
+        "me.rerere.hugeicons.stroke.ArrowUp01",
+        "me.rerere.hugeicons.stroke.Delete01",
+        "me.rerere.rikkahub.R",
+        "me.rerere.rikkahub.data.ai.mcp.McpManager",
+        "me.rerere.rikkahub.data.ai.mcp.McpServerConfig",
+        "me.rerere.rikkahub.data.ai.mcp.McpTool",
+        "me.rerere.rikkahub.ui.components.ui.FormItem",
+        "me.rerere.rikkahub.ui.components.ui.Switch",
+        "me.rerere.rikkahub.ui.components.ui.SwitchSize",
+        "me.rerere.rikkahub.ui.components.ui.Tag",
+        "me.rerere.rikkahub.ui.components.ui.TagType",
+        "me.rerere.rikkahub.ui.hooks.EditState",
+        "me.rerere.rikkahub.ui.hooks.EditStateContent",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/Tool.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpConfig.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpManager.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Switch.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Tag.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/hooks/UseEditState.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
       "module": "app",
       "extension": ".kt",
@@ -40931,6 +41029,36 @@
       "isProductionCode": true,
       "localImports": [
         "me.rerere.rikkahub.data.ai.mcp.McpCommonOptions",
+        "me.rerere.rikkahub.data.ai.mcp.McpServerConfig"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpConfig.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpImport.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 88,
+      "sha256": "20cefdf65e7746aab629bb7b9a98b319d17d1ac41d0b8a0c2ea440a7b2def28b",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "McpImportModal",
+          "kind": "composable",
+          "line": 30
+        }
+      ],
+      "localImportCount": 2,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.R",
         "me.rerere.rikkahub.data.ai.mcp.McpServerConfig"
       ],
       "resolvedImports": [
@@ -45007,6 +45135,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingFilesPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
@@ -94903,12 +95032,29 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.McpCommonOptionsConfigure": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "kind": "composable",
+        "line": 125
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "composable",
         "line": 588
       }
     ],
+    "me.rerere.rikkahub.ui.pages.setting.McpHeadersConfigure": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "kind": "composable",
+        "line": 240
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.setting.McpImportModal": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpImport.kt",
+        "kind": "composable",
+        "line": 30
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "composable",
@@ -94916,6 +95062,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.McpServerConfigModal": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "kind": "composable",
+        "line": 73
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "composable",
@@ -94936,12 +95087,22 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.McpToolCard": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "kind": "composable",
+        "line": 339
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "composable",
         "line": 949
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.McpToolsConfigure": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "kind": "composable",
+        "line": 311
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "composable",
@@ -95775,6 +95936,13 @@
         "line": 79
       }
     ],
+    "me.rerere.rikkahub.ui.pages.setting.updateTool": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "kind": "function",
+        "line": 427
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.setting.upsertMcdonaldsMcpServer": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpHelpers.kt",
@@ -95785,6 +95953,20 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "kind": "function",
         "line": 119
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.urlValue": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "kind": "function",
+        "line": 417
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.withUrl": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
+        "kind": "function",
+        "line": 422
       }
     ],
     "me.rerere.rikkahub.ui.pages.share.handler.ShareHandlerPage": [
