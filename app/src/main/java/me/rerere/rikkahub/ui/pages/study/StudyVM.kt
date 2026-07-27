@@ -202,24 +202,33 @@ class StudyVM(
             var revealItems: List<StudyDrawReveal> = emptyList()
             var message: String? = null
             store.update { current ->
+                // The new pool uses literal per-pull rates. Reset the legacy streak
+                // before each 1/10-pull request so the retired 30-pull forced-purple
+                // path cannot inflate the requested 2%/2%/0.5% purple split.
                 val random = MoonlightGachaRandom(
                     delegate = Random.Default,
-                    initialDrawsSinceNonNormal = current.drawsSinceNonNormal,
+                    initialDrawsSinceNonNormal = 0,
                 )
-                val legacyResult = StudyRules.draw(current, count, random)
+                val legacyResult = StudyRules.draw(
+                    state = current.copy(drawsSinceNonNormal = 0),
+                    drawCount = count,
+                    random = random,
+                )
                 if (legacyResult.results.isEmpty()) {
                     message = "夸夸值或抽卡券不够"
-                    return@update legacyResult.state
+                    return@update current
                 }
+                val legacyStateWithoutSafety = legacyResult.state
+                    .suppressNewLegacyPurpleSafety(previousState = current)
                 val balanced = StudyGachaRewardPolicy.rebalance(
-                    stateAfterLegacyDraw = legacyResult.state,
+                    stateAfterLegacyDraw = legacyStateWithoutSafety,
                     rawResults = legacyResult.results,
                     random = Random.Default,
                 )
                 val updatedStudy = balanced.state.correctMoonlightSpecialTracking(
                     previousState = current,
                     results = balanced.results,
-                )
+                ).copy(drawsSinceNonNormal = 0)
                 revealItems = balanced.results.map(::StudyDrawReveal)
                 updatedStudy
             }
@@ -345,7 +354,8 @@ class StudyVM(
 
 /**
  * Rebalances only the regular-pool rarity roll while leaving StudyRules' payment,
- * persistence and reveal flow untouched.
+ * persistence and reveal flow untouched. Its old cross-request pity is disabled by
+ * always starting this adapter and StudyRules' legacy streak at zero.
  */
 private class MoonlightGachaRandom(
     private val delegate: Random,
@@ -366,8 +376,6 @@ private class MoonlightGachaRandom(
             return delegate.nextDouble()
         }
 
-        // On the guaranteed pull StudyRules calls drawRare directly, so this
-        // double is the legacy subtype roll rather than a rarity roll.
         if (drawsSinceNonNormal >= StudyRules.NON_NORMAL_PITY_DRAW_COUNT - 1) {
             drawsSinceNonNormal = 0
             return delegate.nextDouble()
@@ -420,6 +428,21 @@ private class MoonlightGachaRandom(
         const val LEGACY_RARE_END = 0.9815
         const val LEGACY_EPIC_END = 0.9965
     }
+}
+
+private fun StudyState.suppressNewLegacyPurpleSafety(previousState: StudyState): StudyState {
+    val drawDate = today.ifBlank { LocalDate.now().toString() }
+    val newlyGranted =
+        previousState.purpleSafetyGrantedDate != drawDate &&
+            purpleSafetyGrantedDate == drawDate &&
+            wallet.purpleDrawTickets > previousState.wallet.purpleDrawTickets
+    if (!newlyGranted) return this
+    return copy(
+        wallet = wallet.copy(
+            purpleDrawTickets = (wallet.purpleDrawTickets - 1).coerceAtLeast(0),
+        ),
+        purpleSafetyGrantedDate = previousState.purpleSafetyGrantedDate,
+    )
 }
 
 private fun StudyState.correctMoonlightSpecialTracking(
