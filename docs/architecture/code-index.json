@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:34:56.431491+00:00",
-  "commit": "4a183025a23e4636a18eb0bf8a8532cf651639ea",
+  "generatedAt": "2026-07-27T16:36:05.128630+00:00",
+  "commit": "0df74194b90790f01a14d83a120c870458e58f6a",
   "branch": "master",
-  "sourceFingerprint": "44d64b6fb377a742470ffb06fb54ff1871ae28eb05ae1eca01542bbd30945b72",
+  "sourceFingerprint": "5c4b04eb3a722e525d5c1022a7c2e3f0b2a37a392d6557be6e70ba9305d96049",
   "summary": {
-    "files": 1165,
-    "lines": 267859,
-    "symbols": 5615,
-    "productionCodeFiles": 826,
+    "files": 1166,
+    "lines": 268354,
+    "symbols": 5624,
+    "productionCodeFiles": 827,
     "testFiles": 146,
     "largeProductionFiles": 39,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 704,
+      "app": 705,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 772,
+      ".kt": 773,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 317,
+      "界面": 318,
       "记忆": 44
     },
-    "resolvedImportEdges": 2021
+    "resolvedImportEdges": 2027
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -918,7 +918,7 @@
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
-        "importedByCount": 56,
+        "importedByCount": 57,
         "todoMarkers": 0
       },
       {
@@ -990,7 +990,7 @@
         "lines": 248,
         "symbols": 26,
         "localImportCount": 0,
-        "importedByCount": 31,
+        "importedByCount": 32,
         "todoMarkers": 0
       },
       {
@@ -1802,6 +1802,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProactiveMessagePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderConfigContent.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchDetailPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchPage.kt",
@@ -1967,7 +1968,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 63
+      "imports": 64
     },
     {
       "from": "me.rerere.rikkahub.data.service",
@@ -1985,6 +1986,11 @@
       "imports": 24
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.R",
+      "imports": 22
+    },
+    {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.core.Tool",
       "imports": 21
@@ -1992,11 +1998,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.ui.UIMessagePart",
-      "imports": 21
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.R",
       "imports": 21
     },
     {
@@ -2015,6 +2016,11 @@
       "imports": 18
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.hugeicons.HugeIcons",
+      "imports": 17
+    },
+    {
       "from": "me.rerere.rikkahub.data.ai.transformers",
       "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 16
@@ -2022,11 +2028,6 @@
     {
       "from": "me.rerere.rikkahub.di",
       "to": "me.rerere.rikkahub.data.db.migrations",
-      "imports": 16
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.hugeicons.HugeIcons",
       "imports": 16
     },
     {
@@ -2200,6 +2201,11 @@
       "imports": 8
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.ai.provider.ProviderSetting",
+      "imports": 8
+    },
+    {
       "from": "me.rerere.tts.provider.providers",
       "to": "me.rerere.tts.model.AudioChunk",
       "imports": 8
@@ -2275,11 +2281,6 @@
       "imports": 7
     },
     {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.ai.provider.ProviderSetting",
-      "imports": 7
-    },
-    {
       "from": "me.rerere.ai.provider.providers",
       "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 6
@@ -2342,6 +2343,11 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.data.datastore.DisplaySetting",
+      "imports": 6
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.hugeicons.stroke.Add01",
       "imports": 6
     },
     {
@@ -2482,11 +2488,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.context.LocalToaster",
-      "imports": 5
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.hugeicons.stroke.Add01",
       "imports": 5
     },
     {
@@ -2751,7 +2752,27 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.hugeicons.stroke.Cancel01",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.ai.provider.ModelType",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.hugeicons.stroke.Tools",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.data.ai.prompts",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.ui.pages.assistant",
       "imports": 4
     },
     {
@@ -2942,26 +2963,6 @@
     {
       "from": "me.rerere.rikkahub.data.datastore",
       "to": "me.rerere.ai.provider.ProviderSetting",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.model",
-      "to": "me.rerere.ai.core.MessageRole",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.model",
-      "to": "me.rerere.ai.ui.UIMessage",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.companion.CompanionPrivateImpression",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.cihai.CihaiStore",
       "imports": 3
     }
   ],
@@ -3890,6 +3891,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
@@ -4299,6 +4301,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/ShareSheet.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderConfigContent.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/BalanceOption.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConfigure.kt",
@@ -5640,7 +5643,8 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/importer/CherryStudioProviderImporter.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/SearchPicker.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt"
       ]
     },
     {
@@ -31392,6 +31396,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderConfigContent.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSpeechPage.kt"
@@ -35315,7 +35320,8 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt"
       ]
     },
     {
@@ -41009,6 +41015,95 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 495,
+      "sha256": "07a3e2421c9fc5bbd4819aa1fb2bdd9fb351236d2cb8ffbbfe968133c67bf452",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "SettingProviderModelForm",
+          "kind": "composable",
+          "line": 65
+        },
+        {
+          "name": "setModelId",
+          "kind": "function",
+          "line": 74
+        },
+        {
+          "name": "SettingProviderModelBasicForm",
+          "kind": "composable",
+          "line": 128
+        },
+        {
+          "name": "SettingProviderModelAdvancedForm",
+          "kind": "composable",
+          "line": 188
+        },
+        {
+          "name": "SettingProviderModelTypeSelector",
+          "kind": "composable",
+          "line": 217
+        },
+        {
+          "name": "SettingProviderModelModalitySelector",
+          "kind": "composable",
+          "line": 247
+        },
+        {
+          "name": "ModalAbilitySelector",
+          "kind": "composable",
+          "line": 300
+        },
+        {
+          "name": "SettingProviderBuiltInTools",
+          "kind": "composable",
+          "line": 329
+        },
+        {
+          "name": "SettingProviderOverrideSettings",
+          "kind": "composable",
+          "line": 386
+        }
+      ],
+      "localImportCount": 16,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.provider.BuiltInTools",
+        "me.rerere.ai.provider.Modality",
+        "me.rerere.ai.provider.Model",
+        "me.rerere.ai.provider.ModelAbility",
+        "me.rerere.ai.provider.ModelType",
+        "me.rerere.ai.provider.ProviderSetting",
+        "me.rerere.ai.registry.ModelRegistry",
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.Add01",
+        "me.rerere.hugeicons.stroke.Cancel01",
+        "me.rerere.hugeicons.stroke.Tools",
+        "me.rerere.rikkahub.R",
+        "me.rerere.rikkahub.ui.components.ui.AutoAIIcon",
+        "me.rerere.rikkahub.ui.pages.assistant.detail.CustomBodies",
+        "me.rerere.rikkahub.ui.pages.assistant.detail.CustomHeaders",
+        "me.rerere.rikkahub.ui.pages.setting.components.ProviderConfigure"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
+        "ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt",
+        "ai/src/main/java/me/rerere/ai/registry/ModelRegistry.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/AIIcon.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/PropertyEditor.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConfigure.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt",
       "module": "app",
       "extension": ".kt",
@@ -41825,6 +41920,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderConfigContent.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt"
       ]
     },
@@ -94149,6 +94245,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
         "kind": "composable",
         "line": 1117
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "composable",
+        "line": 300
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.ModelCard": [
@@ -94347,6 +94448,13 @@
         "line": 36
       }
     ],
+    "me.rerere.rikkahub.ui.pages.setting.SettingProviderBuiltInTools": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "composable",
+        "line": 329
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.setting.SettingProviderConfigContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderConfigContent.kt",
@@ -94368,11 +94476,53 @@
         "line": 136
       }
     ],
+    "me.rerere.rikkahub.ui.pages.setting.SettingProviderModelAdvancedForm": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "composable",
+        "line": 188
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.SettingProviderModelBasicForm": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "composable",
+        "line": 128
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.SettingProviderModelForm": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "composable",
+        "line": 65
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.SettingProviderModelModalitySelector": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "composable",
+        "line": 247
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.setting.SettingProviderModelPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
         "kind": "composable",
         "line": 367
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.SettingProviderModelTypeSelector": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "composable",
+        "line": 217
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.SettingProviderOverrideSettings": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "composable",
+        "line": 386
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.SettingProviderPage": [
@@ -94877,6 +95027,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderDetailPage.kt",
         "kind": "function",
         "line": 500
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
+        "kind": "function",
+        "line": 74
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.startWebServer": [
