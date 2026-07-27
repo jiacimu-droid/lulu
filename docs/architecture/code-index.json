@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:58:34.146484+00:00",
-  "commit": "c844af9b49078036edf085433076e5f5eeb2ea71",
+  "generatedAt": "2026-07-27T17:02:36.658531+00:00",
+  "commit": "f24047195ad06d9d4993dc981ae77caf6b3e3753",
   "branch": "master",
-  "sourceFingerprint": "8735896ab15df9e0b252a2c1910e8ce13c9c4685e22d0b42787227a6186127f4",
+  "sourceFingerprint": "881e0d81bb0567d1d71f3f096c434f51b438d53f7f57066ae5d1882bd04ada49",
   "summary": {
-    "files": 1175,
-    "lines": 266843,
-    "symbols": 5644,
-    "productionCodeFiles": 836,
+    "files": 1176,
+    "lines": 267279,
+    "symbols": 5652,
+    "productionCodeFiles": 837,
     "testFiles": 146,
     "largeProductionFiles": 36,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 714,
+      "app": 715,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 782,
+      ".kt": 783,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -55,7 +55,7 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 142,
+      "AI与上下文": 143,
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 323,
+      "界面": 324,
       "记忆": 44
     },
-    "resolvedImportEdges": 2034
+    "resolvedImportEdges": 2044
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -910,7 +910,7 @@
         "lines": 19,
         "symbols": 1,
         "localImportCount": 0,
-        "importedByCount": 62,
+        "importedByCount": 63,
         "todoMarkers": 0
       },
       {
@@ -926,7 +926,7 @@
         "lines": 296,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 55,
+        "importedByCount": 56,
         "todoMarkers": 0
       },
       {
@@ -942,7 +942,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 49,
+        "importedByCount": 50,
         "todoMarkers": 0
       },
       {
@@ -1082,6 +1082,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
+        "lines": 83,
+        "symbols": 2,
+        "localImportCount": 0,
+        "importedByCount": 15,
+        "todoMarkers": 0
+      },
+      {
         "path": "speech/src/main/java/me/rerere/tts/model/TTSResponse.kt",
         "lines": 70,
         "symbols": 6,
@@ -1093,14 +1101,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "lines": 1311,
         "symbols": 51,
-        "localImportCount": 0,
-        "importedByCount": 14,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
-        "lines": 83,
-        "symbols": 2,
         "localImportCount": 0,
         "importedByCount": 14,
         "todoMarkers": 0
@@ -1254,6 +1254,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/components/ai/SearchPicker.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ConversationSystemPromptCard.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptVM.kt",
       "app/src/test/java/me/rerere/rikkahub/data/ai/AILoggingManagerTest.kt",
@@ -1762,6 +1763,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/developer/DeveloperPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/developer/DeveloperVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/ExtensionsPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/QuickMessagesPage.kt",
@@ -2090,6 +2092,11 @@
       "imports": 14
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.extensions",
+      "to": "me.rerere.rikkahub.ui.components.ui",
+      "imports": 14
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 14
@@ -2167,11 +2174,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.ui.theme.CustomColors",
-      "imports": 9
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.extensions",
-      "to": "me.rerere.rikkahub.ui.components.ui",
       "imports": 9
     },
     {
@@ -2350,6 +2352,16 @@
       "imports": 6
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.extensions",
+      "to": "me.rerere.rikkahub.R",
+      "imports": 6
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.extensions",
+      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
+      "imports": 6
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.context.LocalNavController",
       "imports": 6
@@ -2466,17 +2478,12 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.extensions",
-      "to": "me.rerere.rikkahub.R",
+      "to": "me.rerere.hugeicons.HugeIcons",
       "imports": 5
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.extensions",
       "to": "me.rerere.rikkahub.ui.components.nav",
-      "imports": 5
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.extensions",
-      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 5
     },
     {
@@ -2751,7 +2758,17 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.extensions",
-      "to": "me.rerere.hugeicons.HugeIcons",
+      "to": "me.rerere.hugeicons.stroke.Add01",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.extensions",
+      "to": "me.rerere.hugeicons.stroke.Delete01",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.extensions",
+      "to": "me.rerere.rikkahub.ui.context.LocalToaster",
       "imports": 4
     },
     {
@@ -2957,21 +2974,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.ui.UIMessage",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.ui.UIMessageAnnotation",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.rikkahub.data.ai.tools",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.provider.Model",
       "imports": 3
     }
   ],
@@ -3592,6 +3594,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/TTSAutoPlay.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt",
         "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationRoutes.kt",
@@ -17454,6 +17457,7 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Export.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt"
       ]
     },
@@ -17623,6 +17627,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt"
       ]
     },
@@ -18634,6 +18639,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/LuluStatusDialog.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/QuickMessagesPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/QuickMessagesVM.kt",
@@ -32250,6 +32256,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/export/ExportHooks.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt"
       ]
     },
@@ -32398,6 +32405,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionSection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/BackgroundPicker.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
@@ -32727,6 +32735,7 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt"
@@ -32947,6 +32956,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/McpPicker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ModelList.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelDialogs.kt",
@@ -34617,6 +34627,7 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/AssistantPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelDialogs.kt",
@@ -37675,6 +37686,101 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 436,
+      "sha256": "975279fa36b82a55ab3d8590aab2a2403cee370b51172d17be6a66cd06d5a126",
+      "package": "me.rerere.rikkahub.ui.pages.extensions",
+      "categories": [
+        "AI与上下文",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "ModeInjectionTab",
+          "kind": "composable",
+          "line": 87
+        },
+        {
+          "name": "ModeInjectionCard",
+          "kind": "composable",
+          "line": 211
+        },
+        {
+          "name": "ModeInjectionEditSheet",
+          "kind": "composable",
+          "line": 285
+        },
+        {
+          "name": "InjectionPositionSelector",
+          "kind": "composable",
+          "line": 390
+        },
+        {
+          "name": "usesStandaloneMessage",
+          "kind": "function",
+          "line": 403
+        },
+        {
+          "name": "getPositionLabel",
+          "kind": "composable",
+          "line": 412
+        },
+        {
+          "name": "InjectionRoleSelector",
+          "kind": "composable",
+          "line": 421
+        },
+        {
+          "name": "getRoleLabel",
+          "kind": "composable",
+          "line": 432
+        }
+      ],
+      "localImportCount": 22,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.core.MessageRole",
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.Add01",
+        "me.rerere.hugeicons.stroke.ArrowDown01",
+        "me.rerere.hugeicons.stroke.Cancel01",
+        "me.rerere.hugeicons.stroke.Delete01",
+        "me.rerere.hugeicons.stroke.FileImport",
+        "me.rerere.hugeicons.stroke.Share03",
+        "me.rerere.hugeicons.stroke.Tools",
+        "me.rerere.rikkahub.R",
+        "me.rerere.rikkahub.data.export.ModeInjectionSerializer",
+        "me.rerere.rikkahub.data.export.rememberExporter",
+        "me.rerere.rikkahub.data.model.InjectionPosition",
+        "me.rerere.rikkahub.data.model.PromptInjection",
+        "me.rerere.rikkahub.ui.components.ui.ExportDialog",
+        "me.rerere.rikkahub.ui.components.ui.FormItem",
+        "me.rerere.rikkahub.ui.components.ui.Select",
+        "me.rerere.rikkahub.ui.components.ui.Tag",
+        "me.rerere.rikkahub.ui.components.ui.TagType",
+        "me.rerere.rikkahub.ui.context.LocalToaster",
+        "me.rerere.rikkahub.ui.hooks.useEditState",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/MessageRole.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/export/ExportHooks.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/export/ExportSerializer.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Export.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Select.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Tag.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/hooks/UseEditState.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
@@ -44771,6 +44877,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiReadingPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/ExtensionsPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/QuickMessagesPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/SkillDetailPage.kt",
@@ -92385,12 +92492,22 @@
     ],
     "me.rerere.rikkahub.ui.pages.extensions.InjectionPositionSelector": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "kind": "composable",
+        "line": 390
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "kind": "composable",
         "line": 542
       }
     ],
     "me.rerere.rikkahub.ui.pages.extensions.InjectionRoleSelector": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "kind": "composable",
+        "line": 421
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "kind": "composable",
@@ -92420,6 +92537,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.extensions.ModeInjectionCard": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "kind": "composable",
+        "line": 211
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "kind": "composable",
         "line": 317
@@ -92427,12 +92549,22 @@
     ],
     "me.rerere.rikkahub.ui.pages.extensions.ModeInjectionEditSheet": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "kind": "composable",
+        "line": 285
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "kind": "composable",
         "line": 411
       }
     ],
     "me.rerere.rikkahub.ui.pages.extensions.ModeInjectionTab": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "kind": "composable",
+        "line": 87
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "kind": "composable",
@@ -92581,12 +92713,22 @@
     ],
     "me.rerere.rikkahub.ui.pages.extensions.getPositionLabel": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "kind": "composable",
+        "line": 412
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "kind": "composable",
         "line": 565
       }
     ],
     "me.rerere.rikkahub.ui.pages.extensions.getRoleLabel": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "kind": "composable",
+        "line": 432
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "kind": "composable",
@@ -92685,6 +92827,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.extensions.usesStandaloneMessage": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
+        "kind": "function",
+        "line": 403
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPage.kt",
         "kind": "function",
