@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:08:14.667739+00:00",
-  "commit": "32616e9d37bdda4de6a4a73e44d4807690ce2c07",
+  "generatedAt": "2026-07-27T05:08:48.944922+00:00",
+  "commit": "248f035bd2df839cf653a9624e2151f97938d836",
   "branch": "master",
-  "sourceFingerprint": "726883a4b1a0464da97ff9bc41cf6c713f6e76ff8126e309aa46d48df60d9471",
+  "sourceFingerprint": "0481ddee251fc53386eb1a52048129b3e0e9f553b992f536c2ce96aea2817d4f",
   "summary": {
     "files": 1130,
-    "lines": 265913,
-    "symbols": 5547,
+    "lines": 265940,
+    "symbols": 5548,
     "productionCodeFiles": 799,
     "testFiles": 138,
     "largeProductionFiles": 42,
@@ -68,7 +68,7 @@
       "界面": 292,
       "记忆": 44
     },
-    "resolvedImportEdges": 1965
+    "resolvedImportEdges": 1967
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 101,
+        "importedByCount": 102,
         "todoMarkers": 0
       },
       {
@@ -934,7 +934,7 @@
         "lines": 331,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 48,
+        "importedByCount": 49,
         "todoMarkers": 0
       },
       {
@@ -2064,6 +2064,11 @@
     },
     {
       "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.datastore.SettingsStore",
+      "imports": 10
+    },
+    {
+      "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.ai.transformers",
       "imports": 10
     },
@@ -2100,11 +2105,6 @@
     {
       "from": "me.rerere.rikkahub.data.db.dao",
       "to": "me.rerere.rikkahub.data.db.entity",
-      "imports": 9
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.datastore.SettingsStore",
       "imports": 9
     },
     {
@@ -14696,6 +14696,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/datastore/migration/PreferenceStoreV4Migration.kt",
         "app/src/main/java/me/rerere/rikkahub/data/files/SkillManager.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/AssistantInteractionResetService.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/DeviceEventTrackingService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
@@ -18522,6 +18523,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/Transformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/export/ExportSerializer.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishRules.kt",
@@ -20014,53 +20016,58 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 103,
-      "sha256": "52bc2b67ea27c0e18d8c52c3710ec7862c7605a91e7208ed0f8725e33225df0e",
+      "lines": 130,
+      "sha256": "dc13cf405da6fc242766e9212d676d9f8ebcf2e6118207ab4000e51c04beb0dd",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [],
       "symbols": [
         {
           "name": "CompanionAutonomousPulseInput",
           "kind": "class",
-          "line": 9
+          "line": 15
         },
         {
           "name": "CompanionAutonomousPulsePlan",
           "kind": "class",
-          "line": 17
+          "line": 24
         },
         {
           "name": "CompanionAutonomousPulsePlanner",
           "kind": "object",
-          "line": 22
+          "line": 29
         },
         {
           "name": "planNext",
           "kind": "function",
-          "line": 23
+          "line": 30
         },
         {
           "name": "triggerTimeMillis",
           "kind": "function",
-          "line": 73
+          "line": 92
         },
         {
           "name": "buildReason",
           "kind": "function",
-          "line": 78
+          "line": 97
         },
         {
           "name": "activeWorkCount",
           "kind": "function",
-          "line": 89
+          "line": 107
         },
         {
           "name": "stableMinute",
           "kind": "function",
-          "line": 95
+          "line": 113
+        },
+        {
+          "name": "resolveInteractionProfile",
+          "kind": "function",
+          "line": 121
         }
       ],
-      "localImportCount": 4,
+      "localImportCount": 9,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -20068,11 +20075,18 @@
         "me.rerere.rikkahub.data.companion.CompanionConcernStatus",
         "me.rerere.rikkahub.data.companion.CompanionOutboundStatus",
         "me.rerere.rikkahub.data.companion.CompanionSnapshot",
-        "me.rerere.rikkahub.data.datastore.ProactiveMessageSetting"
+        "me.rerere.rikkahub.data.datastore.ProactiveMessageSetting",
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.model.AssistantInitiativeLevel",
+        "me.rerere.rikkahub.data.model.AssistantInteractionProfile",
+        "me.rerere.rikkahub.data.model.initiativeLevel",
+        "me.rerere.rikkahub.data.model.isBlank"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt"
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt"
       ],
       "importedBy": []
     },
@@ -75631,21 +75645,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "kind": "class",
-        "line": 9
+        "line": 15
       }
     ],
     "me.rerere.rikkahub.data.service.CompanionAutonomousPulsePlan": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "kind": "class",
-        "line": 17
+        "line": 24
       }
     ],
     "me.rerere.rikkahub.data.service.CompanionAutonomousPulsePlanner": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "kind": "object",
-        "line": 22
+        "line": 29
       }
     ],
     "me.rerere.rikkahub.data.service.CompanionAutonomousPulsePlannerTest": [
@@ -76163,7 +76177,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "kind": "function",
-        "line": 89
+        "line": 107
       }
     ],
     "me.rerere.rikkahub.data.service.addNotification": [
@@ -76345,7 +76359,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "kind": "function",
-        "line": 78
+        "line": 97
       }
     ],
     "me.rerere.rikkahub.data.service.buildRecallContext": [
@@ -77954,7 +77968,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "kind": "function",
-        "line": 23
+        "line": 30
       }
     ],
     "me.rerere.rikkahub.data.service.popCurrentTargetedAndScheduleNext": [
@@ -78204,6 +78218,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "kind": "function",
         "line": 213
+      }
+    ],
+    "me.rerere.rikkahub.data.service.resolveInteractionProfile": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
+        "kind": "function",
+        "line": 121
       }
     ],
     "me.rerere.rikkahub.data.service.resolveLocation": [
@@ -78545,7 +78566,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "kind": "function",
-        "line": 95
+        "line": 113
       }
     ],
     "me.rerere.rikkahub.data.service.startForegroundCompat": [
@@ -78679,7 +78700,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "kind": "function",
-        "line": 73
+        "line": 92
       }
     ],
     "me.rerere.rikkahub.data.service.unsupported": [
