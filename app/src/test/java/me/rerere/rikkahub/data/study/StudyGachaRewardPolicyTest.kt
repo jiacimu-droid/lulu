@@ -79,6 +79,40 @@ class StudyGachaRewardPolicyTest {
     }
 
     @Test
+    fun `fifty pulls with no game reward top up two four-round tickets`() {
+        val date = "2026-07-27"
+        val result = StudyGachaRewardPolicy.grantFiftyPullGameFloor(
+            StudyState(
+                today = date,
+                dailyDrawCount = 50,
+                dailyGameRewardDate = date,
+            ),
+        )
+
+        assertEquals(2, result.state.inventory.gameRoundTickets)
+        assertEquals(2, result.bonusResults.size)
+        assertTrue(result.bonusResults.all { it.title.contains("50抽游戏保底") })
+        assertEquals(date, result.state.fiftyPullGameFloorGrantedDate)
+    }
+
+    @Test
+    fun `one unlimited ticket already covers the fifty-pull floor`() {
+        val date = "2026-07-27"
+        val result = StudyGachaRewardPolicy.grantFiftyPullGameFloor(
+            StudyState(
+                today = date,
+                dailyDrawCount = 50,
+                dailyGameRewardDate = date,
+                dailyGameUnlimitedTicketsWon = 1,
+            ),
+        )
+
+        assertEquals(0, result.state.inventory.gameRoundTickets)
+        assertTrue(result.bonusResults.isEmpty())
+        assertEquals(date, result.state.fiftyPullGameFloorGrantedDate)
+    }
+
+    @Test
     fun `requested regular pool rates sum to six point two percent special`() {
         val specialRate = StudyGachaRewardPolicy.GAME_ROUND_RATE +
             StudyGachaRewardPolicy.DOUYIN_RATE +
