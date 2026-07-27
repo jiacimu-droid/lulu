@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`d2f563f0f67e3cb01533f0f198f4b46f6780945d`
+- 基准提交：`c89a6d2559743c359a15af3fd1b796c14bf0e0ec`
 - 分支：`master`
-- 源码指纹：`36d1310b7630c377…`
+- 源码指纹：`d079e5df02d3ab7c…`
 - 已索引文件：1132
-- 已索引代码/文本行：266258
+- 已索引代码/文本行：266223
 - 已发现类、接口、对象、函数及 Composable：5550
 
 ## 仓库健康信号
@@ -548,7 +548,7 @@
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 102 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 61 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 56 | 62 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 53 | 331 |
+| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 53 | 296 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 45 | 191 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
