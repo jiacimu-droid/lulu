@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T07:29:20.839162+00:00",
-  "commit": "1e261aff7fe50afbdcdb3cba3510fff00e04390f",
+  "generatedAt": "2026-07-27T07:32:09.495732+00:00",
+  "commit": "b2add58277719f66ffde9a32110f3d65dae753c4",
   "branch": "master",
-  "sourceFingerprint": "f1801ce15420d8ce27dc2f96d8d3f1ea28ca75e6d8e3fc4018b5d3aeb93a55ea",
+  "sourceFingerprint": "df6d7413ce4834a4a1e125103c0766310a6a4964dc43c0733a5661e736387fbb",
   "summary": {
     "files": 1141,
-    "lines": 267227,
-    "symbols": 5585,
+    "lines": 267255,
+    "symbols": 5586,
     "productionCodeFiles": 802,
     "testFiles": 146,
     "largeProductionFiles": 42,
@@ -23697,8 +23697,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 133,
-      "sha256": "bde56610e10f3ec8a1da39316f607ff24fad59cea615f486fff8b35cc2a696a0",
+      "lines": 161,
+      "sha256": "3ba7c9ca97e8cccdd66589a461fbe52895410678ffb0f2f15ebd482c342a8320",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -23715,9 +23715,14 @@
           "line": 87
         },
         {
+          "name": "installIntoLegacyExamPlanViews",
+          "kind": "function",
+          "line": 129
+        },
+        {
           "name": "week",
           "kind": "function",
-          "line": 127
+          "line": 155
         }
       ],
       "localImportCount": 0,
@@ -80467,6 +80472,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "function",
         "line": 290
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
+        "kind": "function",
+        "line": 129
       }
     ],
     "me.rerere.rikkahub.data.study.isEarlySleepForUser": [
@@ -81209,7 +81219,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
         "kind": "function",
-        "line": 127
+        "line": 155
       }
     ],
     "me.rerere.rikkahub.data.study.weekForDate": [
