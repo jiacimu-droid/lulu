@@ -4,6 +4,7 @@ import me.rerere.ai.core.MessageRole
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.limitContext
 import me.rerere.rikkahub.data.model.Assistant
+import me.rerere.rikkahub.data.model.toPromptContext
 
 /** Single bounded hand-off between context producers and model generation. */
 internal data class CompanionContextEnvelope(
@@ -48,6 +49,7 @@ internal fun buildCompanionContextEnvelope(
         .takeIf { it > 0 }
         ?.coerceAtMost(budget.maxHistoryMessages)
         ?: budget.maxHistoryMessages
+    val interactionProfile = assistant.interactionProfile.toPromptContext()
 
     // A rolling summary can arrive as either a persisted chat message or an injected
     // SYSTEM snapshot. Only the newest copy is useful; sending both wastes tokens and
@@ -77,6 +79,7 @@ internal fun buildCompanionContextEnvelope(
     val systemText = deduplicatedSystemMessages.joinToString("\n\n") { it.toText() }
     val fixedText = listOf(
         characterCore,
+        interactionProfile,
         globalLorebook,
         roleLorebook,
         otherMandatoryPrompt,
@@ -102,6 +105,7 @@ internal fun buildCompanionContextEnvelope(
     val classified = classifyStructuredSystemContext(deduplicatedSystemMessages)
     val sections = listOf(
         section("角色核心", characterCore, if (characterCore.isBlank()) 0 else 1),
+        section("互动设定", interactionProfile, if (interactionProfile.isBlank()) 0 else 1),
         section("全局世界书", globalLorebook, if (globalLorebook.isBlank()) 0 else 1),
         section("角色世界书", roleLorebook, if (roleLorebook.isBlank()) 0 else 1),
         section("最近消息", recentText, history.size),
@@ -118,8 +122,12 @@ internal fun buildCompanionContextEnvelope(
     val summaryMessage = latestRollingSummary
         .takeIf { it.isNotBlank() }
         ?.let { summary -> UIMessage.system(summary) }
+    val interactionMessage = interactionProfile
+        .takeIf { it.isNotBlank() }
+        ?.let(UIMessage::system)
     return CompanionContextEnvelope(
         messages = buildList {
+            if (interactionMessage != null) add(interactionMessage)
             addAll(deduplicatedSystemMessages)
             if (summaryMessage != null) add(summaryMessage)
             addAll(history)
@@ -294,6 +302,7 @@ private fun String.isRollingSummaryText(): Boolean {
 }
 
 private fun structuredKind(text: String): String? = when {
+    text.contains("<interaction_profile", ignoreCase = true) -> "interaction_profile"
     text.contains("<companion_runtime", ignoreCase = true) -> "runtime"
     text.contains("<companion_private_context", ignoreCase = true) -> "private_context"
     text.contains("<companion_presence_contract", ignoreCase = true) -> "presence_contract"
