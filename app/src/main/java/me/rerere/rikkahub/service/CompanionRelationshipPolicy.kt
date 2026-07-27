@@ -3,25 +3,12 @@ package me.rerere.rikkahub.service
 import me.rerere.rikkahub.data.companion.CompanionRelationshipState
 
 /**
- * Deterministic relationship gates applied after model planning. Prompt guidance shapes tone;
- * these rules prevent low-trust or tense states from silently authorizing intrusive actions.
+ * Relationship measurements may still protect sensitive tools, but they must not silently
+ * override the user-editable interaction profile that defines initiative, follow-up and expression.
  */
 internal fun CompanionIntentDecision.enforceRelationshipPolicy(
     relationship: CompanionRelationshipState,
 ): CompanionIntentDecision {
-    if (relationship.unresolvedTension >= HIGH_TENSION && intent == CompanionIntent.REACH_OUT) {
-        return copy(
-            intent = CompanionIntent.WAIT,
-            shouldMessageNow = false,
-            delayMinutes = null,
-            toolNames = emptyList(),
-            reason = "Relationship tension is high, so repair waits for relevant user contact instead of an unsolicited reach-out.",
-            followUps = emptyList(),
-            actionToolName = null,
-            actionArgumentsJson = "{}",
-        )
-    }
-
     val filteredTools = toolNames.filter { relationship.allowsUnpromptedTool(it) }
     val filteredAction = actionToolName?.takeIf { relationship.allowsAutonomousAction(it) }
     val validIntent = if (intent == CompanionIntent.SELF_ACTIVITY && filteredAction == null) {
@@ -34,9 +21,7 @@ internal fun CompanionIntentDecision.enforceRelationshipPolicy(
         shouldMessageNow = shouldMessageNow && validIntent != CompanionIntent.WAIT,
         delayMinutes = delayMinutes.takeIf { validIntent != CompanionIntent.WAIT },
         toolNames = filteredTools,
-        followUps = followUps.takeUnless {
-            relationship.unresolvedTension >= HIGH_TENSION || relationship.reliability < LOW_RELIABILITY
-        }.orEmpty(),
+        followUps = followUps,
         actionToolName = filteredAction,
         actionArgumentsJson = actionArgumentsJson.takeIf { filteredAction != null } ?: "{}",
     )
@@ -46,32 +31,18 @@ internal fun CompanionChatTurnPlan.enforceRelationshipPolicy(
     relationship: CompanionRelationshipState,
     latestUserText: String,
 ): CompanionChatTurnPlan {
-    val userExplicitlyRequestedFollowUp = latestUserText.hasAny(
-        "提醒", "叫我", "闹钟", "等会", "过会", "稍后", "明天", "以后", "跟进", "remind", "alarm",
-    )
-    val filteredAffordances = if (relationship.unresolvedTension >= HIGH_TENSION) {
-        expressionAffordances.filter { affordance ->
-            when (affordance) {
-                CompanionExpressionAffordance.STICKER -> latestUserText.hasAny("表情", "贴纸", "sticker")
-                CompanionExpressionAffordance.VOICE -> latestUserText.hasAny("语音", "说给我听", "voice")
-                else -> true
-            }
-        }
-    } else {
-        expressionAffordances
-    }
-    val keepModelFollowUps = userExplicitlyRequestedFollowUp || (
-        relationship.unresolvedTension < HIGH_TENSION && relationship.reliability >= LOW_RELIABILITY
-    )
     return copy(
         toolRequests = toolRequests.filter { request ->
             relationship.allowsUnpromptedTool(request.toolName) ||
                 latestUserText.explicitlyRequestsTool(request.toolName)
         },
-        followUpDelayMinutes = followUpDelayMinutes.takeIf { keepModelFollowUps },
-        followUpReason = followUpReason.takeIf { keepModelFollowUps },
-        followUps = followUps.takeIf { keepModelFollowUps }.orEmpty(),
-        expressionAffordances = filteredAffordances,
+        // Follow-up and expression are governed by the role's editable interaction profile.
+        // Hidden relationship scores no longer erase a role's configured tendency to pursue,
+        // wait, speak briefly, use voice, or express care.
+        followUpDelayMinutes = followUpDelayMinutes,
+        followUpReason = followUpReason,
+        followUps = followUps,
+        expressionAffordances = expressionAffordances,
     )
 }
 
@@ -135,5 +106,4 @@ private val SELF_CONTAINED_DIGITAL_LIFE_TOOLS = setOf(
 
 private const val HIGH_TENSION = 0.6f
 private const val LOW_TRUST = 0.4f
-private const val LOW_RELIABILITY = 0.5f
 private const val LOW_BOUNDARY_CONFIDENCE = 0.45f
