@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T06:32:19.659208+00:00",
-  "commit": "e69b6d107748b712528f0c8407cb008be5a96011",
+  "generatedAt": "2026-07-27T06:59:25.729614+00:00",
+  "commit": "4f562f464174941f7edd3824996473c973a88555",
   "branch": "master",
-  "sourceFingerprint": "8bf222b5e331c3fad9f04331820059e1914e3429ccfd1018ea978cf05f9a001c",
+  "sourceFingerprint": "b68b96fd662bf77a0f6b01caefc2a3c481d6d8637b47d669f7c596e31e12db08",
   "summary": {
-    "files": 1135,
-    "lines": 266551,
-    "symbols": 5554,
-    "productionCodeFiles": 799,
+    "files": 1136,
+    "lines": 266588,
+    "symbols": 5559,
+    "productionCodeFiles": 800,
     "testFiles": 143,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 674,
+      "app": 675,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 742,
+      ".kt": 743,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 23,
+      "学习监督": 24,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
@@ -1371,6 +1371,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt",
@@ -23438,6 +23439,51 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 37,
+      "sha256": "120033f7eae060086dc2594d9a85854caec96447e999280e6cad15a154158755",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "StudyVocabularyPolicy",
+          "kind": "object",
+          "line": 10
+        },
+        {
+          "name": "normalizeText",
+          "kind": "function",
+          "line": 15
+        },
+        {
+          "name": "normalize",
+          "kind": "function",
+          "line": 23
+        },
+        {
+          "name": "normalize",
+          "kind": "function",
+          "line": 28
+        },
+        {
+          "name": "normalize",
+          "kind": "function",
+          "line": 33
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
@@ -79534,6 +79580,13 @@
         "line": 1168
       }
     ],
+    "me.rerere.rikkahub.data.study.StudyVocabularyPolicy": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt",
+        "kind": "object",
+        "line": 10
+      }
+    ],
     "me.rerere.rikkahub.data.study.StudyWallet": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
@@ -80295,11 +80348,35 @@
         "line": 972
       }
     ],
+    "me.rerere.rikkahub.data.study.normalize": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt",
+        "kind": "function",
+        "line": 23
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt",
+        "kind": "function",
+        "line": 28
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt",
+        "kind": "function",
+        "line": 33
+      }
+    ],
     "me.rerere.rikkahub.data.study.normalizeTaskTitle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
         "kind": "function",
         "line": 1118
+      }
+    ],
+    "me.rerere.rikkahub.data.study.normalizeText": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt",
+        "kind": "function",
+        "line": 15
       }
     ],
     "me.rerere.rikkahub.data.study.openMysteryBox": [
