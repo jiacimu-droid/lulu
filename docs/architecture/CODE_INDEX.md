@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`643de3672e66d3210b430b6326fd0df75d3c6323`
+- 基准提交：`cb1b22aafa2855e9871f7f2bd444eaeeb0f6333d`
 - 分支：`master`
-- 源码指纹：`518f87013c45c08a…`
+- 源码指纹：`c0bb55ac71ef464f…`
 - 已索引文件：1129
-- 已索引代码/文本行：265698
+- 已索引代码/文本行：265703
 - 已发现类、接口、对象、函数及 Composable：5526
 
 ## 仓库健康信号
@@ -539,14 +539,14 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1954
+- 已解析本地导入边：1955
 - 可检索完整符号：4929
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
 | `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 128 | 812 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 101 | 953 |
-| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 60 | 19 |
+| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 61 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 55 | 62 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 46 | 258 |
