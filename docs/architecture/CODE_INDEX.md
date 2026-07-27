@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`07bd5491a9b7794fe65090e7a232031b1d9e3d82`
+- 基准提交：`20bd97f116e64e0a3267a3e86f6968c8de63cb7c`
 - 分支：`master`
-- 源码指纹：`687756662e9cf475…`
-- 已索引文件：1184
-- 已索引代码/文本行：266919
-- 已发现类、接口、对象、函数及 Composable：5661
+- 源码指纹：`663a39a4584f802c…`
+- 已索引文件：1185
+- 已索引代码/文本行：267265
+- 已发现类、接口、对象、函数及 Composable：5673
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 845 |
+| 生产代码文件 | 846 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 34 |
 | ≥1500 行生产文件 | 3 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 723 |
+| `app` | 724 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 791 |
+| `.kt` | 792 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -489,7 +489,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 302 个文件，见 `code-index.json`
+- ……另有 303 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -512,6 +512,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt`
+- `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemoryTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt`
@@ -522,8 +523,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankServiceExtractionTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt`
-- ……另有 14 个文件，见 `code-index.json`
+- ……另有 15 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 
@@ -548,17 +548,17 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2062
-- 可检索完整符号：5042
+- 已解析本地导入边：2067
+- 可检索完整符号：5044
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
 | `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 129 | 812 |
-| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 112 | 953 |
+| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 113 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
-| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 60 | 62 |
+| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 61 | 62 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 56 | 296 |
-| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 54 | 191 |
+| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 55 | 191 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 40 | 529 |

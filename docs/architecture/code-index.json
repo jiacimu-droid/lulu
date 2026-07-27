@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T17:26:31.334645+00:00",
-  "commit": "07bd5491a9b7794fe65090e7a232031b1d9e3d82",
+  "generatedAt": "2026-07-27T17:28:00.892958+00:00",
+  "commit": "20bd97f116e64e0a3267a3e86f6968c8de63cb7c",
   "branch": "master",
-  "sourceFingerprint": "687756662e9cf475e76ed47ed7915485a28efd1475d102a36ceab7225b2fd0e2",
+  "sourceFingerprint": "663a39a4584f802caefaede39d3adf2fc7a77812cf4cfd01ed7d43be1851506d",
   "summary": {
-    "files": 1184,
-    "lines": 266919,
-    "symbols": 5661,
-    "productionCodeFiles": 845,
+    "files": 1185,
+    "lines": 267265,
+    "symbols": 5673,
+    "productionCodeFiles": 846,
     "testFiles": 146,
     "largeProductionFiles": 34,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 723,
+      "app": 724,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 791,
+      ".kt": 792,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 332,
-      "记忆": 44
+      "界面": 333,
+      "记忆": 45
     },
-    "resolvedImportEdges": 2062
+    "resolvedImportEdges": 2067
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 112,
+        "importedByCount": 113,
         "todoMarkers": 0
       },
       {
@@ -918,7 +918,7 @@
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
-        "importedByCount": 60,
+        "importedByCount": 61,
         "todoMarkers": 0
       },
       {
@@ -934,7 +934,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 54,
+        "importedByCount": 55,
         "todoMarkers": 0
       },
       {
@@ -1050,6 +1050,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
+        "lines": 83,
+        "symbols": 2,
+        "localImportCount": 0,
+        "importedByCount": 17,
+        "todoMarkers": 0
+      },
+      {
         "path": "speech/src/main/java/me/rerere/tts/model/TTSRequest.kt",
         "lines": 18,
         "symbols": 2,
@@ -1061,14 +1069,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "lines": 277,
         "symbols": 25,
-        "localImportCount": 0,
-        "importedByCount": 16,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
-        "lines": 83,
-        "symbols": 2,
         "localImportCount": 0,
         "importedByCount": 16,
         "todoMarkers": 0
@@ -1816,6 +1816,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProactiveMessagePage.kt",
@@ -1958,6 +1959,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
       "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemoryTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
@@ -1989,12 +1991,12 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 67
+      "imports": 68
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.R",
-      "imports": 28
+      "imports": 29
     },
     {
       "from": "me.rerere.rikkahub.data.service",
@@ -2014,7 +2016,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.hugeicons.HugeIcons",
-      "imports": 23
+      "imports": 24
     },
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
@@ -2037,14 +2039,14 @@
       "imports": 18
     },
     {
-      "from": "me.rerere.search",
-      "to": "me.rerere.ai.core.InputSchema",
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
       "imports": 18
     },
     {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.ui.theme.CustomColors",
-      "imports": 17
+      "from": "me.rerere.search",
+      "to": "me.rerere.ai.core.InputSchema",
+      "imports": 18
     },
     {
       "from": "me.rerere.rikkahub.data.ai.transformers",
@@ -2163,6 +2165,11 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.ui.components.ai",
+      "imports": 10
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.ai.provider.ProviderSetting",
       "imports": 10
     },
@@ -2194,11 +2201,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.utils.plus",
-      "imports": 9
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.ui.components.ai",
       "imports": 9
     },
     {
@@ -2327,6 +2329,11 @@
       "imports": 7
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.hugeicons.stroke.Tools",
+      "imports": 7
+    },
+    {
       "from": "me.rerere.ai.provider.providers",
       "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 6
@@ -2398,7 +2405,12 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.hugeicons.stroke.Tools",
+      "to": "me.rerere.ai.provider.ModelType",
+      "imports": 6
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.data.datastore.Settings",
       "imports": 6
     },
     {
@@ -2524,16 +2536,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.ai.provider.Model",
-      "imports": 5
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.ai.provider.ModelType",
-      "imports": 5
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.data.datastore.Settings",
       "imports": 5
     },
     {
@@ -3914,6 +3916,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelDialogs.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
@@ -14862,6 +14865,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSpeechPage.kt",
@@ -29660,6 +29664,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantBasicPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelDialogs.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
@@ -32433,6 +32438,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchDetailPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchPage.kt",
@@ -41259,6 +41265,106 @@
       "importedBy": []
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 346,
+      "sha256": "4ea0bda8c80859ae67f8b9542e10e49fcca5567aca08e00d6d207412d156eb89",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "记忆",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "ModelSettingSection",
+          "kind": "class",
+          "line": 46
+        },
+        {
+          "name": "defaultModelSettingSections",
+          "kind": "function",
+          "line": 61
+        },
+        {
+          "name": "DefaultMemoryEmbeddingModelSetting",
+          "kind": "composable",
+          "line": 76
+        },
+        {
+          "name": "DefaultMemoryRerankModelSetting",
+          "kind": "composable",
+          "line": 220
+        },
+        {
+          "name": "MemoryEngineModelSettings",
+          "kind": "composable",
+          "line": 238
+        },
+        {
+          "name": "MemoryExtractionModelSetting",
+          "kind": "composable",
+          "line": 277
+        },
+        {
+          "name": "memoryModelName",
+          "kind": "function",
+          "line": 294
+        },
+        {
+          "name": "MemoryEngineDiagnostics",
+          "kind": "composable",
+          "line": 299
+        },
+        {
+          "name": "parseMemoryEmbeddingDimensionsInput",
+          "kind": "function",
+          "line": 323
+        },
+        {
+          "name": "parseMemoryEmbeddingBatchSizeInput",
+          "kind": "function",
+          "line": 326
+        },
+        {
+          "name": "parseMemoryRerankCandidateCountInput",
+          "kind": "function",
+          "line": 329
+        },
+        {
+          "name": "buildMemoryEngineDiagnostics",
+          "kind": "function",
+          "line": 332
+        }
+      ],
+      "localImportCount": 12,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.provider.ModelType",
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.Database02",
+        "me.rerere.hugeicons.stroke.Filter",
+        "me.rerere.hugeicons.stroke.MagicWand01",
+        "me.rerere.hugeicons.stroke.Tools",
+        "me.rerere.rikkahub.R",
+        "me.rerere.rikkahub.data.datastore.Settings",
+        "me.rerere.rikkahub.data.datastore.findModelById",
+        "me.rerere.rikkahub.ui.components.ai.ModelSelector",
+        "me.rerere.rikkahub.ui.components.ui.FormItem",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ModelList.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
       "module": "app",
       "extension": ".kt",
@@ -45205,6 +45311,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpConfig.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingMcpPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderPage.kt",
@@ -94893,6 +95000,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultMemoryEmbeddingModelSetting": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "composable",
+        "line": 76
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
         "line": 156
@@ -94906,6 +95018,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultMemoryRerankModelSetting": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "composable",
+        "line": 220
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
@@ -95198,9 +95315,28 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.MemoryEngineDiagnostics": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "composable",
+        "line": 299
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
         "line": 563
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.MemoryEngineModelSettings": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "composable",
+        "line": 238
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.MemoryExtractionModelSetting": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "composable",
+        "line": 277
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.MetasoOptions": [
@@ -95230,6 +95366,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.ModelSettingSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "class",
+        "line": 46
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "class",
@@ -95581,6 +95722,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.buildMemoryEngineDiagnostics": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "function",
+        "line": 332
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
         "line": 598
@@ -95861,6 +96007,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.defaultModelSettingSections": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "function",
+        "line": 61
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
         "line": 141
@@ -95903,6 +96054,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.memoryModelName": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "function",
+        "line": 294
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
         "line": 557
@@ -95924,6 +96080,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryEmbeddingBatchSizeInput": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "function",
+        "line": 326
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
         "line": 592
@@ -95938,6 +96099,11 @@
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryEmbeddingDimensionsInput": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "function",
+        "line": 323
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
         "line": 589
@@ -95951,6 +96117,11 @@
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryRerankCandidateCountInput": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
+        "kind": "function",
+        "line": 329
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "function",
