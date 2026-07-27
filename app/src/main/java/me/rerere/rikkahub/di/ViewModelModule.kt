@@ -50,6 +50,8 @@ val viewModelModule = module {
             interactionResetService = get(),
             filesManager = get(),
             skillManager = get(),
+            providerManager = get(),
+            apiUsageStore = get(),
         )
     }
     viewModelOf(::TranslatorVM)
