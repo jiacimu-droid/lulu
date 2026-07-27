@@ -211,7 +211,7 @@ class StudyVM(
                 )
                 val legacyResult = StudyRules.draw(
                     state = current.copy(drawsSinceNonNormal = 0),
-                    drawCount = count,
+                    count = count,
                     random = random,
                 )
                 if (legacyResult.results.isEmpty()) {
