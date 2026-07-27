@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T06:31:52.708787+00:00",
-  "commit": "dffd7faad300b28c27ebd7a1986447259ff86949",
+  "generatedAt": "2026-07-27T06:32:19.659208+00:00",
+  "commit": "e69b6d107748b712528f0c8407cb008be5a96011",
   "branch": "master",
-  "sourceFingerprint": "22b146ebe03674cb3621b3973832ea868372f50b4bc7c2e55a5615051691d1f3",
+  "sourceFingerprint": "8bf222b5e331c3fad9f04331820059e1914e3429ccfd1018ea978cf05f9a001c",
   "summary": {
     "files": 1135,
-    "lines": 266534,
+    "lines": 266551,
     "symbols": 5554,
     "productionCodeFiles": 799,
     "testFiles": 143,
@@ -48716,8 +48716,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/study/SummerCourseMilestonePlanTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 65,
-      "sha256": "883a184c15861c677d991f3c66be235218c82f9f701f2fb709dd0ebed3b75e60",
+      "lines": 82,
+      "sha256": "55be5c566430affbd5f602542d140c652635bf64f35d9ebde2f1f11713a66910",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
