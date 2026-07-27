@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T06:25:12.368870+00:00",
-  "commit": "37d5a1b4f217c2a3119b93fe5d97c2404e2a092d",
+  "generatedAt": "2026-07-27T06:26:01.979801+00:00",
+  "commit": "32d51d02c09ce6e2080d7769937e19cfb1be1306",
   "branch": "master",
-  "sourceFingerprint": "f2d7f7b80307cd994349307dd5f619e922eb33ea2301ff571b15131b098567e8",
+  "sourceFingerprint": "5c67ca1c3a9280653c88330e4152e9c6d680147fc31ef26fb461046755bf9185",
   "summary": {
-    "files": 1134,
-    "lines": 266399,
-    "symbols": 5553,
+    "files": 1135,
+    "lines": 266464,
+    "symbols": 5554,
     "productionCodeFiles": 799,
-    "testFiles": 142,
+    "testFiles": 143,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 673,
+      "app": 674,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 741,
+      ".kt": 742,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 22,
+      "学习监督": 23,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
@@ -1382,6 +1382,7 @@
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyPlanCatalogOverlayTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyRulesTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyStorePersistenceTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/study/SummerCourseMilestonePlanTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlowTest.kt"
     ],
     "工具": [
@@ -48712,6 +48713,31 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/study/SummerCourseMilestonePlanTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 65,
+      "sha256": "883a184c15861c677d991f3c66be235218c82f9f701f2fb709dd0ebed3b75e60",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "SummerCourseMilestonePlanTest",
+          "kind": "class",
+          "line": 9
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -79520,6 +79546,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt",
         "kind": "object",
         "line": 15
+      }
+    ],
+    "me.rerere.rikkahub.data.study.SummerCourseMilestonePlanTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/SummerCourseMilestonePlanTest.kt",
+        "kind": "class",
+        "line": 9
       }
     ],
     "me.rerere.rikkahub.data.study.SuperMomentChoice": [
