@@ -5,16 +5,18 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 /**
- * Daily chapter ledger for the 2026 summer first-pass course deadlines.
+ * Hard monthly/weekly milestones with flexible daily execution.
  *
- * Sundays are complete rest days. Course chapters are distributed only across
- * study days, while recitation keeps explicit first/second/third-round goals.
+ * Month plans define the non-negotiable month-end destination. Week plans define
+ * exact chapter and recitation endpoints. Daily plans deliberately do not assign
+ * chapters to individual dates because real course lengths differ: the learner
+ * chooses how much of the week's remaining target to complete each day.
  */
 object SummerCourseDeadlinePlan : StudyPlanOverlay {
-    private val criminalStart = LocalDate.of(2026, 7, 26)
-    private val criminalLastCourseDate = LocalDate.of(2026, 8, 12)
+    private val criminalStart = LocalDate.of(2026, 7, 27)
+    private val criminalCourseEnd = LocalDate.of(2026, 8, 12)
     private val criminalDeadline = LocalDate.of(2026, 8, 15)
-    private val civilStart = LocalDate.of(2026, 8, 16)
+    private val civilStart = LocalDate.of(2026, 8, 17)
     private val civilDeadline = LocalDate.of(2026, 9, 15)
     private val constitutionStart = LocalDate.of(2026, 9, 16)
     private val constitutionEnd = LocalDate.of(2026, 9, 22)
@@ -22,82 +24,151 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
     private val legalHistoryStart = LocalDate.of(2026, 9, 24)
     private val allCourseDeadline = LocalDate.of(2026, 9, 30)
 
+    private val milestones = listOf(
+        milestone(
+            id = "2026-07-w4",
+            title = "刑法第3-7章正式收口与完整休息",
+            start = "2026-07-20",
+            end = "2026-07-26",
+            courseTarget = "7月25日前完成刑法第3-7章合并题、主错因和正式连接框架；7月26日完整休息",
+            recitationTarget = "法理第一轮背诵至少完成第1章闭卷验收",
+            acceptance = "刑法第3-7章不再残留听课任务；第7章闭环后，7月27日才能进入刑法第8章",
+        ),
+        milestone(
+            id = "2026-07-w5",
+            title = "刑法听到第13章，法理背到第2章",
+            start = "2026-07-27",
+            end = "2026-07-31",
+            courseTarget = "刑法新课从第8章推进到第13章，7月31日结束时课程账本必须明确停在第13章",
+            recitationTarget = "法理第一轮闭卷背诵完成第1-2章；达到约70%目录树和关键词复述后才能继续",
+            acceptance = "刑法第8-13章已听完章节留下关键词/目录树；至少把第8-10章的配套题入口、正式框架和主错因记入账本",
+        ),
+        milestone(
+            id = "2026-08-w1",
+            title = "刑法听到第21章，法理背到第5章",
+            start = "2026-08-01",
+            end = "2026-08-07",
+            courseTarget = "刑法第14-21章课程全部完成，周末课程终点固定为第21章",
+            recitationTarget = "法理第一轮背诵完成第3-5章；刑法第8-13章完成第一轮目录树和关键词抽背",
+            acceptance = "刑法第14-21章逐章留下课程完成记录；已听完章节完成最低可用框架、配套题入口和唯一主错因",
+        ),
+        milestone(
+            id = "2026-08-w2",
+            title = "刑法第25章听完并完成一轮总收口",
+            start = "2026-08-08",
+            end = "2026-08-14",
+            courseTarget = "8月12日前完成刑法第22-25章课程，刑法新课终点固定为第25章",
+            recitationTarget = "法理第一轮背诵完成第6-8章；刑法第8-25章完成第一轮关键词背诵登记",
+            acceptance = "8月13-14日集中验收刑法第8-25章课程账本、重点章题目、正式框架、主错因和D1/D3/D7回炉日期",
+        ),
+        milestone(
+            id = "2026-08-w3",
+            title = "刑法验收完成，民法听到第10章",
+            start = "2026-08-15",
+            end = "2026-08-21",
+            courseTarget = "8月15日完成刑法一轮总验收；8月17日起启动民法并在8月21日前听完第1-10章",
+            recitationTarget = "法理第一轮背诵完成第9-10章；民法第一轮目录树和关键词背诵推进到第5章",
+            acceptance = "刑法不得继续残留常规新课；民法课程账本明确到第10章，已完成章节留下框架、配套题入口和主错因",
+        ),
+        milestone(
+            id = "2026-08-w4",
+            title = "民法听到第27章，法理一轮背完",
+            start = "2026-08-22",
+            end = "2026-08-31",
+            courseTarget = "民法第11-27章课程全部完成，8月月末课程终点固定为第27章",
+            recitationTarget = "法理第一轮背诵完成第11-13章并完成全书一轮；民法第一轮背诵推进到第18章",
+            acceptance = "8月31日核对民法课程终点第27章、背诵终点第18章以及所有已听完章节的框架/题目/主错因账本",
+        ),
+        milestone(
+            id = "2026-09-w1",
+            title = "民法听到第40章，背到第32章",
+            start = "2026-09-01",
+            end = "2026-09-07",
+            courseTarget = "民法第28-40章课程全部完成，周末课程终点固定为第40章",
+            recitationTarget = "民法第一轮目录树和关键词背诵完成第19-32章；法理、刑法按D1/D3/D7抽背",
+            acceptance = "民法第28-40章课程记录完整；已完成章节至少留下正式框架、配套题入口和唯一主错因",
+        ),
+        milestone(
+            id = "2026-09-w2",
+            title = "民法第54章全部听完，背到第45章",
+            start = "2026-09-08",
+            end = "2026-09-15",
+            courseTarget = "9月15日前完成民法第41-54章，民法全部新课终点固定为第54章",
+            recitationTarget = "民法第一轮背诵完成第33-45章；较早薄弱章按D1/D3/D7回炉",
+            acceptance = "民法第1-54章课程账本完整，最低可用一轮闭环可核对；9月15日起启动政治，不提前挤占专业课",
+        ),
+        milestone(
+            id = "2026-09-w3",
+            title = "宪法听到第6章，民法一轮背完",
+            start = "2026-09-16",
+            end = "2026-09-21",
+            courseTarget = "宪法第1-6章课程全部完成，周末课程终点固定为第6章",
+            recitationTarget = "民法第一轮背诵完成第46-54章；法理第二轮规范表述推进到第3章",
+            acceptance = "民法第一轮背诵全书收口；宪法第1-6章留下目录树、框架、配套题入口和易混点",
+        ),
+        milestone(
+            id = "2026-09-w4",
+            title = "宪法与法制史全部新课结束",
+            start = "2026-09-22",
+            end = "2026-09-30",
+            courseTarget = "9月22日完成宪法第7章并收口；9月24-30日完成法制史第1-7章全部课程",
+            recitationTarget = "法理第二轮规范表述推进到第6章；刑法第二轮规范表述推进到第5章",
+            acceptance = "9月30日验收刑法、民法、宪法、法制史全部常规新课结束；10月不再安排常规新课",
+        ),
+    )
+
     override val dailyOverrides: Map<LocalDate, DailyStudyPlan> = buildMap {
-        val criminalStudyDates = studyDatesBetween(criminalStart, criminalLastCourseDate)
-        criminalStudyDates.forEachIndexed { index, date ->
-            val startChapter = chapterBoundary(index, criminalStudyDates.size, 18) + 8
-            val endChapter = chapterBoundary(index + 1, criminalStudyDates.size, 18) + 7
-            val chapterText = chapterText(startChapter, endChapter)
+        studyDatesBetween(criminalStart, criminalCourseEnd).forEach { date ->
             put(
                 date,
-                daily(
-                    date,
-                    "刑法${chapterText}：按8月15日节点均匀推进",
-                    law("听众合法硕刑法${chapterText}课程：按真实课时连续推进；两个短章可同日完成，长章未听完时次日先续本章，不跳章"),
-                    review("当天已听完章节闭卷复述目录树、构成关系和关键词；整章听完后完成正式框架图，并集中进入配套题与主错因整理"),
-                    review(recitationTask(date, "刑法")),
-                    english(ExamStudyPlan.dailyVocabularyTaskTitle),
-                    english(defaultEnglishTask(date)),
-                    health("今日所有科目从当天总预算内切分；专业课优先，不用熬夜把长章强行清零"),
+                flexibleCourseDay(
+                    date = date,
+                    subject = "刑法",
+                    courseRule = "从刑法当前真实进度继续听众合法硕刑法课程。今天可以完成半章、一章或多个短章；只要不跳章，并保证本周硬终点即可。",
                 ),
             )
         }
-        addSundayRestDays(criminalStart, criminalLastCourseDate)
+        addSundayRestDays(criminalStart, criminalCourseEnd)
 
-        studyDatesBetween(criminalLastCourseDate.plusDays(1), criminalDeadline).forEach { date ->
-            put(
-                date,
-                daily(
+        datesBetween(criminalCourseEnd.plusDays(1), criminalDeadline).forEach { date ->
+            if (date.dayOfWeek == DayOfWeek.SUNDAY) {
+                put(date, restDay(date))
+            } else {
+                put(
                     date,
-                    "刑法一轮收口：课程、框架、题目与错因总验收",
-                    review("核对刑法第8-25章课程账本：补完尚未结束的最后课程小节，不再新增其他科目新课"),
-                    law("集中完成刑法尚未闭环章节的配套题、唯一主错因和隔日/7-14日回炉日期；优先重点章，不追求把所有二刷一次清零"),
-                    review("刑法第一轮背诵验收：闭卷说出重点章目录树、构成要件和关键词；薄弱点登记D1/D3/D7，不要求一字不差"),
-                    review(recitationTask(date, "刑法")),
-                    english(ExamStudyPlan.dailyVocabularyTaskTitle),
-                    english(defaultEnglishTask(date)),
-                ),
-            )
+                    daily(
+                        date,
+                        "刑法一轮收口：按缺口自由选择验收块",
+                        review("本周新课硬目标已经到第25章；今天从课程账本、重点章配套题、正式框架、唯一主错因和D1/D3/D7中选择最大缺口集中完成"),
+                        review("刑法第一轮背诵按第8-25章账本验收：闭卷说目录树、构成要件和关键词，薄弱章登记回炉，不要求当天平均背完"),
+                        review("法理按本周硬终点继续闭卷背诵，不因刑法收口跳过背书"),
+                        english(ExamStudyPlan.dailyVocabularyTaskTitle),
+                        english(defaultEnglishTask(date)),
+                    ),
+                )
+            }
         }
-        addSundayRestDays(criminalLastCourseDate.plusDays(1), criminalDeadline)
 
-        val civilStudyDates = studyDatesBetween(civilStart, civilDeadline)
-        civilStudyDates.forEachIndexed { index, date ->
-            val startChapter = chapterBoundary(index, civilStudyDates.size, ExamStudyPlan.civilLawChapterCount) + 1
-            val endChapter = chapterBoundary(index + 1, civilStudyDates.size, ExamStudyPlan.civilLawChapterCount)
-            val chapterText = chapterText(startChapter, endChapter)
+        studyDatesBetween(civilStart, civilDeadline).forEach { date ->
             put(
                 date,
-                daily(
-                    date,
-                    "民法${chapterText}：按9月15日节点均匀推进",
-                    law("听众合法硕民法${chapterText}课程：两个短章可同日连续完成；遇到长章按真实课时占满主块，不用章节数伪造进度"),
-                    review("当天已听完章节闭卷复述目录树和关键词，形成最低可用正式框架；整章完成后集中做配套题并记录唯一主错因"),
-                    review(recitationTask(date, "民法")),
-                    english(ExamStudyPlan.dailyVocabularyTaskTitle),
-                    english(defaultEnglishTask(date)),
-                    health("民法54章仅在学习日均匀分配；当天章节过长时先保证连续课程输入，闭环缺口进入随后两天，不熬夜清零"),
+                flexibleCourseDay(
+                    date = date,
+                    subject = "民法",
+                    courseRule = "从民法当前真实进度继续听众合法硕民法课程。短章可连续完成，长章可以跨日；今天不预设具体章节数，只对本周硬终点负责。",
                 ),
             )
         }
         addSundayRestDays(civilStart, civilDeadline)
 
-        val constitutionStudyDates = studyDatesBetween(constitutionStart, constitutionEnd)
-        constitutionStudyDates.forEachIndexed { index, date ->
-            val startChapter = chapterBoundary(index, constitutionStudyDates.size, ExamStudyPlan.constitutionalLawChapterCount) + 1
-            val endChapter = chapterBoundary(index + 1, constitutionStudyDates.size, ExamStudyPlan.constitutionalLawChapterCount)
-            val chapterText = chapterText(startChapter, endChapter)
+        studyDatesBetween(constitutionStart, constitutionEnd).forEach { date ->
             put(
                 date,
-                daily(
-                    date,
-                    "宪法${chapterText}：课程与最低可用闭环",
-                    law("听众合法硕宪法${chapterText}课程：完成当天课程主块并记录实际有效分钟"),
-                    review("当天章节闭卷目录树、正式框架和配套题入口；写出易混点与一条主观题规范表述"),
-                    review(recitationTask(date, "宪法")),
-                    english(ExamStudyPlan.dailyVocabularyTaskTitle),
-                    english(defaultEnglishTask(date)),
-                    politics("政治按当天总预算完成强化课/核心考案小节与1000题启动块，不挤掉专业课主线"),
+                flexibleCourseDay(
+                    date = date,
+                    subject = "宪法",
+                    courseRule = "从宪法当前真实进度继续听众合法硕宪法课程。按真实课时决定今天推进多少，不把每日均分当成完成标准。",
+                    includePolitics = true,
                 ),
             )
         }
@@ -108,138 +179,71 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
             daily(
                 transitionBuffer,
                 "宪法收口与法制史切换缓冲",
-                review("核对宪法第1-7章课程、正式框架、配套题入口和主错因，只补最大缺口"),
-                review("整理宪法总框架与第一轮关键词口述，写清明日法制史第1章入口"),
-                review("第二轮规范表述：从法理、刑法或民法较早章节中选一章，闭卷说定义、构成要件和答题骨架"),
+                review("核对本月硬目标：宪法第1-7章必须全部完成；只补课程、正式框架、配套题入口和主错因中的最大缺口"),
+                review("按本周背诵硬目标完成法理第二轮与刑法第二轮当天份额，不新增无法验收的泛泛背书"),
+                review("写清法制史第1章明日入口；今天不提前制造新的日章节指标"),
                 english(ExamStudyPlan.dailyVocabularyTaskTitle),
                 english(defaultEnglishTask(transitionBuffer)),
                 politics("政治强化课/核心考案小节 + 1000题25-30道 + 主错因"),
             ),
         )
 
-        val historyStudyDates = studyDatesBetween(legalHistoryStart, allCourseDeadline)
-        historyStudyDates.forEachIndexed { index, date ->
-            val startChapter = chapterBoundary(index, historyStudyDates.size, ExamStudyPlan.legalHistoryChapterCount) + 1
-            val endChapter = chapterBoundary(index + 1, historyStudyDates.size, ExamStudyPlan.legalHistoryChapterCount)
-            val chapterText = chapterText(startChapter, endChapter)
+        studyDatesBetween(legalHistoryStart, allCourseDeadline).forEach { date ->
             put(
                 date,
-                daily(
-                    date,
-                    "法制史${chapterText}：9月30日前完成全部新课",
-                    law("听众合法硕法制史${chapterText}课程：按朝代、制度和时间线完成当天课程主块"),
-                    review("当天章节闭卷时间线、制度比较和正式框架；整章结束后进入配套题并记录唯一主错因"),
-                    review(recitationTask(date, "法制史")),
-                    english(ExamStudyPlan.dailyVocabularyTaskTitle),
-                    english(defaultEnglishTask(date)),
-                    politics("政治强化课/核心考案小节 + 1000题25-30道 + 知识点回忆和主错因"),
-                    health(if (date == allCourseDeadline) "今日验收四科常规新课全部结束；10月进入第二轮规范表述，11月进入第三轮限时输出" else "新课仍按唯一主线推进，不提前切换到10月二轮任务"),
+                flexibleCourseDay(
+                    date = date,
+                    subject = "法制史",
+                    courseRule = "从法制史当前真实进度继续听众合法硕法制史课程。按朝代和制度连续推进，今天自由决定章节量，但9月30日必须到第7章。",
+                    includePolitics = true,
                 ),
             )
         }
         addSundayRestDays(legalHistoryStart, allCourseDeadline)
     }
 
-    override val weeklyOverrides: Map<String, WeeklyStudyPlan> = listOf(
-        weekly(
-            "2026-07-w4",
-            "刑法第3-7章收口后完整休息",
-            "2026-07-20 至 2026-07-26",
-            "7月25日已完成刑法第7章题目与框架；7月26日为每周完整休息日，不安排单词或补课",
-            "7月27日从刑法第8章进入唯一新课主线，不提前启动民法",
-        ),
-        weekly(
-            "2026-07-w5",
-            "刑法第8章起按8月15日节点推进",
-            "2026-07-27 至 2026-07-31",
-            "专业课只学刑法：课程→闭卷骨架→正式框架→配套题→唯一主错因",
-            "法理维持第一轮目录树与关键词背诵；英语保留120词与真题主训练",
-            "每天按真实课时推进，长章允许跨日，不用章节数制造虚假完成",
-        ),
-        weekly(
-            "2026-08-w1",
-            "刑法课程连续推进与第一轮背诵",
-            "2026-08-01 至 2026-08-07",
-            "继续刑法第8-25章唯一新课主线，完成章当天留下最低可用正式框架和配套题入口",
-            "周日完整休息；法理与已学刑法按D1/D3/D7回炉",
-        ),
-        weekly(
-            "2026-08-w2",
-            "刑法课程结束与8月15日总验收",
-            "2026-08-08 至 2026-08-14",
-            "8月12日前听完刑法新课；随后集中补课程账本、重点章题目、主错因与第一轮背诵",
-            "民法不得提前插入，刑法一轮在8月15日前完成总收口",
-        ),
-        weekly(
-            "2026-08-w3",
-            "刑法收口后启动民法",
-            "2026-08-15 至 2026-08-21",
-            "8月15日验收刑法；8月16日起按顺序启动民法第1章，不两本书并行听新课",
-            "民法按课程、框架、题目、错因闭环；刑法和法理转为背诵复线",
-        ),
-        weekly(
-            "2026-08-w4",
-            "民法唯一新课主线",
-            "2026-08-22 至 2026-08-31",
-            "按9月15日节点均匀推进民法54章，短章可合并，长章按真实课时跨日",
-            "周日完整休息；英语和第一轮背诵从当天总预算中切分",
-        ),
-        weekly(
-            "2026-09-w1",
-            "民法后半程连续推进",
-            "2026-09-01 至 2026-09-07",
-            "继续民法唯一新课主线，完成章留下正式框架、配套题入口和唯一主错因",
-            "法理、刑法与已学民法继续第一轮目录树和关键词抽背",
-        ),
-        weekly(
-            "2026-09-w2",
-            "民法9月15日节点收口",
-            "2026-09-08 至 2026-09-15",
-            "9月15日前完成民法全部新课与最低可用一轮闭环",
-            "9月15日起启动政治；新增政治时间从当天总预算中切分",
-        ),
-        weekly(
-            "2026-09-w3",
-            "宪法新课与第二轮规范表述启动",
-            "2026-09-16 至 2026-09-21",
-            "9月16日起只听宪法新课，按章节完成目录树、正式框架和配套题入口",
-            "第一轮继续收口，同时启动较早章节第二轮定义、构成要件与答题骨架",
-        ),
-        weekly(
-            "2026-09-w4",
-            "宪法收口并完成法制史全部新课",
-            "2026-09-22 至 2026-09-30",
-            "9月22日前完成宪法；9月23日切换缓冲；9月24-30日完成法制史第1-7章",
-            "9月30日验收四科常规新课全部结束，10月进入第二轮，11月进入第三轮限时输出",
-        ),
-    ).associateBy { it.id }
+    override val weeklyOverrides: Map<String, WeeklyStudyPlan> =
+        milestones.associate { item ->
+            item.id to WeeklyStudyPlan(
+                id = item.id,
+                title = item.title,
+                dateRange = "${item.start} 至 ${item.end}",
+                tasks = listOf(
+                    "【本周新课硬终点】${item.courseTarget}",
+                    "【本周背诵硬终点】${item.recitationTarget}",
+                    "【周末验收】${item.acceptance}",
+                    "【日内自由规则】每天不预先绑定具体章节数；根据长短章、身体状态和当天可用时长，自由选择半章、一章或多个短章，但周末硬终点不得变成‘继续推进’",
+                    "【英语保底】非完整休息日保持120词与真题主训练；英语、背诵和专业课都从当天总预算内切分",
+                ),
+            )
+        }
 
     override fun monthlyPlan(base: MonthlyStudyPlan): MonthlyStudyPlan = when (base.month) {
         "2026-07" -> base.copy(
-            focus = "刑法第3-7章收口，7月27日起从第8章继续",
+            focus = "月末硬目标：刑法听到第13章，法理背到第2章",
             tasks = listOf(
-                "7月25日已完成刑法第7章题目与框架；7月26日完整休息，不安排任何学习任务",
-                "7月27日起只推进刑法第8章及后续章节，按课程→闭卷骨架→正式框架→配套题→主错因执行",
-                "法理进入第一轮目录树与关键词背诵；英语保留每日120词和真题训练",
-                "本月不启动民法和政治，不用多本新课并行制造进度",
+                "【新课硬终点】7月31日前完成刑法第8-13章课程，课程账本明确停在第13章",
+                "【背诵硬终点】法理第一轮闭卷背诵完成第1-2章",
+                "【闭环验收】刑法第8-10章至少留下配套题入口、正式框架和唯一主错因；第11-13章留下课程与目录树记录",
+                "【执行方式】月目标固定、周目标固定；每天只决定当天完成多少，不再把章节按天机械均分",
             ),
         )
         "2026-08" -> base.copy(
-            focus = "8月15日前完成刑法，随后启动民法",
+            focus = "月末硬目标：刑法全部收口，民法听到第27章",
             tasks = listOf(
-                "8月12日前完成刑法第8-25章课程，8月13-15日集中验收框架、配套题、主错因和第一轮背诵",
-                "8月16日起按顺序启动民法第1章；刑法未收口前不得提前听民法新课",
-                "每周星期日完整休息；法理与已学专业课按D1/D3/D7持续抽背",
-                "英语每天120词并轮换阅读、完形、翻译和新题型，全部计入当天总预算",
+                "【新课硬终点】8月12日前听完刑法第25章，8月15日前完成刑法一轮总收口；8月31日前民法课程听到第27章",
+                "【背诵硬终点】法理第一轮完成第1-13章；民法第一轮目录树与关键词背诵完成第1-18章",
+                "【闭环验收】刑法第8-25章课程、重点章题目、正式框架、主错因和回炉日期可核对；民法已学章节留下最低可用闭环",
+                "【执行方式】每周写死章节终点，日计划根据真实课时自由安排，不用某一天没听完一章就判定整月失败",
             ),
         )
         "2026-09" -> base.copy(
-            focus = "9月15日前完成民法，9月30日前完成宪法与法制史",
+            focus = "月末硬目标：四科常规新课全部结束",
             tasks = listOf(
-                "9月15日前完成民法54章全部新课与最低可用一轮闭环",
-                "9月16-22日完成宪法第1-7章；9月23日为收口与切换缓冲",
-                "9月24-30日完成法制史第1-7章，9月30日验收四科常规新课全部结束",
-                "9月15日起启动政治；第一轮背诵收口并在9月下半月启动第二轮规范表述",
+                "【新课硬终点】9月15日前民法听完第54章；9月22日前宪法听完第7章；9月30日前法制史听完第7章",
+                "【背诵硬终点】民法第一轮完成第1-54章；法理第二轮规范表述完成第1-6章；刑法第二轮完成第1-5章",
+                "【政治硬目标】9月15日起每周完成4-5个政治课题绑定块，每块25-30道1000题并记录主错因",
+                "【月末验收】9月30日后不再安排刑法、民法、宪法、法制史常规新课，10月统一进入第二轮、真题与规范表述",
             ),
         )
         else -> base
@@ -247,8 +251,7 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
 
     /**
      * Older composables still read ExamStudyPlan directly. Remove every overlapping
-     * legacy entry first, then install the current plan. These casts are deliberate:
-     * a loud failure is safer than silently falling back to a retired plan again.
+     * legacy entry first, then install the current plan.
      */
     @Suppress("UNCHECKED_CAST")
     internal fun installIntoLegacyExamPlanViews() {
@@ -269,33 +272,45 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         }
     }
 
+    private fun flexibleCourseDay(
+        date: LocalDate,
+        subject: String,
+        courseRule: String,
+        includePolitics: Boolean = false,
+    ): DailyStudyPlan {
+        val target = milestoneFor(date)
+        val tasks = buildList {
+            add(law("本周新课硬目标：${target?.courseTarget ?: "按当前月计划继续"}。$courseRule"))
+            add(review("今天只闭环实际完成的章节：整章听完后再集中做正式框架、配套题和唯一主错因；未听完的长章次日先续，不跳章"))
+            add(review("本周背诵硬目标：${target?.recitationTarget ?: "按当前轮次继续"}。今天从本周剩余章节中自由选择一个可完成背诵块，并留下闭卷复述痕迹"))
+            add(english(ExamStudyPlan.dailyVocabularyTaskTitle))
+            add(english(defaultEnglishTask(date)))
+            if (includePolitics) {
+                add(politics("政治按本周固定题量完成当天一个课题绑定块；从当天总预算中切分，不挤掉专业课硬目标"))
+            }
+            add(health("今天不设置强制章节终点；只要行动服务于本周硬目标即可。状态好可多推进，长章或不适时可少推进，但周末必须按硬终点验收"))
+        }
+        return DailyStudyPlan(
+            date = date,
+            title = "$subject：围绕本周硬目标自由安排今日进度",
+            tasks = tasks,
+        )
+    }
+
+    private fun milestoneFor(date: LocalDate): WeeklyMilestone? =
+        milestones.firstOrNull { date >= it.start && date <= it.end }
+
     private fun MutableMap<LocalDate, DailyStudyPlan>.addSundayRestDays(
         start: LocalDate,
         endInclusive: LocalDate,
     ) {
         datesBetween(start, endInclusive)
             .filter { it.dayOfWeek == DayOfWeek.SUNDAY }
-            .forEach { date ->
-                put(date, DailyStudyPlan(date = date, title = "每周完整休息日", tasks = emptyList()))
-            }
+            .forEach { date -> put(date, restDay(date)) }
     }
 
-    private fun recitationTask(date: LocalDate, currentSubject: String): String = when {
-        date < LocalDate.of(2026, 9, 16) ->
-            "第一轮背诵：法理当前章节闭卷30-40分钟，并抽背${currentSubject}已学章节的目录树、关键词和构成关系；每章最多3个主块，达到约70%后推进，薄弱点按D1/D3/D7回炉"
-        date < LocalDate.of(2026, 10, 1) ->
-            "第一轮收口 + 第二轮启动：当前科目做目录树和关键词闭卷；法理、刑法、民法较早章节轮流背定义、构成要件与规范表述40-60分钟"
-        date < LocalDate.of(2026, 11, 1) ->
-            "第二轮规范表述：按题型闭卷输出定义、构成要件、简答骨架和案例分析步骤，薄弱章隔日回炉"
-        else ->
-            "第三轮限时输出：默写框架、口头答题和高频点抽背，按考场时间限制完成"
-    }
-
-    private fun chapterBoundary(dayIndex: Int, totalDays: Int, chapterCount: Int): Int =
-        (dayIndex * chapterCount) / totalDays
-
-    private fun chapterText(startChapter: Int, endChapter: Int): String =
-        if (startChapter == endChapter) "第${startChapter}章" else "第${startChapter}-${endChapter}章"
+    private fun restDay(date: LocalDate): DailyStudyPlan =
+        DailyStudyPlan(date = date, title = "每周完整休息日", tasks = emptyList())
 
     private fun studyDatesBetween(start: LocalDate, endInclusive: LocalDate): List<LocalDate> =
         datesBetween(start, endInclusive).filter { it.dayOfWeek != DayOfWeek.SUNDAY }
@@ -319,16 +334,37 @@ object SummerCourseDeadlinePlan : StudyPlanOverlay {
         vararg tasks: StudyPlanTask,
     ): DailyStudyPlan = DailyStudyPlan(date = date, title = title, tasks = tasks.toList())
 
-    private fun weekly(
+    private fun milestone(
         id: String,
         title: String,
-        dateRange: String,
-        vararg tasks: String,
-    ): WeeklyStudyPlan = WeeklyStudyPlan(id = id, title = title, dateRange = dateRange, tasks = tasks.toList())
+        start: String,
+        end: String,
+        courseTarget: String,
+        recitationTarget: String,
+        acceptance: String,
+    ): WeeklyMilestone = WeeklyMilestone(
+        id = id,
+        title = title,
+        start = LocalDate.parse(start),
+        end = LocalDate.parse(end),
+        courseTarget = courseTarget,
+        recitationTarget = recitationTarget,
+        acceptance = acceptance,
+    )
 
     private fun law(title: String) = StudyPlanTask(title, StudyPlanTaskKind.Law)
     private fun review(title: String) = StudyPlanTask(title, StudyPlanTaskKind.Review)
     private fun english(title: String) = StudyPlanTask(title, StudyPlanTaskKind.English)
     private fun politics(title: String) = StudyPlanTask(title, StudyPlanTaskKind.Politics)
     private fun health(title: String) = StudyPlanTask(title, StudyPlanTaskKind.Health)
+
+    private data class WeeklyMilestone(
+        val id: String,
+        val title: String,
+        val start: LocalDate,
+        val end: LocalDate,
+        val courseTarget: String,
+        val recitationTarget: String,
+        val acceptance: String,
+    )
 }
