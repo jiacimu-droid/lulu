@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:23:05.016282+00:00",
-  "commit": "defa3e8942d3e16dd3a6435e8d8ce3f869bdceed",
+  "generatedAt": "2026-07-27T16:24:54.356304+00:00",
+  "commit": "220bf72d58e294b99a39fbdb84d0ba9573161991",
   "branch": "master",
-  "sourceFingerprint": "0cfd8c530cc54d6f19703369bc5217c07306d4bb01a99e4fd6cac12ce0023723",
+  "sourceFingerprint": "7212999ded6caf77fa5b628e58f8ede5243413841197582aa23270f35984d8c7",
   "summary": {
-    "files": 1159,
-    "lines": 267864,
-    "symbols": 5594,
-    "productionCodeFiles": 820,
+    "files": 1160,
+    "lines": 268322,
+    "symbols": 5599,
+    "productionCodeFiles": 821,
     "testFiles": 146,
     "largeProductionFiles": 40,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 698,
+      "app": 699,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 766,
+      ".kt": 767,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 311,
+      "界面": 312,
       "记忆": 44
     },
-    "resolvedImportEdges": 2005
+    "resolvedImportEdges": 2012
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 104,
+        "importedByCount": 105,
         "todoMarkers": 0
       },
       {
@@ -942,7 +942,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 48,
+        "importedByCount": 49,
         "todoMarkers": 0
       },
       {
@@ -1042,6 +1042,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
+        "lines": 196,
+        "symbols": 6,
+        "localImportCount": 1,
+        "importedByCount": 17,
+        "todoMarkers": 0
+      },
+      {
         "path": "speech/src/main/java/me/rerere/tts/model/TTSRequest.kt",
         "lines": 18,
         "symbols": 2,
@@ -1054,14 +1062,6 @@
         "lines": 277,
         "symbols": 25,
         "localImportCount": 0,
-        "importedByCount": 16,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
-        "lines": 196,
-        "symbols": 6,
-        "localImportCount": 1,
         "importedByCount": 16,
         "todoMarkers": 0
       },
@@ -1788,6 +1788,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingFilesPage.kt",
@@ -1961,7 +1962,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 58
+      "imports": 62
     },
     {
       "from": "me.rerere.rikkahub.data.service",
@@ -1989,6 +1990,11 @@
       "imports": 21
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.setting",
+      "to": "me.rerere.rikkahub.R",
+      "imports": 19
+    },
+    {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.core.InputSchema",
       "imports": 18
@@ -1996,11 +2002,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 18
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.setting",
-      "to": "me.rerere.rikkahub.R",
       "imports": 18
     },
     {
@@ -2076,7 +2077,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.theme.CustomColors",
-      "imports": 13
+      "imports": 14
     },
     {
       "from": "me.rerere.rikkahub.ui.components.message",
@@ -14805,6 +14806,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
@@ -30771,6 +30773,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/table/DataTable.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/debug/DebugPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt"
       ]
     },
@@ -31511,6 +31514,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/backup/tabs/WebDavTab.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/ExtensionsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
@@ -32937,6 +32941,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/FilesPicker.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSystemToolsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingWebPage.kt"
@@ -34008,6 +34013,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/activity/SafeModeActivity.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt"
       ]
     },
@@ -39968,6 +39974,71 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 458,
+      "sha256": "92baf0c2ab4d4993140e363f892b2335cba3adf01dd005448fc17a04e05ab794",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "DisplayThemeSection",
+          "kind": "composable",
+          "line": 42
+        },
+        {
+          "name": "DisplayGeneralSection",
+          "kind": "composable",
+          "line": 114
+        },
+        {
+          "name": "DisplayProfileSection",
+          "kind": "composable",
+          "line": 186
+        },
+        {
+          "name": "DisplayMessageSection",
+          "kind": "composable",
+          "line": 233
+        },
+        {
+          "name": "DisplaySettingSlider",
+          "kind": "composable",
+          "line": 437
+        }
+      ],
+      "localImportCount": 11,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.R",
+        "me.rerere.rikkahub.data.datastore.ChatFontFamily",
+        "me.rerere.rikkahub.data.datastore.DisplaySetting",
+        "me.rerere.rikkahub.ui.components.richtext.MarkdownBlock",
+        "me.rerere.rikkahub.ui.components.ui.CardGroup",
+        "me.rerere.rikkahub.ui.components.ui.permission.PermissionManager",
+        "me.rerere.rikkahub.ui.components.ui.permission.PermissionNotification",
+        "me.rerere.rikkahub.ui.components.ui.permission.rememberPermissionState",
+        "me.rerere.rikkahub.ui.hooks.rememberSharedPreferenceBoolean",
+        "me.rerere.rikkahub.ui.pages.setting.components.PresetThemeButtonGroup",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/permission/PermissionManager.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/hooks/SharedPreferences.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/PresetThemeButton.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
       "module": "app",
       "extension": ".kt",
@@ -41435,6 +41506,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/theme/PresetTheme.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt"
       ]
     },
@@ -44070,6 +44142,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/log/LogPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingFilesPage.kt",
@@ -93604,6 +93677,41 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "kind": "composable",
         "line": 523
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayGeneralSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+        "kind": "composable",
+        "line": 114
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayMessageSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+        "kind": "composable",
+        "line": 233
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayProfileSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+        "kind": "composable",
+        "line": 186
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplaySettingSlider": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+        "kind": "composable",
+        "line": 437
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayThemeSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+        "kind": "composable",
+        "line": 42
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DonateMethodsCardGroup": [
