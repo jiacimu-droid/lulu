@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:21:09.675832+00:00",
-  "commit": "9b0c95e88bdea03fb9356d70e5ed1d7bddf7ccdc",
+  "generatedAt": "2026-07-27T05:24:10.864968+00:00",
+  "commit": "d2f563f0f67e3cb01533f0f198f4b46f6780945d",
   "branch": "master",
-  "sourceFingerprint": "d656364d4099a4f22f47c83d5dc6da8469a649142f2a6bcb1a754da9a1460668",
+  "sourceFingerprint": "36d1310b7630c3775a9688f476ce41d28ff4420378fd03db4e2a9508684b0b5f",
   "summary": {
     "files": 1132,
-    "lines": 266233,
+    "lines": 266258,
     "symbols": 5550,
     "productionCodeFiles": 799,
     "testFiles": 140,
@@ -48799,8 +48799,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 377,
-      "sha256": "0a8712860f94bc488eb7d638908b7e69cf80c1336e55834493e913d911695fde",
+      "lines": 402,
+      "sha256": "c685e5a050d0012c8d5feba6885e3db2bb264e695776b0857ffd25edd3d2b026",
       "package": "me.rerere.rikkahub.service",
       "categories": [],
       "symbols": [
@@ -48812,7 +48812,7 @@
         {
           "name": "perception",
           "kind": "function",
-          "line": 362
+          "line": 387
         }
       ],
       "localImportCount": 11,
@@ -84498,7 +84498,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/service/CompanionIntentPlannerTest.kt",
         "kind": "function",
-        "line": 362
+        "line": 387
       }
     ],
     "me.rerere.rikkahub.service.periodLabel": [
