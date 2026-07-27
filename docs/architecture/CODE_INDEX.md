@@ -12,9 +12,9 @@
 
 ## 索引状态
 
-- 基准提交：`9dd58b9655b485ec1891b5c7814f9eb05d4dcbd3`
+- 基准提交：`16d282a0e6b062d3e2452b4596387d112c8e9492`
 - 分支：`master`
-- 源码指纹：`716dcfaec94a9bfd…`
+- 源码指纹：`06eb48c0c5de79f6…`
 - 已索引文件：1146
 - 已索引代码/文本行：267483
 - 已发现类、接口、对象、函数及 Composable：5584
@@ -548,7 +548,7 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：1985
+- 已解析本地导入边：1984
 - 可检索完整符号：4976
 
 | 文件 | 被本地文件导入 | 行数 |
@@ -563,7 +563,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 38 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
-| `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 35 | 50 |
+| `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 34 | 50 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 33 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 30 | 248 |
 | `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 30 | 141 |

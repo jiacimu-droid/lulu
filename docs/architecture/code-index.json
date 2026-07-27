@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T14:08:55.331466+00:00",
-  "commit": "9dd58b9655b485ec1891b5c7814f9eb05d4dcbd3",
+  "generatedAt": "2026-07-27T14:12:59.199582+00:00",
+  "commit": "16d282a0e6b062d3e2452b4596387d112c8e9492",
   "branch": "master",
-  "sourceFingerprint": "716dcfaec94a9bfdbc00385718710e4d8d5435376c4ab9dc5bc9ab81dbffc12a",
+  "sourceFingerprint": "06eb48c0c5de79f6e6881c2eaebb18963cd2760c9db6b2e1dab6bc040f878857",
   "summary": {
     "files": 1146,
     "lines": 267483,
@@ -68,7 +68,7 @@
       "界面": 298,
       "记忆": 44
     },
-    "resolvedImportEdges": 1985
+    "resolvedImportEdges": 1984
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -974,7 +974,7 @@
         "lines": 50,
         "symbols": 5,
         "localImportCount": 0,
-        "importedByCount": 35,
+        "importedByCount": 34,
         "todoMarkers": 0
       },
       {
@@ -42560,7 +42560,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 364,
-      "sha256": "b01d2891377fe3cc1bc1c1d7395c9cb49bfe47bd515abd07b313d391a68ec95d",
+      "sha256": "b290f9030d919e95c9bc8e5498ff8010d850461e995cd798546c49b9399eda6c",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -42593,7 +42593,7 @@
           "line": 358
         }
       ],
-      "localImportCount": 10,
+      "localImportCount": 9,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -42606,15 +42606,13 @@
         "me.rerere.rikkahub.data.study.StudyEntertainmentReward",
         "me.rerere.rikkahub.data.study.SuperMomentChoice",
         "me.rerere.rikkahub.ui.context.LocalNavController",
-        "me.rerere.rikkahub.ui.context.LocalSettings",
-        "me.rerere.rikkahub.utils.plus"
+        "me.rerere.rikkahub.ui.context.LocalSettings"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishRules.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
-        "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt"
+        "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt"
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
@@ -44218,8 +44216,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSystemToolsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingWebPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/share/handler/ShareHandlerPage.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt"
       ]
     },
     {
