@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:10:57.298812+00:00",
-  "commit": "8cd4493d13b8863877e1b054a6686de154440860",
+  "generatedAt": "2026-07-27T05:12:08.401342+00:00",
+  "commit": "87dfe8e0cb97ed69a2246fada10846c0d2ef60ca",
   "branch": "master",
-  "sourceFingerprint": "f3340d2e4266063d788988afe75b2b9adf574ab1a06c490ad220b6b2a13c0b76",
+  "sourceFingerprint": "c9b456c8664bc783fb2fea9cd12722c38b60b5bbfff0f3525b8fee896b3111c9",
   "summary": {
     "files": 1130,
-    "lines": 265930,
+    "lines": 265987,
     "symbols": 5548,
     "productionCodeFiles": 799,
     "testFiles": 138,
@@ -68,7 +68,7 @@
       "界面": 292,
       "记忆": 44
     },
-    "resolvedImportEdges": 1967
+    "resolvedImportEdges": 1968
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -934,7 +934,7 @@
         "lines": 331,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 49,
+        "importedByCount": 50,
         "todoMarkers": 0
       },
       {
@@ -18563,6 +18563,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
+        "app/src/test/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlannerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/pages/memory/MemoryAssistantLabelTest.kt"
       ]
     },
@@ -47434,18 +47435,18 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlannerTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 208,
-      "sha256": "cc713a8b20313a9447edc422f30e400329c342fd4207b16bac30c92db17561c4",
+      "lines": 265,
+      "sha256": "5f5a1b48656bfbd7e885622a902e5c5332c16d23b623bbb911e66f0fa4538f2d",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [],
       "symbols": [
         {
           "name": "CompanionAutonomousPulsePlannerTest",
           "kind": "class",
-          "line": 14
+          "line": 15
         }
       ],
-      "localImportCount": 7,
+      "localImportCount": 8,
       "todoMarkers": 0,
       "isTest": true,
       "isProductionCode": false,
@@ -47456,11 +47457,13 @@
         "me.rerere.rikkahub.data.companion.CompanionOutboundStatus",
         "me.rerere.rikkahub.data.companion.CompanionRelationshipState",
         "me.rerere.rikkahub.data.companion.CompanionSnapshot",
-        "me.rerere.rikkahub.data.datastore.ProactiveMessageSetting"
+        "me.rerere.rikkahub.data.datastore.ProactiveMessageSetting",
+        "me.rerere.rikkahub.data.model.AssistantInteractionProfile"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt"
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt"
       ],
       "importedBy": []
     },
@@ -75666,7 +75669,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlannerTest.kt",
         "kind": "class",
-        "line": 14
+        "line": 15
       }
     ],
     "me.rerere.rikkahub.data.service.CompanionHeartbeatDecision": [
