@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T05:27:22.743639+00:00",
-  "commit": "c89a6d2559743c359a15af3fd1b796c14bf0e0ec",
+  "generatedAt": "2026-07-27T05:27:58.685132+00:00",
+  "commit": "45cec7557b5305123a4da33c7b9a4aa1b2096e4f",
   "branch": "master",
-  "sourceFingerprint": "d079e5df02d3ab7c2a6bba3ec915ddd445dda69e59f9580f2dd39ce4a8d596b1",
+  "sourceFingerprint": "4416db703eb96e769a0d2c31421df623c2c488fa42303d261292516ae35bce4c",
   "summary": {
     "files": 1132,
-    "lines": 266223,
+    "lines": 266232,
     "symbols": 5550,
     "productionCodeFiles": 799,
     "testFiles": 140,
@@ -47288,8 +47288,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/model/AssistantInteractionProfileTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 52,
-      "sha256": "5caff667d5ae1795e8408b2ef5d54f4b1009db85b291db066597d3adc87a37ae",
+      "lines": 61,
+      "sha256": "d6ee551566ea5cb0ddb31fe3082f0e5a8515be5dbf4f244c8ddad7fcb1d8ab48",
       "package": "me.rerere.rikkahub.data.model",
       "categories": [],
       "symbols": [
