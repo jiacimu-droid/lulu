@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T16:24:54.356304+00:00",
-  "commit": "220bf72d58e294b99a39fbdb84d0ba9573161991",
+  "generatedAt": "2026-07-27T16:26:29.429682+00:00",
+  "commit": "4e7dc4051f5aafe4ed5d2ec4aa572e54e39a9ffe",
   "branch": "master",
-  "sourceFingerprint": "7212999ded6caf77fa5b628e58f8ede5243413841197582aa23270f35984d8c7",
+  "sourceFingerprint": "0c31285c47342214cd58feb07bb8b0f59596a423a9a65ce5b659bbd0b1b8790f",
   "summary": {
-    "files": 1160,
-    "lines": 268322,
-    "symbols": 5599,
-    "productionCodeFiles": 821,
+    "files": 1161,
+    "lines": 268458,
+    "symbols": 5605,
+    "productionCodeFiles": 822,
     "testFiles": 146,
     "largeProductionFiles": 40,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 699,
+      "app": 700,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 767,
+      ".kt": 768,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 312,
+      "界面": 313,
       "记忆": 44
     },
-    "resolvedImportEdges": 2012
+    "resolvedImportEdges": 2015
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 105,
+        "importedByCount": 106,
         "todoMarkers": 0
       },
       {
@@ -1034,18 +1034,18 @@
         "todoMarkers": 0
       },
       {
-        "path": "speech/src/main/java/me/rerere/tts/provider/TTSProviderSetting.kt",
-        "lines": 225,
-        "symbols": 19,
-        "localImportCount": 0,
-        "importedByCount": 17,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
         "lines": 196,
         "symbols": 6,
         "localImportCount": 1,
+        "importedByCount": 18,
+        "todoMarkers": 0
+      },
+      {
+        "path": "speech/src/main/java/me/rerere/tts/provider/TTSProviderSetting.kt",
+        "lines": 225,
+        "symbols": 19,
+        "localImportCount": 0,
         "importedByCount": 17,
         "todoMarkers": 0
       },
@@ -1789,6 +1789,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingFilesPage.kt",
@@ -1962,7 +1963,7 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.ui",
-      "imports": 62
+      "imports": 65
     },
     {
       "from": "me.rerere.rikkahub.data.service",
@@ -14807,6 +14808,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
@@ -31515,6 +31517,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/ExtensionsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingAboutPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDonatePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt",
@@ -31704,6 +31707,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Background.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Theme.kt"
       ]
@@ -40035,6 +40039,65 @@
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/SharedPreferences.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/PresetThemeButton.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 136,
+      "sha256": "ca6480c458fc0829b9477e051e0a78df29413eea23e677e929fc4201abd8b0f3",
+      "package": "me.rerere.rikkahub.ui.pages.setting",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "DisplayColorSection",
+          "kind": "composable",
+          "line": 28
+        },
+        {
+          "name": "DisplayColorActions",
+          "kind": "composable",
+          "line": 68
+        },
+        {
+          "name": "DisplayColorTarget",
+          "kind": "class",
+          "line": 90
+        },
+        {
+          "name": "defaultColor",
+          "kind": "composable",
+          "line": 104
+        },
+        {
+          "name": "current",
+          "kind": "function",
+          "line": 115
+        },
+        {
+          "name": "apply",
+          "kind": "function",
+          "line": 126
+        }
+      ],
+      "localImportCount": 4,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.datastore.DisplaySetting",
+        "me.rerere.rikkahub.ui.components.ui.CardGroup",
+        "me.rerere.rikkahub.ui.components.ui.ColorPickerDialog",
+        "me.rerere.rikkahub.ui.components.ui.toComposeColor"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/ColorPickerDialog.kt"
       ],
       "importedBy": []
     },
@@ -93679,6 +93742,27 @@
         "line": 523
       }
     ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayColorActions": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
+        "kind": "composable",
+        "line": 68
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayColorSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
+        "kind": "composable",
+        "line": 28
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.DisplayColorTarget": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
+        "kind": "class",
+        "line": 90
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.setting.DisplayGeneralSection": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayBasics.kt",
@@ -94148,6 +94232,13 @@
         "line": 411
       }
     ],
+    "me.rerere.rikkahub.ui.pages.setting.apply": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
+        "kind": "function",
+        "line": 126
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.setting.buildMemoryEngineDiagnostics": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
@@ -94412,6 +94503,20 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingWebPage.kt",
         "kind": "function",
         "line": 125
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.current": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
+        "kind": "function",
+        "line": 115
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.setting.defaultColor": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingDisplayColors.kt",
+        "kind": "composable",
+        "line": 104
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.defaultModelSettingSections": [
