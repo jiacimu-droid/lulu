@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`c27218a8f996d4778d5f8d6565d00b564d0547f2`
+- 基准提交：`81d277f53b2ff082d72067bbf654286a99c82227`
 - 分支：`master`
-- 源码指纹：`1128ecdf54bd3338…`
-- 已索引文件：1183
-- 已索引代码/文本行：266744
-- 已发现类、接口、对象、函数及 Composable：5652
+- 源码指纹：`d87772832dd8c480…`
+- 已索引文件：1184
+- 已索引代码/文本行：266906
+- 已发现类、接口、对象、函数及 Composable：5661
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 844 |
+| 生产代码文件 | 845 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 34 |
 | ≥1500 行生产文件 | 3 |
@@ -135,7 +135,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 722 |
+| `app` | 723 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -160,7 +160,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 790 |
+| `.kt` | 791 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -489,7 +489,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 301 个文件，见 `code-index.json`
+- ……另有 302 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -548,15 +548,15 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2059
-- 可检索完整符号：5041
+- 已解析本地导入边：2061
+- 可检索完整符号：5044
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
 | `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 129 | 812 |
-| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 111 | 953 |
+| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 112 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
-| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 59 | 62 |
+| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 60 | 62 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 56 | 296 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 54 | 191 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
