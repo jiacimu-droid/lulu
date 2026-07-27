@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T13:56:18.291294+00:00",
-  "commit": "2d3e01501080a6a2f667ec3b3323f3d21a070e17",
+  "generatedAt": "2026-07-27T13:58:38.902558+00:00",
+  "commit": "a2b65e3dc7df8de711b85e2b28bfaebb30e5b369",
   "branch": "master",
-  "sourceFingerprint": "011e61b43eab3dd758e73512010277bd187e50975c875beedac472b632a03833",
+  "sourceFingerprint": "4e45af4b55e03aac6ff3c5d58496cca01ce3e91c5f2e3b284291b9545e83f1f7",
   "summary": {
-    "files": 1143,
-    "lines": 267829,
-    "symbols": 5597,
-    "productionCodeFiles": 804,
+    "files": 1144,
+    "lines": 268535,
+    "symbols": 5615,
+    "productionCodeFiles": 805,
     "testFiles": 146,
     "largeProductionFiles": 42,
     "veryLargeProductionFiles": 6,
     "todoMarkers": 32,
     "byModule": {
-      "app": 682,
+      "app": 683,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 750,
+      ".kt": 751,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,16 +59,16 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 36,
-      "学习监督": 31,
+      "学习监督": 32,
       "工具": 6,
       "插件": 44,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 49,
-      "界面": 295,
+      "界面": 296,
       "记忆": 44
     },
-    "resolvedImportEdges": 1980
+    "resolvedImportEdges": 1989
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -902,7 +902,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 102,
+        "importedByCount": 103,
         "todoMarkers": 0
       },
       {
@@ -926,7 +926,7 @@
         "lines": 296,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 54,
+        "importedByCount": 55,
         "todoMarkers": 0
       },
       {
@@ -942,7 +942,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 45,
+        "importedByCount": 46,
         "todoMarkers": 0
       },
       {
@@ -950,7 +950,7 @@
         "lines": 31,
         "symbols": 1,
         "localImportCount": 5,
-        "importedByCount": 43,
+        "importedByCount": 44,
         "todoMarkers": 0
       },
       {
@@ -966,7 +966,7 @@
         "lines": 148,
         "symbols": 10,
         "localImportCount": 5,
-        "importedByCount": 35,
+        "importedByCount": 36,
         "todoMarkers": 0
       },
       {
@@ -982,7 +982,7 @@
         "lines": 1032,
         "symbols": 77,
         "localImportCount": 89,
-        "importedByCount": 32,
+        "importedByCount": 33,
         "todoMarkers": 0
       },
       {
@@ -1014,7 +1014,7 @@
         "lines": 519,
         "symbols": 33,
         "localImportCount": 14,
-        "importedByCount": 20,
+        "importedByCount": 21,
         "todoMarkers": 0
       },
       {
@@ -1082,6 +1082,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
+        "lines": 3143,
+        "symbols": 90,
+        "localImportCount": 126,
+        "importedByCount": 14,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "lines": 1311,
         "symbols": 51,
@@ -1111,14 +1119,6 @@
         "symbols": 2,
         "localImportCount": 0,
         "importedByCount": 14,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
-        "lines": 3143,
-        "symbols": 90,
-        "localImportCount": 126,
-        "importedByCount": 13,
         "todoMarkers": 0
       },
       {
@@ -1380,6 +1380,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCollectionPanel.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt",
@@ -1807,6 +1808,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCollectionPanel.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorPage.kt",
@@ -2311,6 +2313,11 @@
       "imports": 6
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.study",
+      "to": "me.rerere.rikkahub.data.study.StudyRules",
+      "imports": 6
+    },
+    {
       "from": "me.rerere.rikkahub.ui.theme",
       "to": "me.rerere.rikkahub.ui.theme.presets",
       "imports": 6
@@ -2433,11 +2440,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.hugeicons.stroke.Add01",
-      "imports": 5
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.study",
-      "to": "me.rerere.rikkahub.data.study.StudyRules",
       "imports": 5
     },
     {
@@ -2706,6 +2708,11 @@
       "imports": 4
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.study",
+      "to": "me.rerere.hugeicons.HugeIcons",
+      "imports": 4
+    },
+    {
       "from": "me.rerere.tts.controller",
       "to": "me.rerere.tts.model.AudioFormat",
       "imports": 4
@@ -2928,11 +2935,6 @@
     {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.ai.ui.UIMessagePart",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.cihai.CihaiEntry",
       "imports": 3
     }
   ],
@@ -8578,6 +8580,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/ChatUtil.kt"
       ]
@@ -14786,6 +14789,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
@@ -18577,6 +18581,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/CompanionContextEnvelopeTest.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformerTest.kt",
@@ -18740,6 +18745,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/history/HistoryPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/history/HistoryVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/VoiceCallChatSyncTest.kt",
@@ -19122,6 +19128,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/web/WebApiModule.kt",
         "app/src/main/java/me/rerere/rikkahub/web/WebServerManager.kt",
         "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationRoutes.kt"
@@ -23432,6 +23439,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCollectionPanel.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt"
       ]
@@ -27310,6 +27318,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "app/src/main/java/me/rerere/rikkahub/web/WebApiModule.kt",
         "app/src/main/java/me/rerere/rikkahub/web/WebServerManager.kt",
@@ -30414,6 +30423,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/webview/WebViewPage.kt"
       ]
@@ -42740,6 +42750,147 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 706,
+      "sha256": "a0922a806475f6109ede04ea8aaec503867ff59d2850bc0132bbabd6c50a9d7e",
+      "package": "me.rerere.rikkahub.ui.pages.study",
+      "categories": [
+        "学习监督",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "StudyPomodoroPageContent",
+          "kind": "composable",
+          "line": 85
+        },
+        {
+          "name": "StudyPomodoroFocusPageContent",
+          "kind": "composable",
+          "line": 188
+        },
+        {
+          "name": "finishPomodoro",
+          "kind": "function",
+          "line": 218
+        },
+        {
+          "name": "CompanionPrepCard",
+          "kind": "composable",
+          "line": 401
+        },
+        {
+          "name": "DurationCard",
+          "kind": "composable",
+          "line": 422
+        },
+        {
+          "name": "PomodoroTimerCircle",
+          "kind": "composable",
+          "line": 457
+        },
+        {
+          "name": "FocusChatPanel",
+          "kind": "composable",
+          "line": 498
+        },
+        {
+          "name": "PomodoroCard",
+          "kind": "composable",
+          "line": 552
+        },
+        {
+          "name": "PomodoroFocusPalette",
+          "kind": "class",
+          "line": 565
+        },
+        {
+          "name": "focusPalette",
+          "kind": "function",
+          "line": 579
+        },
+        {
+          "name": "PomodoroThemePickerDialog",
+          "kind": "composable",
+          "line": 610
+        },
+        {
+          "name": "focusBrush",
+          "kind": "function",
+          "line": 668
+        },
+        {
+          "name": "secondsText",
+          "kind": "function",
+          "line": 672
+        },
+        {
+          "name": "toRecordedMinutes",
+          "kind": "function",
+          "line": 677
+        },
+        {
+          "name": "studyDurationText",
+          "kind": "function",
+          "line": 680
+        },
+        {
+          "name": "buildEncourageLine",
+          "kind": "function",
+          "line": 691
+        },
+        {
+          "name": "buildStudyChatPrompt",
+          "kind": "function",
+          "line": 696
+        },
+        {
+          "name": "buildPomodoroOpeningPrompt",
+          "kind": "function",
+          "line": 701
+        }
+      ],
+      "localImportCount": 19,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.ArrowUp02",
+        "me.rerere.hugeicons.stroke.Play",
+        "me.rerere.hugeicons.stroke.StopCircle",
+        "me.rerere.rikkahub.Screen",
+        "me.rerere.rikkahub.data.datastore.PomodoroTheme",
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.getAssistantTTSProvider",
+        "me.rerere.rikkahub.data.datastore.getCurrentAssistant",
+        "me.rerere.rikkahub.data.model.Assistant",
+        "me.rerere.rikkahub.data.model.Conversation",
+        "me.rerere.rikkahub.data.repository.ConversationRepository",
+        "me.rerere.rikkahub.data.study.StudyRules",
+        "me.rerere.rikkahub.service.ChatService",
+        "me.rerere.rikkahub.ui.components.nav.BackButton",
+        "me.rerere.rikkahub.ui.context.LocalNavController",
+        "me.rerere.rikkahub.ui.context.LocalSettings",
+        "me.rerere.rikkahub.ui.context.LocalTTSState",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
+        "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
       "module": "app",
       "extension": ".kt",
@@ -43619,6 +43770,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt"
       ]
@@ -94458,6 +94610,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
         "line": 2773
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "composable",
+        "line": 401
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DailyDashboardView": [
@@ -94570,6 +94727,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
         "line": 2790
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "composable",
+        "line": 422
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.EntertainmentRewardRow": [
@@ -94584,6 +94746,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
         "line": 2862
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "composable",
+        "line": 498
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.GachaCard": [
@@ -94691,11 +94858,23 @@
         "line": 179
       }
     ],
+    "me.rerere.rikkahub.ui.pages.study.PomodoroCard": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "composable",
+        "line": 552
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroFocusPalette": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "class",
         "line": 2925
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "class",
+        "line": 565
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroThemePickerDialog": [
@@ -94703,6 +94882,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
         "line": 2969
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "composable",
+        "line": 610
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroTimerCircle": [
@@ -94710,6 +94894,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
         "line": 2821
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "composable",
+        "line": 457
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.RecentEventsCard": [
@@ -94880,11 +95069,25 @@
         "line": 568
       }
     ],
+    "me.rerere.rikkahub.ui.pages.study.StudyPomodoroFocusPageContent": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "composable",
+        "line": 188
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
         "line": 466
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.StudyPomodoroPageContent": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "composable",
+        "line": 85
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyRewardGuidePanel": [
@@ -95032,6 +95235,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 3119
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 691
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.buildPomodoroOpeningPrompt": [
@@ -95039,6 +95247,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 3129
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 701
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.buildStudyChatPrompt": [
@@ -95046,6 +95259,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 3124
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 696
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.buyShopItem": [
@@ -95184,6 +95402,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 595
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 218
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.finishRewardVideo": [
@@ -95198,6 +95421,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 3043
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 668
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.focusPalette": [
@@ -95205,6 +95433,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 2939
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 579
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.formatStudyTimeMetric": [
@@ -95385,6 +95618,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 3099
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 672
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.selectCompanion": [
@@ -95448,6 +95686,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 3108
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 680
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.summary": [
@@ -95483,6 +95726,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
         "line": 3104
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "kind": "function",
+        "line": 677
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.toggleTask": [
