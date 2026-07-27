@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-27T14:13:14.948425+00:00",
-  "commit": "1562ae59b2ce91011fd9d6446334434752824db0",
+  "generatedAt": "2026-07-27T14:43:11.379519+00:00",
+  "commit": "fc148907be2fd0f69be82fac161b3fc7aac34751",
   "branch": "master",
-  "sourceFingerprint": "a8d3247d442f91edf1f82f146fb2786f2823adedd7aeedce0d217d6ee8f1860f",
+  "sourceFingerprint": "67261bc4274ecd38644b7197582cf73ba43e2d93d2e15d3acbd4063fbcf81966",
   "summary": {
-    "files": 1147,
-    "lines": 267509,
+    "files": 1150,
+    "lines": 267576,
     "symbols": 5590,
-    "productionCodeFiles": 808,
+    "productionCodeFiles": 811,
     "testFiles": 146,
-    "largeProductionFiles": 43,
+    "largeProductionFiles": 42,
     "veryLargeProductionFiles": 5,
     "todoMarkers": 32,
     "byModule": {
-      "app": 686,
+      "app": 689,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 754,
+      ".kt": 757,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -64,11 +64,11 @@
       "插件": 44,
       "数据库": 75,
       "构建与发布": 13,
-      "电话与语音": 49,
-      "界面": 299,
+      "电话与语音": 52,
+      "界面": 302,
       "记忆": 44
     },
-    "resolvedImportEdges": 1984
+    "resolvedImportEdges": 1992
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -186,13 +186,6 @@
         "lines": 1369,
         "symbols": 0,
         "localImportCount": 0,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
-        "lines": 1358,
-        "symbols": 31,
-        "localImportCount": 36,
         "todoMarkers": 0
       },
       {
@@ -340,6 +333,13 @@
         "lines": 972,
         "symbols": 20,
         "localImportCount": 18,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "lines": 953,
+        "symbols": 30,
+        "localImportCount": 32,
         "todoMarkers": 0
       }
     ],
@@ -499,13 +499,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
-        "lines": 1358,
-        "symbols": 31,
-        "localImportCount": 36,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "lines": 449,
         "symbols": 31,
@@ -552,6 +545,13 @@
         "lines": 460,
         "symbols": 26,
         "localImportCount": 14,
+        "todoMarkers": 0
+      },
+      {
+        "path": "ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt",
+        "lines": 248,
+        "symbols": 26,
+        "localImportCount": 0,
         "todoMarkers": 0
       }
     ],
@@ -634,13 +634,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
-        "lines": 1358,
-        "symbols": 31,
-        "localImportCount": 36,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "lines": 465,
         "symbols": 20,
@@ -715,6 +708,13 @@
         "lines": 500,
         "symbols": 18,
         "localImportCount": 29,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "lines": 781,
+        "symbols": 9,
+        "localImportCount": 28,
         "todoMarkers": 0
       },
       {
@@ -942,7 +942,7 @@
         "lines": 191,
         "symbols": 4,
         "localImportCount": 0,
-        "importedByCount": 45,
+        "importedByCount": 46,
         "todoMarkers": 0
       },
       {
@@ -970,19 +970,19 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "lines": 1032,
+        "symbols": 77,
+        "localImportCount": 89,
+        "importedByCount": 34,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt",
         "lines": 50,
         "symbols": 5,
         "localImportCount": 0,
         "importedByCount": 34,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
-        "lines": 1032,
-        "symbols": 77,
-        "localImportCount": 89,
-        "importedByCount": 33,
         "todoMarkers": 0
       },
       {
@@ -1550,7 +1550,10 @@
       "app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepository.kt",
       "app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallStreaming.kt",
       "app/src/main/java/me/rerere/rikkahub/service/VoiceCallForegroundService.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallHistoryPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
       "app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepositorySummaryTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/voicecall/VoiceCallStreamingTest.kt",
       "app/src/test/java/me/rerere/rikkahub/service/VoiceCallChatSyncTest.kt",
@@ -1819,7 +1822,10 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorVM.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallHistoryPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/webview/WebViewPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/theme/CodeColor.kt",
@@ -8548,6 +8554,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallHistoryPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/webview/WebViewPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt",
@@ -8587,6 +8594,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallHistoryPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/ChatUtil.kt"
       ]
@@ -11512,7 +11520,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt"
       ]
     },
     {
@@ -24603,6 +24611,7 @@
       "localImports": [],
       "resolvedImports": [],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt"
       ]
     },
@@ -24720,6 +24729,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/AssistantInteractionResetService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/RepositoryModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallHistoryPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt"
       ]
     },
@@ -30352,7 +30362,9 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/TTSAutoPlay.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt"
       ]
     },
     {
@@ -34117,7 +34129,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/TTSController.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/context/LocalTTSState.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt"
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt"
       ]
     },
     {
@@ -43250,11 +43262,132 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 368,
+      "sha256": "f66cf8bebd590d594eed689baa5487694c57e0344ea72c0e8b3e7c7bc6803d31",
+      "package": "me.rerere.rikkahub.ui.pages.voicecall",
+      "categories": [
+        "电话与语音",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "CallContentCard",
+          "kind": "composable",
+          "line": 58
+        },
+        {
+          "name": "IdleCallPanel",
+          "kind": "composable",
+          "line": 88
+        },
+        {
+          "name": "ConnectingPanel",
+          "kind": "composable",
+          "line": 119
+        },
+        {
+          "name": "TranscriptList",
+          "kind": "composable",
+          "line": 158
+        },
+        {
+          "name": "TranscriptLine",
+          "kind": "composable",
+          "line": 198
+        },
+        {
+          "name": "TranscriptSegmentBubble",
+          "kind": "composable",
+          "line": 245
+        },
+        {
+          "name": "SleepModePanel",
+          "kind": "composable",
+          "line": 262
+        },
+        {
+          "name": "VoiceCallHistoryItem",
+          "kind": "composable",
+          "line": 298
+        },
+        {
+          "name": "MiniCallWindow",
+          "kind": "composable",
+          "line": 336
+        }
+      ],
+      "localImportCount": 10,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.Call02",
+        "me.rerere.hugeicons.stroke.Moon02",
+        "me.rerere.hugeicons.stroke.PlayCircle",
+        "me.rerere.hugeicons.stroke.StopCircle",
+        "me.rerere.rikkahub.data.voicecall.VoiceCallLine",
+        "me.rerere.rikkahub.data.voicecall.VoiceCallRole",
+        "me.rerere.rikkahub.data.voicecall.VoiceCallSession",
+        "me.rerere.rikkahub.ui.components.message.splitIntoVisualBubbles",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallModels.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallHistoryPage.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 96,
+      "sha256": "c3609edc6d0aaf3471ba8dc4cecacc973d716a4bed63d549b60a7e40dcb6661d",
+      "package": "me.rerere.rikkahub.ui.pages.voicecall",
+      "categories": [
+        "电话与语音",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "VoiceCallHistoryPage",
+          "kind": "composable",
+          "line": 33
+        }
+      ],
+      "localImportCount": 7,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.hugeicons.HugeIcons",
+        "me.rerere.hugeicons.stroke.ArrowLeft02",
+        "me.rerere.rikkahub.Screen",
+        "me.rerere.rikkahub.data.voicecall.VoiceCallRepository",
+        "me.rerere.rikkahub.data.voicecall.hasUserFacingContent",
+        "me.rerere.rikkahub.ui.context.LocalNavController",
+        "me.rerere.rikkahub.ui.theme.CustomColors"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallRepository.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
+      ],
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
+      ]
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 1358,
-      "sha256": "d8f9034c89d719343dc50cac57245e7708afeba21d4672374be82eb749db0d28",
+      "lines": 781,
+      "sha256": "f5f8df0857ea0389fd0ba43149471c6a6b46904d72b8cd78970aac05015a49f3",
       "package": "me.rerere.rikkahub.ui.pages.voicecall",
       "categories": [
         "电话与语音",
@@ -43264,160 +43397,50 @@
         {
           "name": "CallStage",
           "kind": "class",
-          "line": 114
+          "line": 85
         },
         {
           "name": "VoiceCallPage",
           "kind": "composable",
-          "line": 123
+          "line": 94
         },
         {
           "name": "saveLine",
           "kind": "function",
-          "line": 181
+          "line": 152
         },
         {
           "name": "saveAssistantSleepLine",
           "kind": "function",
-          "line": 202
+          "line": 173
         },
         {
           "name": "assistantSay",
           "kind": "function",
-          "line": 213
+          "line": 184
         },
         {
           "name": "createStreamSpeaker",
           "kind": "function",
-          "line": 229
+          "line": 200
         },
         {
           "name": "startCall",
           "kind": "function",
-          "line": 245
+          "line": 216
         },
         {
           "name": "startListening",
           "kind": "function",
-          "line": 313
+          "line": 284
         },
         {
           "name": "endCall",
           "kind": "function",
-          "line": 382
-        },
-        {
-          "name": "VoiceCallHistoryPage",
-          "kind": "composable",
-          "line": 813
-        },
-        {
-          "name": "CallContentCard",
-          "kind": "composable",
-          "line": 879
-        },
-        {
-          "name": "IdleCallPanel",
-          "kind": "composable",
-          "line": 909
-        },
-        {
-          "name": "ConnectingPanel",
-          "kind": "composable",
-          "line": 940
-        },
-        {
-          "name": "TranscriptList",
-          "kind": "composable",
-          "line": 979
-        },
-        {
-          "name": "TranscriptLine",
-          "kind": "composable",
-          "line": 1019
-        },
-        {
-          "name": "TranscriptSegmentBubble",
-          "kind": "composable",
-          "line": 1066
-        },
-        {
-          "name": "SleepModePanel",
-          "kind": "composable",
-          "line": 1083
-        },
-        {
-          "name": "VoiceCallHistoryItem",
-          "kind": "composable",
-          "line": 1119
-        },
-        {
-          "name": "MiniCallWindow",
-          "kind": "composable",
-          "line": 1157
-        },
-        {
-          "name": "statusText",
-          "kind": "function",
-          "line": 1191
-        },
-        {
-          "name": "shouldStartVoiceCallListening",
-          "kind": "function",
-          "line": 1215
-        },
-        {
-          "name": "waitForTtsPlayback",
-          "kind": "function",
-          "line": 1230
-        },
-        {
-          "name": "speakInSegments",
-          "kind": "function",
-          "line": 1245
-        },
-        {
-          "name": "buildSleepTalkPrompt",
-          "kind": "function",
-          "line": 1258
-        },
-        {
-          "name": "miniStatusText",
-          "kind": "function",
-          "line": 1269
-        },
-        {
-          "name": "buildVoiceCallOpeningPrompt",
-          "kind": "function",
-          "line": 1280
-        },
-        {
-          "name": "isUsableVoiceCallReply",
-          "kind": "function",
-          "line": 1313
-        },
-        {
-          "name": "shouldCommitVoiceTranscript",
-          "kind": "function",
-          "line": 1319
-        },
-        {
-          "name": "voiceCallEndOfSpeechDelayMillis",
-          "kind": "function",
-          "line": 1331
-        },
-        {
-          "name": "cleanRoleLineForUser",
-          "kind": "function",
-          "line": 1341
-        },
-        {
-          "name": "formatTime",
-          "kind": "function",
-          "line": 1356
+          "line": 353
         }
       ],
-      "localImportCount": 36,
+      "localImportCount": 28,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -43428,12 +43451,9 @@
         "me.rerere.hugeicons.stroke.Call02",
         "me.rerere.hugeicons.stroke.Cancel01",
         "me.rerere.hugeicons.stroke.Moon02",
-        "me.rerere.hugeicons.stroke.PlayCircle",
-        "me.rerere.hugeicons.stroke.StopCircle",
         "me.rerere.hugeicons.stroke.TransactionHistory",
         "me.rerere.hugeicons.stroke.VolumeHigh",
         "me.rerere.rikkahub.Screen",
-        "me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression",
         "me.rerere.rikkahub.data.datastore.getAssistantById",
         "me.rerere.rikkahub.data.datastore.getAssistantTTSProvider",
         "me.rerere.rikkahub.data.model.Avatar",
@@ -43447,21 +43467,15 @@
         "me.rerere.rikkahub.service.ChatService",
         "me.rerere.rikkahub.service.VoiceCallForegroundService",
         "me.rerere.rikkahub.ui.components.message.extractSpeakableRoleText",
-        "me.rerere.rikkahub.ui.components.message.splitIntoVisualBubbles",
         "me.rerere.rikkahub.ui.components.ui.FloatingWindow",
         "me.rerere.rikkahub.ui.components.ui.UIAvatar",
         "me.rerere.rikkahub.ui.context.LocalASRState",
         "me.rerere.rikkahub.ui.context.LocalNavController",
         "me.rerere.rikkahub.ui.context.LocalSettings",
-        "me.rerere.rikkahub.ui.context.LocalTTSState",
-        "me.rerere.rikkahub.ui.hooks.CustomTtsState",
-        "me.rerere.rikkahub.ui.theme.CustomColors",
-        "me.rerere.tts.model.PlaybackStatus",
-        "me.rerere.tts.provider.TTSProviderSetting"
+        "me.rerere.rikkahub.ui.context.LocalTTSState"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Avatar.kt",
         "app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt",
@@ -43472,15 +43486,106 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/FloatingWindow.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/UIAvatar.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/hooks/TTS.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt",
-        "speech/src/main/java/me/rerere/asr/ASRState.kt",
-        "speech/src/main/java/me/rerere/tts/model/PlaybackState.kt",
-        "speech/src/main/java/me/rerere/tts/provider/TTSProviderSetting.kt"
+        "speech/src/main/java/me/rerere/asr/ASRState.kt"
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 180,
+      "sha256": "940c14986c8ee310b237f7a05ee0154d79c1df1b24955f381c05de2f7a15b6e1",
+      "package": "me.rerere.rikkahub.ui.pages.voicecall",
+      "categories": [
+        "电话与语音",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "statusText",
+          "kind": "function",
+          "line": 14
+        },
+        {
+          "name": "shouldStartVoiceCallListening",
+          "kind": "function",
+          "line": 38
+        },
+        {
+          "name": "waitForTtsPlayback",
+          "kind": "function",
+          "line": 53
+        },
+        {
+          "name": "speakInSegments",
+          "kind": "function",
+          "line": 68
+        },
+        {
+          "name": "buildSleepTalkPrompt",
+          "kind": "function",
+          "line": 81
+        },
+        {
+          "name": "miniStatusText",
+          "kind": "function",
+          "line": 92
+        },
+        {
+          "name": "buildVoiceCallOpeningPrompt",
+          "kind": "function",
+          "line": 103
+        },
+        {
+          "name": "isUsableVoiceCallReply",
+          "kind": "function",
+          "line": 136
+        },
+        {
+          "name": "shouldCommitVoiceTranscript",
+          "kind": "function",
+          "line": 142
+        },
+        {
+          "name": "voiceCallEndOfSpeechDelayMillis",
+          "kind": "function",
+          "line": 154
+        },
+        {
+          "name": "cleanRoleLineForUser",
+          "kind": "function",
+          "line": 164
+        },
+        {
+          "name": "formatTime",
+          "kind": "function",
+          "line": 178
+        }
+      ],
+      "localImportCount": 6,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.asr.ASRStatus",
+        "me.rerere.rikkahub.data.ai.transformers.sanitizeLuluVisibleExpression",
+        "me.rerere.rikkahub.ui.components.message.splitIntoVisualBubbles",
+        "me.rerere.rikkahub.ui.hooks.CustomTtsState",
+        "me.rerere.tts.model.PlaybackStatus",
+        "me.rerere.tts.provider.TTSProviderSetting"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/components/message/RoleReplySegments.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/hooks/TTS.kt",
+        "speech/src/main/java/me/rerere/asr/ASRState.kt",
+        "speech/src/main/java/me/rerere/tts/model/PlaybackState.kt",
+        "speech/src/main/java/me/rerere/tts/provider/TTSProviderSetting.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/webview/WebViewPage.kt",
@@ -43692,7 +43797,8 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallHistoryPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt"
       ]
     },
@@ -56969,6 +57075,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/ASR.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "app/src/test/java/me/rerere/rikkahub/ui/VoiceCallStateTest.kt",
         "speech/src/main/java/me/rerere/asr/providers/OpenAIRealtimeASRController.kt",
         "speech/src/main/java/me/rerere/asr/providers/SiliconFlowASRController.kt",
@@ -57759,7 +57866,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/TTSController.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/TTS.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "speech/src/main/java/me/rerere/tts/controller/AudioPlayer.kt",
         "speech/src/main/java/me/rerere/tts/controller/TtsController.kt"
       ]
@@ -58099,7 +58206,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/hooks/TTS.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSpeechPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/TTSProviderConfigure.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "speech/src/main/java/me/rerere/tts/controller/TtsAudioCache.kt",
         "speech/src/main/java/me/rerere/tts/controller/TtsController.kt",
         "speech/src/main/java/me/rerere/tts/controller/TtsSynthesizer.kt",
@@ -95596,86 +95703,86 @@
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.CallContentCard": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 879
+        "line": 58
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.CallStage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "class",
-        "line": 114
+        "line": 85
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.ConnectingPanel": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 940
+        "line": 119
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.IdleCallPanel": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 909
+        "line": 88
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.MiniCallWindow": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 1157
+        "line": 336
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.SleepModePanel": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 1083
+        "line": 262
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.TranscriptLine": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 1019
+        "line": 198
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.TranscriptList": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 979
+        "line": 158
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.TranscriptSegmentBubble": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 1066
+        "line": 245
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.VoiceCallHistoryItem": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallComponents.kt",
         "kind": "composable",
-        "line": 1119
+        "line": 298
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.VoiceCallHistoryPage": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallHistoryPage.kt",
         "kind": "composable",
-        "line": 813
+        "line": 33
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.VoiceCallPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "composable",
-        "line": 123
+        "line": 94
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.VoiceCallStateTest": [
@@ -95689,133 +95796,133 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "function",
-        "line": 213
+        "line": 184
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.buildSleepTalkPrompt": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1258
+        "line": 81
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.buildVoiceCallOpeningPrompt": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1280
+        "line": 103
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.cleanRoleLineForUser": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1341
+        "line": 164
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.createStreamSpeaker": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "function",
-        "line": 229
+        "line": 200
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.endCall": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "function",
-        "line": 382
+        "line": 353
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.formatTime": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1356
+        "line": 178
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.isUsableVoiceCallReply": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1313
+        "line": 136
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.miniStatusText": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1269
+        "line": 92
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.saveAssistantSleepLine": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "function",
-        "line": 202
+        "line": 173
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.saveLine": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "function",
-        "line": 181
+        "line": 152
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.shouldCommitVoiceTranscript": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1319
+        "line": 142
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.shouldStartVoiceCallListening": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1215
+        "line": 38
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.speakInSegments": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1245
+        "line": 68
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.startCall": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "function",
-        "line": 245
+        "line": 216
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.startListening": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
         "kind": "function",
-        "line": 313
+        "line": 284
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.statusText": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1191
+        "line": 14
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.voiceCallEndOfSpeechDelayMillis": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1331
+        "line": 154
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.waitForTtsPlayback": [
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt",
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 1230
+        "line": 53
       }
     ],
     "me.rerere.rikkahub.ui.pages.webview.WebViewPage": [
