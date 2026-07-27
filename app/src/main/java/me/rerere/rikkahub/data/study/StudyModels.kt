@@ -45,14 +45,6 @@ data class StudyState(
     val pomodoroInterruptionCompensationVersion: Int = 0,
     /** One-time compensation for the reported forty-draw all-normal experience. */
     val gachaBadLuckCompensationVersion: Int = 0,
-    /** Dates on which the four-hour Douyin reward has already been granted. */
-    val fourHourDouyinRewardDates: Set<String> = emptySet(),
-    /** Date associated with the daily random game-reward counters below. */
-    val dailyGameRewardDate: String? = null,
-    val dailyGameRoundTicketsWon: Int = 0,
-    val dailyGameUnlimitedTicketsWon: Int = 0,
-    /** Date on which the fifty-pull game floor has already been evaluated. */
-    val fiftyPullGameFloorGrantedDate: String? = null,
 )
 
 @Serializable
