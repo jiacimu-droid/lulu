@@ -11,7 +11,7 @@ import java.time.LocalDate
  * happens when a shipped APK must replace an older built-in plan on the same day.
  */
 object StudyPlanTaskSync {
-    private const val ID_PREFIX = "catalog-plan-v6"
+    private const val ID_PREFIX = "catalog-plan-v7"
 
     fun sync(state: StudyState, date: LocalDate = LocalDate.now()): StudyState {
         val dateText = date.toString()
