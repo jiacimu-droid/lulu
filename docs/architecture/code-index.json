@@ -1,16 +1,16 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T06:08:21.355957+00:00",
-  "commit": "0c1af41140c8ab1823f23f4d4fcc2806ddc6ec64",
+  "generatedAt": "2026-07-28T06:08:56.760108+00:00",
+  "commit": "4a8386deea0997bfb25dc022e5df97eab6374a89",
   "branch": "master",
-  "sourceFingerprint": "d5e6494ce053a86fcbac371478bacd8eea04e95bf52e19f7e63b530c20632365",
+  "sourceFingerprint": "c48d116fa4ca2a2acbe40327565b5d541f54889e8d4b0ec9f4c25c014cbf288b",
   "summary": {
-    "files": 1185,
-    "lines": 265921,
+    "files": 1183,
+    "lines": 263783,
     "symbols": 5652,
-    "productionCodeFiles": 847,
+    "productionCodeFiles": 846,
     "testFiles": 146,
-    "largeProductionFiles": 33,
+    "largeProductionFiles": 32,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
@@ -21,7 +21,7 @@
       "speech": 38,
       "search": 30,
       "docs": 24,
-      "plugins": 24,
+      "plugins": 22,
       "common": 21,
       ".agents": 10,
       "root": 10,
@@ -45,8 +45,8 @@
       ".xml": 37,
       ".pro": 15,
       ".kts": 11,
-      ".js": 9,
-      ".html": 7,
+      ".js": 8,
+      ".html": 6,
       ".yml": 4,
       ".css": 4,
       ".yaml": 3,
@@ -58,14 +58,14 @@
       "AI与上下文": 145,
       "主动代理": 25,
       "关系与承诺": 17,
-      "娱乐与数字生活": 35,
+      "娱乐与数字生活": 33,
       "学习监督": 35,
       "工具": 6,
-      "插件": 47,
+      "插件": 45,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 334,
+      "界面": 333,
       "记忆": 45
     },
     "resolvedImportEdges": 2062
@@ -151,13 +151,6 @@
         "lines": 1874,
         "symbols": 94,
         "localImportCount": 17,
-        "todoMarkers": 0
-      },
-      {
-        "path": "plugins/橘市商业街/main.js",
-        "lines": 1369,
-        "symbols": 0,
-        "localImportCount": 0,
         "todoMarkers": 0
       },
       {
@@ -340,6 +333,13 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
+        "todoMarkers": 0
+      },
+      {
+        "path": "web-ui/app/components/input/chat-input.tsx",
+        "lines": 807,
+        "symbols": 1,
+        "localImportCount": 0,
         "todoMarkers": 0
       }
     ],
@@ -1352,9 +1352,7 @@
       "plugins/共读/reader.css",
       "plugins/共读/reader.html",
       "plugins/共读/reader.js",
-      "plugins/橘市商业街/main.js",
       "plugins/橘市商业街/supabase_schema.sql",
-      "plugins/橘市商业街/ui/index.html",
       "plugins/番茄钟/main.js",
       "plugins/番茄钟/manifest.json",
       "plugins/番茄钟/ui/index.html",
@@ -1446,9 +1444,7 @@
       "plugins/共读/reader.css",
       "plugins/共读/reader.html",
       "plugins/共读/reader.js",
-      "plugins/橘市商业街/main.js",
       "plugins/橘市商业街/supabase_schema.sql",
-      "plugins/橘市商业街/ui/index.html",
       "plugins/番茄钟/main.js",
       "plugins/番茄钟/manifest.json",
       "plugins/番茄钟/ui/index.html",
@@ -1899,7 +1895,6 @@
       "app/src/test/java/me/rerere/rikkahub/ui/pages/stats/StatsPageTest.kt",
       "app/src/test/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlowTest.kt",
       "plugins/moments/ui/index.html",
-      "plugins/橘市商业街/ui/index.html",
       "plugins/番茄钟/ui/index.html",
       "plugins/音乐播放器/ui/index.html",
       "web-ui/app/components/ui/ai-icon.tsx",
@@ -56343,26 +56338,6 @@
       "importedBy": []
     },
     {
-      "path": "plugins/橘市商业街/main.js",
-      "module": "plugins",
-      "extension": ".js",
-      "lines": 1369,
-      "sha256": "e2be2ff7f8ebe17e80c44cbbc88477b1ca5e079391a72b8b0ce2a403efcde08b",
-      "package": null,
-      "categories": [
-        "娱乐与数字生活",
-        "插件"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": true,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
       "path": "plugins/橘市商业街/supabase_schema.sql",
       "module": "plugins",
       "extension": ".sql",
@@ -56371,27 +56346,6 @@
       "package": null,
       "categories": [
         "娱乐与数字生活",
-        "插件"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
-      "path": "plugins/橘市商业街/ui/index.html",
-      "module": "plugins",
-      "extension": ".html",
-      "lines": 769,
-      "sha256": "272ee702b51eabc69d268a094b2ae63ecc7b963bda931378575f2cacd95fe3f0",
-      "package": null,
-      "categories": [
-        "娱乐与数字生活",
-        "界面",
         "插件"
       ],
       "symbols": [],

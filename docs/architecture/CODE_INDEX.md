@@ -12,20 +12,20 @@
 
 ## 索引状态
 
-- 基准提交：`0c1af41140c8ab1823f23f4d4fcc2806ddc6ec64`
+- 基准提交：`4a8386deea0997bfb25dc022e5df97eab6374a89`
 - 分支：`master`
-- 源码指纹：`d5e6494ce053a86f…`
-- 已索引文件：1185
-- 已索引代码/文本行：265921
+- 源码指纹：`c48d116fa4ca2a2a…`
+- 已索引文件：1183
+- 已索引代码/文本行：263783
 - 已发现类、接口、对象、函数及 Composable：5652
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 847 |
+| 生产代码文件 | 846 |
 | 测试文件 | 146 |
-| ≥800 行生产文件 | 33 |
+| ≥800 行生产文件 | 32 |
 | ≥1500 行生产文件 | 3 |
 | TODO/FIXME/HACK/XXX | 32 |
 
@@ -98,7 +98,6 @@
 | `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 3143 | 90 | 126 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 2295 | 57 | 90 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt` | 1874 | 94 | 17 |
-| `plugins/橘市商业街/main.js` | 1369 | 0 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt` | 1311 | 51 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt` | 1187 | 60 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt` | 1185 | 30 | 0 |
@@ -110,6 +109,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt` | 1064 | 11 | 33 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt` | 1042 | 16 | 16 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 1032 | 77 | 89 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/TTSProviderConfigure.kt` | 1031 | 11 | 4 |
 
 ### 本地导入最多的生产文件
 
@@ -142,7 +142,7 @@
 | `speech` | 38 |
 | `search` | 30 |
 | `docs` | 24 |
-| `plugins` | 24 |
+| `plugins` | 22 |
 | `common` | 21 |
 | `.agents` | 10 |
 | `root` | 10 |
@@ -169,8 +169,8 @@
 | `.xml` | 37 |
 | `.pro` | 15 |
 | `.kts` | 11 |
-| `.js` | 9 |
-| `.html` | 7 |
+| `.js` | 8 |
+| `.html` | 6 |
 | `.yml` | 4 |
 | `.css` | 4 |
 | `.yaml` | 3 |
@@ -290,11 +290,11 @@
 - `plugins/共读/reader.css`
 - `plugins/共读/reader.html`
 - `plugins/共读/reader.js`
-- `plugins/橘市商业街/main.js`
 - `plugins/橘市商业街/supabase_schema.sql`
-- `plugins/橘市商业街/ui/index.html`
 - `plugins/番茄钟/main.js`
-- ……另有 5 个文件，见 `code-index.json`
+- `plugins/番茄钟/manifest.json`
+- `plugins/番茄钟/ui/index.html`
+- ……另有 3 个文件，见 `code-index.json`
 
 ### 学习监督
 
@@ -371,7 +371,7 @@
 - `plugins/moments/supabase_schema.sql`
 - `plugins/moments/ui/index.html`
 - `plugins/supabase_memory/README.md`
-- ……另有 17 个文件，见 `code-index.json`
+- ……另有 15 个文件，见 `code-index.json`
 
 ### 数据库
 
@@ -489,7 +489,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 304 个文件，见 `code-index.json`
+- ……另有 303 个文件，见 `code-index.json`
 
 ### 记忆
 
