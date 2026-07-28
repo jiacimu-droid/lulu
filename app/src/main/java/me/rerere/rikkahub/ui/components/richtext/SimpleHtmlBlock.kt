@@ -92,7 +92,6 @@ private fun RenderNode(
                 "p" -> {
                     val annotatedString = buildAnnotatedStringFromElement(node, onLinkClick)
                     if (annotatedString.text.isNotBlank()) {
-                        // Parse inline styles for <p> element
                         val style = node.attr("style")
                         val inlineStyle = if (style.isNotEmpty()) parseInlineStyle(style) else null
 
@@ -120,7 +119,6 @@ private fun RenderNode(
 
                     val annotatedString = buildAnnotatedStringFromElement(node, onLinkClick)
                     if (annotatedString.text.isNotBlank()) {
-                        // Parse inline styles for heading elements
                         val style = node.attr("style")
                         val inlineStyle = if (style.isNotEmpty()) parseInlineStyle(style) else null
 
@@ -168,10 +166,8 @@ private fun RenderNode(
                 }
 
                 else -> {
-                    // Render other elements as text
                     val annotatedString = buildAnnotatedStringFromElement(node, onLinkClick)
                     if (annotatedString.text.isNotBlank()) {
-                        // Parse inline styles for other elements
                         val style = node.attr("style")
                         val inlineStyle = if (style.isNotEmpty()) parseInlineStyle(style) else null
 
@@ -237,7 +233,6 @@ private fun RenderDetails(
     val summaryText = summaryElement?.text() ?: "Details"
 
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        // Summary (clickable header)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -267,7 +262,6 @@ private fun RenderDetails(
             )
         }
 
-        // Details content (animated visibility)
         AnimatedVisibility(visible = isExpanded) {
             Column(
                 modifier = Modifier
@@ -405,7 +399,6 @@ private fun processElementNodes(
                         val start = builder.length
                         processElementNodes(node, builder, onLinkClick)
 
-                        // Handle inline styles
                         val style = node.attr("style")
                         if (style.isNotEmpty()) {
                             val spanStyle = parseInlineStyle(style)
@@ -423,10 +416,9 @@ private fun processElementNodes(
                         val start = builder.length
                         processElementNodes(node, builder, onLinkClick)
 
-                        // Handle font color attribute
                         val color = node.attr("color")
                         if (color.isNotEmpty()) {
-                            val parsedColor = parseColor(color)
+                            val parsedColor = parseSimpleHtmlColor(color)
                             if (parsedColor != null) {
                                 builder.addStyle(
                                     SpanStyle(color = parsedColor),
@@ -460,7 +452,7 @@ private fun parseInlineStyle(style: String): SpanStyle? {
     var fontWeight: FontWeight? = null
 
     properties["color"]?.let { colorValue ->
-        color = parseColor(colorValue)
+        color = parseSimpleHtmlColor(colorValue)
     }
 
     properties["font-weight"]?.let { weightValue ->
@@ -475,16 +467,14 @@ private fun parseInlineStyle(style: String): SpanStyle? {
     } else null
 }
 
-private fun parseColor(colorString: String): Color? {
+private fun parseSimpleHtmlColor(colorString: String): Color? {
     return try {
         when {
             colorString.startsWith("#") -> {
-                // Hex color
                 val hex = colorString.removePrefix("#")
                 when (hex.length) {
                     6 -> Color("#$hex".toColorInt())
                     3 -> {
-                        // Convert 3-digit hex to 6-digit
                         val r = hex[0].toString().repeat(2)
                         val g = hex[1].toString().repeat(2)
                         val b = hex[2].toString().repeat(2)
@@ -496,7 +486,6 @@ private fun parseColor(colorString: String): Color? {
             }
 
             colorString.startsWith("rgb(") -> {
-                // RGB color
                 val rgb = colorString.removePrefix("rgb(").removeSuffix(")")
                 val values = rgb.split(",").map { it.trim().toIntOrNull() }
                 if (values.size == 3 && values.all { it != null && it in 0..255 }) {
@@ -505,7 +494,6 @@ private fun parseColor(colorString: String): Color? {
             }
 
             colorString.startsWith("rgba(") -> {
-                // RGBA color
                 val rgba = colorString.removePrefix("rgba(").removeSuffix(")")
                 val values = rgba.split(",").map { it.trim() }
                 if (values.size == 4) {
@@ -522,7 +510,6 @@ private fun parseColor(colorString: String): Color? {
             }
 
             else -> {
-                // Named colors
                 when (colorString.lowercase()) {
                     "red" -> Color.Red
                     "green" -> Color.Green
@@ -573,7 +560,6 @@ private fun RenderProgress(
     val max = progressElement.attr("max").toFloatOrNull() ?: 100f
     val progress = if (max > 0) (value / max).coerceIn(0f, 1f) else 0f
 
-    // Check for width in style attribute first, then width attribute
     val style = progressElement.attr("style")
     var width = ""
     if (style.isNotEmpty()) {
@@ -638,7 +624,6 @@ private fun RenderTable(
     val rows = mutableListOf<List<@Composable () -> Unit>>()
     var headers = emptyList<@Composable () -> Unit>()
 
-    // Extract table headers and rows
     tableElement.select("tr").forEach { tr ->
         val cells = mutableListOf<@Composable () -> Unit>()
 
@@ -657,7 +642,6 @@ private fun RenderTable(
         }
 
         if (cells.isNotEmpty()) {
-            // Check if this row contains header cells (th)
             val isHeaderRow = tr.select("th").isNotEmpty()
             if (isHeaderRow && headers.isEmpty()) {
                 headers = cells
@@ -667,7 +651,6 @@ private fun RenderTable(
         }
     }
 
-    // If no headers found, create empty headers for consistency
     if (headers.isEmpty() && rows.isNotEmpty()) {
         headers = rows.firstOrNull()?.mapIndexed { _, _ ->
             @Composable { Text("") }
