@@ -6,8 +6,8 @@ import me.rerere.ai.provider.ModelType
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.BookOpen02
 import me.rerere.hugeicons.stroke.Chatting01
-import me.rerere.hugeicons.stroke.Compress
 import me.rerere.hugeicons.stroke.Earth
+import me.rerere.hugeicons.stroke.FileZip
 import me.rerere.hugeicons.stroke.Image01
 import me.rerere.hugeicons.stroke.MessageMultiple01
 import me.rerere.hugeicons.stroke.Notebook01
@@ -36,8 +36,8 @@ internal fun DefaultChatModelSetting(settings: Settings, vm: SettingVM) {
 @Composable
 internal fun DefaultLuluModelSetting(settings: Settings, vm: SettingVM) {
     SimpleModelFeature(
-        title = stringResource(R.string.setting_model_page_lulu_model),
-        description = stringResource(R.string.setting_model_page_lulu_model_desc),
+        title = stringResource(R.string.setting_model_page_lulu_intent_model),
+        description = stringResource(R.string.setting_model_page_lulu_intent_model_desc),
         icon = HugeIcons.MessageMultiple01,
         modelId = settings.luluIntentModelId,
         type = ModelType.CHAT,
@@ -105,7 +105,7 @@ internal fun DefaultTranslationModelSetting(settings: Settings, vm: SettingVM) {
         settings = settings,
         allowClear = false,
         prompt = settings.translatePrompt,
-        promptDescription = stringResource(R.string.setting_model_page_translation_prompt_desc),
+        promptDescription = stringResource(R.string.setting_model_page_translate_prompt_vars),
         defaultPrompt = DEFAULT_TRANSLATION_PROMPT,
         onSelect = { model -> vm.updateSettings(settings.copy(translateModeId = model.id)) },
         onPromptChange = { vm.updateSettings(settings.copy(translatePrompt = it)) },
@@ -125,11 +125,9 @@ internal fun DefaultTitleModelSetting(settings: Settings, vm: SettingVM) {
         settings = settings,
         allowClear = true,
         prompt = settings.titlePrompt,
-        promptDescription = stringResource(R.string.setting_model_page_title_prompt_desc),
+        promptDescription = stringResource(R.string.setting_model_page_suggestion_prompt_vars),
         defaultPrompt = DEFAULT_TITLE_PROMPT,
-        onSelect = { model ->
-            vm.updateSettings(settings.copy(titleModelId = model.id.takeUnless { model.modelId.isBlank() }))
-        },
+        onSelect = { model -> vm.updateSettings(settings.copy(titleModelId = model.id)) },
         onPromptChange = { vm.updateSettings(settings.copy(titlePrompt = it)) },
     )
 }
@@ -145,7 +143,7 @@ internal fun DefaultOcrModelSetting(settings: Settings, vm: SettingVM) {
         settings = settings,
         allowClear = false,
         prompt = settings.ocrPrompt,
-        promptDescription = stringResource(R.string.setting_model_page_ocr_prompt_desc),
+        promptDescription = stringResource(R.string.setting_model_page_ocr_prompt_vars),
         defaultPrompt = DEFAULT_OCR_PROMPT,
         onSelect = { model -> vm.updateSettings(settings.copy(ocrModelId = model.id)) },
         onPromptChange = { vm.updateSettings(settings.copy(ocrPrompt = it)) },
@@ -157,13 +155,13 @@ internal fun DefaultCompressModelSetting(settings: Settings, vm: SettingVM) {
     PromptModelFeature(
         title = stringResource(R.string.setting_model_page_compress_model),
         description = stringResource(R.string.setting_model_page_compress_model_desc),
-        icon = HugeIcons.Compress,
+        icon = HugeIcons.FileZip,
         modelId = settings.compressModelId,
         type = ModelType.CHAT,
         settings = settings,
         allowClear = false,
         prompt = settings.compressPrompt,
-        promptDescription = stringResource(R.string.setting_model_page_compress_prompt_desc),
+        promptDescription = stringResource(R.string.setting_model_page_compress_prompt_vars),
         defaultPrompt = DEFAULT_COMPRESS_PROMPT,
         onSelect = { model -> vm.updateSettings(settings.copy(compressModelId = model.id)) },
         onPromptChange = { vm.updateSettings(settings.copy(compressPrompt = it)) },
