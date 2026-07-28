@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T03:42:20.578098+00:00",
-  "commit": "67f0a791d2867e0da407f92792b383c1871ede79",
+  "generatedAt": "2026-07-28T03:42:55.068533+00:00",
+  "commit": "79513dda8913f0798aedd75dd9d6b087988672d0",
   "branch": "master",
-  "sourceFingerprint": "a65dc23baa1fa8a8216415ec419a356331c9c859b916e961fba8a67b87ed8ecb",
+  "sourceFingerprint": "1e381c6319ad108f614cb369b84f1e8f2faa684d942e74eae82b587e2fd041f3",
   "summary": {
     "files": 1186,
     "lines": 266214,
@@ -41103,7 +41103,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 167,
-      "sha256": "a10e03178643eee1bde2cce4178152232d820b30e4b8bbbb5fa147680ebc14c4",
+      "sha256": "97a0eabbdea5cb0705cb78c9f12d8de959d2242eda9c1d8b77ef95a21686993c",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
