@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`64909b82a0e674ae61cc2df137e09af26bcfdbc4`
+- 基准提交：`97ace099dccb893c5951cd7091c7049c3100e36f`
 - 分支：`master`
-- 源码指纹：`3e0d2636881d0a8a…`
-- 已索引文件：1178
-- 已索引代码/文本行：261226
-- 已发现类、接口、对象、函数及 Composable：5652
+- 源码指纹：`69c40e1e90a58ca3…`
+- 已索引文件：1179
+- 已索引代码/文本行：261416
+- 已发现类、接口、对象、函数及 Composable：5654
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 844 |
+| 生产代码文件 | 845 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 31 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 725 |
+| `app` | 726 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 793 |
+| `.kt` | 794 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
@@ -485,7 +485,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 303 个文件，见 `code-index.json`
+- ……另有 304 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -505,6 +505,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/MemoryCandidateQualityGate.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/MemoryVector.kt`
+- `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt`
@@ -518,8 +519,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankContextTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankServiceExtractionTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryCandidateDeduplicationTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/service/MemoryVectorTest.kt`
-- ……另有 15 个文件，见 `code-index.json`
+- ……另有 16 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 
@@ -544,7 +544,7 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2062
+- 已解析本地导入边：2063
 - 可检索完整符号：5043
 
 | 文件 | 被本地文件导入 | 行数 |

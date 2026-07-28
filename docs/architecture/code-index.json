@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T06:10:11.870177+00:00",
-  "commit": "64909b82a0e674ae61cc2df137e09af26bcfdbc4",
+  "generatedAt": "2026-07-28T06:14:58.614722+00:00",
+  "commit": "97ace099dccb893c5951cd7091c7049c3100e36f",
   "branch": "master",
-  "sourceFingerprint": "3e0d2636881d0a8afc6726ad7eed4f034f10642e677df74f7b3f8ac57ef911ee",
+  "sourceFingerprint": "69c40e1e90a58ca3114f3b697f34d6444d8a19ed45359edae025e7d0d55eca62",
   "summary": {
-    "files": 1178,
-    "lines": 261226,
-    "symbols": 5652,
-    "productionCodeFiles": 844,
+    "files": 1179,
+    "lines": 261416,
+    "symbols": 5654,
+    "productionCodeFiles": 845,
     "testFiles": 146,
     "largeProductionFiles": 31,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 725,
+      "app": 726,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 793,
+      ".kt": 794,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 333,
-      "记忆": 45
+      "界面": 334,
+      "记忆": 46
     },
-    "resolvedImportEdges": 2062
+    "resolvedImportEdges": 2063
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -1779,6 +1779,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/log/LogPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt",
@@ -1939,6 +1940,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/MemoryCandidateQualityGate.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/MemoryVector.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryDiagnostics.kt",
@@ -2182,6 +2184,11 @@
       "imports": 9
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.memory",
+      "to": "me.rerere.rikkahub.data.db.entity",
+      "imports": 9
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.message",
       "to": "me.rerere.ai.ui.UIMessagePart",
       "imports": 8
@@ -2204,11 +2211,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.chat",
       "to": "me.rerere.rikkahub.data.model.Conversation",
-      "imports": 8
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.memory",
-      "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 8
     },
     {
@@ -16462,6 +16464,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/db/dao/MemoryBankDAO.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/MemoryArchiveTest.kt",
@@ -39958,6 +39961,41 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 190,
+      "sha256": "a20f4fd40613af31814bd2638ba28eb44b63502c8f6c7fd0a2af62118008ec7a",
+      "package": "me.rerere.rikkahub.ui.pages.memory",
+      "categories": [
+        "记忆",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "EditMemoryDialog",
+          "kind": "composable",
+          "line": 25
+        },
+        {
+          "name": "CorrectMemoryDialog",
+          "kind": "composable",
+          "line": 135
+        }
+      ],
+      "localImportCount": 1,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.db.entity.MemoryBankEntity"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryBankEntity.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
@@ -94214,12 +94252,22 @@
     ],
     "me.rerere.rikkahub.ui.pages.memory.CorrectMemoryDialog": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt",
+        "kind": "composable",
+        "line": 135
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "kind": "composable",
         "line": 577
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.EditMemoryDialog": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt",
+        "kind": "composable",
+        "line": 25
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "kind": "composable",
