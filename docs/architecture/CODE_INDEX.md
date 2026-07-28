@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`4a8386deea0997bfb25dc022e5df97eab6374a89`
+- 基准提交：`05a64ec0ff4102f42d07fbb6c1b918c0fb5312ff`
 - 分支：`master`
-- 源码指纹：`c48d116fa4ca2a2a…`
-- 已索引文件：1183
-- 已索引代码/文本行：263783
+- 源码指纹：`7f3027b4dc92dc70…`
+- 已索引文件：1180
+- 已索引代码/文本行：263333
 - 已发现类、接口、对象、函数及 Composable：5652
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 846 |
+| 生产代码文件 | 845 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 32 |
 | ≥1500 行生产文件 | 3 |
@@ -142,8 +142,8 @@
 | `speech` | 38 |
 | `search` | 30 |
 | `docs` | 24 |
-| `plugins` | 22 |
 | `common` | 21 |
+| `plugins` | 19 |
 | `.agents` | 10 |
 | `root` | 10 |
 | `website` | 10 |
@@ -164,13 +164,13 @@
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
-| `.json` | 56 |
+| `.json` | 55 |
 | `.ts` | 42 |
 | `.xml` | 37 |
 | `.pro` | 15 |
 | `.kts` | 11 |
-| `.js` | 8 |
-| `.html` | 6 |
+| `.js` | 7 |
+| `.html` | 5 |
 | `.yml` | 4 |
 | `.css` | 4 |
 | `.yaml` | 3 |
@@ -285,16 +285,15 @@
 - `plugins/supabase_memory/main.js`
 - `plugins/supabase_memory/manifest.json`
 - `plugins/supabase_memory/supabase_schema.sql`
-- `plugins/共读/main.js`
-- `plugins/共读/manifest.json`
 - `plugins/共读/reader.css`
-- `plugins/共读/reader.html`
 - `plugins/共读/reader.js`
 - `plugins/橘市商业街/supabase_schema.sql`
 - `plugins/番茄钟/main.js`
 - `plugins/番茄钟/manifest.json`
 - `plugins/番茄钟/ui/index.html`
-- ……另有 3 个文件，见 `code-index.json`
+- `plugins/音乐播放器/main.js`
+- `plugins/音乐播放器/manifest.json`
+- `plugins/音乐播放器/ui/index.html`
 
 ### 学习监督
 
@@ -371,7 +370,7 @@
 - `plugins/moments/supabase_schema.sql`
 - `plugins/moments/ui/index.html`
 - `plugins/supabase_memory/README.md`
-- ……另有 15 个文件，见 `code-index.json`
+- ……另有 12 个文件，见 `code-index.json`
 
 ### 数据库
 
