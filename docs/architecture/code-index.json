@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T03:40:21.036456+00:00",
-  "commit": "a8d91fe0994385abc1fee1d1ec92f57154de23ca",
+  "generatedAt": "2026-07-28T03:40:44.234731+00:00",
+  "commit": "8dfba41704b950de745611ffd55bb889405d98ea",
   "branch": "master",
-  "sourceFingerprint": "baf98307afa200df707fd4473471395caf922f1c86136bff077a377ae7541a66",
+  "sourceFingerprint": "df9a2984d34965d00dfdf853c282048a04c8122509d8874c49ab9ffac9369fa8",
   "summary": {
     "files": 1186,
-    "lines": 266262,
+    "lines": 266260,
     "symbols": 5653,
     "productionCodeFiles": 847,
     "testFiles": 146,
@@ -41388,8 +41388,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 62,
-      "sha256": "86a6350ebfba6fc063cd91781fb818a1412e04b3385f4e4433ca576ab047e8df",
+      "lines": 60,
+      "sha256": "13d4fc44c374f3bbb3ac3c0ce5661d8c4e18d549989703dff3b080e1d58392ea",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
