@@ -3,7 +3,6 @@ package me.rerere.rikkahub.ui.pages.setting
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -32,8 +31,7 @@ import androidx.compose.ui.unit.dp
 import me.rerere.ai.provider.ModelType
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Database02
-import me.rerere.hugeicons.stroke.Filter
-import me.rerere.hugeicons.stroke.MagicWand01
+import me.rerere.hugeicons.stroke.Mortarboard01
 import me.rerere.hugeicons.stroke.Tools
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.datastore.Settings
@@ -222,7 +220,7 @@ internal fun DefaultMemoryRerankModelSetting(settings: Settings, vm: SettingVM) 
     SimpleModelFeature(
         title = stringResource(R.string.setting_model_page_memory_rerank_model),
         description = stringResource(R.string.setting_model_page_memory_rerank_model_desc),
-        icon = HugeIcons.Filter,
+        icon = HugeIcons.Database02,
         modelId = config.rerankModelId,
         type = ModelType.RERANK,
         settings = settings,
@@ -240,54 +238,12 @@ internal fun DefaultMemoryRerankModelSetting(settings: Settings, vm: SettingVM) 
 }
 
 @Composable
-internal fun MemoryEngineModelSettings(settings: Settings, vm: SettingVM) {
-    val config = settings.memoryEmbeddingConfig
-    OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.outlinedCardColors(containerColor = CustomColors.listItemColors.containerColor),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.setting_model_page_memory_engine_title),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            FormItem(
-                label = { Text(stringResource(R.string.setting_model_page_memory_vector_enabled)) },
-                description = { Text(stringResource(R.string.setting_model_page_memory_vector_enabled_desc)) },
-                tail = {
-                    Switch(
-                        checked = config.enabled,
-                        onCheckedChange = { enabled ->
-                            vm.updateSettings(
-                                settings.copy(memoryEmbeddingConfig = config.copy(enabled = enabled)),
-                            )
-                        },
-                    )
-                },
-            )
-            MemoryEngineDiagnostics(
-                buildMemoryEngineDiagnostics(
-                    enabled = config.enabled,
-                    embeddingModel = settings.memoryModelName(config.modelId),
-                    rerankModel = settings.memoryModelName(config.rerankModelId),
-                    extractionModel = settings.memoryModelName(config.extractionModelId),
-                    candidateCount = config.rerankCandidateCount,
-                ),
-            )
-        }
-    }
-}
-
-@Composable
 internal fun MemoryExtractionModelSetting(settings: Settings, vm: SettingVM) {
     val config = settings.memoryEmbeddingConfig
     SimpleModelFeature(
         title = stringResource(R.string.setting_model_page_memory_extraction_model),
         description = stringResource(R.string.setting_model_page_memory_extraction_model_desc),
-        icon = HugeIcons.MagicWand01,
+        icon = HugeIcons.Mortarboard01,
         modelId = config.extractionModelId,
         type = ModelType.CHAT,
         settings = settings,
