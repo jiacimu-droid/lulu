@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T03:13:47.342479+00:00",
-  "commit": "29b211c33ae1bd0d1cc5ee91756b3facd6aa96ab",
+  "generatedAt": "2026-07-28T03:39:58.923422+00:00",
+  "commit": "49b4f8a144d7b13d48edfc1acfcc5b20171cead8",
   "branch": "master",
-  "sourceFingerprint": "078b66a2c6215db6070a80662095f334734a4e3f69b1b9e2fff6708b99c02576",
+  "sourceFingerprint": "77035ed7f8f5680d2e4133cd6f023173d6f4e38dd4c00001c18fece4b9818a7a",
   "summary": {
-    "files": 1185,
-    "lines": 266241,
-    "symbols": 5652,
-    "productionCodeFiles": 846,
+    "files": 1186,
+    "lines": 266260,
+    "symbols": 5653,
+    "productionCodeFiles": 847,
     "testFiles": 146,
     "largeProductionFiles": 33,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 724,
+      "app": 725,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 792,
+      ".kt": 793,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -65,7 +65,7 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 333,
+      "界面": 334,
       "记忆": 45
     },
     "resolvedImportEdges": 2062
@@ -1778,6 +1778,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/SkillsVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoritePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoriteVM.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameColors.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GamePage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
@@ -38498,6 +38499,31 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/di/ViewModelModule.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameColors.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 19,
+      "sha256": "4ee5442c71c4686bd29da1e38e6e8079525c63b5b43f3cb7d449e5b696d3d039",
+      "package": "me.rerere.rikkahub.ui.pages.game",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "GameColors",
+          "kind": "object",
+          "line": 7
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
@@ -93163,6 +93189,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
         "line": 411
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.game.GameColors": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameColors.kt",
+        "kind": "object",
+        "line": 7
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameHubColors": [
