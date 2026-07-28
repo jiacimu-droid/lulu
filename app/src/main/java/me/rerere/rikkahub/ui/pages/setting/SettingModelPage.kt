@@ -41,22 +41,20 @@ fun SettingModelPage(vm: SettingVM = koinViewModel()) {
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = innerPadding + PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = innerPadding + PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item { DefaultChatModelSetting(settings, vm) }
-            item { DefaultLuluModelSetting(settings, vm) }
-            item { DefaultTheaterModelSetting(settings, vm) }
-            item { DefaultTranslationModelSetting(settings, vm) }
-            item { DefaultTitleModelSetting(settings, vm) }
-            item { DefaultImageGenerationModelSetting(settings, vm) }
-            item { DefaultVideoGenerationModelSetting(settings, vm) }
-            item { DefaultOcrModelSetting(settings, vm) }
-            item { DefaultCompressModelSetting(settings, vm) }
             item { DefaultMemoryEmbeddingModelSetting(settings, vm) }
             item { DefaultMemoryRerankModelSetting(settings, vm) }
-            item { MemoryEngineModelSettings(settings, vm) }
             item { MemoryExtractionModelSetting(settings, vm) }
+            item { DefaultLuluModelSetting(settings, vm) }
+            item { DefaultTheaterModelSetting(settings, vm) }
+            item { DefaultImageGenerationModelSetting(settings, vm) }
+            item { DefaultVideoGenerationModelSetting(settings, vm) }
+            item { DefaultTranslationModelSetting(settings, vm) }
+            item { DefaultOcrModelSetting(settings, vm) }
+            item { DefaultCompressModelSetting(settings, vm) }
         }
     }
 }
