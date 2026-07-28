@@ -12,20 +12,20 @@
 
 ## 索引状态
 
-- 基准提交：`05a64ec0ff4102f42d07fbb6c1b918c0fb5312ff`
+- 基准提交：`64909b82a0e674ae61cc2df137e09af26bcfdbc4`
 - 分支：`master`
-- 源码指纹：`7f3027b4dc92dc70…`
-- 已索引文件：1180
-- 已索引代码/文本行：263333
+- 源码指纹：`3e0d2636881d0a8a…`
+- 已索引文件：1178
+- 已索引代码/文本行：261226
 - 已发现类、接口、对象、函数及 Composable：5652
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 845 |
+| 生产代码文件 | 844 |
 | 测试文件 | 146 |
-| ≥800 行生产文件 | 32 |
+| ≥800 行生产文件 | 31 |
 | ≥1500 行生产文件 | 3 |
 | TODO/FIXME/HACK/XXX | 32 |
 
@@ -76,7 +76,6 @@
 
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt`
 - `plugins/moments/main.js`
-- `plugins/共读/reader.js`
 - `plugins/番茄钟/main.js`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/MusicPlayerService.kt`
 
@@ -101,7 +100,6 @@
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt` | 1311 | 51 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt` | 1187 | 60 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt` | 1185 | 30 | 0 |
-| `plugins/共读/reader.js` | 1175 | 0 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 1166 | 14 | 44 |
 | `web-ui/app/routes/conversations.tsx` | 1132 | 3 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt` | 1124 | 23 | 6 |
@@ -110,6 +108,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt` | 1042 | 16 | 16 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 1032 | 77 | 89 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/TTSProviderConfigure.kt` | 1031 | 11 | 4 |
+| `app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginUIDeclarativePage.kt` | 985 | 19 | 10 |
 
 ### 本地导入最多的生产文件
 
@@ -143,7 +142,7 @@
 | `search` | 30 |
 | `docs` | 24 |
 | `common` | 21 |
-| `plugins` | 19 |
+| `plugins` | 17 |
 | `.agents` | 10 |
 | `root` | 10 |
 | `website` | 10 |
@@ -169,13 +168,13 @@
 | `.xml` | 37 |
 | `.pro` | 15 |
 | `.kts` | 11 |
-| `.js` | 7 |
+| `.js` | 6 |
 | `.html` | 5 |
 | `.yml` | 4 |
-| `.css` | 4 |
 | `.yaml` | 3 |
 | `.properties` | 3 |
 | `.sql` | 3 |
+| `.css` | 3 |
 | `.toml` | 2 |
 
 ## 功能入口
@@ -285,8 +284,6 @@
 - `plugins/supabase_memory/main.js`
 - `plugins/supabase_memory/manifest.json`
 - `plugins/supabase_memory/supabase_schema.sql`
-- `plugins/共读/reader.css`
-- `plugins/共读/reader.js`
 - `plugins/橘市商业街/supabase_schema.sql`
 - `plugins/番茄钟/main.js`
 - `plugins/番茄钟/manifest.json`
@@ -370,7 +367,7 @@
 - `plugins/moments/supabase_schema.sql`
 - `plugins/moments/ui/index.html`
 - `plugins/supabase_memory/README.md`
-- ……另有 12 个文件，见 `code-index.json`
+- ……另有 10 个文件，见 `code-index.json`
 
 ### 数据库
 

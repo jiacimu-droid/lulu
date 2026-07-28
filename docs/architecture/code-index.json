@@ -1,16 +1,16 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T06:09:39.410976+00:00",
-  "commit": "05a64ec0ff4102f42d07fbb6c1b918c0fb5312ff",
+  "generatedAt": "2026-07-28T06:10:11.870177+00:00",
+  "commit": "64909b82a0e674ae61cc2df137e09af26bcfdbc4",
   "branch": "master",
-  "sourceFingerprint": "7f3027b4dc92dc70b6eef3bba1a717474d7843e2167c67eac02b37041f04304c",
+  "sourceFingerprint": "3e0d2636881d0a8afc6726ad7eed4f034f10642e677df74f7b3f8ac57ef911ee",
   "summary": {
-    "files": 1180,
-    "lines": 263333,
+    "files": 1178,
+    "lines": 261226,
     "symbols": 5652,
-    "productionCodeFiles": 845,
+    "productionCodeFiles": 844,
     "testFiles": 146,
-    "largeProductionFiles": 32,
+    "largeProductionFiles": 31,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
@@ -22,7 +22,7 @@
       "search": 30,
       "docs": 24,
       "common": 21,
-      "plugins": 19,
+      "plugins": 17,
       ".agents": 10,
       "root": 10,
       "website": 10,
@@ -45,23 +45,23 @@
       ".xml": 37,
       ".pro": 15,
       ".kts": 11,
-      ".js": 7,
+      ".js": 6,
       ".html": 5,
       ".yml": 4,
-      ".css": 4,
       ".yaml": 3,
       ".properties": 3,
       ".sql": 3,
+      ".css": 3,
       ".toml": 2
     },
     "byCategory": {
       "AI与上下文": 145,
       "主动代理": 25,
       "关系与承诺": 17,
-      "娱乐与数字生活": 30,
+      "娱乐与数字生活": 28,
       "学习监督": 35,
       "工具": 6,
-      "插件": 42,
+      "插件": 40,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
@@ -115,7 +115,6 @@
       "paths": [
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionDigitalActivities.kt",
         "plugins/moments/main.js",
-        "plugins/共读/reader.js",
         "plugins/番茄钟/main.js",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/MusicPlayerService.kt"
       ]
@@ -171,13 +170,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
         "lines": 1185,
         "symbols": 30,
-        "localImportCount": 0,
-        "todoMarkers": 0
-      },
-      {
-        "path": "plugins/共读/reader.js",
-        "lines": 1175,
-        "symbols": 0,
         "localImportCount": 0,
         "todoMarkers": 0
       },
@@ -340,6 +332,13 @@
         "lines": 807,
         "symbols": 1,
         "localImportCount": 0,
+        "todoMarkers": 0
+      },
+      {
+        "path": "ai/src/main/java/me/rerere/ai/provider/providers/openai/ResponseAPI.kt",
+        "lines": 807,
+        "symbols": 18,
+        "localImportCount": 26,
         "todoMarkers": 0
       }
     ],
@@ -1347,8 +1346,6 @@
       "plugins/supabase_memory/main.js",
       "plugins/supabase_memory/manifest.json",
       "plugins/supabase_memory/supabase_schema.sql",
-      "plugins/共读/reader.css",
-      "plugins/共读/reader.js",
       "plugins/橘市商业街/supabase_schema.sql",
       "plugins/番茄钟/main.js",
       "plugins/番茄钟/manifest.json",
@@ -1436,8 +1433,6 @@
       "plugins/supabase_memory/main.js",
       "plugins/supabase_memory/manifest.json",
       "plugins/supabase_memory/supabase_schema.sql",
-      "plugins/共读/reader.css",
-      "plugins/共读/reader.js",
       "plugins/橘市商业街/supabase_schema.sql",
       "plugins/番茄钟/main.js",
       "plugins/番茄钟/manifest.json",
@@ -56227,46 +56222,6 @@
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
-      "path": "plugins/共读/reader.css",
-      "module": "plugins",
-      "extension": ".css",
-      "lines": 932,
-      "sha256": "6c9083e55c09b32409203461610a9e6efe86a23b174c9257263158793133d680",
-      "package": null,
-      "categories": [
-        "娱乐与数字生活",
-        "插件"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": false,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
-      "path": "plugins/共读/reader.js",
-      "module": "plugins",
-      "extension": ".js",
-      "lines": 1175,
-      "sha256": "329671b04ed354c47174b2ef75e5f031218ccd2e89ec49b883247ffa75dcc950",
-      "package": null,
-      "categories": [
-        "娱乐与数字生活",
-        "插件"
-      ],
-      "symbols": [],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": true,
       "localImports": [],
       "resolvedImports": [],
       "importedBy": []
