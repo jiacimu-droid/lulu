@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T03:40:44.234731+00:00",
-  "commit": "8dfba41704b950de745611ffd55bb889405d98ea",
+  "generatedAt": "2026-07-28T03:41:16.101486+00:00",
+  "commit": "6d0e76519cc4e1b9b42c39f4a5c1a4039fbfc5b7",
   "branch": "master",
-  "sourceFingerprint": "df9a2984d34965d00dfdf853c282048a04c8122509d8874c49ab9ffac9369fa8",
+  "sourceFingerprint": "e9ebffdbb04140159223422ba5e2b895067ea6ae834c4210d2f8783b046731ba",
   "summary": {
     "files": 1186,
-    "lines": 266260,
+    "lines": 266258,
     "symbols": 5653,
     "productionCodeFiles": 847,
     "testFiles": 146,
@@ -41202,8 +41202,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 171,
-      "sha256": "0484d2fdf2f7e86fa82149c0d682393bf1cf30659ad2083af30d22f505e87404",
+      "lines": 169,
+      "sha256": "0c195ab016fffb3e003eb0ec49c25464f3df7c5e0e59ed41ddc44c4092e5d91f",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "界面"
@@ -41247,12 +41247,12 @@
         {
           "name": "DefaultOcrModelSetting",
           "kind": "composable",
-          "line": 138
+          "line": 136
         },
         {
           "name": "DefaultCompressModelSetting",
           "kind": "composable",
-          "line": 156
+          "line": 154
         }
       ],
       "localImportCount": 17,
@@ -41264,8 +41264,8 @@
         "me.rerere.hugeicons.HugeIcons",
         "me.rerere.hugeicons.stroke.BookOpen02",
         "me.rerere.hugeicons.stroke.Chatting01",
-        "me.rerere.hugeicons.stroke.Compress",
         "me.rerere.hugeicons.stroke.Earth",
+        "me.rerere.hugeicons.stroke.FileZip",
         "me.rerere.hugeicons.stroke.Image01",
         "me.rerere.hugeicons.stroke.MessageMultiple01",
         "me.rerere.hugeicons.stroke.Notebook01",
@@ -94854,7 +94854,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
         "kind": "composable",
-        "line": 156
+        "line": 154
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultImageGenerationModelSetting": [
@@ -94889,7 +94889,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelGeneralFeatures.kt",
         "kind": "composable",
-        "line": 138
+        "line": 136
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultTheaterModelSetting": [
