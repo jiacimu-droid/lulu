@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T03:39:58.923422+00:00",
-  "commit": "49b4f8a144d7b13d48edfc1acfcc5b20171cead8",
+  "generatedAt": "2026-07-28T03:40:21.036456+00:00",
+  "commit": "a8d91fe0994385abc1fee1d1ec92f57154de23ca",
   "branch": "master",
-  "sourceFingerprint": "77035ed7f8f5680d2e4133cd6f023173d6f4e38dd4c00001c18fece4b9818a7a",
+  "sourceFingerprint": "baf98307afa200df707fd4473471395caf922f1c86136bff077a377ae7541a66",
   "summary": {
     "files": 1186,
-    "lines": 266260,
+    "lines": 266262,
     "symbols": 5653,
     "productionCodeFiles": 847,
     "testFiles": 146,
@@ -37890,8 +37890,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPaddingValues.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 11,
-      "sha256": "07e3fd14be88019889b2dd4c5022fbf3abe4daa9ef5a51a5ab9630bce25023a4",
+      "lines": 13,
+      "sha256": "56044a17095810333b09991266b6862f8a90e106d5a5837bd629f2c0ee120799",
       "package": "me.rerere.rikkahub.ui.pages.extensions",
       "categories": [
         "AI与上下文",
@@ -37901,7 +37901,7 @@
         {
           "name": "plus",
           "kind": "function",
-          "line": 6
+          "line": 8
         }
       ],
       "localImportCount": 0,
@@ -93055,7 +93055,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptPaddingValues.kt",
         "kind": "function",
-        "line": 6
+        "line": 8
       }
     ],
     "me.rerere.rikkahub.ui.pages.extensions.readFile": [
