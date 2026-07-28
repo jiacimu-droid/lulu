@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T03:49:49.870299+00:00",
-  "commit": "09d324d6180bd0537452d8a50aaccb3aae995fec",
+  "generatedAt": "2026-07-28T03:59:46.281861+00:00",
+  "commit": "0cb59240615ecba008c558aa68eeb1383e2f247f",
   "branch": "master",
-  "sourceFingerprint": "8356049a30c14814218f0a5e24a4012109eb8f8afb128cf1e42269800ac608cb",
+  "sourceFingerprint": "c33b98ea7e2c0dadbf6ec8641d265be616945928a4cf78c845e088df9c672d32",
   "summary": {
     "files": 1186,
-    "lines": 266200,
+    "lines": 266206,
     "symbols": 5652,
     "productionCodeFiles": 847,
     "testFiles": 146,
@@ -26666,8 +26666,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 211,
-      "sha256": "8c0773e57318dc2641d9cdaab6d144df6aa0e5ff205737d85462a43813a6f343",
+      "lines": 217,
+      "sha256": "bf0a7b75cc3a597914ad3d926746d0f3031473c649cb089cdc9ab5f2849f12d2",
       "package": "me.rerere.rikkahub.plugin.webview",
       "categories": [
         "插件"
@@ -26726,17 +26726,17 @@
         {
           "name": "respond",
           "kind": "function",
-          "line": 188
+          "line": 194
         },
         {
           "name": "respondError",
           "kind": "function",
-          "line": 192
+          "line": 198
         },
         {
           "name": "jsonEscape",
           "kind": "function",
-          "line": 201
+          "line": 207
         }
       ],
       "localImportCount": 9,
@@ -85303,7 +85303,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
         "kind": "function",
-        "line": 201
+        "line": 207
       }
     ],
     "me.rerere.rikkahub.plugin.webview.listPluginFiles": [
@@ -85473,14 +85473,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
         "kind": "function",
-        "line": 188
+        "line": 194
       }
     ],
     "me.rerere.rikkahub.plugin.webview.respondError": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
         "kind": "function",
-        "line": 192
+        "line": 198
       }
     ],
     "me.rerere.rikkahub.plugin.webview.restoreFromPrefs": [
