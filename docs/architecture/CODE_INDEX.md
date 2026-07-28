@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`0cb59240615ecba008c558aa68eeb1383e2f247f`
+- 基准提交：`0c1af41140c8ab1823f23f4d4fcc2806ddc6ec64`
 - 分支：`master`
-- 源码指纹：`c33b98ea7e2c0dad…`
-- 已索引文件：1186
-- 已索引代码/文本行：266206
+- 源码指纹：`d5e6494ce053a86f…`
+- 已索引文件：1185
+- 已索引代码/文本行：265921
 - 已发现类、接口、对象、函数及 Composable：5652
 
 ## 仓库健康信号
@@ -141,8 +141,8 @@
 | `ai` | 47 |
 | `speech` | 38 |
 | `search` | 30 |
-| `plugins` | 25 |
 | `docs` | 24 |
+| `plugins` | 24 |
 | `common` | 21 |
 | `.agents` | 10 |
 | `root` | 10 |
@@ -164,7 +164,7 @@
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 58 |
-| `.json` | 57 |
+| `.json` | 56 |
 | `.ts` | 42 |
 | `.xml` | 37 |
 | `.pro` | 15 |
@@ -291,10 +291,10 @@
 - `plugins/共读/reader.html`
 - `plugins/共读/reader.js`
 - `plugins/橘市商业街/main.js`
-- `plugins/橘市商业街/manifest.json`
 - `plugins/橘市商业街/supabase_schema.sql`
 - `plugins/橘市商业街/ui/index.html`
-- ……另有 6 个文件，见 `code-index.json`
+- `plugins/番茄钟/main.js`
+- ……另有 5 个文件，见 `code-index.json`
 
 ### 学习监督
 
@@ -371,7 +371,7 @@
 - `plugins/moments/supabase_schema.sql`
 - `plugins/moments/ui/index.html`
 - `plugins/supabase_memory/README.md`
-- ……另有 18 个文件，见 `code-index.json`
+- ……另有 17 个文件，见 `code-index.json`
 
 ### 数据库
 
