@@ -206,8 +206,8 @@ internal fun DefaultMemoryEmbeddingModelSetting(settings: Settings, vm: SettingV
                     buildMemoryEngineDiagnostics(
                         enabled = config.enabled,
                         embeddingModel = settings.memoryModelName(config.modelId),
-                        rerankModel = settings.memoryModelName(settings.memoryRerankModelId),
-                        extractionModel = settings.memoryModelName(settings.memoryExtractionModelId),
+                        rerankModel = settings.memoryModelName(config.rerankModelId),
+                        extractionModel = settings.memoryModelName(config.extractionModelId),
                         candidateCount = config.rerankCandidateCount,
                     ),
                 )
@@ -218,17 +218,22 @@ internal fun DefaultMemoryEmbeddingModelSetting(settings: Settings, vm: SettingV
 
 @Composable
 internal fun DefaultMemoryRerankModelSetting(settings: Settings, vm: SettingVM) {
+    val config = settings.memoryEmbeddingConfig
     SimpleModelFeature(
         title = stringResource(R.string.setting_model_page_memory_rerank_model),
         description = stringResource(R.string.setting_model_page_memory_rerank_model_desc),
         icon = HugeIcons.Filter,
-        modelId = settings.memoryRerankModelId,
+        modelId = config.rerankModelId,
         type = ModelType.RERANK,
         settings = settings,
         allowClear = true,
         onSelect = { model ->
             vm.updateSettings(
-                settings.copy(memoryRerankModelId = model.id.takeUnless { model.modelId.isBlank() }),
+                settings.copy(
+                    memoryEmbeddingConfig = config.copy(
+                        rerankModelId = model.id.takeUnless { model.modelId.isBlank() },
+                    ),
+                ),
             )
         },
     )
@@ -236,6 +241,7 @@ internal fun DefaultMemoryRerankModelSetting(settings: Settings, vm: SettingVM) 
 
 @Composable
 internal fun MemoryEngineModelSettings(settings: Settings, vm: SettingVM) {
+    val config = settings.memoryEmbeddingConfig
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.outlinedCardColors(containerColor = CustomColors.listItemColors.containerColor),
@@ -253,20 +259,22 @@ internal fun MemoryEngineModelSettings(settings: Settings, vm: SettingVM) {
                 description = { Text(stringResource(R.string.setting_model_page_memory_vector_enabled_desc)) },
                 tail = {
                     Switch(
-                        checked = settings.memoryVectorSearchEnabled,
+                        checked = config.enabled,
                         onCheckedChange = { enabled ->
-                            vm.updateSettings(settings.copy(memoryVectorSearchEnabled = enabled))
+                            vm.updateSettings(
+                                settings.copy(memoryEmbeddingConfig = config.copy(enabled = enabled)),
+                            )
                         },
                     )
                 },
             )
             MemoryEngineDiagnostics(
                 buildMemoryEngineDiagnostics(
-                    enabled = settings.memoryVectorSearchEnabled,
-                    embeddingModel = settings.memoryModelName(settings.memoryEmbeddingConfig.modelId),
-                    rerankModel = settings.memoryModelName(settings.memoryRerankModelId),
-                    extractionModel = settings.memoryModelName(settings.memoryExtractionModelId),
-                    candidateCount = settings.memoryEmbeddingConfig.rerankCandidateCount,
+                    enabled = config.enabled,
+                    embeddingModel = settings.memoryModelName(config.modelId),
+                    rerankModel = settings.memoryModelName(config.rerankModelId),
+                    extractionModel = settings.memoryModelName(config.extractionModelId),
+                    candidateCount = config.rerankCandidateCount,
                 ),
             )
         }
@@ -275,17 +283,22 @@ internal fun MemoryEngineModelSettings(settings: Settings, vm: SettingVM) {
 
 @Composable
 internal fun MemoryExtractionModelSetting(settings: Settings, vm: SettingVM) {
+    val config = settings.memoryEmbeddingConfig
     SimpleModelFeature(
         title = stringResource(R.string.setting_model_page_memory_extraction_model),
         description = stringResource(R.string.setting_model_page_memory_extraction_model_desc),
         icon = HugeIcons.MagicWand01,
-        modelId = settings.memoryExtractionModelId,
+        modelId = config.extractionModelId,
         type = ModelType.CHAT,
         settings = settings,
         allowClear = true,
         onSelect = { model ->
             vm.updateSettings(
-                settings.copy(memoryExtractionModelId = model.id.takeUnless { model.modelId.isBlank() }),
+                settings.copy(
+                    memoryEmbeddingConfig = config.copy(
+                        extractionModelId = model.id.takeUnless { model.modelId.isBlank() },
+                    ),
+                ),
             )
         },
     )
