@@ -164,8 +164,14 @@ internal class PluginOverlayController(
                         val provider = providerManager.getProviderByType(providerSetting)
                         val systemPrompt = "你是一个番茄钟陪伴助手。用户正在使用番茄钟专注。请用简短温暖的话回应，鼓励用户保持专注。当前上下文：$contextJson"
                         val messages = listOf(
-                            UIMessage(MessageRole.SYSTEM, listOf(UIMessagePart.Text(systemPrompt))),
-                            UIMessage(MessageRole.USER, listOf(UIMessagePart.Text(prompt))),
+                            UIMessage(
+                                role = MessageRole.SYSTEM,
+                                parts = listOf(UIMessagePart.Text(systemPrompt)),
+                            ),
+                            UIMessage(
+                                role = MessageRole.USER,
+                                parts = listOf(UIMessagePart.Text(prompt)),
+                            ),
                         )
                         val response = provider.generateText(
                             providerSetting,
