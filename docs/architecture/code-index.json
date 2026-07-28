@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T03:47:20.959936+00:00",
-  "commit": "1aff1b8a4032724d9bb48e7273682eac3bf49350",
+  "generatedAt": "2026-07-28T03:49:49.870299+00:00",
+  "commit": "09d324d6180bd0537452d8a50aaccb3aae995fec",
   "branch": "master",
-  "sourceFingerprint": "6afc02020438c2fffb528eb85bd35a13c63bd71e63a74d81ba007fa766b36eda",
+  "sourceFingerprint": "8356049a30c14814218f0a5e24a4012109eb8f8afb128cf1e42269800ac608cb",
   "summary": {
     "files": 1186,
-    "lines": 266217,
+    "lines": 266200,
     "symbols": 5652,
     "productionCodeFiles": 847,
     "testFiles": 146,
@@ -31527,8 +31527,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 688,
-      "sha256": "b3ba7b25931d847da7ffdf7661e25a476752d09ca4017447f88cf5196d248309",
+      "lines": 671,
+      "sha256": "51601087a96ded43638b0dc05c7d05ba728a0a32c5f8a63f0602d99bcee326a2",
       "package": "me.rerere.rikkahub.ui.components.richtext",
       "categories": [
         "界面"
@@ -31547,52 +31547,52 @@
         {
           "name": "RenderList",
           "kind": "composable",
-          "line": 193
+          "line": 189
         },
         {
           "name": "RenderDetails",
           "kind": "composable",
-          "line": 227
+          "line": 223
         },
         {
           "name": "RenderImage",
           "kind": "composable",
-          "line": 288
+          "line": 282
         },
         {
           "name": "buildAnnotatedStringFromElement",
           "kind": "function",
-          "line": 313
+          "line": 307
         },
         {
           "name": "processElementNodes",
           "kind": "function",
-          "line": 322
+          "line": 316
         },
         {
           "name": "parseInlineStyle",
           "kind": "function",
-          "line": 449
+          "line": 441
         },
         {
-          "name": "parseColor",
+          "name": "parseSimpleHtmlColor",
           "kind": "function",
-          "line": 478
+          "line": 470
         },
         {
           "name": "parseFontWeight",
           "kind": "function",
-          "line": 549
+          "line": 536
         },
         {
           "name": "RenderProgress",
           "kind": "composable",
-          "line": 569
+          "line": 556
         },
         {
           "name": "RenderTable",
           "kind": "composable",
-          "line": 634
+          "line": 620
         }
       ],
       "localImportCount": 1,
@@ -88763,21 +88763,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "composable",
-        "line": 227
+        "line": 223
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.RenderImage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "composable",
-        "line": 288
+        "line": 282
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.RenderList": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "composable",
-        "line": 193
+        "line": 189
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.RenderNode": [
@@ -88791,14 +88791,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "composable",
-        "line": 569
+        "line": 556
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.RenderTable": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "composable",
-        "line": 634
+        "line": 620
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.SimpleHtmlBlock": [
@@ -88882,7 +88882,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "function",
-        "line": 313
+        "line": 307
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.buildCodePreviewHtml": [
@@ -89005,11 +89005,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/MarkdownNew.kt",
         "kind": "function",
         "line": 354
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
-        "kind": "function",
-        "line": 478
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.parseCssDeclarations": [
@@ -89049,7 +89044,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "function",
-        "line": 549
+        "line": 536
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.parseInlineSpanStyle": [
@@ -89063,7 +89058,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "function",
-        "line": 449
+        "line": 441
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.parseLegacyFontSize": [
@@ -89085,6 +89080,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt",
         "kind": "function",
         "line": 198
+      }
+    ],
+    "me.rerere.rikkahub.ui.components.richtext.parseSimpleHtmlColor": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
+        "kind": "function",
+        "line": 470
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.parseSpacing": [
@@ -89124,7 +89126,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/SimpleHtmlBlock.kt",
         "kind": "function",
-        "line": 322
+        "line": 316
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.processLatex": [
