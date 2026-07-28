@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`2030d0b0ddf2d46f2f022cab4b8106b99149f28f`
+- 基准提交：`4cebdd703629b01a3ab2950676340d2dcf836ea9`
 - 分支：`master`
-- 源码指纹：`93a10bd3fca41b81…`
+- 源码指纹：`6f44436f88097f8a…`
 - 已索引文件：1181
-- 已索引代码/文本行：261890
-- 已发现类、接口、对象、函数及 Composable：5667
+- 已索引代码/文本行：261293
+- 已发现类、接口、对象、函数及 Composable：5652
 
 ## 仓库健康信号
 
@@ -25,7 +25,7 @@
 |---|---:|
 | 生产代码文件 | 847 |
 | 测试文件 | 146 |
-| ≥800 行生产文件 | 31 |
+| ≥800 行生产文件 | 30 |
 | ≥1500 行生产文件 | 3 |
 | TODO/FIXME/HACK/XXX | 32 |
 
@@ -105,10 +105,10 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt` | 1124 | 23 | 6 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt` | 1117 | 12 | 37 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt` | 1064 | 11 | 33 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt` | 1042 | 16 | 16 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 1032 | 77 | 89 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/TTSProviderConfigure.kt` | 1031 | 11 | 4 |
 | `app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginUIDeclarativePage.kt` | 985 | 19 | 10 |
+| `web-ui/app/components/conversation-sidebar.tsx` | 983 | 1 | 0 |
 
 ### 本地导入最多的生产文件
 
@@ -544,7 +544,7 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2069
+- 已解析本地导入边：2066
 - 可检索完整符号：5043
 
 | 文件 | 被本地文件导入 | 行数 |
@@ -553,7 +553,7 @@
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 112 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 61 | 62 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 57 | 296 |
+| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 56 | 296 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 55 | 191 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |

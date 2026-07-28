@@ -1,16 +1,16 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-28T06:16:44.153405+00:00",
-  "commit": "2030d0b0ddf2d46f2f022cab4b8106b99149f28f",
+  "generatedAt": "2026-07-28T06:18:48.476051+00:00",
+  "commit": "4cebdd703629b01a3ab2950676340d2dcf836ea9",
   "branch": "master",
-  "sourceFingerprint": "93a10bd3fca41b8163f328141ca3dacbf7e734ce69327e7b2e17f24e621e3b1d",
+  "sourceFingerprint": "6f44436f88097f8a81932a8aae6cb31c5ffc99928a2e02e598dfbd88e0be22b6",
   "summary": {
     "files": 1181,
-    "lines": 261890,
-    "symbols": 5667,
+    "lines": 261293,
+    "symbols": 5652,
     "productionCodeFiles": 847,
     "testFiles": 146,
-    "largeProductionFiles": 31,
+    "largeProductionFiles": 30,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
@@ -68,7 +68,7 @@
       "界面": 336,
       "记忆": 48
     },
-    "resolvedImportEdges": 2069
+    "resolvedImportEdges": 2066
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -209,13 +209,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "lines": 1042,
-        "symbols": 16,
-        "localImportCount": 16,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
         "lines": 1032,
         "symbols": 77,
@@ -338,6 +331,13 @@
         "path": "ai/src/main/java/me/rerere/ai/provider/providers/openai/ResponseAPI.kt",
         "lines": 807,
         "symbols": 18,
+        "localImportCount": 26,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
+        "lines": 803,
+        "symbols": 8,
         "localImportCount": 26,
         "todoMarkers": 0
       }
@@ -925,7 +925,7 @@
         "lines": 296,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 57,
+        "importedByCount": 56,
         "todoMarkers": 0
       },
       {
@@ -2113,11 +2113,6 @@
       "imports": 12
     },
     {
-      "from": "me.rerere.rikkahub.ui.pages.memory",
-      "to": "me.rerere.rikkahub.data.db.entity",
-      "imports": 12
-    },
-    {
       "from": "me.rerere.rikkahub.ui.components.ai",
       "to": "me.rerere.hugeicons.HugeIcons",
       "imports": 11
@@ -2130,6 +2125,11 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.data.model.Assistant",
+      "imports": 11
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.memory",
+      "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 11
     },
     {
@@ -18660,7 +18660,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/QuickMessagesVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManComponents.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/worldbook/WorldbookPage.kt",
@@ -21167,7 +21166,6 @@
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt"
       ]
     },
@@ -32756,7 +32754,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptModeInjection.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt"
       ]
     },
@@ -40140,8 +40137,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 1042,
-      "sha256": "3920645ed60de7d6cea3558da4600b4146c9136af4b359572f881c6b969b9d57",
+      "lines": 445,
+      "sha256": "1d3be39e211c0e17319ae929c71044b520f6edca24f981e9863d3971f003314c",
       "package": "me.rerere.rikkahub.ui.pages.memory",
       "categories": [
         "记忆",
@@ -40151,85 +40148,10 @@
         {
           "name": "MemoryBankPage",
           "kind": "composable",
-          "line": 71
-        },
-        {
-          "name": "EditMemoryDialog",
-          "kind": "composable",
-          "line": 467
-        },
-        {
-          "name": "CorrectMemoryDialog",
-          "kind": "composable",
-          "line": 577
-        },
-        {
-          "name": "MemoryEmbeddingConfigCard",
-          "kind": "composable",
-          "line": 635
-        },
-        {
-          "name": "StatsRow",
-          "kind": "composable",
-          "line": 697
-        },
-        {
-          "name": "MemoryBankLegend",
-          "kind": "composable",
-          "line": 722
-        },
-        {
-          "name": "StatCard",
-          "kind": "composable",
-          "line": 739
-        },
-        {
-          "name": "AssistantFilterRow",
-          "kind": "composable",
-          "line": 757
-        },
-        {
-          "name": "TypeFilterRow",
-          "kind": "composable",
-          "line": 783
-        },
-        {
-          "name": "MemoryCard",
-          "kind": "composable",
-          "line": 807
-        },
-        {
-          "name": "MemoryMetaInfo",
-          "kind": "composable",
-          "line": 970
-        },
-        {
-          "name": "formatShortTime",
-          "kind": "function",
-          "line": 1010
-        },
-        {
-          "name": "firstSourceNodeId",
-          "kind": "function",
-          "line": 1013
-        },
-        {
-          "name": "buildMemoryAssistantLabels",
-          "kind": "function",
-          "line": 1018
-        },
-        {
-          "name": "shortAssistantId",
-          "kind": "function",
-          "line": 1030
-        },
-        {
-          "name": "batchStatusLabel",
-          "kind": "function",
-          "line": 1033
+          "line": 55
         }
       ],
-      "localImportCount": 16,
+      "localImportCount": 10,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -40239,24 +40161,15 @@
         "me.rerere.hugeicons.stroke.Database02",
         "me.rerere.hugeicons.stroke.DatabaseSync",
         "me.rerere.hugeicons.stroke.Delete02",
-        "me.rerere.hugeicons.stroke.PencilEdit01",
         "me.rerere.hugeicons.stroke.Refresh01",
         "me.rerere.hugeicons.stroke.Search01",
         "me.rerere.hugeicons.stroke.Tools",
         "me.rerere.rikkahub.data.db.entity.MemoryBankEntity",
-        "me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchEntity",
-        "me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus",
-        "me.rerere.rikkahub.data.model.Assistant",
-        "me.rerere.rikkahub.data.service.MemoryBankService",
-        "me.rerere.rikkahub.ui.components.ui.Select",
-        "me.rerere.rikkahub.utils.JsonInstant"
+        "me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus"
       ],
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryBankEntity.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryExtractionBatchEntity.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Select.kt"
+        "app/src/main/java/me/rerere/rikkahub/data/db/entity/MemoryExtractionBatchEntity.kt"
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
@@ -94387,11 +94300,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "composable",
         "line": 156
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 757
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.CorrectMemoryDialog": [
@@ -94399,11 +94307,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt",
         "kind": "composable",
         "line": 135
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 577
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.EditMemoryDialog": [
@@ -94411,11 +94314,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankDialogs.kt",
         "kind": "composable",
         "line": 25
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 467
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryAssistantLabelTest": [
@@ -94430,18 +94328,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "composable",
         "line": 116
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 722
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryBankPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "kind": "composable",
-        "line": 71
+        "line": 55
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryBankVM": [
@@ -94463,11 +94356,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankItem.kt",
         "kind": "composable",
         "line": 38
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 807
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryDiagnosticsTest": [
@@ -94482,11 +94370,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "composable",
         "line": 31
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 635
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryMetaInfo": [
@@ -94494,11 +94377,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankItem.kt",
         "kind": "composable",
         "line": 200
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 970
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryTriggerDiagnostic": [
@@ -94520,11 +94398,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "composable",
         "line": 133
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 739
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.StatsRow": [
@@ -94532,11 +94405,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "composable",
         "line": 93
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 697
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.TypeFilterRow": [
@@ -94544,11 +94412,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "composable",
         "line": 182
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "composable",
-        "line": 783
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.batchStatusLabel": [
@@ -94556,11 +94419,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "function",
         "line": 219
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "function",
-        "line": 1033
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.buildBatchOverviews": [
@@ -94575,11 +94433,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "function",
         "line": 205
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "function",
-        "line": 1018
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.buildMemoryTriggerDiagnostic": [
@@ -94622,11 +94475,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankItem.kt",
         "kind": "function",
         "line": 243
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "function",
-        "line": 1013
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.formatShortTime": [
@@ -94634,11 +94482,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankItem.kt",
         "kind": "function",
         "line": 240
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "function",
-        "line": 1010
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.loadMemories": [
@@ -94772,11 +94615,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "function",
         "line": 217
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
-        "kind": "function",
-        "line": 1030
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.updateMemory": [
