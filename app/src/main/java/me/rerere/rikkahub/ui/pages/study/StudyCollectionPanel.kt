@@ -55,6 +55,7 @@ internal fun StudyCollectionPanel(
     onUseUniversalNormalTarget: (String) -> Unit,
     onOpenMysteryBox: (Int) -> Unit,
     onRedeemDouyin: () -> Unit,
+    onRedeemGameRoundTicket: () -> Unit,
     onRedeemGame: () -> Unit,
     onRedeemAnime: () -> Unit,
     onOpenStarWish: () -> Unit,
@@ -128,7 +129,7 @@ internal fun StudyCollectionPanel(
             label = "游戏局数券 · 每张4局",
             count = inventory.gameRoundTickets,
             color = StudyCollectionPurple,
-            actions = emptyList(),
+            actions = listOf("使用" to onRedeemGameRoundTicket),
         )
         StudyEntertainmentRewardRow(
             label = "游戏畅玩券 · 120分钟",
