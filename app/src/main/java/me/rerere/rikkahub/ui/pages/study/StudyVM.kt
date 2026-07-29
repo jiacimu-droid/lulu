@@ -21,8 +21,8 @@ import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
-import me.rerere.rikkahub.data.study.CurrentWeekStudyRecovery
 import me.rerere.rikkahub.data.study.ExamStudyPlan
+import me.rerere.rikkahub.data.study.SelfDirectedStudyPlan
 import me.rerere.rikkahub.data.study.StudyDrawResult
 import me.rerere.rikkahub.data.study.StudyEntertainmentReward
 import me.rerere.rikkahub.data.study.StudyGachaRewardPolicy
@@ -94,35 +94,24 @@ class StudyVM(
                 val provider = providerManager.getProviderByType(providerSetting)
                 val presetPlan = StudyPlanTaskSync.visiblePlan(currentState, date)
                 val prompt = StudyVocabularyPolicy.normalizeText(
-                    ExamStudyPlan.dynamicSchedulePrompt(
+                    SelfDirectedStudyPlan.dynamicSchedulePrompt(
                         date = date,
                         presetPlan = presetPlan,
-                        defaultSchedule = emptyList(),
                         tasks = currentState.tasks,
                         currentTime = currentTime,
                     ),
                 )
-                val scheduleSystemPrompt = buildString {
-                    appendLine(ExamStudyPlan.dynamicScheduleSystemPrompt)
-                    appendLine()
-                    appendLine(CurrentWeekStudyRecovery.executionOrderReference)
-                    appendLine()
-                    appendLine("新课与三轮硬节点：10月7日前全部常规新课结束；10月14日前第一轮全科结束；10月31日前第二轮全科结束；11月30日前第三轮全科结束。")
-                    appendLine("每日单词固定为${StudyVocabularyPolicy.dailyTarget}个（${StudyVocabularyPolicy.dailyGroups}组）；旧提示里的120词全部作废。")
-                    appendLine("每周星期日完整休息；被用户删除的系统待办不得重新排回今日计划。")
-                    appendLine("日计划可给建议章节，但不是强制日终点；周计划和月计划的章节终点必须硬验收。")
-                }
                 val chunk = provider.generateText(
                     providerSetting = providerSetting,
                     messages = listOf(
-                        UIMessage.system(scheduleSystemPrompt),
+                        UIMessage.system(SelfDirectedStudyPlan.dynamicScheduleSystemPrompt),
                         UIMessage.user(prompt),
                     ),
                     params = TextGenerationParams(
                         model = model,
-                        temperature = 0.35f,
-                        topP = 0.9f,
-                        maxTokens = 1800,
+                        temperature = 0.25f,
+                        topP = 0.85f,
+                        maxTokens = 900,
                         reasoningLevel = ReasoningLevel.OFF,
                     ),
                 )
@@ -143,15 +132,15 @@ class StudyVM(
                     currentTime = currentTime,
                 )
                 if (schedule.isEmpty()) {
-                    error("主 API 没有返回可读取的时间表，请再点一次生成。")
+                    error("主 API 没有返回可读取的短计划，请再点一次生成。")
                 }
                 store.update { current ->
                     StudyRules.saveGeneratedSchedule(current, date, schedule)
                 }
-                _effects.tryEmit(StudyEffect.Message("今日计划表已生成"))
+                _effects.tryEmit(StudyEffect.Message("今日短计划已生成"))
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
-                _effects.tryEmit(StudyEffect.Message(e.message ?: "今日计划表生成失败"))
+                _effects.tryEmit(StudyEffect.Message(e.message ?: "今日短计划生成失败"))
             } finally {
                 _isGeneratingSchedule.value = false
             }
