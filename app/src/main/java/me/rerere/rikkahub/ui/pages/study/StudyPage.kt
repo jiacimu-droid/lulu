@@ -230,6 +230,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                                 onUseUniversalNormalTarget = vm::applyUniversalNormal,
                                 onOpenMysteryBox = { vm.openMysteryBox(it) },
                                 onRedeemDouyin = { vm.redeemEntertainment(StudyEntertainmentReward.Douyin) },
+                                onRedeemGameRoundTicket = vm::redeemGameRoundTicket,
                                 onRedeemGame = { vm.redeemEntertainment(StudyEntertainmentReward.Game) },
                                 onRedeemAnime = { vm.redeemEntertainment(StudyEntertainmentReward.Anime) },
                                 onOpenStarWish = { navController.navigate(Screen.StarWish) },
@@ -251,12 +252,6 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                                         ),
                                     )
                                 },
-                            )
-                        }
-                        item {
-                            StudyGameRoundTicketUseCard(
-                                count = state.inventory.gameRoundTickets,
-                                onUse = vm::redeemGameRoundTicket,
                             )
                         }
                     }
