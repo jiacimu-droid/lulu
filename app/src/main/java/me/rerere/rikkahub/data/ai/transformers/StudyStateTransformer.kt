@@ -64,14 +64,15 @@ internal fun buildStudyCompanionContext(
             "今日作息奖励：早睡 ${if (StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlySleep, today)) "已发放" else "未发放"}；" +
                 "早起 ${if (StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlyRise, today)) "已发放" else "未发放"}",
         )
-        appendLine(
-            "作息奖励规则：用户自述昨晚早睡或今天早起时，由当前学习陪伴角色结合当前时间、前后对话和描述可信度判断；" +
-                "你的个人基线是最晚约01:30入睡、最晚约09:30起床。必须得到具体时间，没有时间就先追问；" +
-                "不要因为用户索要就自动发放，明显矛盾或超过个人基线时拒绝。角色认可后通过 today_study_plan 发放。" +
-                "如果可用，先结合 get_gadgetbridge_data 的睡眠记录、get_app_usage 的夜间使用情况和 get_battery_info 的充电线索；" +
-                "早睡 +${StudyRules.EARLY_SLEEP_KUDOS} 夸夸值，早起发十连抽券 " +
-                "x${StudyRules.EARLY_RISE_TEN_DRAW_TICKETS}，每项每天一次。",
-        )
+        appendLine("作息奖励判断规则：")
+        appendLine("- 01:30 入睡、09:30 起床只是用户目前的参考基线，不是系统硬门槛。")
+        appendLine("- 用户提到早睡或早起时，先获得实际时间；没有具体时间就追问，不得猜测发奖。")
+        appendLine("- 结合实际时间、参考时间、近期趋势、当前对话或设备证据，以及生病、赶路、考试压力、恢复期等特殊情况，由你作出最终批准或拒绝。")
+        appendLine("- 实际时间晚于参考值时，你仍可以基于近期改善或特殊情况批准；一旦你明确批准，奖励结算层不会再用固定时间二次否决。")
+        appendLine("- 不要因为用户索要就批准；明显矛盾、证据不足或不可信时明确拒绝。模型或证据异常时设置 model_error=true，不占用当天领取机会。")
+        appendLine("- 调用 today_study_plan 的 claim_sleep_reward 时必须提供 approved 布尔值、decision_reason、reported_hour、reported_minute；尽量同时提供 recent_trend、special_circumstances 和 current_context。")
+        appendLine("- 如果可用，结合 get_gadgetbridge_data 的睡眠记录、get_app_usage 的夜间使用和 get_battery_info 的充电线索，但不要向用户暴露工具细节。")
+        appendLine("- 早睡批准后发 ${StudyRules.EARLY_SLEEP_KUDOS} 夸夸值；早起批准后发十连抽券 x${StudyRules.EARLY_RISE_TEN_DRAW_TICKETS}；每项每天最多一次。")
         if (completedTasks.isNotEmpty()) {
             appendLine("已完成/已划掉待办：")
             completedTasks.take(8).forEach { task ->
