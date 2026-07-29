@@ -14,6 +14,7 @@ object StudyPlanCatalog {
         SummerCourseDeadlinePlan,
         July26StudyDayCorrection,
         ThreeRoundRecitationPlan,
+        SelfDirectedStudyPlan,
     )
 
     val dailyPlans: Map<LocalDate, DailyStudyPlan>
@@ -42,9 +43,27 @@ object StudyPlanCatalog {
         overlays.asReversed().firstNotNullOfOrNull { it.plannedMinutesOverride(date) }
             ?: ExamStudyPlan.plannedStudyMinutes(date)
 
+    fun weekForDate(date: LocalDate): WeeklyStudyPlan? =
+        overlays.asReversed().firstNotNullOfOrNull { overlay ->
+            overlay.weeklyOverrides.values.firstOrNull { week -> week.contains(date) }
+        }?.let(StudyVocabularyPolicy::normalize)
+            ?: ExamStudyPlan.weekForDate(date)?.let(StudyVocabularyPolicy::normalize)
+
     fun weeklyPlan(id: String): WeeklyStudyPlan? = weeklyPlans.firstOrNull { it.id == id }
 
     fun monthlyPlan(month: String): MonthlyStudyPlan? = monthlyPlans.firstOrNull { it.month == month }
+
+    private fun WeeklyStudyPlan.contains(date: LocalDate): Boolean {
+        val parts = dateRange.split(" 至 ")
+        if (parts.size != 2) return false
+        val start = runCatching { LocalDate.parse(parts[0]) }.getOrNull() ?: return false
+        val end = if (parts[1] == "考前") {
+            ExamStudyPlan.examDate
+        } else {
+            runCatching { LocalDate.parse(parts[1]) }.getOrNull() ?: return false
+        }
+        return date >= start && date <= end
+    }
 
     private fun <T, K> mergeByKey(
         base: List<T>,
