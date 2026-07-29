@@ -14,6 +14,8 @@ import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelType
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.datastore.findModelById
+import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.companion.CompanionTurnMutation
@@ -341,8 +343,19 @@ class MemoryBankVM(
         viewModelScope.launch {
             _loading.value = true
             try {
+                val blocker = memoryVectorBlocker(settingsStore.settingsFlow.first())
+                if (blocker != null) {
+                    _maintenanceMessage.value = blocker
+                    return@launch
+                }
                 memoryBankService.rebuildIndex()
+                _maintenanceMessage.value = "向量索引重建完成"
                 loadMemories()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                _maintenanceMessage.value = error.message?.let { "向量索引重建失败：$it" }
+                    ?: "向量索引重建失败"
             } finally {
                 _loading.value = false
             }
@@ -353,8 +366,32 @@ class MemoryBankVM(
         viewModelScope.launch {
             _loading.value = true
             try {
+                val currentSettings = settingsStore.settingsFlow.first()
+                val blocker = memoryVectorBlocker(currentSettings)
+                if (blocker != null) {
+                    _maintenanceMessage.value = blocker
+                    refreshMemoryData(currentSettings)
+                    return@launch
+                }
+
+                val before = memoryBankService.getStats(_selectedAssistantId.value)
                 memoryBankService.processPendingVectors()
-                loadMemories()
+                val after = memoryBankService.getStats(_selectedAssistantId.value)
+                val completed = (after.vectorizedCount - before.vectorizedCount).coerceAtLeast(0)
+                val newlyFailed = (after.failedCount - before.failedCount).coerceAtLeast(0)
+                _maintenanceMessage.value = when {
+                    before.pendingCount == 0 -> "没有待向量化记忆；记忆抽取和向量化是两条独立链路"
+                    completed > 0 && after.pendingCount > 0 ->
+                        "已向量化 $completed 条，仍有 ${after.pendingCount} 条等待下一批处理"
+                    completed > 0 -> "已完成 $completed 条记忆向量化"
+                    newlyFailed > 0 -> "有 $newlyFailed 条向量化失败；请检查 Embedding 模型接口后重建索引"
+                    else -> "没有完成新的向量化；请检查 Embedding 模型是否支持批量向量接口"
+                }
+                refreshMemoryData(currentSettings)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                _maintenanceMessage.value = error.message?.let { "向量化失败：$it" } ?: "向量化失败"
             } finally {
                 _loading.value = false
             }
@@ -376,8 +413,17 @@ class MemoryBankVM(
 
     fun setMemoryEmbeddingEnabled(enabled: Boolean) {
         viewModelScope.launch {
+            val current = settingsStore.settingsFlow.first()
             settingsStore.update { settings ->
                 settings.copy(memoryEmbeddingConfig = settings.memoryEmbeddingConfig.copy(enabled = enabled))
+            }
+            _maintenanceMessage.value = when {
+                !enabled -> "本地向量库已关闭；长期记忆仍会继续抽取和保存"
+                current.memoryEmbeddingConfig.modelId == null -> "向量库已开启，但还需要选择 Embedding 模型"
+                else -> "本地向量库已开启"
+            }
+            if (enabled && current.memoryEmbeddingConfig.modelId != null) {
+                processPendingVectors()
             }
         }
     }
@@ -385,7 +431,20 @@ class MemoryBankVM(
     fun setMemoryEmbeddingModel(modelId: Uuid?) {
         viewModelScope.launch {
             settingsStore.update { settings ->
-                settings.copy(memoryEmbeddingConfig = settings.memoryEmbeddingConfig.copy(modelId = modelId))
+                settings.copy(
+                    memoryEmbeddingConfig = settings.memoryEmbeddingConfig.copy(
+                        modelId = modelId,
+                        enabled = modelId != null,
+                    ),
+                )
+            }
+            _maintenanceMessage.value = if (modelId == null) {
+                "已清除 Embedding 模型并关闭向量库；长期记忆抽取不受影响"
+            } else {
+                "已选择 Embedding 模型并启用向量库，正在处理已有记忆"
+            }
+            if (modelId != null) {
+                processPendingVectors()
             }
         }
     }
@@ -402,4 +461,22 @@ class MemoryBankVM(
     fun embeddingModels(settings: Settings): List<Model> =
         settings.providers.flatMap { provider -> provider.models }
             .filter { model -> model.type == ModelType.EMBEDDING }
+
+    private fun memoryVectorBlocker(settings: Settings): String? {
+        val config = settings.memoryEmbeddingConfig
+        if (!config.enabled) {
+            return "向量化未开始：本地向量库尚未启用；长期记忆抽取仍可正常工作"
+        }
+        val modelId = config.modelId
+            ?: return "向量化未开始：请先选择一个 Embedding 模型"
+        val model = settings.findModelById(modelId)
+            ?: return "向量化未开始：已选择的 Embedding 模型不存在，请重新选择"
+        if (model.type != ModelType.EMBEDDING) {
+            return "向量化未开始：当前选择的不是 Embedding 模型"
+        }
+        if (model.findProvider(settings.providers) == null) {
+            return "向量化未开始：Embedding 模型对应的提供商不存在或已被删除"
+        }
+        return null
+    }
 }
