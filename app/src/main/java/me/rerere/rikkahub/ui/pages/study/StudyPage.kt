@@ -135,7 +135,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                                 Icon(
                                     HugeIcons.ArrowLeft01,
                                     contentDescription = "返回",
-                                    tint = if (isGachaSection) Color(0xFF7B4B57) else MaterialTheme.colorScheme.onSurface,
+                                    tint = if (isGachaSection) Color.White else MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                         }
@@ -251,6 +251,12 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                                         ),
                                     )
                                 },
+                            )
+                        }
+                        item {
+                            StudyGameRoundTicketUseCard(
+                                count = state.inventory.gameRoundTickets,
+                                onUse = vm::redeemGameRoundTicket,
                             )
                         }
                     }
