@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T12:54:28.199264+00:00",
-  "commit": "76a9fcacf8cafcfa3c5a33ccda227d1620d54a59",
+  "generatedAt": "2026-07-29T17:05:13.840991+00:00",
+  "commit": "3e11148e7a349aa9c0ea6bf7be26f5cc65ab13e7",
   "branch": "master",
-  "sourceFingerprint": "2d13aeda569eaaecb56b41f23bb3dadfec2296da80df44ba7ff41a4c541cb5fd",
+  "sourceFingerprint": "47af6852679bd176100a8f164ac09523d5d973da2b678204907d4a5781c64acb",
   "summary": {
-    "files": 1183,
-    "lines": 261995,
-    "symbols": 5661,
-    "productionCodeFiles": 848,
+    "files": 1184,
+    "lines": 262136,
+    "symbols": 5665,
+    "productionCodeFiles": 849,
     "testFiles": 146,
     "largeProductionFiles": 30,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 729,
+      "app": 730,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 797,
+      ".kt": 798,
       ".tsx": 74,
       ".java": 64,
       ".md": 59,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 28,
-      "学习监督": 36,
+      "学习监督": 37,
       "工具": 6,
       "插件": 40,
       "数据库": 75,
@@ -1358,6 +1358,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyExecutionPolicy.kt",
@@ -22772,6 +22773,46 @@
           "name": "monthlyPlan",
           "kind": "function",
           "line": 64
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 141,
+      "sha256": "38d990cb2050fa414cf1147518f5b369bbe7fae32aa9ef2f8a6d36289acd9aff",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "StudySleepHabitEvidence",
+          "kind": "class",
+          "line": 8
+        },
+        {
+          "name": "StudySleepHabitDecision",
+          "kind": "class",
+          "line": 17
+        },
+        {
+          "name": "settleRoleJudgedSleepReward",
+          "kind": "function",
+          "line": 31
+        },
+        {
+          "name": "referenceTimeFor",
+          "kind": "function",
+          "line": 132
         }
       ],
       "localImportCount": 0,
@@ -81506,6 +81547,20 @@
         "line": 147
       }
     ],
+    "me.rerere.rikkahub.data.study.StudySleepHabitDecision": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt",
+        "kind": "class",
+        "line": 17
+      }
+    ],
+    "me.rerere.rikkahub.data.study.StudySleepHabitEvidence": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt",
+        "kind": "class",
+        "line": 8
+      }
+    ],
     "me.rerere.rikkahub.data.study.StudySleepRewardResult": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
@@ -82625,6 +82680,13 @@
         "line": 850
       }
     ],
+    "me.rerere.rikkahub.data.study.referenceTimeFor": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt",
+        "kind": "function",
+        "line": 132
+      }
+    ],
     "me.rerere.rikkahub.data.study.refreshShopIfNeeded": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
@@ -82742,6 +82804,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
         "kind": "function",
         "line": 98
+      }
+    ],
+    "me.rerere.rikkahub.data.study.settleRoleJudgedSleepReward": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt",
+        "kind": "function",
+        "line": 31
       }
     ],
     "me.rerere.rikkahub.data.study.shortDailyPrompt": [

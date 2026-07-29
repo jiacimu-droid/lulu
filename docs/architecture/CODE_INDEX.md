@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`76a9fcacf8cafcfa3c5a33ccda227d1620d54a59`
+- 基准提交：`3e11148e7a349aa9c0ea6bf7be26f5cc65ab13e7`
 - 分支：`master`
-- 源码指纹：`2d13aeda569eaaec…`
-- 已索引文件：1183
-- 已索引代码/文本行：261995
-- 已发现类、接口、对象、函数及 Composable：5661
+- 源码指纹：`47af6852679bd176…`
+- 已索引文件：1184
+- 已索引代码/文本行：262136
+- 已发现类、接口、对象、函数及 Composable：5665
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 848 |
+| 生产代码文件 | 849 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 30 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 729 |
+| `app` | 730 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 797 |
+| `.kt` | 798 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 59 |
@@ -297,6 +297,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt`
+- `app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyExecutionPolicy.kt`
@@ -323,8 +324,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/StudyAchievementRewardsTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/study/StudyPlanCatalogOverlayTest.kt`
-- ……另有 6 个文件，见 `code-index.json`
+- ……另有 7 个文件，见 `code-index.json`
 
 ### 工具
 
@@ -545,7 +545,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：2067
-- 可检索完整符号：5047
+- 可检索完整符号：5051
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
