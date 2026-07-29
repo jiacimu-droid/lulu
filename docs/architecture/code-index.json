@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T17:08:15.248027+00:00",
-  "commit": "d0cafdf44a39892618893db1cef5fa354c0f6611",
+  "generatedAt": "2026-07-29T17:08:49.872214+00:00",
+  "commit": "633db8bf9eb09ff769fa393d1eb1eb7bd80b72c1",
   "branch": "master",
-  "sourceFingerprint": "3b6efc1e72121eb09ec4aed1351604c4f78ca4196e218b8c3a96bc2a6d705cf5",
+  "sourceFingerprint": "4cd8e88ad8f1e770b8e2bf87dc7148382191a62a2acc245de680c539b70099e6",
   "summary": {
-    "files": 1184,
-    "lines": 262191,
-    "symbols": 5665,
+    "files": 1185,
+    "lines": 262347,
+    "symbols": 5667,
     "productionCodeFiles": 849,
-    "testFiles": 146,
+    "testFiles": 147,
     "largeProductionFiles": 30,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 730,
+      "app": 731,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 798,
+      ".kt": 799,
       ".tsx": 74,
       ".java": 64,
       ".md": 59,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 28,
-      "学习监督": 37,
+      "学习监督": 38,
       "工具": 6,
       "插件": 40,
       "数据库": 75,
@@ -1383,6 +1383,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyAchievementRewardsTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/StudyPlanCatalogOverlayTest.kt",
@@ -50634,6 +50635,36 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 156,
+      "sha256": "4792e11b013c8c2f75344c0caea1c3f3bee89553b6547a7fc370470b7408c01d",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "RoleJudgedSleepRewardPolicyTest",
+          "kind": "class",
+          "line": 12
+        },
+        {
+          "name": "testMillis",
+          "kind": "function",
+          "line": 141
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/study/StudyAchievementRewardsTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -81337,6 +81368,13 @@
         "line": 24
       }
     ],
+    "me.rerere.rikkahub.data.study.RoleJudgedSleepRewardPolicyTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt",
+        "kind": "class",
+        "line": 12
+      }
+    ],
     "me.rerere.rikkahub.data.study.SelfDirectedStudyPlan": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
@@ -82881,6 +82919,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
         "kind": "function",
         "line": 205
+      }
+    ],
+    "me.rerere.rikkahub.data.study.testMillis": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt",
+        "kind": "function",
+        "line": 141
       }
     ],
     "me.rerere.rikkahub.data.study.tickets": [
