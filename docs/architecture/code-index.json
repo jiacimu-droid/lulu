@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T06:17:06.704242+00:00",
-  "commit": "58ffa141dd240d81864d11ffd05fe1e35f4cc3c6",
+  "generatedAt": "2026-07-29T06:18:41.150319+00:00",
+  "commit": "a2f5acbb6cf874bf5094a98a3de2f65543e36032",
   "branch": "master",
-  "sourceFingerprint": "16c1a2597e039de1b2a4089dd25d4323616346c37cc5cb50c73ca1856b7e1c37",
+  "sourceFingerprint": "080cf4201a6841ebc0d4badb7e42dd4ed3fb9b0417068f179a0545aa8f28c58d",
   "summary": {
-    "files": 1182,
-    "lines": 261355,
-    "symbols": 5653,
-    "productionCodeFiles": 848,
+    "files": 1181,
+    "lines": 261295,
+    "symbols": 5652,
+    "productionCodeFiles": 847,
     "testFiles": 146,
     "largeProductionFiles": 30,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 729,
+      "app": 728,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 797,
+      ".kt": 796,
       ".tsx": 74,
       ".java": 64,
       ".md": 58,
@@ -59,13 +59,13 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 28,
-      "学习监督": 36,
+      "学习监督": 35,
       "工具": 6,
       "插件": 40,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 337,
+      "界面": 336,
       "记忆": 48
     },
     "resolvedImportEdges": 2066
@@ -1374,7 +1374,6 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCollectionPanel.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
-      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyGameRoundTicketUseCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
@@ -1840,7 +1839,6 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCollectionPanel.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
-      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyGameRoundTicketUseCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
@@ -43880,32 +43878,6 @@
       "importedBy": []
     },
     {
-      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyGameRoundTicketUseCard.kt",
-      "module": "app",
-      "extension": ".kt",
-      "lines": 55,
-      "sha256": "83cc410f6bff65a3d4496ea0dfaee723aa56d036a844624c528c31faf827e12a",
-      "package": "me.rerere.rikkahub.ui.pages.study",
-      "categories": [
-        "学习监督",
-        "界面"
-      ],
-      "symbols": [
-        {
-          "name": "StudyGameRoundTicketUseCard",
-          "kind": "composable",
-          "line": 21
-        }
-      ],
-      "localImportCount": 0,
-      "todoMarkers": 0,
-      "isTest": false,
-      "isProductionCode": true,
-      "localImports": [],
-      "resolvedImports": [],
-      "importedBy": []
-    },
-    {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
       "module": "app",
       "extension": ".kt",
@@ -44122,8 +44094,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 370,
-      "sha256": "f2f0bd4c2552c3abb098e244dd6ce0f646844acbc0423b38ef3b215e555039d4",
+      "lines": 365,
+      "sha256": "90374c3f3b658eff47b500cda997134027647f47e73c616b17e1480099d20982",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -44143,17 +44115,17 @@
         {
           "name": "StudyPomodoroPage",
           "kind": "composable",
-          "line": 343
+          "line": 338
         },
         {
           "name": "StudyPomodoroFocusPage",
           "kind": "composable",
-          "line": 348
+          "line": 343
         },
         {
           "name": "studyGachaPageBrush",
           "kind": "function",
-          "line": 364
+          "line": 359
         }
       ],
       "localImportCount": 9,
@@ -96633,13 +96605,6 @@
         "line": 223
       }
     ],
-    "me.rerere.rikkahub.ui.pages.study.StudyGameRoundTicketUseCard": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyGameRoundTicketUseCard.kt",
-        "kind": "composable",
-        "line": 21
-      }
-    ],
     "me.rerere.rikkahub.ui.pages.study.StudyGuideBlock": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
@@ -96742,7 +96707,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 348
+        "line": 343
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroFocusPageContent": [
@@ -96756,7 +96721,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 343
+        "line": 338
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroPageContent": [
@@ -97335,7 +97300,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 364
+        "line": 359
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.studyHeroBrush": [
