@@ -69,6 +69,7 @@ import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.study.DailyStudyPlan
 import me.rerere.rikkahub.data.study.ExamStudyPlan
 import me.rerere.rikkahub.data.study.StudyEvent
+import me.rerere.rikkahub.data.study.StudyPlanCatalog
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyScheduleBlock
 import me.rerere.rikkahub.data.study.StudySleepHabit
@@ -376,10 +377,17 @@ internal fun StudyDailyDashboard(
     onDelete: (String) -> Unit,
 ) {
     val today = LocalDate.now()
-    val todayPlan = ExamStudyPlan.todayPlan(today)
-    val tomorrowPlan = ExamStudyPlan.todayPlan(today.plusDays(1))
-    val schedule = generatedSchedule ?: ExamStudyPlan.todaySchedule(today)
-    val tips = ExamStudyPlan.todayTips(today)
+    val todayPlan = StudyPlanCatalog.dailyPlan(today)
+    val tomorrowPlan = StudyPlanCatalog.dailyPlan(today.plusDays(1))
+    val schedule = generatedSchedule ?: todayPlan?.tasks.orEmpty().map { task ->
+        StudyScheduleBlock("自定", task.kind.label, task.title)
+    }
+    val tips = listOf(
+        StudyTip("你决定今天怎么排", "休息日、任务顺序和各块时长都由你自己决定；周任务池才是硬目标。"),
+        StudyTip("先选一个专业课主线", "从看课、章节闭环、背诵输出或错题回炉中选一个最重要的入口。"),
+        StudyTip("英语不能只剩单词", "完成单词滚动后，再从本周阅读、完形、新题型、翻译或作文任务中选一个主训练。"),
+        StudyTip("未完成回到周任务池", "今天没做完不整套顺延、不熬夜补；记录有效分钟和卡点后重新分配。"),
+    )
     var dashboardView by remember { mutableStateOf(StudyMainDashboardView.Tasks) }
 
     StudyMainCard {
@@ -490,7 +498,7 @@ private fun StudyTodayPlanContent(
             Column(Modifier.weight(1f)) {
                 Text("今日计划", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(
-                    if (generatedByAi) "已按今日待办重新生成" else todayPlan?.title ?: "今天先守住最小学习闭环",
+                    if (generatedByAi) "已按你今天选的待办生成短计划" else todayPlan?.title ?: "今天由你从周任务池自行安排",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -501,7 +509,7 @@ private fun StudyTodayPlanContent(
                     Icon(HugeIcons.AiMagic, null, modifier = Modifier.size(18.dp))
                 }
                 Spacer(Modifier.width(6.dp))
-                Text(if (isGeneratingSchedule) "生成中" else "生成计划表")
+                Text(if (isGeneratingSchedule) "生成中" else "生成短计划")
             }
         }
         schedule.forEach { block ->
@@ -555,7 +563,7 @@ private fun StudyTomorrowPlanContent(tomorrowPlan: DailyStudyPlan?) {
                 }
             }
             Text(
-                "明日待办只是预览；今晚收尾时再决定明天第一步，不把焦虑提前搬到今天。",
+                "明日待办只是短提醒；具体任务和休息安排明天由你从周任务池选择。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -570,7 +578,7 @@ private fun StudyTipsContent(tips: List<StudyTip>) {
             Icon(HugeIcons.AiMagic, null, tint = StudyMainColors.gold)
             Column(Modifier.weight(1f)) {
                 Text("tips", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text("按今天任务给你提效，不照搬经验帖强度。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("按周任务池给你提效，不替你决定日程。", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         tips.forEach { tip ->
@@ -586,7 +594,7 @@ private fun StudyTipsContent(tips: List<StudyTip>) {
 internal fun StudyPlanOverviewPanel() {
     var planView by remember { mutableStateOf(StudyMainPlanView.Weekly) }
     val today = LocalDate.now()
-    val week = ExamStudyPlan.weekForDate(today) ?: ExamStudyPlan.weeklyPlans.firstOrNull()
+    val week = StudyPlanCatalog.weekForDate(today) ?: StudyPlanCatalog.weeklyPlans.firstOrNull()
 
     StudyMainCard {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
@@ -607,12 +615,12 @@ internal fun StudyPlanOverviewPanel() {
                     it.tasks.forEach { task ->
                         Text("· $task", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                } ?: Text("本周计划待生成", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                } ?: Text("本周计划待更新", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             StudyMainPlanView.Monthly -> {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("7-12月总计划", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    ExamStudyPlan.monthlyPlans.forEach { month ->
+                    Text("7-12月滚动计划", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    StudyPlanCatalog.monthlyPlans.forEach { month ->
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text("${month.month} · ${month.focus}", fontWeight = FontWeight.SemiBold)
                             month.tasks.forEach { task ->
