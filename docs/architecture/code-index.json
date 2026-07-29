@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T07:12:38.856927+00:00",
-  "commit": "cca4fb09378797ada22550f559cd7dd9f79873eb",
+  "generatedAt": "2026-07-29T07:15:12.133692+00:00",
+  "commit": "59e7b37b8b90995d9645c45bd591c8582125872f",
   "branch": "master",
-  "sourceFingerprint": "feb9ef32ca3785119ef63eec0318661d55c59c4b5bf9c66aa15f1bae3a328989",
+  "sourceFingerprint": "ff5da8f8037e01f7416c160045e37e7028d1b7a6f86974ebc31df09d813c52d3",
   "summary": {
     "files": 1181,
-    "lines": 261384,
+    "lines": 261386,
     "symbols": 5653,
     "productionCodeFiles": 847,
     "testFiles": 146,
@@ -41367,8 +41367,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 315,
-      "sha256": "c221eebaf58068bd616a0e9e772e9da57db518324a6b05b0a11bf8d9b09687e8",
+      "lines": 317,
+      "sha256": "eea7ae2bc213356282634ac854b2e921bf331840e64830095a365b599d55cdff",
       "package": "me.rerere.rikkahub.ui.pages.setting",
       "categories": [
         "记忆",
@@ -41393,42 +41393,42 @@
         {
           "name": "DefaultMemoryRerankModelSetting",
           "kind": "composable",
-          "line": 218
+          "line": 220
         },
         {
           "name": "MemoryExtractionModelSetting",
           "kind": "composable",
-          "line": 241
+          "line": 243
         },
         {
           "name": "memoryModelName",
           "kind": "function",
-          "line": 263
+          "line": 265
         },
         {
           "name": "MemoryEngineDiagnostics",
           "kind": "composable",
-          "line": 268
+          "line": 270
         },
         {
           "name": "parseMemoryEmbeddingDimensionsInput",
           "kind": "function",
-          "line": 292
+          "line": 294
         },
         {
           "name": "parseMemoryEmbeddingBatchSizeInput",
           "kind": "function",
-          "line": 295
+          "line": 297
         },
         {
           "name": "parseMemoryRerankCandidateCountInput",
           "kind": "function",
-          "line": 298
+          "line": 300
         },
         {
           "name": "buildMemoryEngineDiagnostics",
           "kind": "function",
-          "line": 301
+          "line": 303
         }
       ],
       "localImportCount": 11,
@@ -94803,7 +94803,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "kind": "composable",
-        "line": 218
+        "line": 220
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.DefaultOcrModelSetting": [
@@ -95069,14 +95069,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "kind": "composable",
-        "line": 268
+        "line": 270
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.MemoryExtractionModelSetting": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "kind": "composable",
-        "line": 241
+        "line": 243
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.MetasoOptions": [
@@ -95454,7 +95454,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "kind": "function",
-        "line": 301
+        "line": 303
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.buildMemoryEngineDiagnosticsSummarizesLocalPipelineStatus": [
@@ -95776,7 +95776,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "kind": "function",
-        "line": 263
+        "line": 265
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.normalizeMcdonaldsMcpAuthValue": [
@@ -95797,7 +95797,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "kind": "function",
-        "line": 295
+        "line": 297
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryEmbeddingBatchSizeInputClampsToServiceRange": [
@@ -95811,7 +95811,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "kind": "function",
-        "line": 292
+        "line": 294
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryEmbeddingDimensionsInputAllowsBlankOrPositiveInteger": [
@@ -95825,7 +95825,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelMemoryFeatures.kt",
         "kind": "function",
-        "line": 298
+        "line": 300
       }
     ],
     "me.rerere.rikkahub.ui.pages.setting.parseMemoryRerankCandidateCountInputClampsToServiceRange": [
