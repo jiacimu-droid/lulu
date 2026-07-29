@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T06:18:41.150319+00:00",
-  "commit": "a2f5acbb6cf874bf5094a98a3de2f65543e36032",
+  "generatedAt": "2026-07-29T07:07:58.726339+00:00",
+  "commit": "cd7123585b9527cd56442d7d15c932f31c6a55cf",
   "branch": "master",
-  "sourceFingerprint": "080cf4201a6841ebc0d4badb7e42dd4ed3fb9b0417068f179a0545aa8f28c58d",
+  "sourceFingerprint": "4174338f7cdbb90bf186c2d016778211855fef1d1d0132d03b2f8c8b6f6157f2",
   "summary": {
     "files": 1181,
-    "lines": 261295,
+    "lines": 261304,
     "symbols": 5652,
     "productionCodeFiles": 847,
     "testFiles": 146,
@@ -19437,8 +19437,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 97,
-      "sha256": "ef966bb194ff9ef9033493e77bdf8652d5f68afb9f4847d25b7d74cf2dca3c3f",
+      "lines": 106,
+      "sha256": "4ecbe5912cd50a714d8c6919670af99636627f06a8b234ed69c355426e876ff2",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "记忆"
@@ -19472,7 +19472,7 @@
         {
           "name": "toMemoryExtractionTurns",
           "kind": "function",
-          "line": 83
+          "line": 92
         }
       ],
       "localImportCount": 2,
@@ -80715,7 +80715,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
         "kind": "function",
-        "line": 83
+        "line": 92
       }
     ],
     "me.rerere.rikkahub.data.service.toMemoryRerankResults": [
