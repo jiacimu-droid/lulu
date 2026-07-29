@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -19,9 +20,13 @@ import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.study.ExamStudyPlan
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudySleepHabit
+import me.rerere.rikkahub.data.study.StudySleepHabitDecision
+import me.rerere.rikkahub.data.study.StudySleepHabitEvidence
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.data.study.StudyTaskSource
+import me.rerere.rikkahub.data.study.referenceTimeFor
+import me.rerere.rikkahub.data.study.settleRoleJudgedSleepReward
 import org.koin.core.context.GlobalContext
 import java.time.LocalDate
 import java.time.LocalTime
@@ -34,11 +39,12 @@ fun createTodayStudyPlanTool(
     name = "today_study_plan",
     description = """
         Read or update today's app-local study state. Use action=set_completion only after the user explicitly reports
-        task completion. Use action=claim_sleep_reward only after the character has judged the user's early-sleep or
-        early-rise report credible from the current time and conversation. Do not grant merely because the user asks;
-        obtain the reported clock time or derive it from available sleep/app-usage evidence, ask a follow-up when it
-        is missing, and refuse obvious contradictions. The user's personal baseline is sleep by about 01:30 and wake
-        by about 09:30. Each reward is idempotent per day.
+        task completion. Use action=claim_sleep_reward only after the selected character has made an explicit structured
+        approval or rejection from the actual clock time, the user's reference baseline, recent trend, current context
+        and any special circumstances. The 01:30 sleep and 09:30 wake times are reference baselines, not hard system
+        gates. Once the selected character explicitly approves, the settlement layer must not reject only because the
+        actual time is later than that reference. Do not grant merely because the user asks; ask for the actual time when
+        it is missing. Each reward is idempotent per day.
         Use this for 考研计划, 今日计划, 待办, 番茄钟, 作息, 早睡, 早起, 夸夸值 and rewards.
         Only existing tasks can change; this tool never creates or deletes tasks. Do not use calendar_tool.
     """.trimIndent().replace("\n", " "),
@@ -54,7 +60,7 @@ fun createTodayStudyPlanTool(
                     })
                     put(
                         "description",
-                        JsonPrimitive("Read state, update completion, or grant a self-reported sleep reward."),
+                        JsonPrimitive("Read state, update completion, or settle a role-judged sleep reward."),
                     )
                 }
                 putJsonObject("sleep_habit") {
@@ -68,11 +74,18 @@ fun createTodayStudyPlanTool(
                         JsonPrimitive("early_sleep means last night's bedtime; early_rise means today's wake-up."),
                     )
                 }
+                putJsonObject("approved") {
+                    put("type", JsonPrimitive("boolean"))
+                    put(
+                        "description",
+                        JsonPrimitive("The selected character's explicit final decision. Always supply for claim_sleep_reward."),
+                    )
+                }
                 putJsonObject("decision_reason") {
                     put("type", JsonPrimitive("string"))
                     put(
                         "description",
-                        JsonPrimitive("A short in-character reason why the report is credible enough to reward."),
+                        JsonPrimitive("A short in-character reason for approving or rejecting the reward."),
                     )
                 }
                 putJsonObject("reported_hour") {
@@ -86,6 +99,22 @@ fun createTodayStudyPlanTool(
                     put("minimum", JsonPrimitive(0))
                     put("maximum", JsonPrimitive(59))
                     put("description", JsonPrimitive("The reported minute of sleeping or waking."))
+                }
+                putJsonObject("recent_trend") {
+                    put("type", JsonPrimitive("string"))
+                    put("description", JsonPrimitive("Recent sleep/wake trend used by the character, or unknown."))
+                }
+                putJsonObject("special_circumstances") {
+                    put("type", JsonPrimitive("string"))
+                    put("description", JsonPrimitive("Illness, travel, exam stress, recovery, or other relevant exception."))
+                }
+                putJsonObject("current_context") {
+                    put("type", JsonPrimitive("string"))
+                    put("description", JsonPrimitive("Concise evidence from the current conversation or device signals."))
+                }
+                putJsonObject("model_error") {
+                    put("type", JsonPrimitive("boolean"))
+                    put("description", JsonPrimitive("True only when no reliable role decision could be produced."))
                 }
                 putJsonObject("complete_task_ids") {
                     put("type", JsonPrimitive("array"))
@@ -142,10 +171,18 @@ fun createTodayStudyPlanTool(
                 var blockedByCompanion = false
                 var alreadyClaimed = false
                 var granted = false
+                var approvedByRole = false
                 var rewardKudos = 0
                 var rewardTenDrawTickets = 0
                 var resultReason = ""
                 var updatedState: StudyState? = null
+                val actualTime = params.reportedSleepClockTime()
+                val referenceTime = referenceTimeFor(habit)
+                val recentTrend = params["recent_trend"]?.jsonPrimitive?.contentOrNull.orEmpty()
+                val specialCircumstances = params["special_circumstances"]?.jsonPrimitive?.contentOrNull.orEmpty()
+                val currentContext = params["current_context"]?.jsonPrimitive?.contentOrNull.orEmpty()
+                val modelError = params["model_error"]?.jsonPrimitive?.booleanOrNull == true
+                val explicitApproval = params["approved"]?.jsonPrimitive?.booleanOrNull
                 store.update { current ->
                     val selectedAssistantId = current.selectedAssistantId
                     if (
@@ -157,15 +194,27 @@ fun createTodayStudyPlanTool(
                         updatedState = current
                         current
                     } else {
-                        val result = StudyRules.claimSleepHabitReward(
+                        approvedByRole = explicitApproval == true && !modelError
+                        val missingStructuredDecision = explicitApproval == null && !modelError
+                        val result = settleRoleJudgedSleepReward(
                             state = current,
                             habit = habit,
                             assistantName = assistantName,
-                            decisionReason = params["decision_reason"]
-                                ?.jsonPrimitive
-                                ?.contentOrNull
-                                .orEmpty(),
-                            reportedTime = params.reportedSleepClockTime(),
+                            evidence = StudySleepHabitEvidence(
+                                actualTime = actualTime,
+                                referenceTime = referenceTime,
+                                recentTrend = recentTrend.ifBlank { "近期趋势未知" },
+                                specialCircumstances = specialCircumstances.ifBlank { "无已知特殊情况" },
+                                currentContext = currentContext,
+                            ),
+                            decision = StudySleepHabitDecision(
+                                approved = explicitApproval == true,
+                                reason = when {
+                                    missingStructuredDecision -> "角色没有返回明确的 approved 布尔值，本次不发奖。"
+                                    else -> params["decision_reason"]?.jsonPrimitive?.contentOrNull.orEmpty()
+                                },
+                                modelError = modelError || missingStructuredDecision,
+                            ),
                         )
                         alreadyClaimed = result.alreadyClaimed
                         granted = result.granted
@@ -179,8 +228,13 @@ fun createTodayStudyPlanTool(
                 val finalState = updatedState ?: store.state.first()
                 listOf(UIMessagePart.Text(buildJsonObject {
                     put("success", !blockedByCompanion)
+                    put("approved_by_role", !blockedByCompanion && approvedByRole)
                     put("granted", !blockedByCompanion && granted)
                     put("already_claimed_today", alreadyClaimed)
+                    put("actual_time", actualTime?.toString() ?: "unknown")
+                    put("reference_time", referenceTime.toString())
+                    put("recent_trend", recentTrend.ifBlank { "unknown" })
+                    put("special_circumstances", specialCircumstances.ifBlank { "none_known" })
                     if (blockedByCompanion) {
                         put("error", "Only the character selected as today's study companion can grant this reward.")
                     }
@@ -305,18 +359,18 @@ fun buildTodayStudyPlanPayload(
                 StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlySleep, today),
             )
             put("early_sleep_reward_kudos", StudyRules.EARLY_SLEEP_KUDOS)
-            put("early_sleep_personal_cutoff", "01:30")
+            put("early_sleep_reference_time", "01:30")
             put(
                 "early_rise_claimed_today",
                 StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlyRise, today),
             )
             put("early_rise_reward_ten_draw_tickets", StudyRules.EARLY_RISE_TEN_DRAW_TICKETS)
-            put("early_rise_personal_cutoff", "09:30")
+            put("early_rise_reference_time", "09:30")
             put(
                 "instruction",
-                "The character decides whether the report is credible from time and conversation. " +
-                    "Do not grant just because the user asks; ask when ambiguous and refuse contradictions. " +
-                    "Each habit can be granted once per day.",
+                "The selected character owns the final approval decision. Actual time, reference time, recent trend, " +
+                    "current context and special circumstances are evidence. A later-than-reference time may still be " +
+                    "approved, and the system must not apply a second clock-threshold rejection. Each habit is once per day.",
             )
         })
         put("already_done", buildJsonArray {
