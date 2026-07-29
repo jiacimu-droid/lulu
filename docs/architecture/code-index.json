@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T17:06:40.416418+00:00",
-  "commit": "91543596ff09ca829cfd56563e8976a3a9d5580b",
+  "generatedAt": "2026-07-29T17:08:15.248027+00:00",
+  "commit": "d0cafdf44a39892618893db1cef5fa354c0f6611",
   "branch": "master",
-  "sourceFingerprint": "29be524a0226164bbc636b8658fc59d37574aa280db5c37cca5be914f089c50d",
+  "sourceFingerprint": "3b6efc1e72121eb09ec4aed1351604c4f78ca4196e218b8c3a96bc2a6d705cf5",
   "summary": {
     "files": 1184,
-    "lines": 262190,
+    "lines": 262191,
     "symbols": 5665,
     "productionCodeFiles": 849,
     "testFiles": 146,
@@ -11881,8 +11881,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformer.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 108,
-      "sha256": "cfada07a9ad1071d08a1e88aa22e21915a7970711e71bd3f90f8084f3ae71428",
+      "lines": 109,
+      "sha256": "c3b29aa90b9ddef3b5d600262337c224704431e62969a6ed42451ebd00b71595",
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -11906,7 +11906,7 @@
         {
           "name": "toLocalDateOrToday",
           "kind": "function",
-          "line": 102
+          "line": 103
         }
       ],
       "localImportCount": 7,
@@ -71352,7 +71352,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformer.kt",
         "kind": "function",
-        "line": 102
+        "line": 103
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.toTimeString": [
