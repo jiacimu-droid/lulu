@@ -65,17 +65,26 @@ fun buildAffectiveMemoryExtractionPlan(
     val stableTurns = logicalTurns.dropLast(protectedRecentCount.coerceAtLeast(0))
     if (stableTurns.size < extractionInterval) return null
 
-    // Automatic extraction is edge-triggered instead of level-triggered.
-    // With an interval of 40, only stable counts 40, 80, 120... are eligible.
-    // Counts such as 41, 59 or 79 cannot create sliding 2..41 / 20..59 windows.
-    if (stableTurns.size % extractionInterval != 0) return null
+    // Build fixed, non-overlapping windows from the beginning of the stable region. The planner is
+    // deliberately level-triggered: if an automatic run missed the exact 20/40/60 boundary, the
+    // next completed reply can still recover that aligned batch without creating a sliding window.
+    val pendingWindows = stableTurns
+        .chunked(extractionInterval)
+        .asSequence()
+        .filter { window -> window.size == extractionInterval }
+        .filter { window -> window.any { turn -> turn.nodeId !in processedSourceNodeIds } }
+        .toList()
+    if (pendingWindows.isEmpty()) return null
 
-    val boundaryWindow = stableTurns.takeLast(extractionInterval)
-    if (boundaryWindow.size != extractionInterval) return null
-    if (boundaryWindow.all { turn -> turn.nodeId in processedSourceNodeIds }) return null
+    // A partially checkpointed legacy window is rebuilt as one complete aligned batch. Saved
+    // memories retain source-node IDs, so storage-level identity checks prevent duplicate rows.
+    val selectedTurns = when (direction) {
+        MemoryExtractionDirection.OLDEST_FIRST -> pendingWindows.first()
+        MemoryExtractionDirection.RECENT_FIRST -> pendingWindows.last()
+    }
 
     return AffectiveMemoryExtractionPlan(
-        turns = boundaryWindow,
+        turns = selectedTurns,
         reason = if (direction == MemoryExtractionDirection.RECENT_FIRST) "recent_interval" else "interval",
     )
 }
