@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T17:05:13.840991+00:00",
-  "commit": "3e11148e7a349aa9c0ea6bf7be26f5cc65ab13e7",
+  "generatedAt": "2026-07-29T17:06:40.416418+00:00",
+  "commit": "91543596ff09ca829cfd56563e8976a3a9d5580b",
   "branch": "master",
-  "sourceFingerprint": "47af6852679bd176100a8f164ac09523d5d973da2b678204907d4a5781c64acb",
+  "sourceFingerprint": "29be524a0226164bbc636b8658fc59d37574aa280db5c37cca5be914f089c50d",
   "summary": {
     "files": 1184,
-    "lines": 262136,
+    "lines": 262190,
     "symbols": 5665,
     "productionCodeFiles": 849,
     "testFiles": 146,
@@ -68,7 +68,7 @@
       "界面": 336,
       "记忆": 48
     },
-    "resolvedImportEdges": 2067
+    "resolvedImportEdges": 2068
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -10592,8 +10592,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 372,
-      "sha256": "a3c87723c119d7f88a689257615be2d188cd47598cd1f5372f5c44f4b5e12f65",
+      "lines": 426,
+      "sha256": "ac1aab6589c85cd5f21651564d978b0ef1808cce4edcc0786dc6daf9480ca8f0",
       "package": "me.rerere.rikkahub.data.ai.tools",
       "categories": [
         "AI与上下文",
@@ -10603,50 +10603,50 @@
         {
           "name": "createTodayStudyPlanTool",
           "kind": "function",
-          "line": 30
+          "line": 35
         },
         {
           "name": "StudyTaskCompletionUpdate",
           "kind": "class",
-          "line": 202
+          "line": 256
         },
         {
           "name": "updateTodayStudyTaskCompletion",
           "kind": "function",
-          "line": 207
+          "line": 261
         },
         {
           "name": "matchTaskTitleQueries",
           "kind": "function",
-          "line": 236
+          "line": 290
         },
         {
           "name": "stringSet",
           "kind": "function",
-          "line": 256
+          "line": 310
         },
         {
           "name": "reportedSleepClockTime",
           "kind": "function",
-          "line": 262
+          "line": 316
         },
         {
           "name": "normalizedTaskTitle",
           "kind": "function",
-          "line": 269
+          "line": 323
         },
         {
           "name": "buildTodayStudyPlanPayload",
           "kind": "function",
-          "line": 272
+          "line": 326
         },
         {
           "name": "toLocalDateOrToday",
           "kind": "function",
-          "line": 367
+          "line": 421
         }
       ],
-      "localImportCount": 9,
+      "localImportCount": 13,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -10657,14 +10657,19 @@
         "me.rerere.rikkahub.data.study.ExamStudyPlan",
         "me.rerere.rikkahub.data.study.StudyRules",
         "me.rerere.rikkahub.data.study.StudySleepHabit",
+        "me.rerere.rikkahub.data.study.StudySleepHabitDecision",
+        "me.rerere.rikkahub.data.study.StudySleepHabitEvidence",
         "me.rerere.rikkahub.data.study.StudyState",
         "me.rerere.rikkahub.data.study.StudyStore",
-        "me.rerere.rikkahub.data.study.StudyTaskSource"
+        "me.rerere.rikkahub.data.study.StudyTaskSource",
+        "me.rerere.rikkahub.data.study.referenceTimeFor",
+        "me.rerere.rikkahub.data.study.settleRoleJudgedSleepReward"
       ],
       "resolvedImports": [
         "ai/src/main/java/me/rerere/ai/core/Tool.kt",
         "ai/src/main/java/me/rerere/ai/ui/Message.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt"
@@ -22821,7 +22826,9 @@
       "isProductionCode": true,
       "localImports": [],
       "resolvedImports": [],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt"
+      ]
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
@@ -69918,7 +69925,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "class",
-        "line": 202
+        "line": 256
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.SystemToolOption": [
@@ -69988,7 +69995,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
-        "line": 272
+        "line": 326
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.buildWriteFilesTool": [
@@ -70128,7 +70135,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
-        "line": 30
+        "line": 35
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.createWeatherTool": [
@@ -70278,14 +70285,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
-        "line": 236
+        "line": 290
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.normalizedTaskTitle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
-        "line": 269
+        "line": 323
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.passivePerceptionTools": [
@@ -70348,7 +70355,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
-        "line": 262
+        "line": 316
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.scheduleInlineVoiceMessage": [
@@ -70376,7 +70383,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
-        "line": 256
+        "line": 310
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.synthesizeInlineVoiceMessage": [
@@ -70404,7 +70411,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
-        "line": 367
+        "line": 421
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.tool": [
@@ -70425,7 +70432,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "kind": "function",
-        "line": 207
+        "line": 261
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.warn": [
