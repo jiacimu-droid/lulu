@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T06:12:54.505036+00:00",
-  "commit": "99fcd907699ceeaf5c05df4cda0c94d32b28f550",
+  "generatedAt": "2026-07-29T06:14:07.211937+00:00",
+  "commit": "4ae2f4efcacb33cfc423f8450ad899c19002f785",
   "branch": "master",
-  "sourceFingerprint": "2059bb93032d72ac9064c828ceab4d209dfe78e194749d1f886850c2191b950f",
+  "sourceFingerprint": "9bb7df3a790e6fef276a116e93958a73e1d99f0e779222218995ac67a77d54b1",
   "summary": {
     "files": 1182,
-    "lines": 261353,
+    "lines": 261354,
     "symbols": 5653,
     "productionCodeFiles": 848,
     "testFiles": 146,
@@ -43883,8 +43883,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyGameRoundTicketUseCard.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 54,
-      "sha256": "56b956d1f61529726aac8c8fa51103d63644c94f5af1b89d72d222d4e770afea",
+      "lines": 55,
+      "sha256": "83cc410f6bff65a3d4496ea0dfaee723aa56d036a844624c528c31faf827e12a",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -43894,7 +43894,7 @@
         {
           "name": "StudyGameRoundTicketUseCard",
           "kind": "composable",
-          "line": 20
+          "line": 21
         }
       ],
       "localImportCount": 0,
@@ -96637,7 +96637,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyGameRoundTicketUseCard.kt",
         "kind": "composable",
-        "line": 20
+        "line": 21
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyGuideBlock": [
