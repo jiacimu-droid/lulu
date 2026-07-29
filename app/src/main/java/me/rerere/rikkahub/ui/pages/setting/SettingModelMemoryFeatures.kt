@@ -96,10 +96,12 @@ internal fun DefaultMemoryEmbeddingModelSetting(settings: Settings, vm: SettingV
                     modelId = config.modelId,
                     type = ModelType.EMBEDDING,
                     onSelect = { model ->
+                        val selectedModelId = model.id.takeUnless { model.modelId.isBlank() }
                         vm.updateSettings(
                             settings.copy(
                                 memoryEmbeddingConfig = config.copy(
-                                    modelId = model.id.takeUnless { model.modelId.isBlank() },
+                                    modelId = selectedModelId,
+                                    enabled = selectedModelId != null,
                                 ),
                             ),
                         )
