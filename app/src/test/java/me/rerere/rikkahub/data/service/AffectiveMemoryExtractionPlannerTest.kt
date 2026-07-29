@@ -93,8 +93,8 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
-    fun `planner selects the next exact interval without overlap`() {
-        val conversation = nodes(50)
+    fun `planner selects the next aligned interval without overlap`() {
+        val conversation = nodes(51)
         val processed = (1..20).map { idOf(it) }.toSet()
 
         val plan = buildAffectiveMemoryExtractionPlan(
@@ -110,18 +110,21 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
-    fun `planner does not trigger between configured boundaries`() {
-        val conversation = nodes(51)
-        val processed = (1..40).map { idOf(it) }.toSet()
+    fun `planner catches a missed boundary when stable count is off by one`() {
+        val conversation = nodes(31)
 
         val plan = buildAffectiveMemoryExtractionPlan(
             messageNodes = conversation,
-            processedSourceNodeIds = processed,
-            extractionInterval = 40,
+            processedSourceNodeIds = emptySet(),
+            extractionInterval = 20,
             protectedRecentCount = 10,
         )
 
-        assertEquals(null, plan)
+        requireNotNull(plan)
+        assertEquals(20, plan.turns.size)
+        assertEquals(idOf(1), plan.turns.first().nodeId)
+        assertEquals(idOf(20), plan.turns.last().nodeId)
+        assertFalse(plan.turns.any { it.nodeId == idOf(21) })
     }
 
     @Test
@@ -143,7 +146,7 @@ class AffectiveMemoryExtractionPlannerTest {
 
     @Test
     fun `planner respects a forty message interval after keeping the newest ten`() {
-        val conversation = nodes(90)
+        val conversation = nodes(91)
         val processed = (1..40).map { idOf(it) }.toSet()
 
         val plan = buildAffectiveMemoryExtractionPlan(
@@ -159,8 +162,8 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
-    fun `recent planner selects newest exact aligned forty message batch`() {
-        val conversation = nodes(330)
+    fun `recent planner selects newest complete aligned forty message batch`() {
+        val conversation = nodes(335)
 
         val plan = buildAffectiveMemoryExtractionPlan(
             messageNodes = conversation,
@@ -179,7 +182,7 @@ class AffectiveMemoryExtractionPlannerTest {
 
     @Test
     fun `planner uses role configured interval and zero disables automatic extraction`() {
-        val conversation = nodes(22)
+        val conversation = nodes(23)
 
         assertEquals(
             null,
