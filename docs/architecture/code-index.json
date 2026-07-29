@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T12:49:39.851221+00:00",
-  "commit": "0cecf2eb6201c71aee963d82efa00666cc42fdee",
+  "generatedAt": "2026-07-29T12:54:28.199264+00:00",
+  "commit": "76a9fcacf8cafcfa3c5a33ccda227d1620d54a59",
   "branch": "master",
-  "sourceFingerprint": "ad43c14e8fb2030b21fe814dd54fb5303f1c05de66e778d8c4734249a259097b",
+  "sourceFingerprint": "2d13aeda569eaaecb56b41f23bb3dadfec2296da80df44ba7ff41a4c541cb5fd",
   "summary": {
     "files": 1183,
-    "lines": 262032,
+    "lines": 261995,
     "symbols": 5661,
     "productionCodeFiles": 848,
     "testFiles": 146,
@@ -22787,7 +22787,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 350,
-      "sha256": "96b8ea8dc6abd19adfd2b85a4ac9eb34e29d576c0426a17cdd2a094e45f66aec",
+      "sha256": "77bb4510954b42103a2724ec000ecdc3e8fc2b4f45e40a71ed0cc82719484db3",
       "package": "me.rerere.rikkahub.data.study",
       "categories": [
         "学习监督"
@@ -60327,8 +60327,8 @@
       "path": "study-plans/kaoyan-2026/README.md",
       "module": "study-plans",
       "extension": ".md",
-      "lines": 120,
-      "sha256": "75f10214d3c787826d09863f76780468174ae6594bc5ba9c1248f5d3c33f163f",
+      "lines": 83,
+      "sha256": "6bc15ca01b6aa80f299cd337844cea879ee701a0207d5f6a7b4bf77bb425898a",
       "package": null,
       "categories": [],
       "symbols": [],
