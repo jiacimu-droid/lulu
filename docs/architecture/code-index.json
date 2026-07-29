@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-29T07:15:12.133692+00:00",
-  "commit": "59e7b37b8b90995d9645c45bd591c8582125872f",
+  "generatedAt": "2026-07-29T12:43:54.491461+00:00",
+  "commit": "e9ba048bdff088ec90600eff3f8451c20c9daf12",
   "branch": "master",
-  "sourceFingerprint": "ff5da8f8037e01f7416c160045e37e7028d1b7a6f86974ebc31df09d813c52d3",
+  "sourceFingerprint": "88bd44e9c9f9556d1b6b2dfaeeb0e6d4fc58d932127a9711613388c8ba7adca1",
   "summary": {
-    "files": 1181,
-    "lines": 261386,
-    "symbols": 5653,
-    "productionCodeFiles": 847,
+    "files": 1183,
+    "lines": 262016,
+    "symbols": 5659,
+    "productionCodeFiles": 848,
     "testFiles": 146,
     "largeProductionFiles": 30,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 728,
+      "app": 729,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -30,16 +30,16 @@
       "web": 7,
       ".claude": 5,
       ".github": 5,
+      "study-plans": 5,
       "locale-tui": 4,
-      "study-plans": 4,
       "money-lab": 3,
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 796,
+      ".kt": 797,
       ".tsx": 74,
       ".java": 64,
-      ".md": 58,
+      ".md": 59,
       ".json": 55,
       ".ts": 42,
       ".xml": 37,
@@ -59,7 +59,7 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 28,
-      "学习监督": 35,
+      "学习监督": 36,
       "工具": 6,
       "插件": 40,
       "数据库": 75,
@@ -1358,6 +1358,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyExecutionPolicy.kt",
       "app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt",
@@ -22771,6 +22772,56 @@
           "name": "monthlyPlan",
           "kind": "function",
           "line": 64
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 350,
+      "sha256": "96b8ea8dc6abd19adfd2b85a4ac9eb34e29d576c0426a17cdd2a094e45f66aec",
+      "package": "me.rerere.rikkahub.data.study",
+      "categories": [
+        "学习监督"
+      ],
+      "symbols": [
+        {
+          "name": "SelfDirectedStudyPlan",
+          "kind": "object",
+          "line": 14
+        },
+        {
+          "name": "monthlyPlan",
+          "kind": "function",
+          "line": 234
+        },
+        {
+          "name": "plannedMinutesOverride",
+          "kind": "function",
+          "line": 301
+        },
+        {
+          "name": "dynamicSchedulePrompt",
+          "kind": "function",
+          "line": 310
+        },
+        {
+          "name": "shortDailyPrompt",
+          "kind": "function",
+          "line": 332
+        },
+        {
+          "name": "week",
+          "kind": "function",
+          "line": 344
         }
       ],
       "localImportCount": 0,
@@ -60262,8 +60313,8 @@
       "path": "study-plans/kaoyan-2026/README.md",
       "module": "study-plans",
       "extension": ".md",
-      "lines": 121,
-      "sha256": "914aab23470c2118e38b9bc87262a33b27453411551588f19eeaf8f581032190",
+      "lines": 120,
+      "sha256": "75f10214d3c787826d09863f76780468174ae6594bc5ba9c1248f5d3c33f163f",
       "package": null,
       "categories": [],
       "symbols": [],
@@ -60279,8 +60330,25 @@
       "path": "study-plans/kaoyan-2026/learner-profile.md",
       "module": "study-plans",
       "extension": ".md",
-      "lines": 99,
-      "sha256": "d279193d6a6388f61f27a3cd6665abf3a100e04bd3de4f46008cb6f12364fc64",
+      "lines": 110,
+      "sha256": "e7d1553f5a069769fb46accb756ff87d54b7ecf84d18c42c15152089dfae8809",
+      "package": null,
+      "categories": [],
+      "symbols": [],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "study-plans/kaoyan-2026/monthly-weekly-plan.md",
+      "module": "study-plans",
+      "extension": ".md",
+      "lines": 270,
+      "sha256": "1e6b23de0fd2acf2971c2f497fa8ac445e863468ec338d7ad8b899b4b586c4e5",
       "package": null,
       "categories": [],
       "symbols": [],
@@ -81207,6 +81275,13 @@
         "line": 24
       }
     ],
+    "me.rerere.rikkahub.data.study.SelfDirectedStudyPlan": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
+        "kind": "object",
+        "line": 14
+      }
+    ],
     "me.rerere.rikkahub.data.study.StudyAchievement": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
@@ -81875,6 +81950,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt",
         "kind": "function",
         "line": 853
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
+        "kind": "function",
+        "line": 310
       }
     ],
     "me.rerere.rikkahub.data.study.english": [
@@ -82219,6 +82299,11 @@
         "line": 64
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
+        "kind": "function",
+        "line": 234
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
         "line": 47
@@ -82405,6 +82490,11 @@
       }
     ],
     "me.rerere.rikkahub.data.study.plannedMinutesOverride": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
+        "kind": "function",
+        "line": 301
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt",
         "kind": "function",
@@ -82633,6 +82723,13 @@
         "line": 98
       }
     ],
+    "me.rerere.rikkahub.data.study.shortDailyPrompt": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
+        "kind": "function",
+        "line": 332
+      }
+    ],
     "me.rerere.rikkahub.data.study.sichuanUniversityTargetUsesASafetyMarginInsteadOfTheHistoricalMinimum": [
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt",
@@ -82809,6 +82906,11 @@
       }
     ],
     "me.rerere.rikkahub.data.study.week": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt",
+        "kind": "function",
+        "line": 344
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt",
         "kind": "function",

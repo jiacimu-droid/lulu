@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`59e7b37b8b90995d9645c45bd591c8582125872f`
+- 基准提交：`e9ba048bdff088ec90600eff3f8451c20c9daf12`
 - 分支：`master`
-- 源码指纹：`ff5da8f8037e01f7…`
-- 已索引文件：1181
-- 已索引代码/文本行：261386
-- 已发现类、接口、对象、函数及 Composable：5653
+- 源码指纹：`88bd44e9c9f9556d…`
+- 已索引文件：1183
+- 已索引代码/文本行：262016
+- 已发现类、接口、对象、函数及 Composable：5659
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 847 |
+| 生产代码文件 | 848 |
 | 测试文件 | 146 |
 | ≥800 行生产文件 | 30 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 728 |
+| `app` | 729 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -150,8 +150,8 @@
 | `web` | 7 |
 | `.claude` | 5 |
 | `.github` | 5 |
+| `study-plans` | 5 |
 | `locale-tui` | 4 |
-| `study-plans` | 4 |
 | `money-lab` | 3 |
 | `gradle` | 2 |
 
@@ -159,10 +159,10 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 796 |
+| `.kt` | 797 |
 | `.tsx` | 74 |
 | `.java` | 64 |
-| `.md` | 58 |
+| `.md` | 59 |
 | `.json` | 55 |
 | `.ts` | 42 |
 | `.xml` | 37 |
@@ -297,6 +297,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt`
+- `app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyExecutionPolicy.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt`
@@ -323,8 +324,7 @@
 - `app/src/test/java/me/rerere/rikkahub/data/study/StudyAchievementRewardsTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicyTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/StudyPlanCatalogOverlayTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/study/StudyRulesTest.kt`
-- ……另有 5 个文件，见 `code-index.json`
+- ……另有 6 个文件，见 `code-index.json`
 
 ### 工具
 
@@ -545,7 +545,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：2066
-- 可检索完整符号：5044
+- 可检索完整符号：5046
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
