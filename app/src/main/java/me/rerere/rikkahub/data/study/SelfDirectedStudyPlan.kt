@@ -314,7 +314,7 @@ object SelfDirectedStudyPlan : StudyPlanOverlay {
         currentTime: LocalTime,
     ): String = buildString {
         val formatter = DateTimeFormatter.ofPattern("HH:mm")
-        val unfinished = tasks.filterNot(StudyTask::done)
+        val unfinished = tasks.filterNot { task -> task.done }
         appendLine("日期：$date；当前时间：${currentTime.format(formatter)}。")
         appendLine("用户自己决定今天是否休息以及具体学习顺序。不要假设周日或任何固定星期必须休息。")
         appendLine("今日短提醒：${presetPlan?.tasks.orEmpty().joinToString("；") { it.title }}")
