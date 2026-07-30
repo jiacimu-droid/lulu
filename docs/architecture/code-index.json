@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-30T08:23:01.305660+00:00",
-  "commit": "4df1f1c1658b49e979b055f31f543f66a7eec1c7",
+  "generatedAt": "2026-07-30T08:27:29.155514+00:00",
+  "commit": "568921b9603d0c27af5dccb7e11fe48747bcea4c",
   "branch": "master",
-  "sourceFingerprint": "ee5ceb14e42bf6bc8b63b68a9b050df818bac9a1cb63a42ce26bca097a89ebba",
+  "sourceFingerprint": "e65470b082a848d9300c99b18ba204b840eb928771c9dbe71dd00f86e6336bb1",
   "summary": {
-    "files": 1186,
-    "lines": 262381,
-    "symbols": 5669,
-    "productionCodeFiles": 850,
+    "files": 1187,
+    "lines": 262399,
+    "symbols": 5670,
+    "productionCodeFiles": 851,
     "testFiles": 147,
     "largeProductionFiles": 30,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 32,
     "byModule": {
-      "app": 732,
+      "app": 733,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 800,
+      ".kt": 801,
       ".tsx": 74,
       ".java": 64,
       ".md": 59,
@@ -59,13 +59,13 @@
       "主动代理": 25,
       "关系与承诺": 17,
       "娱乐与数字生活": 28,
-      "学习监督": 39,
+      "学习监督": 40,
       "工具": 6,
       "插件": 40,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 337,
+      "界面": 338,
       "记忆": 48
     },
     "resolvedImportEdges": 2069
@@ -1382,6 +1382,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRecentEventDisplayPolicy.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudySnackbarHost.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt",
@@ -1849,6 +1850,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRecentEventDisplayPolicy.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudySnackbarHost.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorVM.kt",
@@ -44513,6 +44515,32 @@
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt"
       ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudySnackbarHost.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 18,
+      "sha256": "4e4d1850780a79ee5f39e01d4773e9549bac55f91642562fc94dbd413fde5395",
+      "package": "me.rerere.rikkahub.ui.pages.study",
+      "categories": [
+        "学习监督",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "SnackbarHost",
+          "kind": "composable",
+          "line": 13
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
       "importedBy": []
     },
     {
@@ -96778,6 +96806,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "composable",
         "line": 457
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.SnackbarHost": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudySnackbarHost.kt",
+        "kind": "composable",
+        "line": 13
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyAchievementPanel": [
