@@ -64,8 +64,10 @@ object StudyGachaRewardPolicy {
     fun consumeGameRoundTicket(state: StudyState): StudyState? {
         val count = gameRoundTicketCount(state)
         if (count <= 0) return null
+        val title = "游戏局数券已使用 · 可玩${GAME_ROUNDS_PER_TICKET}局"
         return state.copy(
             inventory = state.inventory.copy(gameRoundTickets = count - 1),
+            recentEvents = state.recentEvents.addGameRoundTicketUseEvent(title),
         )
     }
 
@@ -136,5 +138,16 @@ object StudyGachaRewardPolicy {
         result.fragmentType == StudyFragmentType.Video -> copy(videoFragments = videoFragments + 1)
         result.fragmentType == StudyFragmentType.Anime -> copy(animeFragments = animeFragments + 1)
         else -> this
+    }
+
+    private fun List<StudyEvent>.addGameRoundTicketUseEvent(title: String): List<StudyEvent> {
+        val event = StudyEvent(
+            id = "event-${System.currentTimeMillis()}-${size}",
+            type = StudyEventType.Entertainment,
+            title = title,
+            detail = "使用 1 张游戏局数券",
+            createdAt = System.currentTimeMillis(),
+        )
+        return (listOf(event) + this).take(40)
     }
 }
