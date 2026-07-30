@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-30T09:18:05.169276+00:00",
-  "commit": "05cecd72a267a650f20f81d6400f31072f25a3b4",
+  "generatedAt": "2026-07-30T09:18:57.368955+00:00",
+  "commit": "9d0858cc152895f75978b5e6454f7fafcdcdbe56",
   "branch": "master",
-  "sourceFingerprint": "0b3f9d1ac78d2c6527effe24b70a4443c7321d9954e174b52babc12cd7b2f6bf",
+  "sourceFingerprint": "740f71ff87f6bd8c12bc24d65c77602967134f2093ca2c3b9a07702aaa38af72",
   "summary": {
     "files": 1188,
-    "lines": 262762,
+    "lines": 262736,
     "symbols": 5681,
     "productionCodeFiles": 852,
     "testFiles": 147,
@@ -44319,8 +44319,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 365,
-      "sha256": "90374c3f3b658eff47b500cda997134027647f47e73c616b17e1480099d20982",
+      "lines": 339,
+      "sha256": "cfdac006ebc7f991f1e76edd2319e83d61207bb16380f3ef16e73fc0dc4e4e52",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -44340,17 +44340,17 @@
         {
           "name": "StudyPomodoroPage",
           "kind": "composable",
-          "line": 338
+          "line": 312
         },
         {
           "name": "StudyPomodoroFocusPage",
           "kind": "composable",
-          "line": 343
+          "line": 317
         },
         {
           "name": "studyGachaPageBrush",
           "kind": "function",
-          "line": 359
+          "line": 333
         }
       ],
       "localImportCount": 9,
@@ -97200,7 +97200,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 343
+        "line": 317
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroFocusPageContent": [
@@ -97214,7 +97214,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 338
+        "line": 312
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroPageContent": [
@@ -97814,7 +97814,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 359
+        "line": 333
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.studyHeroBrush": [
