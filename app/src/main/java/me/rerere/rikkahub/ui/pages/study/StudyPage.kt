@@ -74,7 +74,6 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
     var pendingBoxDialog by remember { mutableStateOf(false) }
     var boxDialog by remember { mutableStateOf<me.rerere.rikkahub.data.study.StudyMysteryBoxReward?>(null) }
     var showSuperDialog by remember { mutableStateOf(false) }
-    var showLevelDialog by remember { mutableStateOf(false) }
     val isGachaSection = section == StudySection.Gacha
     val pageColor = if (isGachaSection) StudyGachaPageColor else StudyDefaultPageColor
 
@@ -121,11 +120,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                         Surface(
                             modifier = Modifier.size(44.dp).clickable { navController.popBackStack() },
                             shape = CircleShape,
-                            color = if (isGachaSection) {
-                                Color.White.copy(alpha = 0.90f)
-                            } else {
-                                Color.White.copy(alpha = 0.72f)
-                            },
+                            color = if (isGachaSection) Color.White.copy(alpha = 0.90f) else Color.White.copy(alpha = 0.72f),
                             border = BorderStroke(
                                 1.dp,
                                 if (isGachaSection) Color(0xFFFFC9A6) else StudyPageBlue.copy(alpha = 0.12f),
@@ -143,9 +138,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             labels = StudySection.entries.map { it.label },
                             selectedLabel = section.label,
                             onSelected = { selectedLabel ->
-                                StudySection.entries
-                                    .firstOrNull { it.label == selectedLabel }
-                                    ?.let { section = it }
+                                StudySection.entries.firstOrNull { it.label == selectedLabel }?.let { section = it }
                             },
                             gacha = isGachaSection,
                             modifier = Modifier.weight(1f),
@@ -156,21 +149,15 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                 when (section) {
                     StudySection.Companion -> {
                         item {
-                            StudyHeroPanel(
+                            StudyCompactHeroPanel(
                                 state = state,
                                 assistant = companionAssistant,
                                 assistants = settings.assistants,
                                 onSignIn = vm::signIn,
-                                onOpenLevel = { showLevelDialog = true },
                                 onSelectCompanion = { vm.selectCompanion(it.id.toString()) },
                             )
                         }
-                        item {
-                            StudySleepHabitRewardCard(
-                                state = state,
-                                assistantName = companionAssistant.name.ifBlank { "当前角色" },
-                            )
-                        }
+                        item { StudyCompactSleepHabitCard(state = state) }
                         item { StudyRecentEventsCard(events = state.recentEvents) }
                     }
 
@@ -205,9 +192,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                         }
                     }
 
-                    StudySection.Plan -> {
-                        item { StudyPlanOverviewPanel() }
-                    }
+                    StudySection.Plan -> item { StudyPlanOverviewPanel() }
 
                     StudySection.Gacha -> {
                         item {
@@ -225,9 +210,8 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
 
                     StudySection.Collection -> {
                         item {
-                            StudyCollectionPanel(
+                            StudyCompactCollectionPanel(
                                 inventory = state.inventory,
-                                onUseUniversalNormalTarget = vm::applyUniversalNormal,
                                 onOpenMysteryBox = { vm.openMysteryBox(it) },
                                 onRedeemDouyin = { vm.redeemEntertainment(StudyEntertainmentReward.Douyin) },
                                 onRedeemGameRoundTicket = vm::redeemGameRoundTicket,
@@ -275,9 +259,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                         }
                     }
 
-                    StudySection.Guide -> {
-                        item { StudyRewardGuidePanel() }
-                    }
+                    StudySection.Guide -> item { StudyRewardGuidePanel() }
                 }
             }
         }
@@ -322,14 +304,6 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                 showSuperDialog = false
                 vm.claimSuperMoment(SuperMomentChoice.NormalFragments)
             },
-        )
-    }
-
-    if (showLevelDialog) {
-        StudyLevelDialog(
-            state = state,
-            onClaimLevel = vm::claimLevel,
-            onDismissRequest = { showLevelDialog = false },
         )
     }
 }
