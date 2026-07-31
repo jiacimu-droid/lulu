@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T13:06:55.767955+00:00",
-  "commit": "a55d5b8c20802f265565c6b4896fee6640ccae87",
+  "generatedAt": "2026-07-31T13:07:47.115984+00:00",
+  "commit": "5de6f350d772e205c64fab6398003fc7734aa9e5",
   "branch": "master",
-  "sourceFingerprint": "2db80d73658fb9787b7d7283d60156973ccccceab544ce122f396e659f437dd0",
+  "sourceFingerprint": "632e948771958aceba61bb5b56e343e917249f413408e08a7753d5df0d70bf25",
   "summary": {
     "files": 1193,
-    "lines": 262174,
+    "lines": 262178,
     "symbols": 5677,
     "productionCodeFiles": 855,
     "testFiles": 148,
@@ -50516,8 +50516,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveMessageWorkerTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 95,
-      "sha256": "054e56d2a58b0199d5a869767b9738b71ec41cca0c3da17e662fb5703e1f1420",
+      "lines": 99,
+      "sha256": "c75d10f6dbe1d91d203f97398d8238c38ba4a47a5a026d7715915d157697108f",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "主动代理"
