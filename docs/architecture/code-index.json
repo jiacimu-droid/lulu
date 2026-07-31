@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T01:44:52.318332+00:00",
-  "commit": "eaf6f904804741bed7bc98f4ebcb992829f58c09",
+  "generatedAt": "2026-07-31T01:45:31.668164+00:00",
+  "commit": "27ba3b20803398ebf8979ea5834c112b9eeeaf85",
   "branch": "master",
-  "sourceFingerprint": "964f5e54f1068f214c48b6ececaef06a0bdd8b31db16904c681092e5ae2de7c0",
+  "sourceFingerprint": "ea4d0b1d16e68a0ccb49d36ebdb84844b4bcc899843de17d7b10279fe0213718",
   "summary": {
     "files": 1188,
-    "lines": 262567,
+    "lines": 262561,
     "symbols": 5674,
     "productionCodeFiles": 851,
     "testFiles": 147,
@@ -44258,8 +44258,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 339,
-      "sha256": "cfdac006ebc7f991f1e76edd2319e83d61207bb16380f3ef16e73fc0dc4e4e52",
+      "lines": 333,
+      "sha256": "39c9cd5044d5b71daa1c7ecac662cadb2a100278c5f8af5d25b4df838827b221",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -44269,27 +44269,27 @@
         {
           "name": "StudySection",
           "kind": "class",
-          "line": 48
+          "line": 46
         },
         {
           "name": "StudyPage",
           "kind": "composable",
-          "line": 60
+          "line": 58
         },
         {
           "name": "StudyPomodoroPage",
           "kind": "composable",
-          "line": 312
+          "line": 306
         },
         {
           "name": "StudyPomodoroFocusPage",
           "kind": "composable",
-          "line": 317
+          "line": 311
         },
         {
           "name": "studyGachaPageBrush",
           "kind": "function",
-          "line": 333
+          "line": 327
         }
       ],
       "localImportCount": 9,
@@ -97107,7 +97107,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 60
+        "line": 58
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPlanOverviewPanel": [
@@ -97121,7 +97121,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 317
+        "line": 311
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroFocusPageContent": [
@@ -97135,7 +97135,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "composable",
-        "line": 312
+        "line": 306
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroPageContent": [
@@ -97170,7 +97170,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "class",
-        "line": 48
+        "line": 46
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudySectionChips": [
@@ -97721,7 +97721,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
         "kind": "function",
-        "line": 333
+        "line": 327
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.studyHeroBrush": [
