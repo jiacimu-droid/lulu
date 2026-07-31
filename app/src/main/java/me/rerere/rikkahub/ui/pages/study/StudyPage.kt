@@ -17,8 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,7 +65,6 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
         settings.assistants.firstOrNull { it.id.toString() == selected }
             ?: settings.getCurrentAssistant()
     }
-    val snackbarHostState = remember { SnackbarHostState() }
     var section by remember { mutableStateOf(StudySection.Today) }
     var newTask by remember { mutableStateOf("") }
     var drawDialog by remember { mutableStateOf<List<StudyDrawReveal>?>(null) }
@@ -80,7 +77,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
     LaunchedEffect(Unit) {
         vm.effects.collect { effect ->
             when (effect) {
-                is StudyEffect.Message -> snackbarHostState.showSnackbar(effect.text)
+                is StudyEffect.Message -> Unit
                 StudyEffect.MysteryBoxReady -> pendingBoxDialog = true
                 is StudyEffect.MysteryBox -> boxDialog = effect.reward
                 is StudyEffect.DrawResults -> drawDialog = effect.results
@@ -89,10 +86,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = pageColor,
-    ) { padding ->
+    Scaffold(containerColor = pageColor) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -158,7 +152,7 @@ fun StudyPage(vm: StudyVM = koinViewModel()) {
                             )
                         }
                         item { StudyCompactSleepHabitCard(state = state) }
-                        item { StudyRecentEventsCard(events = state.recentEvents) }
+                        item { StudyCompactRecentEventsCard(events = state.recentEvents) }
                     }
 
                     StudySection.Today -> {
