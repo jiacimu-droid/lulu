@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T11:01:26.389555+00:00",
-  "commit": "835bac096f1384a4284f0623245f1e4ca282c070",
+  "generatedAt": "2026-07-31T11:06:33.120467+00:00",
+  "commit": "b500d7b103391367fd63a467caab5f03d1d39487",
   "branch": "master",
-  "sourceFingerprint": "f301e7e730efd9fa4ad510f01e85fd882f7c8992b48d4e592b50a1e3a8607624",
+  "sourceFingerprint": "2cd42643c841c7f4a4b956dea2a059aaab8dceb12534cde74569981299f55706",
   "summary": {
-    "files": 1192,
-    "lines": 262113,
-    "symbols": 5676,
+    "files": 1193,
+    "lines": 262152,
+    "symbols": 5677,
     "productionCodeFiles": 855,
-    "testFiles": 147,
+    "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 737,
+      "app": 738,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 805,
+      ".kt": 806,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -66,7 +66,7 @@
       "构建与发布": 13,
       "电话与语音": 52,
       "界面": 338,
-      "记忆": 48
+      "记忆": 49
     },
     "resolvedImportEdges": 2084
   },
@@ -1968,6 +1968,7 @@
       "app/src/test/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemoryTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
+      "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionSupportTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractorTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryPromptPhilosophyTest.kt",
       "app/src/test/java/me/rerere/rikkahub/data/service/MemoryArchiveTest.kt",
@@ -19615,7 +19616,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 132,
-      "sha256": "df1efcd6927ba83114a788fd797b598462ff58b7253e6577c57e8aa9524cdcd7",
+      "sha256": "2759319945f35afca6af857f2d9dbd45fd534bf5232c8e149d03ec9de73082fe",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "记忆"
@@ -49682,6 +49683,31 @@
       "importedBy": []
     },
     {
+      "path": "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionSupportTest.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 39,
+      "sha256": "a4494a9c300ff75f25492588dbacf8b6d0ccc1f756e9626bedbc2a3ae94177a1",
+      "package": "me.rerere.rikkahub.data.service",
+      "categories": [
+        "记忆"
+      ],
+      "symbols": [
+        {
+          "name": "AffectiveMemoryExtractionSupportTest",
+          "kind": "class",
+          "line": 6
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": true,
+      "isProductionCode": false,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractorTest.kt",
       "module": "app",
       "extension": ".kt",
@@ -78016,6 +78042,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "class",
         "line": 25
+      }
+    ],
+    "me.rerere.rikkahub.data.service.AffectiveMemoryExtractionSupportTest": [
+      {
+        "path": "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionSupportTest.kt",
+        "kind": "class",
+        "line": 6
       }
     ],
     "me.rerere.rikkahub.data.service.AffectiveMemoryExtractor": [

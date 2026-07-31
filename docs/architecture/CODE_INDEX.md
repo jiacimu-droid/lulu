@@ -12,19 +12,19 @@
 
 ## 索引状态
 
-- 基准提交：`835bac096f1384a4284f0623245f1e4ca282c070`
+- 基准提交：`b500d7b103391367fd63a467caab5f03d1d39487`
 - 分支：`master`
-- 源码指纹：`f301e7e730efd9fa…`
-- 已索引文件：1192
-- 已索引代码/文本行：262113
-- 已发现类、接口、对象、函数及 Composable：5676
+- 源码指纹：`2cd42643c841c7f4…`
+- 已索引文件：1193
+- 已索引代码/文本行：262152
+- 已发现类、接口、对象、函数及 Composable：5677
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
 | 生产代码文件 | 855 |
-| 测试文件 | 147 |
+| 测试文件 | 148 |
 | ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
 | TODO/FIXME/HACK/XXX | 38 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 737 |
+| `app` | 738 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 805 |
+| `.kt` | 806 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -517,11 +517,11 @@
 - `app/src/test/java/me/rerere/rikkahub/data/companion/CompanionAlwaysOnMemoryTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/db/entity/MemoryGraphEdgeEntityTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt`
+- `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionSupportTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractorTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryPromptPhilosophyTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/service/MemoryArchiveTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/service/MemoryBankContextTest.kt`
-- ……另有 18 个文件，见 `code-index.json`
+- ……另有 19 个文件，见 `code-index.json`
 
 ## 关键符号快速入口
 
@@ -547,7 +547,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：2084
-- 可检索完整符号：5062
+- 可检索完整符号：5063
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
