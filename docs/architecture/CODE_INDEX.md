@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`941ff9cceec2e77ff2f98e6767e934487a7f1366`
+- 基准提交：`c98e15cfe0b7af489ca451234ace5ce33e02a231`
 - 分支：`master`
-- 源码指纹：`d767a6fecf3e5acc…`
+- 源码指纹：`53d6710b39ad2e30…`
 - 已索引文件：1190
-- 已索引代码/文本行：263136
-- 已发现类、接口、对象、函数及 Composable：5698
+- 已索引代码/文本行：262041
+- 已发现类、接口、对象、函数及 Composable：5662
 
 ## 仓库健康信号
 
@@ -25,7 +25,7 @@
 |---|---:|
 | 生产代码文件 | 853 |
 | 测试文件 | 147 |
-| ≥800 行生产文件 | 29 |
+| ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
 | TODO/FIXME/HACK/XXX | 38 |
 
@@ -97,7 +97,6 @@
 | `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 3143 | 90 | 126 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 2295 | 57 | 90 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt` | 1874 | 94 | 17 |
-| `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt` | 1311 | 51 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt` | 1187 | 60 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt` | 1185 | 30 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 1166 | 14 | 44 |
@@ -109,6 +108,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/TTSProviderConfigure.kt` | 1031 | 11 | 4 |
 | `app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginUIDeclarativePage.kt` | 985 | 19 | 10 |
 | `web-ui/app/components/conversation-sidebar.tsx` | 983 | 1 | 0 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt` | 974 | 21 | 23 |
 
 ### 本地导入最多的生产文件
 
@@ -546,7 +546,7 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2068
+- 已解析本地导入边：2079
 - 可检索完整符号：5048
 
 | 文件 | 被本地文件导入 | 行数 |
