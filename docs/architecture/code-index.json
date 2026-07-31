@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T01:56:58.892146+00:00",
-  "commit": "ab246f8dfb892e477dc23a93eca34918ed9e23ad",
+  "generatedAt": "2026-07-31T03:31:35.334377+00:00",
+  "commit": "5eff3da81173ab16e091c116af16c4b15c574c03",
   "branch": "master",
-  "sourceFingerprint": "5983ec51220576af48661fce74d98071e57d123f0930d359a015279fbfc2ee7e",
+  "sourceFingerprint": "066711863d8c9327c0f24394cd49cb76f0f9242ad5ec851840a426a0534422f5",
   "summary": {
-    "files": 1190,
-    "lines": 262033,
-    "symbols": 5664,
-    "productionCodeFiles": 853,
+    "files": 1191,
+    "lines": 262157,
+    "symbols": 5669,
+    "productionCodeFiles": 854,
     "testFiles": 147,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 735,
+      "app": 736,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 803,
+      ".kt": 804,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -59,16 +59,16 @@
       "主动代理": 26,
       "关系与承诺": 18,
       "娱乐与数字生活": 28,
-      "学习监督": 38,
+      "学习监督": 39,
       "工具": 6,
       "插件": 40,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 336,
+      "界面": 337,
       "记忆": 48
     },
-    "resolvedImportEdges": 2079
+    "resolvedImportEdges": 2080
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -1383,6 +1383,7 @@
       "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCompactPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
@@ -1849,6 +1850,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCompactPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
@@ -27230,7 +27232,9 @@
         "me.rerere.rikkahub.R"
       ],
       "resolvedImports": [],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt"
+      ]
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -43908,6 +43912,56 @@
       "resolvedImports": [
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 124,
+      "sha256": "5faccd9365c621b074eb00e4c7cbd48aec1f644190ce8e1c034f86151c8c2aad",
+      "package": "me.rerere.rikkahub.ui.pages.study",
+      "categories": [
+        "学习监督",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "PomodoroInAppOverlayController",
+          "kind": "object",
+          "line": 21
+        },
+        {
+          "name": "show",
+          "kind": "function",
+          "line": 26
+        },
+        {
+          "name": "dp",
+          "kind": "function",
+          "line": 37
+        },
+        {
+          "name": "run",
+          "kind": "function",
+          "line": 104
+        },
+        {
+          "name": "hide",
+          "kind": "function",
+          "line": 118
+        }
+      ],
+      "localImportCount": 1,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.plugin.webview.PomodoroTimerService"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt"
       ],
       "importedBy": []
     },
@@ -96906,6 +96960,13 @@
         "line": 565
       }
     ],
+    "me.rerere.rikkahub.ui.pages.study.PomodoroInAppOverlayController": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
+        "kind": "object",
+        "line": 21
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroThemePickerDialog": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
@@ -97354,6 +97415,13 @@
         "line": 75
       }
     ],
+    "me.rerere.rikkahub.ui.pages.study.dp": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
+        "kind": "function",
+        "line": 37
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.study.draw": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
@@ -97441,6 +97509,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "kind": "function",
         "line": 79
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.hide": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
+        "kind": "function",
+        "line": 118
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.loadDrawVideo": [
@@ -97569,6 +97644,13 @@
         "line": 250
       }
     ],
+    "me.rerere.rikkahub.ui.pages.study.run": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
+        "kind": "function",
+        "line": 104
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.study.secondsText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
@@ -97581,6 +97663,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "kind": "function",
         "line": 62
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.show": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
+        "kind": "function",
+        "line": 26
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.signIn": [

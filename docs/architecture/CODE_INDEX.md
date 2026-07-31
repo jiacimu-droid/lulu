@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`ab246f8dfb892e477dc23a93eca34918ed9e23ad`
+- 基准提交：`5eff3da81173ab16e091c116af16c4b15c574c03`
 - 分支：`master`
-- 源码指纹：`5983ec51220576af…`
-- 已索引文件：1190
-- 已索引代码/文本行：262033
-- 已发现类、接口、对象、函数及 Composable：5664
+- 源码指纹：`066711863d8c9327…`
+- 已索引文件：1191
+- 已索引代码/文本行：262157
+- 已发现类、接口、对象、函数及 Composable：5669
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 853 |
+| 生产代码文件 | 854 |
 | 测试文件 | 147 |
 | ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 735 |
+| `app` | 736 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 803 |
+| `.kt` | 804 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -315,6 +315,7 @@
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt`
+- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCompactPanels.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt`
@@ -325,8 +326,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/study/StudyAchievementRewardsTest.kt`
-- ……另有 8 个文件，见 `code-index.json`
+- ……另有 9 个文件，见 `code-index.json`
 
 ### 工具
 
@@ -487,7 +487,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 306 个文件，见 `code-index.json`
+- ……另有 307 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -546,8 +546,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2079
-- 可检索完整符号：5050
+- 已解析本地导入边：2080
+- 可检索完整符号：5055
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
