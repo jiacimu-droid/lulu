@@ -28,6 +28,8 @@ internal data class TargetedProactiveWorkSpec(
         get() = assistantId.isNotBlank() && commitmentId.isNotBlank()
 }
 
+private const val TARGETED_FALLBACK_GRACE_MILLIS = 2L * 60L * 1000L
+
 internal fun buildTargetedProactiveWorkSpec(
     triggerAtMillis: Long,
     nowMillis: Long = System.currentTimeMillis(),
@@ -35,7 +37,10 @@ internal fun buildTargetedProactiveWorkSpec(
     commitmentId: String,
 ): TargetedProactiveWorkSpec = TargetedProactiveWorkSpec(
     uniqueWorkName = "targeted_proactive_message_work:${assistantId.trim()}:${commitmentId.trim()}",
-    delayMillis = (triggerAtMillis - nowMillis).coerceAtLeast(0L),
+    // AlarmManager is the primary delivery path. WorkManager is a delayed fallback rather than a
+    // second simultaneous trigger; after this grace period it verifies that the same projection is
+    // still pending before dispatching.
+    delayMillis = (triggerAtMillis - nowMillis).coerceAtLeast(0L) + TARGETED_FALLBACK_GRACE_MILLIS,
     assistantId = assistantId.trim(),
     commitmentId = commitmentId.trim(),
 )
@@ -100,7 +105,6 @@ class ProactiveMessageWorker(
                     workRequest
                 )
 
-            // Also save trigger time to SharedPreferences for UI display
             val triggerTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(safeDelayMinutes.toLong())
             context.getSharedPreferences("proactive_message_prefs", Context.MODE_PRIVATE)
                 .edit()
@@ -114,7 +118,6 @@ class ProactiveMessageWorker(
         fun cancel(context: Context, assistantId: String? = null) {
             val workManager = WorkManager.getInstance(context)
             if (assistantId.isNullOrBlank()) {
-                // Compatibility cleanup for schedules created by older app versions.
                 workManager.cancelUniqueWork(UNIQUE_WORK_NAME)
             } else {
                 workManager.cancelAllWorkByTag(assistantWorkTag(assistantId))
@@ -150,7 +153,7 @@ class ProactiveMessageWorker(
                 ExistingWorkPolicy.REPLACE,
                 workRequest,
             )
-            Log.d(TAG, "Scheduled targeted WorkManager fallback commitment=${spec.commitmentId}")
+            Log.d(TAG, "Scheduled delayed targeted WorkManager fallback commitment=${spec.commitmentId}")
         }
 
         fun cancelTargeted(context: Context, assistantId: String? = null, commitmentId: String? = null) {
@@ -160,15 +163,11 @@ class ProactiveMessageWorker(
             } else if (!assistantId.isNullOrBlank()) {
                 workManager.cancelAllWorkByTag(assistantWorkTag(assistantId))
             } else {
-                // Compatibility cleanup for the pre-per-role targeted fallback.
                 workManager.cancelUniqueWork(TARGETED_UNIQUE_WORK_NAME)
             }
             Log.d(TAG, "Cancelled targeted WorkManager fallback")
         }
 
-        /**
-         * Check if exact alarm permission is granted (Android 12+)
-         */
         fun canScheduleExactAlarms(context: Context): Boolean {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 return true
@@ -177,9 +176,6 @@ class ProactiveMessageWorker(
             return alarmManager.canScheduleExactAlarms()
         }
 
-        /**
-         * Check if app is ignoring battery optimizations
-         */
         fun isIgnoringBatteryOptimizations(context: Context): Boolean {
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
             return powerManager.isIgnoringBatteryOptimizations(context.packageName)
@@ -204,6 +200,32 @@ class ProactiveMessageWorker(
             ?.let { runCatching { Uuid.parse(it) }.getOrNull() }
             ?: if (isTargeted) return Result.failure() else null
         val proactiveSetting = settings.getProactiveMessageSetting(scheduledAssistantUuid)
+
+        if (isTargeted) {
+            val prefs = applicationContext.getSharedPreferences(
+                ProactiveMessageService.PREFS_NAME,
+                Context.MODE_PRIVATE,
+            )
+            val projectedAssistantId = prefs.getString(ProactiveMessageService.EXTRA_ASSISTANT_ID, null)
+            val projectedCommitmentId = prefs.getString(
+                ProactiveMessageService.KEY_TARGETED_COMMITMENT_ID,
+                null,
+            )
+            val projectedTriggerTime = prefs.getLong(
+                ProactiveMessageService.KEY_TARGETED_TRIGGER_TIME,
+                0L,
+            )
+            val sameProjectionStillPending = projectedTriggerTime > 0L &&
+                projectedAssistantId == scheduledAssistantId &&
+                projectedCommitmentId == targetedCommitmentId
+            if (!sameProjectionStillPending) {
+                Log.d(
+                    TAG,
+                    "Targeted fallback is stale or already delivered; skipping commitment=$targetedCommitmentId",
+                )
+                return Result.success()
+            }
+        }
 
         val powerManager = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wakeLock = powerManager.newWakeLock(
