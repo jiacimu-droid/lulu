@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T01:52:10.058873+00:00",
-  "commit": "d03d9687bbad896cb676e4e839b1efdb9c67b634",
+  "generatedAt": "2026-07-31T01:53:36.907446+00:00",
+  "commit": "aa656668b7e5622c3d12ae3688cedb8d4fc169a2",
   "branch": "master",
-  "sourceFingerprint": "016656a56223794ffbde34467e884686195b02b99196fac296d30b3b0d3e3817",
+  "sourceFingerprint": "ca33589db4178db5f6ccf0d70a8ba682aa999a7d92f7259189c63d933c2cbb12",
   "summary": {
-    "files": 1188,
-    "lines": 262274,
-    "symbols": 5676,
-    "productionCodeFiles": 851,
+    "files": 1189,
+    "lines": 262705,
+    "symbols": 5692,
+    "productionCodeFiles": 852,
     "testFiles": 147,
     "largeProductionFiles": 29,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 733,
+      "app": 734,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 801,
+      ".kt": 802,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -14174,6 +14174,104 @@
           "name": "CompanionRuntimeReduction",
           "kind": "class",
           "line": 21
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 431,
+      "sha256": "bac66843912621450399ecfb2caba65cf431d7ea6f9f0b49b3d9bf17a55ba730",
+      "package": "me.rerere.rikkahub.data.companion",
+      "categories": [],
+      "symbols": [
+        {
+          "name": "selectNextCompanionCommitment",
+          "kind": "function",
+          "line": 3
+        },
+        {
+          "name": "reduceCompanionRuntimeState",
+          "kind": "function",
+          "line": 35
+        },
+        {
+          "name": "reduceCompanionInteractionTimeline",
+          "kind": "function",
+          "line": 183
+        },
+        {
+          "name": "applyInteractionEvent",
+          "kind": "function",
+          "line": 197
+        },
+        {
+          "name": "updateContact",
+          "kind": "function",
+          "line": 201
+        },
+        {
+          "name": "resolveLatest",
+          "kind": "function",
+          "line": 222
+        },
+        {
+          "name": "updateLatest",
+          "kind": "function",
+          "line": 235
+        },
+        {
+          "name": "isTerminalOutboundStatus",
+          "kind": "function",
+          "line": 305
+        },
+        {
+          "name": "userReplyInteractionEvents",
+          "kind": "function",
+          "line": 320
+        },
+        {
+          "name": "hasVisibleStateContent",
+          "kind": "function",
+          "line": 355
+        },
+        {
+          "name": "hasSameVisibleContent",
+          "kind": "function",
+          "line": 365
+        },
+        {
+          "name": "belongsTo",
+          "kind": "function",
+          "line": 374
+        },
+        {
+          "name": "appendRelationshipEvents",
+          "kind": "function",
+          "line": 381
+        },
+        {
+          "name": "snapshotOrEmpty",
+          "kind": "function",
+          "line": 395
+        },
+        {
+          "name": "withUpdatedSnapshot",
+          "kind": "function",
+          "line": 398
+        },
+        {
+          "name": "unchangedReduction",
+          "kind": "function",
+          "line": 417
         }
       ],
       "localImportCount": 0,
@@ -72699,6 +72797,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 1135
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 381
       }
     ],
     "me.rerere.rikkahub.data.companion.appendTransition": [
@@ -72730,6 +72833,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 659
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 197
       }
     ],
     "me.rerere.rikkahub.data.companion.applyTurn": [
@@ -72772,6 +72880,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 1268
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 374
       }
     ],
     "me.rerere.rikkahub.data.companion.buildAutonomousReflectionLifeEvent": [
@@ -73450,6 +73563,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 827
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 365
       }
     ],
     "me.rerere.rikkahub.data.companion.hasVisibleStateContent": [
@@ -73457,6 +73575,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 817
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 355
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionStore.kt",
@@ -73568,6 +73691,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 767
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 305
       }
     ],
     "me.rerere.rikkahub.data.companion.isWakeGoal": [
@@ -73874,6 +74002,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 645
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 183
       }
     ],
     "me.rerere.rikkahub.data.companion.reduceCompanionLifeAnchor": [
@@ -73895,6 +74028,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 497
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 35
       }
     ],
     "me.rerere.rikkahub.data.companion.relationshipDeclaration": [
@@ -73944,6 +74082,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 684
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 222
       }
     ],
     "me.rerere.rikkahub.data.companion.retryMinutesOrDefault": [
@@ -73979,6 +74122,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 465
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 3
       }
     ],
     "me.rerere.rikkahub.data.companion.semanticConcernText": [
@@ -74022,6 +74170,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 1275
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 395
       }
     ],
     "me.rerere.rikkahub.data.companion.sortRank": [
@@ -74197,6 +74350,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 1297
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 417
       }
     ],
     "me.rerere.rikkahub.data.companion.update": [
@@ -74211,6 +74369,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 663
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 201
       }
     ],
     "me.rerere.rikkahub.data.companion.updateLatest": [
@@ -74218,6 +74381,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 697
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 235
       }
     ],
     "me.rerere.rikkahub.data.companion.updateSnapshot": [
@@ -74244,6 +74412,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 782
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 320
       }
     ],
     "me.rerere.rikkahub.data.companion.validate": [
@@ -74282,6 +74455,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 1278
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeStateReducer.kt",
+        "kind": "function",
+        "line": 398
       }
     ],
     "me.rerere.rikkahub.data.companion.withoutAssistant": [
