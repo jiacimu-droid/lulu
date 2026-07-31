@@ -33,22 +33,13 @@ class StudyStore(
     private val backupStateKey = stringPreferencesKey("state_backup")
 
     init {
-        // Older study composables still read ExamStudyPlan directly. Install every
-        // approved overlay before the first screen composition so visible plans,
-        // persisted tasks and AI scheduling all resolve the same milestones.
         SummerCourseDeadlinePlan.installIntoLegacyExamPlanViews()
         ThreeRoundRecitationPlan.installIntoLegacyExamPlanViews()
 
         scope.launch {
             context.studyDataStore.edit { prefs ->
                 val current = readState(prefs) ?: return@edit
-                val migrated = current.ensureToday()
-                    .migrateLegacyEntertainmentFragments()
-                    .preserveOfficialEconomy()
-                    .grantDataLossCompensation()
-                    .grantPomodoroInterruptionCompensation()
-                    .grantGachaBadLuckCompensation()
-                    .let { StudyRules.refreshShopIfNeeded(it, LocalDate.now(), Random.Default) }
+                val migrated = current.prepareForCurrentStudySystem()
                 if (migrated != current) {
                     prefs.writeState(migrated)
                 }
@@ -61,49 +52,20 @@ class StudyStore(
             readState(prefs) ?: StudyState(today = LocalDate.now().toString())
         }
         .catch { emit(StudyState(today = LocalDate.now().toString())) }
-        .map {
-            StudyRules.refreshShopIfNeeded(
-                it.ensureToday()
-                    .migrateLegacyEntertainmentFragments()
-                    .preserveOfficialEconomy()
-                    .grantDataLossCompensation()
-                    .grantPomodoroInterruptionCompensation()
-                    .grantGachaBadLuckCompensation(),
-                LocalDate.now(),
-                Random.Default,
-            )
-        }
+        .map(StudyState::prepareForCurrentStudySystem)
         .stateIn(scope, SharingStarted.Eagerly, StudyState(today = LocalDate.now().toString()))
 
     suspend fun update(transform: (StudyState) -> StudyState) {
         context.studyDataStore.edit { prefs ->
             val current = readState(prefs) ?: StudyState(today = LocalDate.now().toString())
-            val migrated = current.ensureToday()
-                .migrateLegacyEntertainmentFragments()
-                .preserveOfficialEconomy()
-                .grantDataLossCompensation()
-                .grantPomodoroInterruptionCompensation()
-                .grantGachaBadLuckCompensation()
-                .let { StudyRules.refreshShopIfNeeded(it, LocalDate.now(), Random.Default) }
-            prefs.writeState(
-                transform(migrated)
-                    .preserveOfficialEconomy()
-                    .grantDataLossCompensation()
-                    .grantPomodoroInterruptionCompensation()
-                    .grantGachaBadLuckCompensation(),
-            )
+            val migrated = current.prepareForCurrentStudySystem()
+            prefs.writeState(transform(migrated).prepareForCurrentStudySystem())
         }
     }
 
     suspend fun set(state: StudyState) {
         context.studyDataStore.edit { prefs ->
-            prefs.writeState(
-                state.migrateLegacyEntertainmentFragments()
-                    .preserveOfficialEconomy()
-                    .grantDataLossCompensation()
-                    .grantPomodoroInterruptionCompensation()
-                    .grantGachaBadLuckCompensation(),
-            )
+            prefs.writeState(state.prepareForCurrentStudySystem())
         }
     }
 
@@ -135,8 +97,38 @@ private val studyJson = Json(JsonInstant) {
     coerceInputValues = true
 }
 
+private fun StudyState.prepareForCurrentStudySystem(): StudyState =
+    ensureToday()
+        .migrateLegacyEntertainmentFragments()
+        .retireLegacyProgressionResources()
+        .preserveOfficialEconomy()
+        .grantDataLossCompensation()
+        .grantPomodoroInterruptionCompensation()
+        .grantGachaBadLuckCompensation()
+        .let { StudyRules.refreshShopIfNeeded(it, LocalDate.now(), Random.Default) }
+
 private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState =
     StudyPlanTaskSync.sync(this, date)
+
+/**
+ * Level rewards and universal fragments are retired product concepts. Their
+ * serialized fields stay readable only so older private-build saves can still
+ * be decoded; every live read and write removes their value and reward payload.
+ */
+private fun StudyState.retireLegacyProgressionResources(): StudyState {
+    val cleanedBoxes = inventory.unopenedMysteryBoxes.map { box ->
+        if (box.universalNormalFragments == 0) box else box.copy(universalNormalFragments = 0)
+    }
+    return copy(
+        claimedLevelRewards = emptySet(),
+        inventory = inventory.copy(
+            universalNormalFragments = 0,
+            universalRareFragments = 0,
+            universalEpicFragments = 0,
+            unopenedMysteryBoxes = cleanedBoxes,
+        ),
+    )
+}
 
 private fun StudyState.preserveOfficialEconomy(): StudyState {
     return if (internalTestGrantVersion >= StudyRules.OFFICIAL_ECONOMY_RESET_VERSION) {
