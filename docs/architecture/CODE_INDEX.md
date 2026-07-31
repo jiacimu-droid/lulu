@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`27ba3b20803398ebf8979ea5834c112b9eeeaf85`
+- 基准提交：`03a50bbe341231f2b9b677f6e76d8e35ebdd01d0`
 - 分支：`master`
-- 源码指纹：`ea4d0b1d16e68a0c…`
-- 已索引文件：1188
-- 已索引代码/文本行：262561
-- 已发现类、接口、对象、函数及 Composable：5674
+- 源码指纹：`0948292a855353ed…`
+- 已索引文件：1186
+- 已索引代码/文本行：262522
+- 已发现类、接口、对象、函数及 Composable：5672
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 851 |
+| 生产代码文件 | 849 |
 | 测试文件 | 147 |
 | ≥800 行生产文件 | 30 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 733 |
+| `app` | 731 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 801 |
+| `.kt` | 799 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -319,12 +319,12 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRecentEventDisplayPolicy.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudySnackbarHost.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt`
-- ……另有 10 个文件，见 `code-index.json`
+- `app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt`
+- `app/src/test/java/me/rerere/rikkahub/data/study/StudyAchievementRewardsTest.kt`
+- ……另有 8 个文件，见 `code-index.json`
 
 ### 工具
 
@@ -485,7 +485,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 308 个文件，见 `code-index.json`
+- ……另有 306 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -544,8 +544,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2070
-- 可检索完整符号：5060
+- 已解析本地导入边：2069
+- 可检索完整符号：5058
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
