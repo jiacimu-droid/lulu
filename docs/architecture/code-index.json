@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T03:34:09.196702+00:00",
-  "commit": "6e9da42a63174249447b8cc31def159066316200",
+  "generatedAt": "2026-07-31T03:34:44.439570+00:00",
+  "commit": "4a9829d55f423155200853759e4d7e9bc7bcab05",
   "branch": "master",
-  "sourceFingerprint": "1e5cd036f6c8d5eb86e912d3444e1c99b41853fd36a195d5147090bea43104a7",
+  "sourceFingerprint": "722d83a7e2ae3e9380cad40a2684143edc5178e9a0553c6e6c96d078dc7fa853",
   "summary": {
-    "files": 1191,
-    "lines": 262047,
-    "symbols": 5674,
-    "productionCodeFiles": 854,
+    "files": 1192,
+    "lines": 262062,
+    "symbols": 5675,
+    "productionCodeFiles": 855,
     "testFiles": 147,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 736,
+      "app": 737,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 804,
+      ".kt": 805,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -59,16 +59,16 @@
       "主动代理": 26,
       "关系与承诺": 18,
       "娱乐与数字生活": 28,
-      "学习监督": 39,
+      "学习监督": 40,
       "工具": 6,
       "插件": 40,
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 337,
+      "界面": 338,
       "记忆": 48
     },
-    "resolvedImportEdges": 2083
+    "resolvedImportEdges": 2084
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -972,7 +972,7 @@
         "lines": 148,
         "symbols": 10,
         "localImportCount": 5,
-        "importedByCount": 35,
+        "importedByCount": 36,
         "todoMarkers": 0
       },
       {
@@ -1385,6 +1385,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCompactPanels.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyConversationFactoryCompat.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
@@ -1852,6 +1853,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCompactPanels.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyConversationFactoryCompat.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt",
@@ -18939,6 +18941,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/history/HistoryPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/history/HistoryVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyConversationFactoryCompat.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlannerTest.kt",
@@ -44090,6 +44093,36 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyConversationFactoryCompat.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 15,
+      "sha256": "202cf6486aa0dfa6bac49316c17dcf4dde577f255ed5a55a50437d5d6936bb05",
+      "package": "me.rerere.rikkahub.ui.pages.study",
+      "categories": [
+        "学习监督",
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "ofId",
+          "kind": "function",
+          "line": 7
+        }
+      ],
+      "localImportCount": 1,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.model.Conversation"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt"
       ],
       "importedBy": []
     },
@@ -97642,6 +97675,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCompactPanels.kt",
         "kind": "function",
         "line": 438
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.study.ofId": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyConversationFactoryCompat.kt",
+        "kind": "function",
+        "line": 7
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.openFocusAgain": [

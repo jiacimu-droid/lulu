@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`6e9da42a63174249447b8cc31def159066316200`
+- 基准提交：`4a9829d55f423155200853759e4d7e9bc7bcab05`
 - 分支：`master`
-- 源码指纹：`1e5cd036f6c8d5eb…`
-- 已索引文件：1191
-- 已索引代码/文本行：262047
-- 已发现类、接口、对象、函数及 Composable：5674
+- 源码指纹：`722d83a7e2ae3e93…`
+- 已索引文件：1192
+- 已索引代码/文本行：262062
+- 已发现类、接口、对象、函数及 Composable：5675
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 854 |
+| 生产代码文件 | 855 |
 | 测试文件 | 147 |
 | ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 736 |
+| `app` | 737 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 804 |
+| `.kt` | 805 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -317,6 +317,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCompactPanels.kt`
+- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyConversationFactoryCompat.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt`
@@ -325,8 +326,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt`
-- ……另有 9 个文件，见 `code-index.json`
+- ……另有 10 个文件，见 `code-index.json`
 
 ### 工具
 
@@ -487,7 +487,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 307 个文件，见 `code-index.json`
+- ……另有 308 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -546,8 +546,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2083
-- 可检索完整符号：5060
+- 已解析本地导入边：2084
+- 可检索完整符号：5061
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
@@ -560,7 +560,7 @@
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 40 | 529 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
+| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 36 | 148 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 34 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 34 | 248 |
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 34 | 50 |
