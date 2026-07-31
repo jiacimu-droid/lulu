@@ -8,13 +8,14 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -31,18 +32,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Clapping01
 import me.rerere.hugeicons.stroke.Package
 import me.rerere.rikkahub.data.model.Assistant
+import me.rerere.rikkahub.data.study.StudyEvent
 import me.rerere.rikkahub.data.study.StudyInventory
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudySleepHabit
 import me.rerere.rikkahub.data.study.StudyState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 internal fun StudyCompactHeroPanel(
@@ -61,12 +66,7 @@ internal fun StudyCompactHeroPanel(
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .compactHeroBackground()
-                .padding(18.dp),
-        ) {
+        Box(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -82,6 +82,8 @@ internal fun StudyCompactHeroPanel(
                         "${assistant.name}陪你备考",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -98,12 +100,12 @@ internal fun StudyCompactHeroPanel(
                         value = compactStudyMetric(overview.todayMinutes, overview.todayPomodoros),
                         modifier = Modifier.weight(1f),
                     )
-                    CompactMetric(
-                        label = "本周学习",
-                        value = compactStudyMetric(overview.weekMinutes, overview.weekPomodoros),
-                        modifier = Modifier.weight(1f),
-                    )
                 }
+                CompactMetric(
+                    label = "本周学习",
+                    value = compactStudyMetric(overview.weekMinutes, overview.weekPomodoros),
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
                 FilledTonalButton(onClick = onSignIn, modifier = Modifier.fillMaxWidth()) {
                     Icon(HugeIcons.Clapping01, contentDescription = null)
@@ -119,8 +121,11 @@ internal fun StudyCompactHeroPanel(
             onDismissRequest = { showCompanionPicker = false },
             title = { Text("选择陪伴角色") },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    assistants.forEach { item ->
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(assistants, key = { it.id }) { item ->
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -145,7 +150,12 @@ internal fun StudyCompactHeroPanel(
                                     item.avatar,
                                     Modifier.size(42.dp),
                                 )
-                                Text(item.name.ifBlank { "未命名角色" }, fontWeight = FontWeight.SemiBold)
+                                Text(
+                                    item.name.ifBlank { "未命名角色" },
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
                             }
                         }
                     }
@@ -187,12 +197,18 @@ private fun CompactMetric(
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 11.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 11.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(3.dp),
         ) {
             Text(label, style = MaterialTheme.typography.labelSmall)
-            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(
+                value,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
@@ -255,6 +271,9 @@ internal fun StudyCompactCollectionPanel(
     onOpenStarWish: () -> Unit,
     onOpenImageGen: (String) -> Unit,
 ) {
+    var showAllOutfits by remember { mutableStateOf(false) }
+    val outfits = if (showAllOutfits) StudyRules.outfitNames else StudyRules.outfitNames.take(4)
+
     CompactStudyCard {
         Text("收藏背包", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
 
@@ -268,14 +287,22 @@ internal fun StudyCompactCollectionPanel(
         }
 
         CompactRewardRow("抖音时长券 · 20分钟", inventory.douyinFragments, "使用", onRedeemDouyin)
-        CompactRewardRow("剧场碎片", inventory.theaterFragments, "小剧场", onOpenStarWish, allowWhenEmpty = true)
+        CompactNavigationRow("小剧场", inventory.theaterFragments, "进入", onOpenStarWish)
         CompactRewardRow("游戏局数券 · 每张4局", inventory.gameRoundTickets, "使用", onRedeemGameRoundTicket)
         CompactRewardRow("游戏畅玩券 · 120分钟", inventory.gameFragments, "使用", onRedeemGame)
-        CompactRewardRow("视频解锁卡", inventory.videoFragments, "视频馆", onOpenStarWish, allowWhenEmpty = true)
+        CompactNavigationRow("视频馆", inventory.videoFragments, "进入", onOpenStarWish)
         CompactRewardRow("番剧兑换券 · 3小时", inventory.animeFragments, "使用", onRedeemAnime)
 
-        Text("画卷收藏", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-        StudyRules.outfitNames.forEach { outfit ->
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Text("画卷收藏", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+            if (StudyRules.outfitNames.size > 4) {
+                TextButton(onClick = { showAllOutfits = !showAllOutfits }) {
+                    Text(if (showAllOutfits) "收起" else "查看全部")
+                }
+            }
+        }
+
+        outfits.forEach { outfit ->
             val count = inventory.normalOutfitTotalCompact(outfit)
                 .coerceAtMost(StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT)
             val unlocked = outfit in inventory.unlockedOutfits
@@ -289,7 +316,7 @@ internal fun StudyCompactCollectionPanel(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(outfit, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                        Text(outfit, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text("$count/${StudyRules.NORMAL_FRAGMENTS_PER_OUTFIT}")
                     }
                     LinearProgressIndicator(
@@ -311,25 +338,83 @@ private fun CompactRewardRow(
     count: Int,
     actionLabel: String,
     onAction: () -> Unit,
-    allowWhenEmpty: Boolean = false,
+) {
+    CompactInventoryRow(title, count, actionLabel, onAction, enabled = count > 0, navigation = false)
+}
+
+@Composable
+private fun CompactNavigationRow(
+    title: String,
+    count: Int,
+    actionLabel: String,
+    onAction: () -> Unit,
+) {
+    CompactInventoryRow(title, count, actionLabel, onAction, enabled = true, navigation = true)
+}
+
+@Composable
+private fun CompactInventoryRow(
+    title: String,
+    count: Int,
+    actionLabel: String,
+    onAction: () -> Unit,
+    enabled: Boolean,
+    navigation: Boolean,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = Color.White.copy(alpha = 0.72f),
+        color = if (navigation) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.55f) else Color.White.copy(alpha = 0.72f),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Icon(HugeIcons.Package, contentDescription = null, tint = Color(0xFF8067B7))
+            Icon(HugeIcons.Package, contentDescription = null, tint = if (navigation) MaterialTheme.colorScheme.secondary else Color(0xFF8067B7))
             Column(Modifier.weight(1f)) {
                 Text(title, fontWeight = FontWeight.SemiBold)
                 Text("$count 枚", style = MaterialTheme.typography.bodySmall)
             }
-            TextButton(onClick = onAction, enabled = count > 0 || allowWhenEmpty) {
-                Text(actionLabel)
+            TextButton(onClick = onAction, enabled = enabled) { Text(actionLabel) }
+        }
+    }
+}
+
+@Composable
+internal fun StudyCompactRecentEventsCard(events: List<StudyEvent>) {
+    val formatter = remember { SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()) }
+    CompactStudyCard {
+        Text("奖励记录", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        if (events.isEmpty()) {
+            Text("暂无记录", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } else {
+            events.take(10).forEach { event ->
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 13.dp, vertical = 11.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(event.title, fontWeight = FontWeight.SemiBold)
+                            if (event.detail.isNotBlank()) {
+                                Text(event.detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                        if (event.createdAt > 0L) {
+                            Text(
+                                formatter.format(Date(event.createdAt)),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -349,11 +434,6 @@ private fun CompactStudyCard(content: @Composable ColumnScope.() -> Unit) {
         )
     }
 }
-
-private fun Modifier.compactHeroBackground(): Modifier =
-    this.then(
-        Modifier,
-    )
 
 private fun StudyInventory.normalOutfitTotalCompact(outfit: String): Int {
     val prefix = "normal:$outfit:"
