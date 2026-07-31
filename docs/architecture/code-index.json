@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T11:06:33.120467+00:00",
-  "commit": "b500d7b103391367fd63a467caab5f03d1d39487",
+  "generatedAt": "2026-07-31T13:06:55.767955+00:00",
+  "commit": "a55d5b8c20802f265565c6b4896fee6640ccae87",
   "branch": "master",
-  "sourceFingerprint": "2cd42643c841c7f4a4b956dea2a059aaab8dceb12534cde74569981299f55706",
+  "sourceFingerprint": "2db80d73658fb9787b7d7283d60156973ccccceab544ce122f396e659f437dd0",
   "summary": {
     "files": 1193,
-    "lines": 262152,
+    "lines": 262174,
     "symbols": 5677,
     "productionCodeFiles": 855,
     "testFiles": 148,
@@ -22172,8 +22172,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 250,
-      "sha256": "28764a539f16043dd5d5b26e508c9ecb36b2ad10d19f210ab0b9a3b0d5daf809",
+      "lines": 272,
+      "sha256": "518c6cd5784df1cb4324bcb32731c6816de47bec04232549cdfedc3c3c1a0f0e",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "主动代理"
@@ -22187,62 +22187,62 @@
         {
           "name": "buildTargetedProactiveWorkSpec",
           "kind": "function",
-          "line": 31
+          "line": 33
         },
         {
           "name": "ProactiveMessageWorker",
           "kind": "class",
-          "line": 47
+          "line": 52
         },
         {
           "name": "autonomousWorkName",
           "kind": "function",
-          "line": 57
+          "line": 62
         },
         {
           "name": "assistantWorkTag",
           "kind": "function",
-          "line": 60
+          "line": 65
         },
         {
           "name": "scheduleNext",
           "kind": "function",
-          "line": 63
+          "line": 68
         },
         {
           "name": "scheduleNext",
           "kind": "function",
-          "line": 75
+          "line": 80
         },
         {
           "name": "cancel",
           "kind": "function",
-          "line": 114
+          "line": 118
         },
         {
           "name": "scheduleTargeted",
           "kind": "function",
-          "line": 125
+          "line": 128
         },
         {
           "name": "cancelTargeted",
           "kind": "function",
-          "line": 156
+          "line": 159
         },
         {
           "name": "canScheduleExactAlarms",
           "kind": "function",
-          "line": 172
+          "line": 171
         },
         {
           "name": "isIgnoringBatteryOptimizations",
           "kind": "function",
-          "line": 183
+          "line": 179
         },
         {
           "name": "doWork",
           "kind": "function",
-          "line": 189
+          "line": 185
         }
       ],
       "localImportCount": 2,
@@ -78545,7 +78545,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "class",
-        "line": 47
+        "line": 52
       }
     ],
     "me.rerere.rikkahub.data.service.ProactiveMessageWorkerTest": [
@@ -78720,14 +78720,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 60
+        "line": 65
       }
     ],
     "me.rerere.rikkahub.data.service.autonomousWorkName": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 57
+        "line": 62
       }
     ],
     "me.rerere.rikkahub.data.service.beginExtractionBatch": [
@@ -78930,7 +78930,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 31
+        "line": 33
       }
     ],
     "me.rerere.rikkahub.data.service.buildUserPortrait": [
@@ -78958,7 +78958,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 172
+        "line": 171
       }
     ],
     "me.rerere.rikkahub.data.service.cancel": [
@@ -78980,7 +78980,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 114
+        "line": 118
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/SupabaseSyncService.kt",
@@ -78992,7 +78992,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 156
+        "line": 159
       }
     ],
     "me.rerere.rikkahub.data.service.candidate": [
@@ -79311,7 +79311,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 189
+        "line": 185
       }
     ],
     "me.rerere.rikkahub.data.service.dynamicRecallLimit": [
@@ -80038,7 +80038,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 183
+        "line": 179
       }
     ],
     "me.rerere.rikkahub.data.service.isNotBlankValue": [
@@ -80900,12 +80900,12 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 63
+        "line": 68
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 75
+        "line": 80
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/SupabaseSyncService.kt",
@@ -80934,7 +80934,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
-        "line": 125
+        "line": 128
       }
     ],
     "me.rerere.rikkahub.data.service.scheduleWakeContinuationAlarm": [
