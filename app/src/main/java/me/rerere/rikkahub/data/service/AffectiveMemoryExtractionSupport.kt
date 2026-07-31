@@ -23,7 +23,7 @@ internal fun String.extractJsonPayload(): String {
  */
 private fun String.firstBalancedJsonValue(): String? {
     val start = indices.firstOrNull { index -> this[index] == '{' || this[index] == '[' } ?: return null
-    val stack = ArrayDeque<Char>()
+    val stack = java.util.ArrayDeque<Char>()
     var inString = false
     var escaped = false
 
