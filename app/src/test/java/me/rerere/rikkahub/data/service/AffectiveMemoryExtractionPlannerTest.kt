@@ -162,7 +162,7 @@ class AffectiveMemoryExtractionPlannerTest {
     }
 
     @Test
-    fun `recent planner selects newest complete aligned forty message batch`() {
+    fun `recent mode still repairs the oldest missing aligned forty message batch`() {
         val conversation = nodes(335)
 
         val plan = buildAffectiveMemoryExtractionPlan(
@@ -173,11 +173,28 @@ class AffectiveMemoryExtractionPlannerTest {
         )
 
         requireNotNull(plan)
-        assertEquals("recent_interval", plan.reason)
+        assertEquals("interval", plan.reason)
         assertEquals(40, plan.turns.size)
-        assertEquals(idOf(281), plan.turns.first().nodeId)
-        assertEquals(idOf(320), plan.turns.last().nodeId)
-        assertFalse(plan.turns.any { it.nodeId == idOf(321) })
+        assertEquals(idOf(1), plan.turns.first().nodeId)
+        assertEquals(idOf(40), plan.turns.last().nodeId)
+        assertFalse(plan.turns.any { it.nodeId == idOf(41) })
+    }
+
+    @Test
+    fun `recent mode moves to second batch only after first batch is processed`() {
+        val conversation = nodes(335)
+        val processed = (1..40).map { idOf(it) }.toSet()
+
+        val plan = buildAffectiveMemoryExtractionPlan(
+            messageNodes = conversation,
+            processedSourceNodeIds = processed,
+            extractionInterval = 40,
+            direction = MemoryExtractionDirection.RECENT_FIRST,
+        )
+
+        requireNotNull(plan)
+        assertEquals(idOf(41), plan.turns.first().nodeId)
+        assertEquals(idOf(80), plan.turns.last().nodeId)
     }
 
     @Test
