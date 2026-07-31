@@ -53,8 +53,9 @@ class ProactiveMessageWorkerTest {
             nextAlwaysOnAnchorReviewAt(after, zone),
         )
     }
+
     @Test
-    fun `targeted work keeps commitment identity and exact remaining delay`() {
+    fun `targeted work keeps identity and waits before fallback delivery`() {
         val spec = buildTargetedProactiveWorkSpec(
             triggerAtMillis = 130_000L,
             nowMillis = 10_000L,
@@ -62,15 +63,18 @@ class ProactiveMessageWorkerTest {
             commitmentId = "commitment-1",
         )
 
-        assertEquals("targeted_proactive_message_work", spec.uniqueWorkName)
-        assertEquals(120_000L, spec.delayMillis)
+        assertEquals(
+            "targeted_proactive_message_work:assistant-1:commitment-1",
+            spec.uniqueWorkName,
+        )
+        assertEquals(240_000L, spec.delayMillis)
         assertEquals("assistant-1", spec.assistantId)
         assertEquals("commitment-1", spec.commitmentId)
         assertTrue(spec.isTargeted)
     }
 
     @Test
-    fun `targeted work never produces a negative delay`() {
+    fun `overdue targeted work still waits for fallback grace`() {
         val spec = buildTargetedProactiveWorkSpec(
             triggerAtMillis = 9_000L,
             nowMillis = 10_000L,
@@ -78,7 +82,7 @@ class ProactiveMessageWorkerTest {
             commitmentId = "commitment-1",
         )
 
-        assertEquals(0L, spec.delayMillis)
+        assertEquals(120_000L, spec.delayMillis)
     }
 
     @Test
