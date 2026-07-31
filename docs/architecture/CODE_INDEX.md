@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`aa656668b7e5622c3d12ae3688cedb8d4fc169a2`
+- 基准提交：`941ff9cceec2e77ff2f98e6767e934487a7f1366`
 - 分支：`master`
-- 源码指纹：`ca33589db4178db5…`
-- 已索引文件：1189
-- 已索引代码/文本行：262705
-- 已发现类、接口、对象、函数及 Composable：5692
+- 源码指纹：`d767a6fecf3e5acc…`
+- 已索引文件：1190
+- 已索引代码/文本行：263136
+- 已发现类、接口、对象、函数及 Composable：5698
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 852 |
+| 生产代码文件 | 853 |
 | 测试文件 | 147 |
 | ≥800 行生产文件 | 29 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 734 |
+| `app` | 735 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 802 |
+| `.kt` | 803 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -216,6 +216,7 @@
 ### 主动代理
 
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentReducer.kt`
+- `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentRuntime.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/NotificationListenerService.kt`
@@ -244,6 +245,7 @@
 ### 关系与承诺
 
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentReducer.kt`
+- `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentRuntime.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRelationshipBehavior.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRelationshipInitialization.kt`
@@ -545,7 +547,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：2068
-- 可检索完整符号：5047
+- 可检索完整符号：5048
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
