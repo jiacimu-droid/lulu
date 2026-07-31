@@ -16,17 +16,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,27 +49,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Add01
 import me.rerere.hugeicons.stroke.AiMagic
 import me.rerere.hugeicons.stroke.ArrowRight01
 import me.rerere.hugeicons.stroke.BookOpen02
-import me.rerere.hugeicons.stroke.Chart
-import me.rerere.hugeicons.stroke.Clapping01
 import me.rerere.hugeicons.stroke.Clock02
 import me.rerere.hugeicons.stroke.Delete01
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.study.DailyStudyPlan
-import me.rerere.rikkahub.data.study.ExamStudyPlan
-import me.rerere.rikkahub.data.study.StudyEvent
 import me.rerere.rikkahub.data.study.StudyPlanCatalog
-import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.data.study.StudyScheduleBlock
-import me.rerere.rikkahub.data.study.StudySleepHabit
 import me.rerere.rikkahub.data.study.StudyState
-import me.rerere.rikkahub.data.study.StudyTip
 import me.rerere.rikkahub.data.study.StudyTask
 import me.rerere.rikkahub.data.study.StudyTaskSource
 import java.time.LocalDate
@@ -89,176 +76,6 @@ private enum class StudyMainDashboardView(val label: String) {
     Plan("今日计划"),
     Tomorrow("明日待办"),
     Tips("Tips"),
-}
-
-@Composable
-internal fun StudyHeroPanel(
-    state: StudyState,
-    assistant: Assistant,
-    assistants: List<Assistant>,
-    onSignIn: () -> Unit,
-    onOpenLevel: () -> Unit,
-    onSelectCompanion: (Assistant) -> Unit,
-) {
-    val daysLeft = ExamStudyPlan.daysLeft()
-    val currentMilestone = ExamStudyPlan.currentMilestone()
-    val studyTimeOverview = StudyRules.studyTimeOverview(state)
-    val professionalTargetScore =
-        ExamStudyPlan.professionalFoundationTargetScore + ExamStudyPlan.professionalComprehensiveTargetScore
-    var showCompanionPicker by remember { mutableStateOf(false) }
-
-    ElevatedCard(
-        colors = CardDefaults.elevatedCardColors(containerColor = StudyMainColors.hero),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(studyHeroBrush())
-                .padding(18.dp),
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    me.rerere.rikkahub.ui.components.ui.UIAvatar(
-                        assistant.name,
-                        assistant.avatar,
-                        Modifier.size(58.dp),
-                        onClick = { showCompanionPicker = true },
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            "${assistant.name}陪你备考",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            "点头像可以换陪你学习的角色。今天的待办和番茄钟会同步给 TA。",
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                    StudyHeroMetric("规划倒计时", "${daysLeft}天", Modifier.weight(1f))
-                    StudyHeroMetric("夸夸值", state.wallet.kudos.toString(), Modifier.weight(1f))
-                    StudyHeroMetric(
-                        "Lv",
-                        StudyRules.currentLevel(state).level.toString(),
-                        Modifier.weight(1f),
-                        onOpenLevel,
-                    )
-                }
-                Text(
-                    text = ExamStudyPlan.examDateNotice,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                    StudyHeroMetric("川大目标", "${ExamStudyPlan.scuSafeTargetScore}分", Modifier.weight(1f))
-                    StudyHeroMetric("专业课目标", "$professionalTargetScore/300", Modifier.weight(1f))
-                }
-                Text(
-                    text = currentMilestone,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                    StudyHeroMetric(
-                        "今日学习",
-                        studyTimeMetric(studyTimeOverview.todayMinutes, studyTimeOverview.todayPomodoros),
-                        Modifier.weight(1f),
-                    )
-                    StudyHeroMetric(
-                        "本周学习",
-                        studyTimeMetric(studyTimeOverview.weekMinutes, studyTimeOverview.weekPomodoros),
-                        Modifier.weight(1f),
-                    )
-                }
-                FilledTonalButton(onClick = onSignIn, modifier = Modifier.fillMaxWidth()) {
-                    Icon(HugeIcons.Clapping01, null)
-                    Spacer(Modifier.width(6.dp))
-                    Text("签到")
-                }
-            }
-        }
-    }
-
-    if (showCompanionPicker) {
-        AlertDialog(
-            onDismissRequest = { showCompanionPicker = false },
-            title = { Text("选择今天陪你学习的角色") },
-            text = {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.height(360.dp),
-                ) {
-                    items(assistants) { item ->
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onSelectCompanion(item)
-                                    showCompanionPicker = false
-                                },
-                            color = if (item.id == assistant.id) {
-                                Color.White.copy(alpha = 0.92f)
-                            } else {
-                                Color.White.copy(alpha = 0.62f)
-                            },
-                            shape = RoundedCornerShape(14.dp),
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            ) {
-                                me.rerere.rikkahub.ui.components.ui.UIAvatar(
-                                    item.name,
-                                    item.avatar,
-                                    Modifier.size(42.dp),
-                                )
-                                Column(Modifier.weight(1f)) {
-                                    Text(item.name.ifBlank { "未命名角色" }, fontWeight = FontWeight.SemiBold)
-                                    Text(
-                                        if (item.id == assistant.id) "正在陪你学习" else "切换为今日陪伴",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showCompanionPicker = false }) {
-                    Text("收起")
-                }
-            },
-        )
-    }
-}
-
-@Composable
-private fun StudyHeroMetric(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-) {
-    Surface(
-        modifier = modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
-        color = Color.White.copy(alpha = 0.42f),
-        shape = MaterialTheme.shapes.medium,
-    ) {
-        Column(Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(label, style = MaterialTheme.typography.labelMedium)
-            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        }
-    }
 }
 
 @Composable
@@ -318,7 +135,7 @@ internal fun StudyTodayPomodoroLaunchCard(onClick: () -> Unit) {
             Column(Modifier.weight(1f)) {
                 Text("开始番茄钟", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(
-                    "从今天的任务顺手开始一轮专注",
+                    "选择任务后开始一轮专注",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -337,11 +154,12 @@ internal fun StudyTodayProgressCard(
     val done = state.tasks.count { it.done }
     val progress = if (total == 0) 0f else done.toFloat() / total
     val progressPercent = (progress * 100).toInt().coerceIn(0, 100)
+
     StudyMainCard {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.weight(1f)) {
                 Text("今日进度", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text("计划下面单独看进度：$done/$total", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("$done/$total", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Surface(color = StudyMainColors.hero.copy(alpha = 0.78f), shape = CircleShape) {
                 Text(
@@ -352,14 +170,12 @@ internal fun StudyTodayProgressCard(
                 )
             }
         }
+        LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
         if (state.superMomentAvailable) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onClaimNormal, modifier = Modifier.fillMaxWidth()) {
-                    Text("领取十连券 x1")
-                }
+            Button(onClick = onClaimNormal, modifier = Modifier.fillMaxWidth()) {
+                Text("领取十连券 ×1")
             }
         }
-        LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -382,12 +198,6 @@ internal fun StudyDailyDashboard(
     val schedule = generatedSchedule ?: todayPlan?.tasks.orEmpty().map { task ->
         StudyScheduleBlock("自定", task.kind.label, task.title)
     }
-    val tips = listOf(
-        StudyTip("你决定今天怎么排", "休息日、任务顺序和各块时长都由你自己决定；周任务池才是硬目标。"),
-        StudyTip("先选一个专业课主线", "从看课、章节闭环、背诵输出或错题回炉中选一个最重要的入口。"),
-        StudyTip("英语不能只剩单词", "完成单词滚动后，再从本周阅读、完形、新题型、翻译或作文任务中选一个主训练。"),
-        StudyTip("未完成回到周任务池", "今天没做完不整套顺延、不熬夜补；记录有效分钟和卡点后重新分配。"),
-    )
     var dashboardView by remember { mutableStateOf(StudyMainDashboardView.Tasks) }
 
     StudyMainCard {
@@ -403,6 +213,7 @@ internal fun StudyDailyDashboard(
                 )
             }
         }
+
         when (dashboardView) {
             StudyMainDashboardView.Tasks -> StudyTaskContent(
                 tasks = tasks,
@@ -421,7 +232,7 @@ internal fun StudyDailyDashboard(
                 onGenerateSchedule = onGenerateSchedule,
             )
             StudyMainDashboardView.Tomorrow -> StudyTomorrowPlanContent(tomorrowPlan)
-            StudyMainDashboardView.Tips -> StudyTipsContent(tips)
+            StudyMainDashboardView.Tips -> StudyTipsContent()
         }
     }
 }
@@ -437,11 +248,7 @@ private fun StudyTaskContent(
     onDelete: (String) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Column(Modifier.weight(1f)) {
-                Text("待办", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            }
-        }
+        Text("待办", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             androidx.compose.material3.OutlinedTextField(
                 value = newTask,
@@ -450,13 +257,11 @@ private fun StudyTaskContent(
                 modifier = Modifier.weight(1f),
                 singleLine = true,
             )
-            IconButton(onClick = onAdd) {
-                Icon(HugeIcons.Add01, "添加")
-            }
+            IconButton(onClick = onAdd) { Icon(HugeIcons.Add01, "添加") }
         }
         if (tasks.isEmpty()) {
             Text(
-                "先写下今天最重要的 3-5 件事。${assistantName}会按人设和约定陪你保持节奏。",
+                "写下今天最重要的事情，${assistantName}会看到你的任务和完成情况。",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -472,9 +277,7 @@ private fun StudyTaskContent(
                         textDecoration = if (task.done) TextDecoration.LineThrough else null,
                     )
                 }
-                IconButton(onClick = { onDelete(task.id) }) {
-                    Icon(HugeIcons.Delete01, "删除")
-                }
+                IconButton(onClick = { onDelete(task.id) }) { Icon(HugeIcons.Delete01, "删除") }
             }
         }
     }
@@ -489,16 +292,12 @@ private fun StudyTodayPlanContent(
     onGenerateSchedule: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Icon(HugeIcons.Clock02, null, tint = StudyMainColors.blue)
             Column(Modifier.weight(1f)) {
                 Text("今日计划", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(
-                    if (generatedByAi) "已按你今天选的待办生成短计划" else todayPlan?.title ?: "今天由你从周任务池自行安排",
+                    if (generatedByAi) "已生成短计划" else todayPlan?.title ?: "今天由你自行安排",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -509,24 +308,17 @@ private fun StudyTodayPlanContent(
                     Icon(HugeIcons.AiMagic, null, modifier = Modifier.size(18.dp))
                 }
                 Spacer(Modifier.width(6.dp))
-                Text(if (isGeneratingSchedule) "生成中" else "生成短计划")
+                Text(if (isGeneratingSchedule) "生成中" else "生成")
             }
         }
         schedule.forEach { block ->
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    block.time,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = StudyMainColors.blue,
-                    modifier = Modifier.width(82.dp),
-                )
+                Text(block.time, style = MaterialTheme.typography.labelMedium, color = StudyMainColors.blue, modifier = Modifier.width(72.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(block.title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text(
-                        block.detail,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Text(block.title, fontWeight = FontWeight.SemiBold)
+                    if (block.detail.isNotBlank()) {
+                        Text(block.detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
         }
@@ -538,55 +330,25 @@ private fun StudyTomorrowPlanContent(tomorrowPlan: DailyStudyPlan?) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Icon(HugeIcons.BookOpen02, null, tint = StudyMainColors.purple)
-            Column(Modifier.weight(1f)) {
-                Text("明日待办", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text(
-                    tomorrowPlan?.title ?: "明天先保留弹性，不提前制造压力",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            Text("明日待办", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         }
         if (tomorrowPlan == null) {
-            Text("还没有明天的预制计划。今晚收尾时只写明天第一步。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("暂无预制计划", color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
-            tomorrowPlan.tasks.forEachIndexed { index, task ->
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                    Surface(shape = CircleShape, color = StudyMainColors.softBlue, modifier = Modifier.size(26.dp)) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text("${index + 1}", style = MaterialTheme.typography.labelSmall, color = StudyMainColors.blue)
-                        }
-                    }
-                    Column(Modifier.weight(1f)) {
-                        Text(task.kind.label, style = MaterialTheme.typography.labelSmall, color = StudyMainColors.purple)
-                        Text(task.title, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
+            tomorrowPlan.tasks.forEach { task ->
+                Text("· ${task.title}", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Text(
-                "明日待办只是短提醒；具体任务和休息安排明天由你从周任务池选择。",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
 
 @Composable
-private fun StudyTipsContent(tips: List<StudyTip>) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Icon(HugeIcons.AiMagic, null, tint = StudyMainColors.gold)
-            Column(Modifier.weight(1f)) {
-                Text("tips", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text("按周任务池给你提效，不替你决定日程。", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
-        tips.forEach { tip ->
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(tip.title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                Text(tip.detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
+private fun StudyTipsContent() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Tips", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text("先做最重要的一项，再决定下一步。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("没做完的任务回到任务池，不用熬夜补。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("英语训练不要只剩单词，记得安排真题。", color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -611,77 +373,20 @@ internal fun StudyPlanOverviewPanel() {
             StudyMainPlanView.Weekly -> {
                 week?.let {
                     Text(it.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    Text(it.dateRange, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    it.tasks.forEach { task ->
-                        Text("· $task", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+                    it.tasks.forEach { task -> Text("· $task", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 } ?: Text("本周计划待更新", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             StudyMainPlanView.Monthly -> {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("7-12月滚动计划", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    StudyPlanCatalog.monthlyPlans.forEach { month ->
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text("${month.month} · ${month.focus}", fontWeight = FontWeight.SemiBold)
-                            month.tasks.forEach { task ->
-                                Text("· $task", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
+                Text("7-12月滚动计划", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                StudyPlanCatalog.monthlyPlans.forEach { month ->
+                    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text("${month.month} · ${month.focus}", fontWeight = FontWeight.SemiBold)
+                        month.tasks.forEach { task -> Text("· $task", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-internal fun StudyLevelDialog(
-    state: StudyState,
-    onClaimLevel: (Int) -> Unit,
-    onDismissRequest: () -> Unit,
-) {
-    val level = StudyRules.currentLevel(state)
-    val next = StudyRules.levels.firstOrNull { it.level == level.level + 1 }
-    val claimable = StudyRules.claimableLevels(state)
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = { TextButton(onClick = onDismissRequest) { Text("收起") } },
-        title = { Text("等级进度") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Icon(HugeIcons.Chart, null, tint = StudyMainColors.gold)
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            "Lv${level.level} ${level.title}",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text("累计夸夸值 ${state.wallet.totalKudosEarned}")
-                    }
-                }
-                next?.let {
-                    val span = (it.threshold - level.threshold).coerceAtLeast(1)
-                    val current = (state.wallet.totalKudosEarned - level.threshold).coerceIn(0, span)
-                    LinearProgressIndicator(progress = { current.toFloat() / span }, modifier = Modifier.fillMaxWidth())
-                    Text("距离 Lv${it.level} 还差 ${(it.threshold - state.wallet.totalKudosEarned).coerceAtLeast(0)} 累计夸夸值")
-                } ?: Text("你已经抵达星穹彼岸")
-
-                Text("可领取奖励", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                if (claimable.isEmpty()) {
-                    Text("暂时没有新的等级奖励。继续完成待办和番茄钟吧。", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                claimable.take(5).forEach {
-                    AssistChip(onClick = { onClaimLevel(it.level) }, label = { Text("领取 Lv${it.level}：${it.reward.title}") })
-                }
-
-                Text("等级奖励表", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                StudyRules.levels.forEach {
-                    Text("Lv${it.level} ${it.title} · ${it.threshold} · ${it.reward.title}", style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        },
-    )
 }
 
 @Composable
@@ -693,10 +398,7 @@ internal fun StudySuperMomentCelebration(
     val pulse by rememberInfiniteTransition(label = "super-moment").animateFloat(
         initialValue = 0.88f,
         targetValue = 1.18f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 900),
-            repeatMode = RepeatMode.Reverse,
-        ),
+        animationSpec = infiniteRepeatable(animation = tween(900), repeatMode = RepeatMode.Reverse),
         label = "super-moment-pulse",
     )
     Box(
@@ -720,116 +422,19 @@ internal fun StudySuperMomentCelebration(
                     ) {}
                 }
             }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(18.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(18.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("超神时刻", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold, color = Color.White)
                 Text("今日全清", style = MaterialTheme.typography.headlineMedium, color = Color.White.copy(alpha = 0.92f))
                 Text(
-                    "${assistant.name}看见你把今天全部拿下了。奖励固定发放十连券 x1。",
+                    "${assistant.name}看见你完成了今天的全部任务。",
                     color = Color.White.copy(alpha = 0.92f),
                     style = MaterialTheme.typography.bodyLarge,
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    repeat(12) {
-                        Surface(
-                            shape = CircleShape,
-                            color = listOf(Color.White, StudyMainColors.gold, StudyMainColors.purple)[it % 3]
-                                .copy(alpha = 0.78f),
-                            modifier = Modifier.size(((10 + it % 4 * 5) * pulse).dp),
-                        ) {}
-                    }
-                }
             }
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = onClaimNormal, modifier = Modifier.fillMaxWidth()) {
-                    Text("领取十连券 x1")
-                }
-                TextButton(onClick = onDismissRequest, modifier = Modifier.fillMaxWidth()) {
-                    Text("先等等", color = Color.White)
-                }
+                Button(onClick = onClaimNormal, modifier = Modifier.fillMaxWidth()) { Text("领取十连券 ×1") }
+                TextButton(onClick = onDismissRequest, modifier = Modifier.fillMaxWidth()) { Text("先等等", color = Color.White) }
             }
-        }
-    }
-}
-
-@Composable
-internal fun StudySleepHabitRewardCard(
-    state: StudyState,
-    assistantName: String,
-) {
-    val today = LocalDate.now()
-    val earlySleepClaimed = StudyRules.hasClaimedSleepHabitReward(
-        state = state,
-        habit = StudySleepHabit.EarlySleep,
-        date = today,
-    )
-    val earlyRiseClaimed = StudyRules.hasClaimedSleepHabitReward(
-        state = state,
-        habit = StudySleepHabit.EarlyRise,
-        date = today,
-    )
-    StudyMainCard {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("作息任务", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text(
-                "个人标准：约01:30前睡、09:30前起。告诉 $assistantName 具体时间，由 TA 结合对话判断。每天每项一次。",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-        StudySleepHabitRewardRow(
-            title = "昨晚早睡",
-            reward = "+${StudyRules.EARLY_SLEEP_KUDOS} 夸夸值",
-            claimed = earlySleepClaimed,
-        )
-        StudySleepHabitRewardRow(
-            title = "今天早起",
-            reward = "十连抽券 ×${StudyRules.EARLY_RISE_TEN_DRAW_TICKETS}",
-            claimed = earlyRiseClaimed,
-        )
-    }
-}
-
-@Composable
-private fun StudySleepHabitRewardRow(
-    title: String,
-    reward: String,
-    claimed: Boolean,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = if (claimed) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                Text(reward, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Text(
-                if (claimed) "今天已领取" else "等你告诉 TA",
-                style = MaterialTheme.typography.labelLarge,
-                color = if (claimed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-internal fun StudyRecentEventsCard(events: List<StudyEvent>) {
-    StudyMainCard {
-        Text("奖励记录", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-        if (events.isEmpty()) {
-            Text("完成一个待办或番茄钟后，这里会亮起来。")
-        }
-        events.take(6).forEach { event ->
-            Text("· ${event.title} ${event.detail}", maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -846,19 +451,11 @@ private fun StudyMainCard(content: @Composable ColumnScope.() -> Unit) {
 
 private object StudyMainColors {
     val hero = Color(0xFFFFE6B8)
-    val softBlue = Color(0xFFDCECF4)
     val blue = Color(0xFF3D7EA6)
     val purple = Color(0xFF8067B7)
     val gold = Color(0xFF9B6B10)
 }
 
-private fun studyHeroBrush(): Brush = Brush.linearGradient(
-    listOf(Color(0xFFFFE5AE), Color(0xFFE2F0F7), Color(0xFFFFF8D8)),
-)
-
 private fun studySuperMomentBrush(): Brush = Brush.linearGradient(
     listOf(Color(0xFFFFC857), Color(0xFFFF7AA2), Color(0xFF7C6BFF)),
 )
-
-private fun studyTimeMetric(minutes: Int, pomodoros: Int): String =
-    "${minutes}分 · ${pomodoros}个"
