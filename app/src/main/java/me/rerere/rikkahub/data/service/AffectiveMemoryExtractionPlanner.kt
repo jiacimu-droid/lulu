@@ -65,9 +65,9 @@ fun buildAffectiveMemoryExtractionPlan(
     val stableTurns = logicalTurns.dropLast(protectedRecentCount.coerceAtLeast(0))
     if (stableTurns.size < extractionInterval) return null
 
-    // Build fixed, non-overlapping windows from the beginning of the stable region. The planner is
-    // deliberately level-triggered: if an automatic run missed the exact 20/40/60 boundary, the
-    // next completed reply can still recover that aligned batch without creating a sliding window.
+    // Only fixed, non-overlapping windows are valid: 1..N, N+1..2N, and so on.
+    // Never slide a window forward with every new message. Sliding windows produced legacy ranges
+    // such as 51..90, 53..92 and caused the same conversation area to be retried repeatedly.
     val pendingWindows = stableTurns
         .chunked(extractionInterval)
         .asSequence()
@@ -76,16 +76,17 @@ fun buildAffectiveMemoryExtractionPlan(
         .toList()
     if (pendingWindows.isEmpty()) return null
 
-    // A partially checkpointed legacy window is rebuilt as one complete aligned batch. Saved
-    // memories retain source-node IDs, so storage-level identity checks prevent duplicate rows.
-    val selectedTurns = when (direction) {
-        MemoryExtractionDirection.OLDEST_FIRST -> pendingWindows.first()
-        MemoryExtractionDirection.RECENT_FIRST -> pendingWindows.last()
-    }
+    // A gap must always be repaired from the oldest complete aligned batch. RECENT_FIRST remains in
+    // the public call shape for compatibility, but it must not skip 1..40 in order to process a
+    // newer batch. This also makes manual retry deterministic instead of retrying an unrelated
+    // recent range.
+    @Suppress("UNUSED_VARIABLE")
+    val compatibilityDirection = direction
+    val selectedTurns = pendingWindows.first()
 
     return AffectiveMemoryExtractionPlan(
         turns = selectedTurns,
-        reason = if (direction == MemoryExtractionDirection.RECENT_FIRST) "recent_interval" else "interval",
+        reason = "oldest_pending_interval",
     )
 }
 
