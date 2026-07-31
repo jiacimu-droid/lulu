@@ -86,7 +86,7 @@ fun buildAffectiveMemoryExtractionPlan(
 
     return AffectiveMemoryExtractionPlan(
         turns = selectedTurns,
-        reason = "oldest_pending_interval",
+        reason = "interval",
     )
 }
 
