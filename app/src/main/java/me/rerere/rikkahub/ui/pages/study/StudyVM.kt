@@ -167,10 +167,7 @@ class StudyVM(
         if (result.reward.title.isNotBlank()) {
             _effects.tryEmit(
                 StudyEffect.MysteryBox(
-                    StudyMysteryBoxReward(
-                        kudos = result.reward.kudos,
-                        universalNormalFragments = result.reward.universalNormalFragments,
-                    ),
+                    StudyMysteryBoxReward(kudos = result.reward.kudos),
                 ),
             )
         }
@@ -195,8 +192,6 @@ class StudyVM(
                     message = "夸夸值或抽卡券不够"
                     return@update current
                 }
-                // Keep only the real consecutive-30-pull purple pity. The older
-                // two-hour/30-pull safety-ticket giveaway is intentionally removed.
                 val legacyStateWithoutSafety = legacyResult.state
                     .suppressNewLegacyPurpleSafety(previousState = current)
                 val balanced = StudyGachaRewardPolicy.rebalance(
@@ -252,12 +247,6 @@ class StudyVM(
         result.state
     }
 
-    fun claimLevel(level: Int) = reduce {
-        val result = StudyRules.claimLevelReward(it, level)
-        emitReward(result.reward.title)
-        result.state
-    }
-
     fun refreshShop() = reduce { StudyRules.manualRefreshShop(it, LocalDate.now(), Random.Default) }
 
     fun buyShopItem(item: StudyShopItem) = reduce {
@@ -294,24 +283,6 @@ class StudyVM(
         }
     }
 
-    fun applyUniversalNormal(key: String) = reduce {
-        val result = StudyRules.useUniversalNormalFragment(it, key)
-        emitReward(result.reward.title)
-        result.state
-    }
-
-    fun applyBestUniversalNormal() = reduce {
-        val key = StudyRules.bestNormalFragmentTarget(it)
-        val result = key?.let { target -> StudyRules.useUniversalNormalFragment(it, target) }
-        if (result == null) {
-            _effects.tryEmit(StudyEffect.Message("普通套装已经全部补满"))
-            it
-        } else {
-            emitReward(result.reward.title)
-            result.state
-        }
-    }
-
     fun applyPenalty() = reduce {
         val result = StudyRules.applyInactivityPenalty(it)
         emitReward(result.reward.title)
@@ -331,10 +302,6 @@ class StudyVM(
     }
 }
 
-/**
- * Rebalances the regular-pool rarity roll while preserving the old consecutive
- * 30-pull purple pity tracked by StudyRules and drawsSinceNonNormal.
- */
 private class MoonlightGachaRandom(
     private val delegate: Random,
     initialDrawsSinceNonNormal: Int,
@@ -354,8 +321,6 @@ private class MoonlightGachaRandom(
             return delegate.nextDouble()
         }
 
-        // StudyRules calls drawRare directly on the guaranteed 30th pull, so this
-        // value is then used only for the purple subtype selection.
         if (drawsSinceNonNormal >= StudyRules.NON_NORMAL_PITY_DRAW_COUNT - 1) {
             drawsSinceNonNormal = 0
             return delegate.nextDouble()
@@ -396,14 +361,9 @@ private class MoonlightGachaRandom(
     }
 
     private companion object {
-        // Requested regular-pool rates:
-        // blue 93.8%, purple 4.5%, gold 1.5%, rainbow 0.2%.
         const val MOONLIGHT_NORMAL_END = 0.938
         const val MOONLIGHT_RARE_END = 0.983
         const val MOONLIGHT_EPIC_END = 0.998
-
-        // Legacy StudyRules thresholds. Mapping into these intervals keeps payment,
-        // inventory persistence and the reveal animation in one existing path.
         const val LEGACY_NORMAL_END = 0.9215
         const val LEGACY_RARE_END = 0.9815
         const val LEGACY_EPIC_END = 0.9965
@@ -447,8 +407,6 @@ private fun StudyState.correctMoonlightSpecialTracking(
         } else {
             wallet
         },
-        // Keep the old serialized field name for compatibility, but from this point
-        // it records all purple/gold/rainbow results, not purple alone.
         dailyPurpleDrawCount = dailyPurpleDrawCount + goldOrRainbowCount,
         purpleSafetyGrantedDate = if (safetyWasIncorrectlyGranted) {
             previousState.purpleSafetyGrantedDate
