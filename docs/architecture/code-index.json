@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T01:46:02.557193+00:00",
-  "commit": "03a50bbe341231f2b9b677f6e76d8e35ebdd01d0",
+  "generatedAt": "2026-07-31T01:46:17.393822+00:00",
+  "commit": "9a5d52024f3b258fb44e19283850234d08bb1f40",
   "branch": "master",
-  "sourceFingerprint": "0948292a855353ed7e421b9c0680ec85c71c8a4c7b43bb758a10120c0f0f22b2",
+  "sourceFingerprint": "6d6d41e2c16d68d5e018cd249c382878258ae1d64976ae16baebf72189c0a1a5",
   "summary": {
     "files": 1186,
-    "lines": 262522,
+    "lines": 262478,
     "symbols": 5672,
     "productionCodeFiles": 849,
     "testFiles": 147,
@@ -44457,8 +44457,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 211,
-      "sha256": "9d0b23aee643ac1c5edcfb5883c46fe2e3a2ef58b38b4fefdabf2a71236e9015",
+      "lines": 167,
+      "sha256": "e264deef7f4ade9cfd88cd27af588b06dea411ee58c52fd14b5104b2c1268c17",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -44483,17 +44483,17 @@
         {
           "name": "StudyRewardGuidePanel",
           "kind": "composable",
-          "line": 116
+          "line": 115
         },
         {
           "name": "StudyGuideBlock",
           "kind": "composable",
-          "line": 187
+          "line": 145
         },
         {
           "name": "StudyRewardPanelCard",
           "kind": "composable",
-          "line": 197
+          "line": 153
         }
       ],
       "localImportCount": 7,
@@ -96969,7 +96969,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
         "kind": "composable",
-        "line": 187
+        "line": 145
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyHeroMetric": [
@@ -97088,14 +97088,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
         "kind": "composable",
-        "line": 116
+        "line": 115
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyRewardPanelCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt",
         "kind": "composable",
-        "line": 197
+        "line": 153
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudySection": [
