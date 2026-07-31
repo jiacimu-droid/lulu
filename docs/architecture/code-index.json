@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T01:49:42.300405+00:00",
-  "commit": "a6e93ea1b6f5d31801c8e2479800c820c16d13d4",
+  "generatedAt": "2026-07-31T01:52:10.058873+00:00",
+  "commit": "d03d9687bbad896cb676e4e839b1efdb9c67b634",
   "branch": "master",
-  "sourceFingerprint": "46c221ea4f4b72b78dc9c11e8e14f19ed45061daa7129c3eae08c37999afa150",
+  "sourceFingerprint": "016656a56223794ffbde34467e884686195b02b99196fac296d30b3b0d3e3817",
   "summary": {
-    "files": 1186,
-    "lines": 262033,
-    "symbols": 5661,
-    "productionCodeFiles": 849,
+    "files": 1188,
+    "lines": 262274,
+    "symbols": 5676,
+    "productionCodeFiles": 851,
     "testFiles": 147,
     "largeProductionFiles": 29,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 731,
+      "app": 733,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 799,
+      ".kt": 801,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -13130,6 +13130,89 @@
       ]
     },
     {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 216,
+      "sha256": "d49c887a0fae80ffc13a329963341cb5dfe9b97f5ac8da6691f5529d0f378e0f",
+      "package": "me.rerere.rikkahub.data.companion",
+      "categories": [],
+      "symbols": [
+        {
+          "name": "CompanionFollowUpDraft",
+          "kind": "class",
+          "line": 6
+        },
+        {
+          "name": "toConcern",
+          "kind": "function",
+          "line": 21
+        },
+        {
+          "name": "toCommitment",
+          "kind": "function",
+          "line": 38
+        },
+        {
+          "name": "stableSubjectKey",
+          "kind": "function",
+          "line": 72
+        },
+        {
+          "name": "stableId",
+          "kind": "function",
+          "line": 80
+        },
+        {
+          "name": "neutralResponsibilityText",
+          "kind": "function",
+          "line": 85
+        },
+        {
+          "name": "reconcileCompanionFollowUpDrafts",
+          "kind": "function",
+          "line": 99
+        },
+        {
+          "name": "expandExplicitCompanionResponsibilities",
+          "kind": "function",
+          "line": 130
+        },
+        {
+          "name": "containsExplicitResponsibilityIntent",
+          "kind": "function",
+          "line": 162
+        },
+        {
+          "name": "hasRecurringResponsibilityIntent",
+          "kind": "function",
+          "line": 165
+        },
+        {
+          "name": "containsRescheduleIntent",
+          "kind": "function",
+          "line": 186
+        },
+        {
+          "name": "semanticConcernText",
+          "kind": "function",
+          "line": 191
+        },
+        {
+          "name": "family",
+          "kind": "function",
+          "line": 200
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
+    },
+    {
       "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionHumanTextSanitizer.kt",
       "module": "app",
       "extension": ".kt",
@@ -14072,6 +14155,34 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeModels.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 25,
+      "sha256": "7513193734a27e016aa48f8dd4f06452d5145bb78996b19daf726191714ca53c",
+      "package": "me.rerere.rikkahub.data.companion",
+      "categories": [],
+      "symbols": [
+        {
+          "name": "CompanionTurnMutation",
+          "kind": "class",
+          "line": 3
+        },
+        {
+          "name": "CompanionRuntimeReduction",
+          "kind": "class",
+          "line": 21
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionScheduledToolEvent.kt",
@@ -72005,6 +72116,11 @@
     ],
     "me.rerere.rikkahub.data.companion.CompanionFollowUpDraft": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "class",
+        "line": 6
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "class",
         "line": 7
@@ -72330,6 +72446,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "class",
         "line": 247
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeModels.kt",
+        "kind": "class",
+        "line": 21
       }
     ],
     "me.rerere.rikkahub.data.companion.CompanionScheduledToolEventTest": [
@@ -72421,6 +72542,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "class",
         "line": 229
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeModels.kt",
+        "kind": "class",
+        "line": 3
       }
     ],
     "me.rerere.rikkahub.data.companion.CompanionTurnPersistenceInput": [
@@ -72908,12 +73034,22 @@
     ],
     "me.rerere.rikkahub.data.companion.containsExplicitResponsibilityIntent": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 162
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 173
       }
     ],
     "me.rerere.rikkahub.data.companion.containsRescheduleIntent": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 186
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
@@ -73186,6 +73322,11 @@
     ],
     "me.rerere.rikkahub.data.companion.expandExplicitCompanionResponsibilities": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 130
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 138
@@ -73199,6 +73340,11 @@
       }
     ],
     "me.rerere.rikkahub.data.companion.family": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 200
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
@@ -73280,6 +73426,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionExplicitResponsibilities.kt",
         "kind": "function",
         "line": 136
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 165
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
@@ -73522,6 +73673,11 @@
     ],
     "me.rerere.rikkahub.data.companion.neutralResponsibilityText": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 85
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 86
@@ -73696,6 +73852,11 @@
     ],
     "me.rerere.rikkahub.data.companion.reconcileCompanionFollowUpDrafts": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 99
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 101
@@ -73822,6 +73983,11 @@
     ],
     "me.rerere.rikkahub.data.companion.semanticConcernText": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 191
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 202
@@ -73886,6 +74052,11 @@
     ],
     "me.rerere.rikkahub.data.companion.stableId": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 80
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 81
@@ -73899,6 +74070,11 @@
       }
     ],
     "me.rerere.rikkahub.data.companion.stableSubjectKey": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 72
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
@@ -73942,12 +74118,22 @@
     ],
     "me.rerere.rikkahub.data.companion.toCommitment": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 38
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
         "line": 39
       }
     ],
     "me.rerere.rikkahub.data.companion.toConcern": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionFollowUpDrafts.kt",
+        "kind": "function",
+        "line": 21
+      },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
         "kind": "function",
