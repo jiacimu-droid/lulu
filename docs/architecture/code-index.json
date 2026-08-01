@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-07-31T13:07:47.115984+00:00",
-  "commit": "5de6f350d772e205c64fab6398003fc7734aa9e5",
+  "generatedAt": "2026-08-01T04:31:48.700794+00:00",
+  "commit": "42b86b3bc8b8a11b71abd29d10d4eba368e8dc50",
   "branch": "master",
-  "sourceFingerprint": "632e948771958aceba61bb5b56e343e917249f413408e08a7753d5df0d70bf25",
+  "sourceFingerprint": "2c3864afba33280515cc1ef7375b1a952cf80773ccae6b5c3ed82e6d78c94334",
   "summary": {
     "files": 1193,
-    "lines": 262178,
+    "lines": 262186,
     "symbols": 5677,
     "productionCodeFiles": 855,
     "testFiles": 148,
@@ -19556,8 +19556,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 107,
-      "sha256": "cd98944207809e4f756438f1b71825195c4a993fa4262c50c3f134de000c9a79",
+      "lines": 115,
+      "sha256": "db961e3314c98ec4dc132fa8b276e69ba1873dafb82c6609c6a8bd7c9ce25bc7",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "记忆"
@@ -19566,32 +19566,32 @@
         {
           "name": "AffectiveMemoryExtractionPlan",
           "kind": "class",
-          "line": 12
+          "line": 14
         },
         {
           "name": "MemoryExtractionDirection",
           "kind": "class",
-          "line": 17
+          "line": 19
         },
         {
           "name": "buildSelectedConversationBranchId",
           "kind": "function",
-          "line": 22
+          "line": 24
         },
         {
           "name": "firstSelectedBranchMutationSequence",
           "kind": "function",
-          "line": 38
+          "line": 40
         },
         {
           "name": "buildAffectiveMemoryExtractionPlan",
           "kind": "function",
-          "line": 55
+          "line": 57
         },
         {
           "name": "toMemoryExtractionTurns",
           "kind": "function",
-          "line": 93
+          "line": 88
         }
       ],
       "localImportCount": 2,
@@ -78027,7 +78027,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
         "kind": "class",
-        "line": 12
+        "line": 14
       }
     ],
     "me.rerere.rikkahub.data.service.AffectiveMemoryExtractionPlannerTest": [
@@ -78412,7 +78412,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
         "kind": "class",
-        "line": 17
+        "line": 19
       }
     ],
     "me.rerere.rikkahub.data.service.MemoryExtractionInvalidationResult": [
@@ -78741,7 +78741,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
         "kind": "function",
-        "line": 55
+        "line": 57
       }
     ],
     "me.rerere.rikkahub.data.service.buildAllTools": [
@@ -78909,7 +78909,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
         "kind": "function",
-        "line": 22
+        "line": 24
       }
     ],
     "me.rerere.rikkahub.data.service.buildStoredPrivateImpression": [
@@ -79430,7 +79430,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
         "kind": "function",
-        "line": 38
+        "line": 40
       }
     ],
     "me.rerere.rikkahub.data.service.formatAddress": [
@@ -81165,7 +81165,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
         "kind": "function",
-        "line": 93
+        "line": 88
       }
     ],
     "me.rerere.rikkahub.data.service.toMemoryRerankResults": [
