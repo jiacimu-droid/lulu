@@ -11,6 +11,9 @@ internal val companionInputTransformers: List<InputMessageTransformer> = listOf(
     DocumentAsPromptTransformer,
     OcrTransformer,
     VoiceMessageTransformer,
+    // Only activates for the internal proactive request marker. It converts the latest visible
+    // dialogue into an explicit continue/advance/transition/pass decision before generation.
+    ProactiveContinuityTransformer,
     // Compact the newly generated runtime by semantic fields, then keep only the
     // newest snapshot of every transient context kind.
     CompanionRuntimeCompactTransformer,
