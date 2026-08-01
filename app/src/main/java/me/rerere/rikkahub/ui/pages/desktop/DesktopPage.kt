@@ -21,13 +21,16 @@ import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -65,6 +68,10 @@ import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.desktop.DesktopStore
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Conversation
+import me.rerere.rikkahub.data.model.GroupChatMember
+import me.rerere.rikkahub.data.model.GroupChatSpec
+import me.rerere.rikkahub.data.model.groupChatSpec
+import me.rerere.rikkahub.data.model.toConversationSystemPrompt
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.context.LocalNavController
@@ -191,11 +198,17 @@ fun ChatRoomsPage() {
     val settingsStore = koinInject<SettingsStore>()
     val scope = rememberCoroutineScope()
     val latestConversations = remember { mutableStateMapOf<Uuid, Conversation?>() }
+    val allConversations by conversationRepository.searchConversations("")
+        .collectAsState(initial = emptyList())
+    val groupConversations = remember(allConversations) {
+        allConversations.filter { it.groupChatSpec != null }
+    }
+    var showCreateGroup by remember { mutableStateOf(false) }
 
     LaunchedEffect(settings.assistants) {
         settings.assistants.forEach { assistant ->
             latestConversations[assistant.id] = conversationRepository.getRecentConversations(assistant.id, limit = 1)
-                .firstOrNull()
+                .firstOrNull { it.groupChatSpec == null }
         }
     }
 
@@ -206,11 +219,46 @@ fun ChatRoomsPage() {
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "聊天",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    TextButton(onClick = { showCreateGroup = true }) {
+                        Text("＋ 新建群聊")
+                    }
+                }
+            }
+
+            if (groupConversations.isNotEmpty()) {
+                item {
+                    Text(
+                        "群聊",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                items(groupConversations, key = { "group-${it.id}" }) { conversation ->
+                    val spec = conversation.groupChatSpec ?: return@items
+                    GroupChatRoomRow(
+                        conversation = conversation,
+                        spec = spec,
+                        assistants = settings.assistants,
+                        onClick = { navController.navigate(Screen.Chat(conversation.id.toString())) },
+                    )
+                }
+            }
+
+            item {
                 Text(
-                    text = "聊天",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp),
+                    "私聊",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             items(settings.assistants, key = { it.id.toString() }) { assistant ->
@@ -221,8 +269,8 @@ fun ChatRoomsPage() {
                     onClick = {
                         scope.launch {
                             settingsStore.updateAssistant(assistant.id)
-                            val target = conversationRepository.getRecentConversations(assistant.id, limit = 1)
-                                .firstOrNull()
+                            val target = conversationRepository.getRecentConversations(assistant.id, limit = 10)
+                                .firstOrNull { it.groupChatSpec == null }
                                 ?: Conversation.ofId(
                                     id = Uuid.random(),
                                     assistantId = assistant.id,
@@ -233,6 +281,167 @@ fun ChatRoomsPage() {
                     },
                 )
             }
+        }
+    }
+
+    if (showCreateGroup) {
+        CreateGroupChatDialog(
+            assistants = settings.assistants,
+            onDismiss = { showCreateGroup = false },
+            onCreate = { name, memberIds ->
+                val members = settings.assistants.filter { it.id.toString() in memberIds }
+                if (members.size < 2) return@CreateGroupChatDialog
+                scope.launch {
+                    val spec = GroupChatSpec(
+                        name = name.trim(),
+                        members = members.map { assistant ->
+                            GroupChatMember(
+                                assistantId = assistant.id.toString(),
+                                title = "群成员",
+                            )
+                        },
+                    )
+                    val conversation = Conversation(
+                        id = Uuid.random(),
+                        assistantId = members.first().id,
+                        title = spec.name,
+                        messageNodes = emptyList(),
+                        customSystemPrompt = spec.toConversationSystemPrompt(),
+                    )
+                    conversationRepository.insertConversation(conversation)
+                    settingsStore.updateAssistant(members.first().id)
+                    showCreateGroup = false
+                    navController.navigate(Screen.Chat(conversation.id.toString()))
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun CreateGroupChatDialog(
+    assistants: List<Assistant>,
+    onDismiss: () -> Unit,
+    onCreate: (String, Set<String>) -> Unit,
+) {
+    var name by remember { mutableStateOf("") }
+    var selected by remember { mutableStateOf<Set<String>>(emptySet()) }
+    val canCreate = name.isNotBlank() && selected.size >= 2
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("新建群聊") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text("群名称") },
+                    placeholder = { Text("例如：露露的小客厅") },
+                )
+                Text(
+                    "选择至少两个角色。你会自动作为群主加入群聊。",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                assistants.forEach { assistant ->
+                    val id = assistant.id.toString()
+                    val checked = id in selected
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                selected = if (checked) selected - id else selected + id
+                            }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(
+                            checked = checked,
+                            onCheckedChange = {
+                                selected = if (checked) selected - id else selected + id
+                            },
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        UIAvatar(
+                            name = assistant.name.ifBlank { "角色" },
+                            value = assistant.avatar,
+                            modifier = Modifier.size(36.dp),
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text(assistant.name.ifBlank { "角色" })
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = canCreate,
+                onClick = { onCreate(name, selected) },
+            ) {
+                Text("创建")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("取消")
+            }
+        },
+    )
+}
+
+@Composable
+private fun GroupChatRoomRow(
+    conversation: Conversation,
+    spec: GroupChatSpec,
+    assistants: List<Assistant>,
+    onClick: () -> Unit,
+) {
+    val names = spec.members.mapNotNull { member ->
+        assistants.firstOrNull { it.id.toString() == member.assistantId }
+            ?.name
+            ?.ifBlank { "角色" }
+    }
+    Card(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        colors = CustomColors.cardColorsOnSurfaceContainer,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text("${spec.members.size + 1}人", style = MaterialTheme.typography.labelMedium)
+                }
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    spec.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    names.joinToString("、").ifBlank { "群聊成员" },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Text(
+                relativeTime(conversation.updateAt),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
