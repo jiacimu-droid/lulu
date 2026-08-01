@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T05:17:06.813671+00:00",
-  "commit": "b33683da8631b5d4678403ce4da59e89a27e3a79",
+  "generatedAt": "2026-08-01T05:37:34.970369+00:00",
+  "commit": "e8f0488e87e27ebcd62a3fc3eca6026585f1712a",
   "branch": "master",
-  "sourceFingerprint": "8a9ec5083a372bdc11ea712b4c018d0639f63b2f3040dd2fab09e67cc544f226",
+  "sourceFingerprint": "36403362070a36dd4fe80f6e57a38130a607acb53d799e226846aa56113041f8",
   "summary": {
     "files": 1194,
-    "lines": 262564,
-    "symbols": 5692,
+    "lines": 262736,
+    "symbols": 5698,
     "productionCodeFiles": 856,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -68,7 +68,7 @@
       "界面": 338,
       "记忆": 49
     },
-    "resolvedImportEdges": 2085
+    "resolvedImportEdges": 2086
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -435,6 +435,13 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "lines": 621,
+        "symbols": 37,
+        "localImportCount": 26,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt",
         "lines": 676,
         "symbols": 37,
@@ -481,13 +488,6 @@
         "lines": 329,
         "symbols": 32,
         "localImportCount": 0,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
-        "lines": 449,
-        "symbols": 31,
-        "localImportCount": 21,
         "todoMarkers": 0
       },
       {
@@ -752,17 +752,17 @@
         "todoMarkers": 0
       },
       {
-        "path": "ai/src/main/java/me/rerere/ai/provider/providers/openai/ResponseAPI.kt",
-        "lines": 807,
-        "symbols": 18,
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "lines": 621,
+        "symbols": 37,
         "localImportCount": 26,
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationRoutes.kt",
-        "lines": 433,
-        "symbols": 4,
-        "localImportCount": 25,
+        "path": "ai/src/main/java/me/rerere/ai/provider/providers/openai/ResponseAPI.kt",
+        "lines": 807,
+        "symbols": 18,
+        "localImportCount": 26,
         "todoMarkers": 0
       }
     ],
@@ -19060,6 +19060,7 @@
       ],
       "resolvedImports": [],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt"
       ]
     },
@@ -36701,8 +36702,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 449,
-      "sha256": "2a1af8e75c36ceafe13b86455bfe19990560682b6063d5feb9057541c3efbc61",
+      "lines": 621,
+      "sha256": "4f13ee384a1574a009baa5d84127d86b9442b206ce7bbe4993fbd3f6193897a8",
       "package": "me.rerere.rikkahub.ui.pages.chat",
       "categories": [
         "界面"
@@ -36711,160 +36712,190 @@
         {
           "name": "ChatVM",
           "kind": "class",
-          "line": 54
+          "line": 67
         },
         {
           "name": "onCleared",
           "kind": "function",
-          "line": 115
+          "line": 124
         },
         {
           "name": "launchAfterInitialization",
           "kind": "function",
-          "line": 121
+          "line": 130
         },
         {
           "name": "dismissError",
           "kind": "function",
-          "line": 156
+          "line": 161
         },
         {
           "name": "clearAllErrors",
           "kind": "function",
-          "line": 158
+          "line": 163
         },
         {
           "name": "updateSettings",
           "kind": "function",
-          "line": 166
+          "line": 169
         },
         {
           "name": "checkUserAvatarDelete",
           "kind": "function",
-          "line": 176
+          "line": 177
         },
         {
           "name": "setChatModel",
           "kind": "function",
-          "line": 186
+          "line": 185
         },
         {
           "name": "handleMessageSend",
           "kind": "function",
-          "line": 209
+          "line": 197
         },
         {
           "name": "handleReplyRequest",
           "kind": "function",
-          "line": 218
+          "line": 211
         },
         {
-          "name": "handleMessageEdit",
+          "name": "startGroupConversation",
           "kind": "function",
-          "line": 225
+          "line": 223
         },
         {
-          "name": "handleCompressContext",
+          "name": "runGroupTurns",
           "kind": "function",
-          "line": 234
+          "line": 244
         },
         {
-          "name": "forkMessage",
+          "name": "chooseNextGroupSpeaker",
           "kind": "function",
-          "line": 248
+          "line": 326
         },
         {
-          "name": "deleteMessage",
-          "kind": "function",
-          "line": 253
-        },
-        {
-          "name": "showDeleteBlockedWhileGeneratingError",
-          "kind": "function",
-          "line": 259
-        },
-        {
-          "name": "regenerateAtMessage",
-          "kind": "function",
-          "line": 267
-        },
-        {
-          "name": "handleToolApproval",
-          "kind": "function",
-          "line": 277
-        },
-        {
-          "name": "handleToolAnswer",
-          "kind": "function",
-          "line": 288
-        },
-        {
-          "name": "stopGeneration",
-          "kind": "function",
-          "line": 298
-        },
-        {
-          "name": "saveConversationAsync",
-          "kind": "function",
-          "line": 305
-        },
-        {
-          "name": "updateTitle",
-          "kind": "function",
-          "line": 312
-        },
-        {
-          "name": "deleteConversation",
-          "kind": "function",
-          "line": 319
-        },
-        {
-          "name": "updatePinnedStatus",
-          "kind": "function",
-          "line": 325
-        },
-        {
-          "name": "moveConversationToAssistant",
-          "kind": "function",
-          "line": 331
-        },
-        {
-          "name": "translateMessage",
-          "kind": "function",
-          "line": 344
-        },
-        {
-          "name": "generateTitle",
+          "name": "buildGroupSpeakerPrompt",
           "kind": "function",
           "line": 350
         },
         {
+          "name": "tagLatestGroupReply",
+          "kind": "function",
+          "line": 367
+        },
+        {
+          "name": "handleMessageEdit",
+          "kind": "function",
+          "line": 401
+        },
+        {
+          "name": "handleCompressContext",
+          "kind": "function",
+          "line": 409
+        },
+        {
+          "name": "forkMessage",
+          "kind": "function",
+          "line": 423
+        },
+        {
+          "name": "deleteMessage",
+          "kind": "function",
+          "line": 428
+        },
+        {
+          "name": "showDeleteBlockedWhileGeneratingError",
+          "kind": "function",
+          "line": 434
+        },
+        {
+          "name": "regenerateAtMessage",
+          "kind": "function",
+          "line": 442
+        },
+        {
+          "name": "handleToolApproval",
+          "kind": "function",
+          "line": 452
+        },
+        {
+          "name": "handleToolAnswer",
+          "kind": "function",
+          "line": 463
+        },
+        {
+          "name": "stopGeneration",
+          "kind": "function",
+          "line": 470
+        },
+        {
+          "name": "saveConversationAsync",
+          "kind": "function",
+          "line": 477
+        },
+        {
+          "name": "updateTitle",
+          "kind": "function",
+          "line": 483
+        },
+        {
+          "name": "deleteConversation",
+          "kind": "function",
+          "line": 489
+        },
+        {
+          "name": "updatePinnedStatus",
+          "kind": "function",
+          "line": 495
+        },
+        {
+          "name": "moveConversationToAssistant",
+          "kind": "function",
+          "line": 501
+        },
+        {
+          "name": "translateMessage",
+          "kind": "function",
+          "line": 515
+        },
+        {
+          "name": "generateTitle",
+          "kind": "function",
+          "line": 521
+        },
+        {
           "name": "clearTranslationField",
           "kind": "function",
-          "line": 357
+          "line": 529
         },
         {
           "name": "updateConversation",
           "kind": "function",
-          "line": 363
+          "line": 535
         },
         {
           "name": "toggleMessageFavorite",
           "kind": "function",
-          "line": 376
+          "line": 548
+        },
+        {
+          "name": "shouldReturnGroupFloorToUser",
+          "kind": "function",
+          "line": 584
         },
         {
           "name": "mergeConversationEdit",
           "kind": "function",
-          "line": 417
+          "line": 597
         },
         {
           "name": "canRequestManualReply",
           "kind": "function",
-          "line": 448
+          "line": 620
         }
       ],
-      "localImportCount": 21,
+      "localImportCount": 26,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -36882,8 +36913,13 @@
         "me.rerere.rikkahub.data.model.Assistant",
         "me.rerere.rikkahub.data.model.Avatar",
         "me.rerere.rikkahub.data.model.Conversation",
+        "me.rerere.rikkahub.data.model.GroupChatMember",
+        "me.rerere.rikkahub.data.model.GroupChatSpec",
         "me.rerere.rikkahub.data.model.MessageNode",
         "me.rerere.rikkahub.data.model.NodeFavoriteTarget",
+        "me.rerere.rikkahub.data.model.groupChatSpec",
+        "me.rerere.rikkahub.data.model.isGroupChat",
+        "me.rerere.rikkahub.data.model.toConversationSystemPrompt",
         "me.rerere.rikkahub.data.repository.ConversationRepository",
         "me.rerere.rikkahub.data.repository.FavoriteRepository",
         "me.rerere.rikkahub.service.ChatError",
@@ -36901,6 +36937,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Avatar.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Favorite.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
         "app/src/main/java/me/rerere/rikkahub/data/repository/FavoriteRepository.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -92224,7 +92261,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "class",
-        "line": 54
+        "line": 67
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ChatVMInitTest": [
@@ -92395,6 +92432,13 @@
         "line": 189
       }
     ],
+    "me.rerere.rikkahub.ui.pages.chat.buildGroupSpeakerPrompt": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "kind": "function",
+        "line": 350
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.chat.buildHighlightedText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
@@ -92406,28 +92450,35 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 448
+        "line": 620
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.checkUserAvatarDelete": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 176
+        "line": 177
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.chat.chooseNextGroupSpeaker": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "kind": "function",
+        "line": 326
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.clearAllErrors": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 158
+        "line": 163
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.clearTranslationField": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 357
+        "line": 529
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.conversationWith": [
@@ -92441,21 +92492,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 319
+        "line": 489
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.deleteMessage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 253
+        "line": 428
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.dismissError": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 156
+        "line": 161
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.exportToImage": [
@@ -92497,7 +92548,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 248
+        "line": 423
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.formatAbsoluteTime": [
@@ -92532,49 +92583,49 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 350
+        "line": 521
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.handleCompressContext": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 234
+        "line": 409
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.handleMessageEdit": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 225
+        "line": 401
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.handleMessageSend": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 209
+        "line": 197
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.handleReplyRequest": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 218
+        "line": 211
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.handleToolAnswer": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 288
+        "line": 463
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.handleToolApproval": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 277
+        "line": 452
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.isAtBottom": [
@@ -92616,35 +92667,35 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 121
+        "line": 130
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.mergeConversationEdit": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 417
+        "line": 597
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.moveConversationToAssistant": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 331
+        "line": 501
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.onCleared": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 115
+        "line": 124
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.regenerateAtMessage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 267
+        "line": 442
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.rememberConversationSizeInfo": [
@@ -92654,18 +92705,25 @@
         "line": 38
       }
     ],
+    "me.rerere.rikkahub.ui.pages.chat.runGroupTurns": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "kind": "function",
+        "line": 244
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.chat.saveConversationAsync": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 305
+        "line": 477
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.setChatModel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 186
+        "line": 185
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.shareFile": [
@@ -92675,18 +92733,39 @@
         "line": 772
       }
     ],
+    "me.rerere.rikkahub.ui.pages.chat.shouldReturnGroupFloorToUser": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "kind": "function",
+        "line": 584
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.chat.showDeleteBlockedWhileGeneratingError": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 259
+        "line": 434
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.chat.startGroupConversation": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "kind": "function",
+        "line": 223
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.stopGeneration": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 298
+        "line": 470
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.chat.tagLatestGroupReply": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "kind": "function",
+        "line": 367
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.toHumanActivityMode": [
@@ -92700,42 +92779,42 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 376
+        "line": 548
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.translateMessage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 344
+        "line": 515
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.updateConversation": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 363
+        "line": 535
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.updatePinnedStatus": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 325
+        "line": 495
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.updateSettings": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 166
+        "line": 169
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.updateTitle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "kind": "function",
-        "line": 312
+        "line": 483
       }
     ],
     "me.rerere.rikkahub.ui.pages.cihai.AssistantSelector": [
