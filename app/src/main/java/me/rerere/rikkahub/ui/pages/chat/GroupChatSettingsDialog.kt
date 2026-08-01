@@ -67,7 +67,7 @@ internal fun GroupChatSettingsDialog(
                 )
                 OutlinedTextField(
                     value = maxTurns,
-                    onValueChange = { value -> maxTurns = value.filter(Char::isDigit).take(2) },
+                    onValueChange = { value -> maxTurns = value.filter { char -> char.isDigit() }.take(2) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     label = { Text("每次自动互动轮数（3～10）") },
