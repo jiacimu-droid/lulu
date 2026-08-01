@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T11:02:03.205705+00:00",
-  "commit": "963194866e425a730af5d890c612aecc92b6dbc3",
+  "generatedAt": "2026-08-01T11:02:39.796309+00:00",
+  "commit": "4989468ed59bd1bf64e1693b3961eecf48f7614f",
   "branch": "master",
-  "sourceFingerprint": "3d4078d2dbf1b909a3847daa5fcd4b83344606057cdb8ac276dadd216243319a",
+  "sourceFingerprint": "092854cf60d8a7b8e74c37c620b0c73c5b65cf9d8707c4570450874d73fc3c74",
   "summary": {
     "files": 1197,
-    "lines": 262853,
+    "lines": 262830,
     "symbols": 5720,
     "productionCodeFiles": 859,
     "testFiles": 148,
@@ -39017,8 +39017,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 281,
-      "sha256": "834ad9166d900b91af89d5c898a88c1aa2bcfa48dc7c5a192838dd2d10791f30",
+      "lines": 258,
+      "sha256": "caf9f9683a41dd96e8f6c9e972efb0c3f0b00482f5a0ce159e549c8da513d754",
       "package": "me.rerere.rikkahub.ui.pages.game",
       "categories": [
         "界面"
@@ -39047,27 +39047,27 @@
         {
           "name": "chooseGomokuMove",
           "kind": "function",
-          "line": 169
+          "line": 156
         },
         {
           "name": "gomokuWinner",
           "kind": "function",
-          "line": 210
+          "line": 192
         },
         {
           "name": "gomokuPlacementScore",
           "kind": "function",
-          "line": 224
+          "line": 206
         },
         {
           "name": "countDirection",
           "kind": "function",
-          "line": 251
+          "line": 233
         },
         {
           "name": "gomokuIndex",
           "kind": "function",
-          "line": 274
+          "line": 256
         }
       ],
       "localImportCount": 2,
@@ -94424,7 +94424,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
-        "line": 169
+        "line": 156
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.chooseRoleHeldIndices": [
@@ -94466,7 +94466,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
-        "line": 251
+        "line": 233
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.defaultAdventureChoices": [
@@ -94515,21 +94515,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
-        "line": 274
+        "line": 256
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.gomokuPlacementScore": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
-        "line": 224
+        "line": 206
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.gomokuWinner": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GomokuGame.kt",
         "kind": "function",
-        "line": 210
+        "line": 192
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.index": [
