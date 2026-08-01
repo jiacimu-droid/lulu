@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T08:01:36.494154+00:00",
-  "commit": "ec9190b6276bd74d3ae6771e30836fd46e5b1240",
+  "generatedAt": "2026-08-01T08:02:07.898400+00:00",
+  "commit": "be4dbe83e6b224a86ea4df2756501999eba4a5d8",
   "branch": "master",
-  "sourceFingerprint": "f7e34d8f544935e153d0025a00b271a5d95936139fca5ebb903c4ce0f33f99d8",
+  "sourceFingerprint": "9f009140db617860286b80807521d1a3d4d9359a6ff98e2866bcc8fee5a63b65",
   "summary": {
     "files": 1197,
-    "lines": 263115,
+    "lines": 263127,
     "symbols": 5720,
     "productionCodeFiles": 859,
     "testFiles": 148,
@@ -22400,8 +22400,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 162,
-      "sha256": "01bdaff8785089d90942d9384087ced525d4f6d0a8db6b095cd56ff0c9a9cbed",
+      "lines": 174,
+      "sha256": "3239bbacd26ace91a8c9bcef0a1ac1f6f37d40b26eb256854c8f486d86fa103b",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "主动代理"
@@ -22410,72 +22410,72 @@
         {
           "name": "ProactiveTurnDispatcher",
           "kind": "class",
-          "line": 19
+          "line": 18
         },
         {
           "name": "dispatch",
           "kind": "function",
-          "line": 22
+          "line": 21
         },
         {
           "name": "claimExecutionLease",
           "kind": "function",
-          "line": 82
+          "line": 96
         },
         {
           "name": "releaseExecutionLease",
           "kind": "function",
-          "line": 108
+          "line": 120
         },
         {
           "name": "activeExecutionId",
           "kind": "function",
-          "line": 123
+          "line": 135
         },
         {
           "name": "ProactiveExecutionLeaseLock",
           "kind": "object",
-          "line": 128
+          "line": 140
         },
         {
           "name": "ProactiveExecutionLease",
           "kind": "class",
-          "line": 130
+          "line": 142
         },
         {
           "name": "encode",
           "kind": "function",
-          "line": 135
+          "line": 147
         },
         {
           "name": "decodeLease",
           "kind": "function",
-          "line": 138
+          "line": 150
         },
         {
           "name": "ProactiveTurnDispatchResult",
           "kind": "interface",
-          "line": 148
+          "line": 160
         },
         {
           "name": "Dispatched",
           "kind": "class",
-          "line": 149
+          "line": 161
         },
         {
           "name": "Busy",
           "kind": "class",
-          "line": 155
+          "line": 167
         },
         {
           "name": "Disabled",
           "kind": "object",
-          "line": 160
+          "line": 172
         },
         {
           "name": "InvalidTarget",
           "kind": "class",
-          "line": 161
+          "line": 173
         }
       ],
       "localImportCount": 2,
@@ -78581,7 +78581,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "class",
-        "line": 155
+        "line": 167
       }
     ],
     "me.rerere.rikkahub.data.service.CameraInfo": [
@@ -78714,14 +78714,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "object",
-        "line": 160
+        "line": 172
       }
     ],
     "me.rerere.rikkahub.data.service.Dispatched": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "class",
-        "line": 149
+        "line": 161
       }
     ],
     "me.rerere.rikkahub.data.service.DuplicateMemoryDeprecation": [
@@ -78756,7 +78756,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "class",
-        "line": 161
+        "line": 173
       }
     ],
     "me.rerere.rikkahub.data.service.Latest": [
@@ -78945,14 +78945,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "class",
-        "line": 130
+        "line": 142
       }
     ],
     "me.rerere.rikkahub.data.service.ProactiveExecutionLeaseLock": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "object",
-        "line": 128
+        "line": 140
       }
     ],
     "me.rerere.rikkahub.data.service.ProactiveMessageAssemblyTest": [
@@ -79022,14 +79022,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "interface",
-        "line": 148
+        "line": 160
       }
     ],
     "me.rerere.rikkahub.data.service.ProactiveTurnDispatcher": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "class",
-        "line": 19
+        "line": 18
       }
     ],
     "me.rerere.rikkahub.data.service.RecordingMemoryBankDAO": [
@@ -79162,7 +79162,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "function",
-        "line": 123
+        "line": 135
       }
     ],
     "me.rerere.rikkahub.data.service.activeWorkCount": [
@@ -79504,7 +79504,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "function",
-        "line": 82
+        "line": 96
       }
     ],
     "me.rerere.rikkahub.data.service.classifySemanticMemoryExtraction": [
@@ -79640,7 +79640,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "function",
-        "line": 138
+        "line": 150
       }
     ],
     "me.rerere.rikkahub.data.service.decodeMemoryNodeIds": [
@@ -79795,7 +79795,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "function",
-        "line": 22
+        "line": 21
       }
     ],
     "me.rerere.rikkahub.data.service.doWork": [
@@ -79830,7 +79830,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "function",
-        "line": 135
+        "line": 147
       }
     ],
     "me.rerere.rikkahub.data.service.encodeMemoryVector": [
@@ -81143,7 +81143,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "function",
-        "line": 108
+        "line": 120
       }
     ],
     "me.rerere.rikkahub.data.service.removeNotification": [
