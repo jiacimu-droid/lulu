@@ -13,8 +13,7 @@ private const val EXECUTION_LEASE_MILLIS = 10L * 60L * 1000L
 
 /**
  * Resolves a proactive target and atomically leases one execution per assistant.
- * A later Alarm/Worker/app fallback for the same role is merged instead of
- * starting another generation coroutine.
+ * Alarm, Worker and in-app triggers all pass through this gate before the generation service starts.
  */
 class ProactiveTurnDispatcher(
     private val settingsStore: SettingsStore,
@@ -24,10 +23,16 @@ class ProactiveTurnDispatcher(
         assistantId: String?,
         commitmentId: String?,
         triggerId: String = UUID.randomUUID().toString(),
+        targetedReason: String? = null,
+        targetedUserText: String? = null,
+        targetedKind: String? = null,
     ): ProactiveTurnDispatchResult {
-        val targeted = !assistantId.isNullOrBlank() && !commitmentId.isNullOrBlank()
+        val targeted = !commitmentId.isNullOrBlank() ||
+            !targetedReason.isNullOrBlank() ||
+            !targetedUserText.isNullOrBlank() ||
+            !targetedKind.isNullOrBlank()
         val parsedAssistantId = assistantId
-            ?.takeIf(String::isNotBlank)
+            ?.takeIf { it.isNotBlank() }
             ?.let { runCatching { Uuid.parse(it) }.getOrNull() }
             ?: if (targeted) {
                 return ProactiveTurnDispatchResult.InvalidTarget("Invalid assistant id for targeted turn")
@@ -36,7 +41,7 @@ class ProactiveTurnDispatcher(
             }
         val settings = settingsStore.settingsFlow.value
         val proactiveSetting = settings.getProactiveMessageSetting(parsedAssistantId)
-        if (!targeted && !proactiveSetting.enabled) {
+        if (!proactiveSetting.enabled) {
             return ProactiveTurnDispatchResult.Disabled
         }
 
@@ -55,8 +60,17 @@ class ProactiveTurnDispatcher(
                 putExtra(ProactiveMessageService.EXTRA_ASSISTANT_ID, resolvedAssistantId)
                 putExtra(EXTRA_PROACTIVE_EXECUTION_ID, executionId)
                 putExtra(EXTRA_PROACTIVE_TRIGGER_ID, triggerId)
-                commitmentId?.takeIf(String::isNotBlank)?.let {
+                commitmentId?.takeIf { it.isNotBlank() }?.let {
                     putExtra(ProactiveMessageService.EXTRA_COMMITMENT_ID, it)
+                }
+                targetedReason?.takeIf { it.isNotBlank() }?.let {
+                    putExtra(ProactiveMessageService.EXTRA_TARGETED_REASON, it)
+                }
+                targetedUserText?.takeIf { it.isNotBlank() }?.let {
+                    putExtra(ProactiveMessageService.EXTRA_TARGETED_USER_TEXT, it)
+                }
+                targetedKind?.takeIf { it.isNotBlank() }?.let {
+                    putExtra(ProactiveMessageService.EXTRA_TARGETED_KIND, it)
                 }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -98,8 +112,6 @@ internal fun claimExecutionLease(
             triggerId = triggerId,
             expiresAt = nowMillis + EXECUTION_LEASE_MILLIS,
         )
-        // commit() is intentional: claiming must be synchronous and visible before
-        // another entry point can pass the same gate.
         val saved = prefs.edit().putString(key, lease.encode()).commit()
         return executionId.takeIf { saved }
     }
