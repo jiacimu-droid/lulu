@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T06:16:51.804993+00:00",
-  "commit": "592902b9ad4ebca77db559d6ed09fc2a4e275238",
+  "generatedAt": "2026-08-01T06:17:29.060336+00:00",
+  "commit": "eefdb715fdaf8ef5afb34c90cbd2c227642ab8cd",
   "branch": "master",
-  "sourceFingerprint": "46fe9e8f1247e88f9bcf651925db0517d15d94700ea468b9eefa24b192778766",
+  "sourceFingerprint": "3c0d8e609733b9c2104d2f13a07ceac8bd8b74d5fe1b12b5596e7ba37c98744e",
   "summary": {
     "files": 1195,
-    "lines": 262869,
-    "symbols": 5705,
+    "lines": 262964,
+    "symbols": 5713,
     "productionCodeFiles": 857,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -22342,8 +22342,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 67,
-      "sha256": "e3f0e98c06e7ff005c60c2f68476d942351ac8603885651e50ae80cef9c7e02e",
+      "lines": 162,
+      "sha256": "01bdaff8785089d90942d9384087ced525d4f6d0a8db6b095cd56ff0c9a9cbed",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "主动代理"
@@ -22352,32 +22352,72 @@
         {
           "name": "ProactiveTurnDispatcher",
           "kind": "class",
-          "line": 18
+          "line": 19
         },
         {
           "name": "dispatch",
           "kind": "function",
-          "line": 21
+          "line": 22
+        },
+        {
+          "name": "claimExecutionLease",
+          "kind": "function",
+          "line": 82
+        },
+        {
+          "name": "releaseExecutionLease",
+          "kind": "function",
+          "line": 108
+        },
+        {
+          "name": "activeExecutionId",
+          "kind": "function",
+          "line": 123
+        },
+        {
+          "name": "ProactiveExecutionLeaseLock",
+          "kind": "object",
+          "line": 128
+        },
+        {
+          "name": "ProactiveExecutionLease",
+          "kind": "class",
+          "line": 130
+        },
+        {
+          "name": "encode",
+          "kind": "function",
+          "line": 135
+        },
+        {
+          "name": "decodeLease",
+          "kind": "function",
+          "line": 138
         },
         {
           "name": "ProactiveTurnDispatchResult",
           "kind": "interface",
-          "line": 59
+          "line": 148
         },
         {
           "name": "Dispatched",
           "kind": "class",
-          "line": 60
+          "line": 149
+        },
+        {
+          "name": "Busy",
+          "kind": "class",
+          "line": 155
         },
         {
           "name": "Disabled",
           "kind": "object",
-          "line": 65
+          "line": 160
         },
         {
           "name": "InvalidTarget",
           "kind": "class",
-          "line": 66
+          "line": 161
         }
       ],
       "localImportCount": 2,
@@ -78416,6 +78456,13 @@
         "line": 78
       }
     ],
+    "me.rerere.rikkahub.data.service.Busy": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "class",
+        "line": 155
+      }
+    ],
     "me.rerere.rikkahub.data.service.CameraInfo": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/CameraService.kt",
@@ -78546,14 +78593,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "object",
-        "line": 65
+        "line": 160
       }
     ],
     "me.rerere.rikkahub.data.service.Dispatched": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "class",
-        "line": 60
+        "line": 149
       }
     ],
     "me.rerere.rikkahub.data.service.DuplicateMemoryDeprecation": [
@@ -78588,7 +78635,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "class",
-        "line": 66
+        "line": 161
       }
     ],
     "me.rerere.rikkahub.data.service.Latest": [
@@ -78773,6 +78820,20 @@
         "line": 2098
       }
     ],
+    "me.rerere.rikkahub.data.service.ProactiveExecutionLease": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "class",
+        "line": 130
+      }
+    ],
+    "me.rerere.rikkahub.data.service.ProactiveExecutionLeaseLock": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "object",
+        "line": 128
+      }
+    ],
     "me.rerere.rikkahub.data.service.ProactiveMessageAssemblyTest": [
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveMessageAssemblyTest.kt",
@@ -78840,14 +78901,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "interface",
-        "line": 59
+        "line": 148
       }
     ],
     "me.rerere.rikkahub.data.service.ProactiveTurnDispatcher": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "class",
-        "line": 18
+        "line": 19
       }
     ],
     "me.rerere.rikkahub.data.service.RecordingMemoryBankDAO": [
@@ -78967,6 +79028,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryCandidateQualityGate.kt",
         "kind": "function",
         "line": 61
+      }
+    ],
+    "me.rerere.rikkahub.data.service.activeExecutionId": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "function",
+        "line": 123
       }
     ],
     "me.rerere.rikkahub.data.service.activeWorkCount": [
@@ -79304,6 +79372,13 @@
         "line": 128
       }
     ],
+    "me.rerere.rikkahub.data.service.claimExecutionLease": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "function",
+        "line": 82
+      }
+    ],
     "me.rerere.rikkahub.data.service.classifySemanticMemoryExtraction": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
@@ -79431,6 +79506,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractor.kt",
         "kind": "function",
         "line": 388
+      }
+    ],
+    "me.rerere.rikkahub.data.service.decodeLease": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "function",
+        "line": 138
       }
     ],
     "me.rerere.rikkahub.data.service.decodeMemoryNodeIds": [
@@ -79585,7 +79667,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
         "kind": "function",
-        "line": 21
+        "line": 22
       }
     ],
     "me.rerere.rikkahub.data.service.doWork": [
@@ -79614,6 +79696,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "kind": "function",
         "line": 1653
+      }
+    ],
+    "me.rerere.rikkahub.data.service.encode": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "function",
+        "line": 135
       }
     ],
     "me.rerere.rikkahub.data.service.encodeMemoryVector": [
@@ -80915,6 +81004,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "kind": "function",
         "line": 1359
+      }
+    ],
+    "me.rerere.rikkahub.data.service.releaseExecutionLease": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+        "kind": "function",
+        "line": 108
       }
     ],
     "me.rerere.rikkahub.data.service.removeNotification": [
