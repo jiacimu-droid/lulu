@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T05:52:25.571442+00:00",
-  "commit": "fd6733d64e264697b872bdd59da4dd4c8125ecbc",
+  "generatedAt": "2026-08-01T05:54:21.822055+00:00",
+  "commit": "3ae4a8364e0b8d3a010aa49fb6630b63db483374",
   "branch": "master",
-  "sourceFingerprint": "03a10ee78fe11f6b8b2ade2f5ebbb46bbb22df5f12cfb7b0bf52a6006895a41d",
+  "sourceFingerprint": "103bf4757ca84b3aa1ec4408df16ba21e18e9201291e2e709ac96427dd4c51b9",
   "summary": {
-    "files": 1194,
-    "lines": 262782,
-    "symbols": 5703,
-    "productionCodeFiles": 856,
+    "files": 1195,
+    "lines": 262949,
+    "symbols": 5704,
+    "productionCodeFiles": 857,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 739,
+      "app": 740,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 807,
+      ".kt": 808,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 338,
+      "界面": 339,
       "记忆": 49
     },
-    "resolvedImportEdges": 2086
+    "resolvedImportEdges": 2088
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -932,7 +932,7 @@
         "lines": 296,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 57,
+        "importedByCount": 58,
         "todoMarkers": 0
       },
       {
@@ -1750,6 +1750,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ConversationSystemPromptCard.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/GroupChatSettingsDialog.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/LuluStatusDialog.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/TTSAutoPlay.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
@@ -2790,6 +2791,11 @@
       "imports": 4
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.chat",
+      "to": "me.rerere.rikkahub.data.model.Assistant",
+      "imports": 4
+    },
+    {
       "from": "me.rerere.rikkahub.ui.pages.extensions",
       "to": "me.rerere.rikkahub.utils.plus",
       "imports": 4
@@ -2987,11 +2993,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai",
       "to": "me.rerere.rikkahub.data.model.Assistant",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.tools",
-      "to": "me.rerere.rikkahub.data.service.AmapService",
       "imports": 3
     }
   ],
@@ -18769,6 +18770,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantRequestPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/GroupChatSettingsDialog.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/LuluStatusDialog.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/extensions/PromptLorebook.kt",
@@ -19086,6 +19088,7 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/GroupChatSettingsDialog.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt"
       ]
     },
@@ -37121,6 +37124,39 @@
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Theme.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/ContextUtil.kt",
         "highlight/src/main/java/me/rerere/highlight/Highlighter.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/GroupChatSettingsDialog.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 167,
+      "sha256": "baa8d79d24f379fc418501ff654c2f3ce3570c8d48f08e7064d781be9b68990b",
+      "package": "me.rerere.rikkahub.ui.pages.chat",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "GroupChatSettingsDialog",
+          "kind": "composable",
+          "line": 31
+        }
+      ],
+      "localImportCount": 4,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.model.Assistant",
+        "me.rerere.rikkahub.data.model.GroupChatMember",
+        "me.rerere.rikkahub.data.model.GroupChatRole",
+        "me.rerere.rikkahub.data.model.GroupChatSpec"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt"
       ],
       "importedBy": []
     },
@@ -92392,6 +92428,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt",
         "kind": "composable",
         "line": 713
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.chat.GroupChatSettingsDialog": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/GroupChatSettingsDialog.kt",
+        "kind": "composable",
+        "line": 31
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ImageExportOptions": [
