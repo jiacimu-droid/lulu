@@ -63,13 +63,32 @@ class PomodoroTimerService : android.app.Service() {
             task: String = "",
             recordStudy: Boolean = false,
         ) {
+            val normalizedSeconds = seconds.coerceAtLeast(1)
+            val normalizedTask = task.trim()
+
+            // The WebView reads these process-local values immediately after invoking start().
+            // Seed them before Android asynchronously delivers onStartCommand(), otherwise the
+            // first rendered frame briefly sees the default 0:00 state.
+            totalSeconds = normalizedSeconds
+            remainingSeconds = normalizedSeconds
+            this.task = normalizedTask
+            running = true
+
             val intent = Intent(context, PomodoroTimerService::class.java).apply {
                 action = ACTION_START
-                putExtra(EXTRA_SECONDS, seconds)
-                putExtra(EXTRA_TASK, task)
+                putExtra(EXTRA_SECONDS, normalizedSeconds)
+                putExtra(EXTRA_TASK, normalizedTask)
                 putExtra(EXTRA_RECORD_STUDY, recordStudy)
             }
-            context.startForegroundService(intent)
+            runCatching {
+                context.startForegroundService(intent)
+            }.onFailure {
+                running = false
+                remainingSeconds = 0
+                totalSeconds = 0
+                this.task = ""
+                throw it
+            }
         }
 
         fun stop(context: Context) {
