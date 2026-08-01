@@ -2,8 +2,6 @@ package me.rerere.rikkahub.ui.pages.memory
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -47,10 +45,11 @@ import me.rerere.hugeicons.stroke.Refresh01
 import me.rerere.hugeicons.stroke.Search01
 import me.rerere.hugeicons.stroke.Tools
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
+import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchEntity
 import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemoryBankPage(
     onBack: () -> Unit,
@@ -75,21 +74,19 @@ fun MemoryBankPage(
     val selectedAssistant = remember(selectedAssistantId, settings.assistants) {
         selectedAssistantId?.let { id -> settings.assistants.firstOrNull { it.id.toString() == id } }
     }
+    val batchSize = selectedAssistant?.memoryExtractionInterval?.coerceAtLeast(1) ?: 20
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showDeleteDialog by remember { mutableStateOf<MemoryBankEntity?>(null) }
     var showClearAllDialog by remember { mutableStateOf(false) }
     var editMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
     var correctionMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
-    var showFullRebuildDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeFlexibleTopAppBar(
-                title = {
-                    Text("记忆库")
-                },
+                title = { Text("记忆库") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(HugeIcons.ArrowLeft01, contentDescription = "返回")
@@ -97,25 +94,22 @@ fun MemoryBankPage(
                 },
                 actions = {
                     if (loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp,
-                        )
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                         Spacer(modifier = Modifier.width(8.dp))
                     }
-                    IconButton(onClick = { vm.rebuildIndex() }) {
+                    IconButton(onClick = vm::rebuildIndex) {
                         Icon(HugeIcons.Database02, contentDescription = "重建向量索引")
                     }
-                    IconButton(onClick = { vm.processPendingVectors() }) {
+                    IconButton(onClick = vm::processPendingVectors) {
                         Icon(HugeIcons.DatabaseSync, contentDescription = "处理待向量化记忆")
                     }
-                    IconButton(onClick = { vm.runLightMaintenance() }) {
-                        Icon(HugeIcons.Tools, contentDescription = "轻量维护")
+                    IconButton(onClick = vm::runLightMaintenance) {
+                        Icon(HugeIcons.Tools, contentDescription = "合并重复记忆")
                     }
                     IconButton(onClick = { showClearAllDialog = true }) {
                         Icon(HugeIcons.Delete02, contentDescription = "清除长期记忆")
                     }
-                    IconButton(onClick = { vm.loadMemories() }) {
+                    IconButton(onClick = vm::loadMemories) {
                         Icon(HugeIcons.Refresh01, contentDescription = "刷新")
                     }
                 },
@@ -124,15 +118,11 @@ fun MemoryBankPage(
         },
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            item {
-                StatsRow(stats)
-            }
+            item { StatsRow(stats) }
 
             maintenanceMessage?.let { message ->
                 item {
@@ -157,158 +147,89 @@ fun MemoryBankPage(
             }
 
             item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        Text("整理聊天记忆", style = MaterialTheme.typography.titleSmall)
-                        Text(
-                            selectedAssistant?.let { assistant ->
-                                "每批 ${assistant.memoryExtractionInterval} 条，最近 ${assistant.memoryExtractionProtectedRecentCount} 条保持原文；不会跨批次拼接或重复整理。"
-                            } ?: "每个角色按自己的批次与最近保护区设置整理；不会跨批次拼接或重复整理。",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            TextButton(
-                                enabled = !reorganizationProgress.running,
-                                onClick = vm::repairMemoriesFromHistory,
-                            ) {
-                                Icon(HugeIcons.Refresh01, contentDescription = null)
-                                Spacer(Modifier.width(6.dp))
-                                Text("整理最近一批")
-                            }
-                            TextButton(
-                                enabled = !reorganizationProgress.running,
-                                onClick = vm::continueHistoricalMemoryRepair,
-                            ) {
-                                Text("继续补齐旧记录")
-                            }
-                            TextButton(
-                                enabled = !reorganizationProgress.running,
-                                onClick = { showFullRebuildDialog = true },
-                            ) {
-                                Text("完整重建")
-                            }
-                        }
-                        if (reorganizationProgress.message.isNotBlank()) {
-                            Text(
-                                text = reorganizationProgress.message,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = if (reorganizationProgress.failedBatches > 0) {
-                                    MaterialTheme.colorScheme.error
-                                } else {
-                                    MaterialTheme.colorScheme.primary
-                                },
-                            )
-                        }
-                        if (reorganizationProgress.running) {
-                            Text(
-                                "进度：${reorganizationProgress.currentConversation}/${reorganizationProgress.totalConversations} 个对话，已完成 ${reorganizationProgress.completedBatches} 批",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-            }
-
-            if (batchOverviews.isNotEmpty()) {
-                item {
-                    Text("持久记忆批次", style = MaterialTheme.typography.titleSmall)
-                }
-                items(batchOverviews, key = { it.conversationId }) { overview ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(
-                            modifier = Modifier.padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
-                        ) {
-                            Text(
-                                "对话 ${overview.conversationId.take(8)}…",
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                            Text(
-                                "成功点 ${overview.successfulThrough} · 下一批从 ${overview.nextBatchStart} 开始 · 稳定区到 ${overview.stableRegionEnd} · 剩余 ${overview.remainingMessageCount} 条",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            overview.batches
-                                .filter { it.status != MemoryExtractionBatchStatus.SUCCESS_WITH_MEMORIES.name }
-                                .takeLast(8)
-                                .forEach { batch ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                "${batch.batchStartSequence}～${batch.batchEndSequence} · ${batchStatusLabel(batch)}",
-                                                style = MaterialTheme.typography.bodySmall,
-                                            )
-                                            Text(
-                                                "尝试 ${batch.attemptCount} 次${batch.lastError?.let { " · $it" }.orEmpty()}",
-                                                style = MaterialTheme.typography.labelSmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            )
-                                        }
-                                        if (
-                                            batch.status == MemoryExtractionBatchStatus.FAILED_RETRYABLE.name ||
-                                            batch.status == MemoryExtractionBatchStatus.FAILED_MANUAL_REVIEW.name
-                                        ) {
-                                            TextButton(
-                                                enabled = !loading && !reorganizationProgress.running,
-                                                onClick = { vm.retryExtractionBatch(batch.batchId) },
-                                            ) {
-                                                Text("重试")
-                                            }
-                                        }
-                                    }
-                                }
-                        }
-                    }
-                }
-            }
-
-            item { Spacer(modifier = Modifier.height(4.dp)) }
-
-            item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("查看哪个角色的记忆", style = MaterialTheme.typography.titleSmall)
                     AssistantFilterRow(
                         selectedAssistantId = selectedAssistantId,
                         assistantIds = assistantIds,
                         assistantLabels = assistantLabels,
-                        onAssistantSelected = { vm.setSelectedAssistantId(it) },
+                        onAssistantSelected = vm::setSelectedAssistantId,
                     )
                 }
             }
 
-            item {
-                MemoryBankLegend()
+            if (batchOverviews.isNotEmpty()) {
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("持久记忆批次", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "按每批 $batchSize 条固定分段。每一条消息只属于一个批次；旧版滑动区间不再显示。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                items(batchOverviews, key = { it.conversationId }) { overview ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text("对话 ${overview.conversationId.take(8)}…", style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                "可整理到 ${overview.stableRegionEnd}；最近保护区不会进入批次。",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            buildAlignedBatchRows(overview, batchSize).forEach { row ->
+                                AlignedMemoryBatchRow(
+                                    row = row,
+                                    busy = loading || reorganizationProgress.running,
+                                    onProcess = vm::continueHistoricalMemoryRepair,
+                                    onRetry = vm::retryExtractionBatch,
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                item {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            "当前还没有达到一个完整的 $batchSize 条稳定批次。",
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
             }
 
-            item { Spacer(modifier = Modifier.height(4.dp)) }
-
-            item {
-                TypeFilterRow(
-                    selectedType = selectedType,
-                    onTypeSelected = { vm.setSelectedType(it) },
-                )
+            if (reorganizationProgress.message.isNotBlank()) {
+                item {
+                    Text(
+                        text = reorganizationProgress.message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (reorganizationProgress.failedBatches > 0) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        },
+                    )
+                }
             }
 
-            item { Spacer(modifier = Modifier.height(8.dp)) }
-
+            item { MemoryBankLegend() }
+            item {
+                TypeFilterRow(selectedType = selectedType, onTypeSelected = vm::setSelectedType)
+            }
             item {
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { vm.setSearchQuery(it) },
+                    onValueChange = vm::setSearchQuery,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("搜索记忆...") },
-                    leadingIcon = {
-                        Icon(HugeIcons.Search01, contentDescription = null)
-                    },
+                    leadingIcon = { Icon(HugeIcons.Search01, contentDescription = null) },
                     singleLine = true,
                 )
             }
@@ -334,15 +255,10 @@ fun MemoryBankPage(
                         ) {
                             Text("这个角色还没有长期记忆", style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "系统只保存明确偏好、边界、纠正、承诺和重要共同事件；普通寒暄不会为了凑数写进来。",
+                                "请直接在上面的标准批次中选择“整理”或“重试”，不再使用含义不清楚的一键补齐入口。",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            TextButton(onClick = vm::repairMemoriesFromHistory) {
-                                Icon(HugeIcons.Refresh01, contentDescription = null)
-                                Spacer(Modifier.width(6.dp))
-                                Text("整理最近一批")
-                            }
                         }
                     }
                 }
@@ -359,34 +275,9 @@ fun MemoryBankPage(
                 TextButton(onClick = {
                     vm.deleteMemory(memory.id)
                     showDeleteDialog = null
-                }) {
-                    Text("删除", color = MaterialTheme.colorScheme.error)
-                }
+                }) { Text("删除", color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = null }) {
-                    Text("取消")
-                }
-            },
-        )
-    }
-
-    if (showFullRebuildDialog) {
-        AlertDialog(
-            onDismissRequest = { showFullRebuildDialog = false },
-            title = { Text("完整重建记忆？") },
-            text = {
-                Text("这会重新扫描当前筛选角色的全部完整批次，用于修复旧版本的时间和投影错误。已有聊天不会被删除，但可能调用多次模型。")
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showFullRebuildDialog = false
-                    vm.rebuildAllHistoricalMemories()
-                }) { Text("开始重建") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showFullRebuildDialog = false }) { Text("取消") }
-            },
+            dismissButton = { TextButton(onClick = { showDeleteDialog = null }) { Text("取消") } },
         )
     }
 
@@ -399,9 +290,9 @@ fun MemoryBankPage(
             text = {
                 Text(
                     if (clearingAll) {
-                        "将不可撤销地删除记忆库中的全部长期记忆。角色人设、世界书、聊天记录和考研计划不会受影响。"
+                        "将不可撤销地删除记忆库中的全部长期记忆。聊天记录不会受影响。"
                     } else {
-                        "将不可撤销地删除“$selectedName”的全部长期记忆。角色人设、世界书、聊天记录和考研计划不会受影响。"
+                        "将不可撤销地删除“$selectedName”的全部长期记忆。聊天记录不会受影响。"
                     },
                 )
             },
@@ -409,15 +300,9 @@ fun MemoryBankPage(
                 TextButton(onClick = {
                     vm.clearLongTermMemories()
                     showClearAllDialog = false
-                }) {
-                    Text("清除", color = MaterialTheme.colorScheme.error)
-                }
+                }) { Text("清除", color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = {
-                TextButton(onClick = { showClearAllDialog = false }) {
-                    Text("取消")
-                }
-            },
+            dismissButton = { TextButton(onClick = { showClearAllDialog = false }) { Text("取消") } },
         )
     }
 
@@ -441,5 +326,82 @@ fun MemoryBankPage(
                 correctionMemory = null
             },
         )
+    }
+}
+
+private data class AlignedBatchRow(
+    val start: Int,
+    val end: Int,
+    val batch: MemoryExtractionBatchEntity?,
+    val isNextPending: Boolean,
+)
+
+private fun buildAlignedBatchRows(
+    overview: MemoryBatchOverview,
+    batchSize: Int,
+): List<AlignedBatchRow> {
+    if (overview.stableRegionEnd <= 0) return emptyList()
+    return generateSequence(1) { previous -> previous + batchSize }
+        .takeWhile { start -> start <= overview.stableRegionEnd }
+        .map { start ->
+            val end = (start + batchSize - 1).coerceAtMost(overview.stableRegionEnd)
+            val exact = overview.batches
+                .filter { it.batchStartSequence == start && it.batchEndSequence == end }
+                .maxByOrNull { it.updatedAt }
+            AlignedBatchRow(
+                start = start,
+                end = end,
+                batch = exact,
+                isNextPending = start == overview.nextBatchStart,
+            )
+        }
+        .toList()
+}
+
+@Composable
+private fun AlignedMemoryBatchRow(
+    row: AlignedBatchRow,
+    busy: Boolean,
+    onProcess: () -> Unit,
+    onRetry: (String) -> Unit,
+) {
+    val batch = row.batch
+    val status = when (batch?.status) {
+        MemoryExtractionBatchStatus.SUCCESS_WITH_MEMORIES.name -> "成功"
+        MemoryExtractionBatchStatus.SUCCESS_EMPTY.name -> "成功 · 无需长期保存"
+        MemoryExtractionBatchStatus.PROCESSING.name -> "整理中"
+        MemoryExtractionBatchStatus.PENDING.name -> "待整理"
+        MemoryExtractionBatchStatus.FAILED_RETRYABLE.name -> "失败 · 可重试"
+        MemoryExtractionBatchStatus.FAILED_MANUAL_REVIEW.name -> "失败 · 可重试"
+        MemoryExtractionBatchStatus.INVALIDATED.name -> "已失效 · 可重新整理"
+        null -> if (row.isNextPending) "待整理" else "等待前序批次"
+        else -> "状态未知"
+    }
+    val retryable = batch != null && batch.status in setOf(
+        MemoryExtractionBatchStatus.FAILED_RETRYABLE.name,
+        MemoryExtractionBatchStatus.FAILED_MANUAL_REVIEW.name,
+        MemoryExtractionBatchStatus.INVALIDATED.name,
+    )
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text("${row.start}～${row.end} · $status", style = MaterialTheme.typography.bodySmall)
+            batch?.lastError?.takeIf(String::isNotBlank)?.let { error ->
+                Text(
+                    text = error,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error,
+                    maxLines = 3,
+                )
+            }
+        }
+        when {
+            retryable -> TextButton(enabled = !busy, onClick = { onRetry(batch!!.batchId) }) { Text("重试") }
+            batch == null && row.isNextPending -> TextButton(enabled = !busy, onClick = onProcess) { Text("整理") }
+        }
     }
 }
