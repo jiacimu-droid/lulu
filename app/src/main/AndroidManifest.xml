@@ -130,10 +130,7 @@
 
     <receiver android:name=".data.voicecall.ProactiveCallActionReceiver" android:exported="false" />
 
-    <!-- Kept temporarily so old PendingIntents from an installed previous build fail safely. -->
-    <receiver android:name=".data.service.ProactiveMessageReceiver" android:exported="false" />
-
-    <!-- All newly scheduled proactive alarms enter through the shared dispatcher lease. -->
+    <!-- The only AlarmManager entry for proactive text generation. -->
     <receiver android:name=".data.service.UnifiedProactiveAlarmReceiver" android:exported="false" />
 
     <receiver android:name=".data.service.ProactiveBootReceiver" android:exported="true">
