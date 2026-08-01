@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T06:30:05.105249+00:00",
-  "commit": "1ebf009da9d083847662e4abe452e908ca01a43f",
+  "generatedAt": "2026-08-01T06:36:17.696422+00:00",
+  "commit": "bc7d6f51e68931372d4af23ee6562bbfa4a12af1",
   "branch": "master",
-  "sourceFingerprint": "0f29ac6218e7857cda6c6c3b4151fc68fbae813b56c2c02de52bfe844545c5f6",
+  "sourceFingerprint": "18eef650decc2c0df9b47db866678197f7329497376b4b4ae03342f615c9f109",
   "summary": {
     "files": 1196,
-    "lines": 263035,
+    "lines": 263037,
     "symbols": 5718,
     "productionCodeFiles": 858,
     "testFiles": 148,
@@ -19084,55 +19084,55 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 98,
-      "sha256": "5dd6ddd2481431567f0d1ae8bbfe77f2bdca7de60d171e5aff34515d7868de0e",
+      "lines": 100,
+      "sha256": "d9fd01fb466bdbd8f4c267e2d05e2dc3317618ed67b1bd757f406e435bd09314",
       "package": "me.rerere.rikkahub.data.model",
       "categories": [],
       "symbols": [
         {
           "name": "GroupChatRole",
           "kind": "class",
-          "line": 10
+          "line": 12
         },
         {
           "name": "GroupChatMember",
           "kind": "class",
-          "line": 17
+          "line": 19
         },
         {
           "name": "GroupChatSpec",
           "kind": "class",
-          "line": 24
+          "line": 26
         },
         {
           "name": "normalized",
           "kind": "function",
-          "line": 39
+          "line": 41
         },
         {
           "name": "updateMemberTitle",
           "kind": "function",
-          "line": 48
+          "line": 50
         },
         {
           "name": "removeMember",
           "kind": "function",
-          "line": 58
+          "line": 60
         },
         {
           "name": "transferOwnershipTo",
           "kind": "function",
-          "line": 63
+          "line": 65
         },
         {
           "name": "toConversationSystemPrompt",
           "kind": "function",
-          "line": 73
+          "line": 75
         },
         {
           "name": "decodeGroupChatSpec",
           "kind": "function",
-          "line": 82
+          "line": 84
         }
       ],
       "localImportCount": 1,
@@ -77700,21 +77700,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "class",
-        "line": 17
+        "line": 19
       }
     ],
     "me.rerere.rikkahub.data.model.GroupChatRole": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "class",
-        "line": 10
+        "line": 12
       }
     ],
     "me.rerere.rikkahub.data.model.GroupChatSpec": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "class",
-        "line": 24
+        "line": 26
       }
     ],
     "me.rerere.rikkahub.data.model.Image": [
@@ -77838,7 +77838,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "function",
-        "line": 82
+        "line": 84
       }
     ],
     "me.rerere.rikkahub.data.model.extractContextForMatching": [
@@ -77915,7 +77915,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "function",
-        "line": 39
+        "line": 41
       }
     ],
     "me.rerere.rikkahub.data.model.of": [
@@ -77936,7 +77936,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "function",
-        "line": 58
+        "line": 60
       }
     ],
     "me.rerere.rikkahub.data.model.replaceRegexes": [
@@ -77950,7 +77950,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "function",
-        "line": 73
+        "line": 75
       }
     ],
     "me.rerere.rikkahub.data.model.toMessageNode": [
@@ -77971,7 +77971,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "function",
-        "line": 63
+        "line": 65
       }
     ],
     "me.rerere.rikkahub.data.model.updateCurrentMessages": [
@@ -77985,7 +77985,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "kind": "function",
-        "line": 48
+        "line": 50
       }
     ],
     "me.rerere.rikkahub.data.repository.ConversationPageResult": [
