@@ -7,19 +7,21 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import me.rerere.rikkahub.plugin.webview.PomodoroTimerService
+import kotlin.math.roundToInt
 
-/**
- * Small in-app timer bar attached to the activity content view.
- * It survives Compose navigation without requesting system overlay permission.
- */
+/** Small movable in-app timer bar that survives Compose navigation. */
 object PomodoroInAppOverlayController {
     private const val VIEW_TAG = "study-pomodoro-mini-bar"
+    private const val PREFS_NAME = "study_pomodoro_overlay"
+    private const val KEY_X = "x"
+    private const val KEY_Y = "y"
     private val handler = Handler(Looper.getMainLooper())
     private var ticker: Runnable? = null
 
@@ -34,7 +36,7 @@ object PomodoroInAppOverlayController {
 
         val root = activity.findViewById<ViewGroup>(android.R.id.content) ?: return
         val density = activity.resources.displayMetrics.density
-        fun dp(value: Int): Int = (value * density).toInt()
+        fun dp(value: Int): Int = (value * density).roundToInt()
 
         val background = GradientDrawable().apply {
             cornerRadius = dp(18).toFloat()
@@ -94,11 +96,62 @@ object PomodoroInAppOverlayController {
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
-            Gravity.BOTTOM,
+            Gravity.TOP or Gravity.START,
         ).apply {
-            setMargins(dp(14), 0, dp(14), dp(88))
+            setMargins(dp(14), dp(90), dp(14), 0)
         }
         root.addView(bar, params)
+
+        val prefs = activity.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE)
+        bar.post {
+            val maxX = (root.width - bar.width).coerceAtLeast(0).toFloat()
+            val maxY = (root.height - bar.height).coerceAtLeast(0).toFloat()
+            val defaultY = (root.height - bar.height - dp(88)).coerceAtLeast(dp(24)).toFloat()
+            bar.x = prefs.getFloat(KEY_X, dp(14).toFloat()).coerceIn(0f, maxX)
+            bar.y = prefs.getFloat(KEY_Y, defaultY).coerceIn(0f, maxY)
+        }
+
+        var downRawX = 0f
+        var downRawY = 0f
+        var startX = 0f
+        var startY = 0f
+        var dragging = false
+        val touchSlop = dp(5).toFloat()
+        bar.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    downRawX = event.rawX
+                    downRawY = event.rawY
+                    startX = bar.x
+                    startY = bar.y
+                    dragging = false
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = event.rawX - downRawX
+                    val dy = event.rawY - downRawY
+                    if (!dragging && (kotlin.math.abs(dx) > touchSlop || kotlin.math.abs(dy) > touchSlop)) {
+                        dragging = true
+                    }
+                    if (dragging) {
+                        val maxX = (root.width - bar.width).coerceAtLeast(0).toFloat()
+                        val maxY = (root.height - bar.height).coerceAtLeast(0).toFloat()
+                        bar.x = (startX + dx).coerceIn(0f, maxX)
+                        bar.y = (startY + dy).coerceIn(0f, maxY)
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (dragging) {
+                        prefs.edit().putFloat(KEY_X, bar.x).putFloat(KEY_Y, bar.y).apply()
+                    } else if (event.actionMasked == MotionEvent.ACTION_UP) {
+                        bar.performClick()
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
 
         val tick = object : Runnable {
             override fun run() {
