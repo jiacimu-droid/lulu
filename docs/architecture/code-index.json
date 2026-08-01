@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T11:02:39.796309+00:00",
-  "commit": "4989468ed59bd1bf64e1693b3961eecf48f7614f",
+  "generatedAt": "2026-08-01T11:03:05.955505+00:00",
+  "commit": "e54270d1c7842cdbe4be53d205004ac0788d7d37",
   "branch": "master",
-  "sourceFingerprint": "092854cf60d8a7b8e74c37c620b0c73c5b65cf9d8707c4570450874d73fc3c74",
+  "sourceFingerprint": "9587b0bfbce8d89205f7606fccaab099b6f1cf3fb3c90b5ae1a0e6eeb6ac15ff",
   "summary": {
     "files": 1197,
-    "lines": 262830,
+    "lines": 262802,
     "symbols": 5720,
     "productionCodeFiles": 859,
     "testFiles": 148,
@@ -38932,8 +38932,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 148,
-      "sha256": "29adc9904ceb79ac93049041d7f9238483adf60c16ca04ff92e615c7d5368869",
+      "lines": 120,
+      "sha256": "544eb08426fbb9973f71acb23442fcc1250f0eb7ab5edef1bc89175b11c797e8",
       "package": "me.rerere.rikkahub.ui.pages.game",
       "categories": [
         "界面"
@@ -38942,22 +38942,22 @@
         {
           "name": "GameHubFeaturePage",
           "kind": "composable",
-          "line": 39
+          "line": 40
         },
         {
           "name": "GameHubTileCard",
           "kind": "composable",
-          "line": 104
+          "line": 79
         },
         {
           "name": "GameHubTile",
           "kind": "class",
-          "line": 139
+          "line": 111
         },
         {
           "name": "GameHubColors",
           "kind": "object",
-          "line": 145
+          "line": 117
         }
       ],
       "localImportCount": 5,
@@ -94102,14 +94102,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "kind": "object",
-        "line": 145
+        "line": 117
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameHubFeaturePage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "kind": "composable",
-        "line": 39
+        "line": 40
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameHubPage": [
@@ -94123,14 +94123,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "kind": "class",
-        "line": 139
+        "line": 111
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameHubTileCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/GameHubFeature.kt",
         "kind": "composable",
-        "line": 104
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameResultText": [
