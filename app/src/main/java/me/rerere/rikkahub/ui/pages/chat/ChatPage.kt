@@ -55,13 +55,15 @@ import me.rerere.rikkahub.data.companion.CompanionPersistedState
 import me.rerere.rikkahub.data.companion.CompanionSnapshot
 import me.rerere.rikkahub.data.companion.CompanionStore
 import me.rerere.rikkahub.data.datastore.Settings
-import me.rerere.rikkahub.data.datastore.getAssistantById
 import me.rerere.rikkahub.data.datastore.findProvider
+import me.rerere.rikkahub.data.datastore.getAssistantById
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.datastore.getCurrentChatModel
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Conversation
+import me.rerere.rikkahub.data.model.groupChatSpec
+import me.rerere.rikkahub.data.model.toConversationSystemPrompt
 import me.rerere.rikkahub.service.ChatError
 import me.rerere.rikkahub.ui.components.ai.ChatInput
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
@@ -77,15 +79,10 @@ import kotlin.uuid.Uuid
 
 @Composable
 fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, autoStartVoice: Boolean = false) {
-    val vm: ChatVM = koinViewModel(
-        parameters = {
-            parametersOf(id.toString())
-        }
-    )
+    val vm: ChatVM = koinViewModel(parameters = { parametersOf(id.toString()) })
     val filesManager: FilesManager = koinInject()
     val companionStore: CompanionStore = koinInject()
     val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
 
     val setting by vm.settings.collectAsStateWithLifecycle()
     val conversation by vm.conversation.collectAsStateWithLifecycle()
@@ -95,35 +92,23 @@ fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, au
     val enableWebSearch by vm.enableWebSearch.collectAsStateWithLifecycle()
     val errors by vm.errors.collectAsStateWithLifecycle()
     val companionState by companionStore.state.collectAsStateWithLifecycle()
-
     val inputState = vm.inputState
 
-    // 初始化输入状态（处理传入的 files 和 text 参数）
     LaunchedEffect(files, text) {
         if (files.isNotEmpty()) {
             val localFiles = filesManager.createChatFilesByContents(files)
-            val contentTypes = files.mapNotNull { file ->
-                filesManager.getFileMimeType(file)
-            }
-            val parts = buildList {
+            val contentTypes = files.mapNotNull(filesManager::getFileMimeType)
+            inputState.messageContent = buildList {
                 localFiles.forEachIndexed { index, file ->
-                    val type = contentTypes.getOrNull(index)
-                    if (type?.startsWith("image/") == true) {
-                        add(UIMessagePart.Image(url = file.toString()))
-                    } else if (type?.startsWith("video/") == true) {
-                        add(UIMessagePart.Video(url = file.toString()))
-                    } else if (type?.startsWith("audio/") == true) {
-                        add(UIMessagePart.Audio(url = file.toString()))
+                    when {
+                        contentTypes.getOrNull(index)?.startsWith("image/") == true -> add(UIMessagePart.Image(file.toString()))
+                        contentTypes.getOrNull(index)?.startsWith("video/") == true -> add(UIMessagePart.Video(file.toString()))
+                        contentTypes.getOrNull(index)?.startsWith("audio/") == true -> add(UIMessagePart.Audio(file.toString()))
                     }
                 }
             }
-            inputState.messageContent = parts
         }
-        text?.base64Decode()?.let { decodedText ->
-            if (decodedText.isNotEmpty()) {
-                inputState.setMessageText(decodedText)
-            }
-        }
+        text?.base64Decode()?.takeIf(String::isNotEmpty)?.let(inputState::setMessageText)
     }
 
     val chatListState = rememberLazyListState()
@@ -131,9 +116,7 @@ fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, au
         if (!vm.chatListInitialized && conversation.messageNodes.isNotEmpty()) {
             if (nodeId != null) {
                 val index = conversation.messageNodes.indexOfFirst { it.id == nodeId }
-                if (index >= 0) {
-                    chatListState.scrollToItem(index)
-                }
+                if (index >= 0) chatListState.scrollToItem(index)
             } else {
                 chatListState.requestScrollToItem(conversation.currentMessages.size + 5)
             }
@@ -155,8 +138,8 @@ fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, au
         currentChatModel = currentChatModel,
         autoStartVoice = autoStartVoice,
         errors = errors,
-        onDismissError = { vm.dismissError(it) },
-        onClearAllErrors = { vm.clearAllErrors() },
+        onDismissError = vm::dismissError,
+        onClearAllErrors = vm::clearAllErrors,
     )
 }
 
@@ -164,7 +147,7 @@ fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, au
 private fun ChatPageContent(
     inputState: ChatInputState,
     loadingJob: Job?,
-    processingStatus: String? = null,
+    processingStatus: String?,
     setting: Settings,
     companionState: CompanionPersistedState,
     conversation: Conversation,
@@ -173,7 +156,7 @@ private fun ChatPageContent(
     chatListState: LazyListState,
     enableWebSearch: Boolean,
     currentChatModel: Model?,
-    autoStartVoice: Boolean = false,
+    autoStartVoice: Boolean,
     errors: List<ChatError>,
     onDismissError: (Uuid) -> Unit,
     onClearAllErrors: () -> Unit,
@@ -181,20 +164,17 @@ private fun ChatPageContent(
     val scope = rememberCoroutineScope()
     val toaster = LocalToaster.current
     var previewMode by rememberSaveable { mutableStateOf(false) }
+    var showGroupSettings by rememberSaveable { mutableStateOf(false) }
     val hazeState = rememberHazeState()
     val imeVisible = WindowInsets.isImeVisible
-    val assistant = setting.getAssistantById(conversation.assistantId)
-        ?: setting.getCurrentAssistant()
-    val companionSnapshot = companionState.snapshots
-        .firstOrNull { it.assistantId == assistant.id.toString() }
+    val groupSpec = conversation.groupChatSpec
+    val assistant = setting.getAssistantById(conversation.assistantId) ?: setting.getCurrentAssistant()
+    val companionSnapshot = companionState.snapshots.firstOrNull { it.assistantId == assistant.id.toString() }
         ?: CompanionSnapshot.empty(assistant.id.toString())
 
     TTSAutoPlay(setting = setting, conversation = conversation, loading = loadingJob != null)
 
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
         AssistantBackground(setting = setting)
         Scaffold(
             topBar = {
@@ -204,54 +184,37 @@ private fun ChatPageContent(
                     companionSnapshot = companionSnapshot,
                     navController = navController,
                     previewMode = previewMode,
+                    groupName = groupSpec?.name,
+                    groupMemberCount = groupSpec?.members?.size?.plus(1),
                     customSystemPrompt = conversation.customSystemPrompt,
-                    allowConversationSystemPrompt = assistant.allowConversationSystemPrompt,
+                    allowConversationSystemPrompt = groupSpec == null && assistant.allowConversationSystemPrompt,
                     onConversationSystemPromptChange = { newPrompt ->
                         vm.updateConversation(conversation.copy(customSystemPrompt = newPrompt))
                         vm.saveConversationAsync()
                     },
-                    onClickMenu = {
-                        previewMode = !previewMode
-                    },
-                    onStartVoiceCall = {
-                        navController.navigate(
-                            Screen.VoiceCall(
-                                conversationId = conversation.id.toString(),
-                                assistantId = conversation.assistantId.toString(),
-                            )
-                        )
-                    },
-                    onOpenVoiceCallHistory = {
-                        navController.navigate(
-                            Screen.VoiceCallHistory(
-                                conversationId = conversation.id.toString(),
-                                assistantId = conversation.assistantId.toString(),
-                            )
-                        )
-                    },
+                    onClickMenu = { previewMode = !previewMode },
+                    onGroupSettings = if (groupSpec != null) ({ showGroupSettings = true }) else null,
+                    onStartVoiceCall = if (groupSpec == null) ({
+                        navController.navigate(Screen.VoiceCall(conversation.id.toString(), conversation.assistantId.toString()))
+                    }) else null,
+                    onOpenVoiceCallHistory = if (groupSpec == null) ({
+                        navController.navigate(Screen.VoiceCallHistory(conversation.id.toString(), conversation.assistantId.toString()))
+                    }) else null,
                 )
             },
             bottomBar = {
                 ChatInput(
-                    modifier = if (imeVisible) {
-                        Modifier.consumeWindowInsets(WindowInsets.navigationBars)
-                    } else {
-                        Modifier
-                    },
+                    modifier = if (imeVisible) Modifier.consumeWindowInsets(WindowInsets.navigationBars) else Modifier,
                     state = inputState,
                     loading = loadingJob != null,
                     settings = setting,
                     conversation = conversation,
                     mcpManager = vm.mcpManager,
                     hazeState = hazeState,
-                    autoStartVoice = autoStartVoice,
-                    onCancelClick = {
-                        vm.stopGeneration()
-                    },
+                    autoStartVoice = autoStartVoice && groupSpec == null,
+                    onCancelClick = vm::stopGeneration,
                     enableSearch = enableWebSearch,
-                    onToggleSearch = {
-                        vm.updateSettings(setting.copy(enableWebSearch = !enableWebSearch))
-                    },
+                    onToggleSearch = { vm.updateSettings(setting.copy(enableWebSearch = !enableWebSearch)) },
                     canReplyToCurrentConversation = canRequestManualReply(conversation),
                     onSendClick = {
                         if (currentChatModel == null) {
@@ -259,15 +222,10 @@ private fun ChatPageContent(
                             return@ChatInput
                         }
                         if (inputState.isEditing()) {
-                            vm.handleMessageEdit(
-                                parts = inputState.getContents(),
-                                messageId = inputState.editingMessage!!,
-                            )
+                            vm.handleMessageEdit(inputState.getContents(), inputState.editingMessage!!)
                         } else {
-                            vm.handleMessageSend(content = inputState.getContents(), answer = false)
-                            scope.launch {
-                                chatListState.requestScrollToItem(conversation.currentMessages.size + 5)
-                            }
+                            vm.handleMessageSend(inputState.getContents(), answer = false)
+                            scope.launch { chatListState.requestScrollToItem(conversation.currentMessages.size + 5) }
                         }
                         inputState.clearInput()
                     },
@@ -276,66 +234,32 @@ private fun ChatPageContent(
                             toaster.show("请先选择模型", type = ToastType.Error)
                             return@ChatInput
                         }
-                        if (inputState.isEditing()) {
-                            vm.handleMessageEdit(
-                                parts = inputState.getContents(),
-                                messageId = inputState.editingMessage!!,
-                            )
-                            inputState.clearInput()
-                        } else if (!inputState.isEmpty()) {
-                            vm.handleMessageSend(content = inputState.getContents(), answer = true)
-                            inputState.clearInput()
-                        } else {
-                            vm.handleReplyRequest()
+                        when {
+                            inputState.isEditing() -> {
+                                vm.handleMessageEdit(inputState.getContents(), inputState.editingMessage!!)
+                                inputState.clearInput()
+                            }
+                            !inputState.isEmpty() -> {
+                                vm.handleMessageSend(inputState.getContents(), answer = true)
+                                inputState.clearInput()
+                            }
+                            else -> vm.handleReplyRequest()
                         }
-                        scope.launch {
-                            chatListState.requestScrollToItem(conversation.currentMessages.size + 5)
-                        }
+                        scope.launch { chatListState.requestScrollToItem(conversation.currentMessages.size + 5) }
                     },
                     onVoiceMessage = { url, duration, transcript ->
                         if (currentChatModel == null) {
                             toaster.show("请先选择模型", type = ToastType.Error)
                             return@ChatInput
                         }
-                        vm.handleMessageSend(
-                            listOf(
-                                UIMessagePart.VoiceMessage(
-                                    url = url,
-                                    duration = duration,
-                                    transcript = transcript,
-                                )
-                            )
-                        )
-                        scope.launch {
-                            chatListState.requestScrollToItem(conversation.currentMessages.size + 5)
-                        }
+                        vm.handleMessageSend(listOf(UIMessagePart.VoiceMessage(url, duration, transcript)))
                     },
-                    onUpdateChatModel = {
-                        vm.setChatModel(assistant = setting.getCurrentAssistant(), model = it)
+                    onUpdateChatModel = { vm.setChatModel(setting.getCurrentAssistant(), it) },
+                    onUpdateAssistant = { updated ->
+                        vm.updateSettings(setting.copy(assistants = setting.assistants.map { if (it.id == updated.id) updated else it }))
                     },
-                    onUpdateAssistant = {
-                        vm.updateSettings(
-                            setting.copy(
-                                assistants = setting.assistants.map { assistant ->
-                                    if (assistant.id == it.id) {
-                                        it
-                                    } else {
-                                        assistant
-                                    }
-                                }
-                            )
-                        )
-                    },
-                    onUpdateSearchService = { index ->
-                        vm.updateSettings(
-                            setting.copy(
-                                searchServiceSelected = index
-                            )
-                        )
-                    },
-                    onCompressContext = { additionalPrompt, targetTokens, keepRecentMessages ->
-                        vm.handleCompressContext(additionalPrompt, targetTokens, keepRecentMessages)
-                    },
+                    onUpdateSearchService = { vm.updateSettings(setting.copy(searchServiceSelected = it)) },
+                    onCompressContext = vm::handleCompressContext,
                 )
             },
             containerColor = Color.Transparent,
@@ -353,62 +277,57 @@ private fun ChatPageContent(
                 errors = errors,
                 onDismissError = onDismissError,
                 onClearAllErrors = onClearAllErrors,
-                onRegenerate = {
-                    vm.regenerateAtMessage(it)
-                },
+                onRegenerate = vm::regenerateAtMessage,
                 onEdit = {
                     inputState.editingMessage = it.id
                     inputState.setContents(it.parts)
                 },
                 onForkMessage = {
-                    scope.launch {
-                        val fork = vm.forkMessage(message = it)
-                        navController.navigate(Screen.Chat(fork.id.toString()))
-                    }
+                    scope.launch { navController.navigate(Screen.Chat(vm.forkMessage(it).id.toString())) }
                 },
-                onDelete = {
-                    if (loadingJob != null) {
-                        vm.showDeleteBlockedWhileGeneratingError()
-                    } else {
-                        vm.deleteMessage(it)
-                    }
-                },
+                onDelete = { if (loadingJob != null) vm.showDeleteBlockedWhileGeneratingError() else vm.deleteMessage(it) },
                 onUpdateMessage = { newNode ->
-                    vm.updateConversation(
-                        conversation.copy(
-                            messageNodes = conversation.messageNodes.map { node ->
-                                if (node.id == newNode.id) {
-                                    newNode
-                                } else {
-                                    node
-                                }
-                            }
-                        ))
+                    vm.updateConversation(conversation.copy(messageNodes = conversation.messageNodes.map { if (it.id == newNode.id) newNode else it }))
                     vm.saveConversationAsync()
                 },
-                onTranslate = { message, locale ->
-                    vm.translateMessage(message, locale)
-                },
-                onClearTranslation = { message ->
-                    vm.clearTranslationField(message.id)
-                },
-                onJumpToMessage = { index ->
+                onTranslate = vm::translateMessage,
+                onClearTranslation = { vm.clearTranslationField(it.id) },
+                onJumpToMessage = {
                     previewMode = false
-                    scope.launch {
-                        chatListState.animateScrollToItem(index)
-                    }
+                    scope.launch { chatListState.animateScrollToItem(it) }
                 },
-                onToolApproval = { toolCallId, approved, reason ->
-                    vm.handleToolApproval(toolCallId, approved, reason)
-                },
-                onToolAnswer = { toolCallId, answer ->
-                    vm.handleToolAnswer(toolCallId, answer)
-                },
-                onToggleFavorite = { node ->
-                    vm.toggleMessageFavorite(node)
-                },
+                onToolApproval = vm::handleToolApproval,
+                onToolAnswer = vm::handleToolAnswer,
+                onToggleFavorite = vm::toggleMessageFavorite,
             )
         }
+    }
+
+    if (showGroupSettings && groupSpec != null) {
+        GroupChatSettingsDialog(
+            spec = groupSpec,
+            assistants = setting.assistants,
+            onDismiss = { showGroupSettings = false },
+            onSave = { updated ->
+                vm.updateConversation(
+                    conversation.copy(
+                        title = updated.name,
+                        assistantId = updated.members.firstOrNull()?.assistantId
+                            ?.let { runCatching { Uuid.parse(it) }.getOrNull() }
+                            ?: conversation.assistantId,
+                        customSystemPrompt = updated.toConversationSystemPrompt(),
+                    ),
+                )
+                vm.saveConversationAsync()
+                showGroupSettings = false
+            },
+            onDeleteGroup = {
+                vm.stopGeneration()
+                vm.deleteConversation(conversation)
+                showGroupSettings = false
+                navController.popBackStack()
+            },
+        )
     }
 }
 
@@ -419,16 +338,20 @@ private fun TopBar(
     companionSnapshot: CompanionSnapshot,
     navController: Navigator,
     previewMode: Boolean,
+    groupName: String?,
+    groupMemberCount: Int?,
     customSystemPrompt: String?,
     allowConversationSystemPrompt: Boolean,
     onConversationSystemPromptChange: (String?) -> Unit,
     onClickMenu: () -> Unit,
-    onStartVoiceCall: () -> Unit,
-    onOpenVoiceCallHistory: () -> Unit,
+    onGroupSettings: (() -> Unit)?,
+    onStartVoiceCall: (() -> Unit)?,
+    onOpenVoiceCallHistory: (() -> Unit)?,
 ) {
     var showLuluStatus by rememberSaveable { mutableStateOf(false) }
     var showConversationSystemPrompt by rememberSaveable { mutableStateOf(false) }
     val assistantDefaultName = stringResource(R.string.assistant_page_default_assistant)
+    val isGroup = groupName != null
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
@@ -439,66 +362,61 @@ private fun TopBar(
         },
         title = {
             val model = settings.getCurrentChatModel()
-            val provider = model?.findProvider(providers = settings.providers, checkOverwrite = false)
+            val provider = model?.findProvider(settings.providers, checkOverwrite = false)
             Row {
                 UIAvatar(
-                    name = assistant.name.ifBlank { assistantDefaultName },
+                    name = groupName ?: assistant.name.ifBlank { assistantDefaultName },
                     value = assistant.avatar,
                     modifier = Modifier.size(40.dp),
-                    onClick = { showLuluStatus = true },
+                    onClick = { if (isGroup) onGroupSettings?.invoke() else showLuluStatus = true },
                 )
                 androidx.compose.foundation.layout.Spacer(Modifier.width(10.dp))
                 Column {
                     Text(
-                        text = assistant.name.ifBlank { assistantDefaultName },
+                        text = groupName ?: assistant.name.ifBlank { assistantDefaultName },
                         maxLines = 1,
                         style = MaterialTheme.typography.bodyMedium,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    if (model != null && provider != null) {
-                        Text(
-                            text = "${model.displayName} (${provider.name})",
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                            color = LocalContentColor.current.copy(0.65f),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 8.sp,
-                            )
-                        )
-                    }
+                    Text(
+                        text = if (isGroup) {
+                            "${groupMemberCount ?: 0}人群聊"
+                        } else if (model != null && provider != null) {
+                            "${model.displayName} (${provider.name})"
+                        } else {
+                            ""
+                        },
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = LocalContentColor.current.copy(0.65f),
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                    )
                 }
             }
         },
         actions = {
-            if (allowConversationSystemPrompt) {
+            if (onGroupSettings != null) {
+                IconButton(onClick = onGroupSettings) {
+                    Icon(HugeIcons.Setting07, contentDescription = "群聊设置")
+                }
+            } else if (allowConversationSystemPrompt) {
                 IconButton(onClick = { showConversationSystemPrompt = true }) {
-                    Icon(
-                        HugeIcons.Setting07,
-                        contentDescription = stringResource(R.string.chat_page_conversation_system_prompt),
-                    )
+                    Icon(HugeIcons.Setting07, contentDescription = stringResource(R.string.chat_page_conversation_system_prompt))
                 }
             }
-            IconButton(onClick = onStartVoiceCall) {
-                Icon(HugeIcons.Call02, contentDescription = "电话")
+            onStartVoiceCall?.let { action ->
+                IconButton(onClick = action) { Icon(HugeIcons.Call02, contentDescription = "电话") }
             }
-            IconButton(onClick = onOpenVoiceCallHistory) {
-                Icon(HugeIcons.TransactionHistory, contentDescription = "电话历史")
+            onOpenVoiceCallHistory?.let { action ->
+                IconButton(onClick = action) { Icon(HugeIcons.TransactionHistory, contentDescription = "电话历史") }
             }
-            IconButton(
-                onClick = {
-                    onClickMenu()
-                }
-            ) {
+            IconButton(onClick = onClickMenu) {
                 Icon(if (previewMode) HugeIcons.Cancel01 else HugeIcons.LeftToRightListBullet, "Chat Options")
             }
         },
     )
     if (showLuluStatus) {
-        LuluStatusDialog(
-            assistant = assistant,
-            snapshot = companionSnapshot,
-            onDismissRequest = { showLuluStatus = false },
-        )
+        LuluStatusDialog(assistant, companionSnapshot, onDismissRequest = { showLuluStatus = false })
     }
     ConversationSystemPromptDialog(
         visible = showConversationSystemPrompt,
