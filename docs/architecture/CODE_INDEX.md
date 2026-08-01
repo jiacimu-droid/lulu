@@ -12,11 +12,11 @@
 
 ## 索引状态
 
-- 基准提交：`3ae4a8364e0b8d3a010aa49fb6630b63db483374`
+- 基准提交：`6d7bbe12c7d877d1a51e7e86055031137134c343`
 - 分支：`master`
-- 源码指纹：`103bf4757ca84b3a…`
+- 源码指纹：`a81aae3b2812d04a…`
 - 已索引文件：1195
-- 已索引代码/文本行：262949
+- 已索引代码/文本行：262867
 - 已发现类、接口、对象、函数及 Composable：5704
 
 ## 仓库健康信号
@@ -126,9 +126,9 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt` | 34 | 455 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt` | 33 | 732 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt` | 33 | 1064 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt` | 32 | 427 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 32 | 953 |
 | `ai/src/main/java/me/rerere/ai/provider/providers/GoogleProvider.kt` | 32 | 897 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt` | 30 | 509 |
 
 ## 模块概览
 
@@ -546,7 +546,7 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2088
+- 已解析本地导入边：2089
 - 可检索完整符号：5090
 
 | 文件 | 被本地文件导入 | 行数 |
