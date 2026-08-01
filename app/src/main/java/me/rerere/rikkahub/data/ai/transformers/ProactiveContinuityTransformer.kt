@@ -73,8 +73,8 @@ private fun UIMessage.visibleText(): String = parts
     .trim()
 
 private fun String.compactPreview(): String = lineSequence()
-    .map(String::trim)
-    .filter(String::isNotBlank)
+    .map { it.trim() }
+    .filter { it.isNotBlank() }
     .joinToString(" ")
     .replace(Regex("\\s+"), " ")
     .take(MAX_TURN_PREVIEW_CHARS)
