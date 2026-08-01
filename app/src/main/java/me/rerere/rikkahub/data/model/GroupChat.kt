@@ -1,6 +1,8 @@
 package me.rerere.rikkahub.data.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import me.rerere.rikkahub.utils.JsonInstant
 
 private const val GROUP_CHAT_PREFIX = "<!--lulu-group-chat:"
