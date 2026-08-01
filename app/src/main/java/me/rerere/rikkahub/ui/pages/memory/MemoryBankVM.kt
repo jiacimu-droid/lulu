@@ -4,32 +4,35 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelType
+import me.rerere.rikkahub.data.companion.CompanionRuntime
+import me.rerere.rikkahub.data.companion.CompanionTurnMutation
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
-import me.rerere.rikkahub.data.companion.CompanionRuntime
-import me.rerere.rikkahub.data.companion.CompanionTurnMutation
 import me.rerere.rikkahub.data.db.entity.MemoryBankEntity
 import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchEntity
 import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.buildCompanionPrivateImpression
-import me.rerere.rikkahub.data.service.buildSelectedConversationBranchId
 import me.rerere.rikkahub.data.service.buildDeterministicMemoryCandidatesFromNodes
 import me.rerere.rikkahub.data.service.buildRelationshipEventsFromMemoryCandidates
+import me.rerere.rikkahub.data.service.buildSelectedConversationBranchId
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.service.MemoryReorganizationMode
+import me.rerere.rikkahub.utils.JsonInstant
 import kotlin.uuid.Uuid
 
 data class MemoryBatchOverview(
@@ -53,6 +56,9 @@ class MemoryBankVM(
 
     private val _memories = MutableStateFlow<List<MemoryBankEntity>>(emptyList())
     val memories: StateFlow<List<MemoryBankEntity>> = _memories.asStateFlow()
+
+    private val _archiveSources = MutableStateFlow<Map<Int, List<MemoryBankEntity>>>(emptyMap())
+    val archiveSources: StateFlow<Map<Int, List<MemoryBankEntity>>> = _archiveSources.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -124,14 +130,36 @@ class MemoryBankVM(
         }
         val assistantId = _selectedAssistantId.value
         _stats.value = memoryBankService.getStats(assistantId)
-        _memories.value = memoryBankService.searchMemories(
+        val visible = memoryBankService.searchMemories(
             keyword = _searchQuery.value,
             type = _selectedType.value,
             limit = 100,
             assistantId = assistantId,
         )
-
+        _memories.value = collapseArchiveSources(visible)
+        _archiveSources.value = loadArchiveSources(assistantId, visible)
         _batchOverviews.value = buildBatchOverviews(currentSettings, assistantId)
+    }
+
+    private suspend fun loadArchiveSources(
+        assistantId: String?,
+        visible: List<MemoryBankEntity>,
+    ): Map<Int, List<MemoryBankEntity>> {
+        val archives = visible.filter(MemoryBankEntity::isDailyArchive)
+        if (archives.isEmpty()) return emptyMap()
+        val archivedRows = memoryBankService.searchMemories(
+            type = "deprecated",
+            limit = 1000,
+            assistantId = assistantId,
+        )
+        val activeRows = memoryBankService.searchMemories(
+            limit = 1000,
+            assistantId = assistantId,
+        )
+        val allById = (activeRows + archivedRows).associateBy { it.id }
+        return archives.associate { archive ->
+            archive.id to archive.sourceMemoryIds().mapNotNull(allById::get)
+        }
     }
 
     private suspend fun buildBatchOverviews(
@@ -290,6 +318,26 @@ class MemoryBankVM(
 
     fun deleteMemory(id: Int) {
         viewModelScope.launch {
+            val archive = _memories.value.firstOrNull { it.id == id && it.isDailyArchive() }
+            archive?.sourceMemoryIds()?.let { sourceIds ->
+                val archivedRows = memoryBankService.searchMemories(
+                    type = "deprecated",
+                    limit = 1000,
+                    assistantId = archive.assistantId,
+                ).associateBy { it.id }
+                sourceIds.mapNotNull(archivedRows::get)
+                    .filter { it.deprecatedReason == "archived_into_daily:$id" }
+                    .forEach { source ->
+                        memoryBankService.updateMemory(
+                            source.copy(
+                                deprecated = false,
+                                deprecatedReason = null,
+                                supersededByMemoryId = null,
+                                correctedAt = null,
+                            ),
+                        )
+                    }
+            }
             memoryBankService.deleteMemory(id)
             loadMemories()
         }
@@ -403,12 +451,35 @@ class MemoryBankVM(
             _loading.value = true
             try {
                 val result = memoryBankService.runLightMaintenance()
-                _maintenanceMessage.value = "轻量维护完成：合并 ${result.deprecatedDuplicateCount} 条重复记忆"
-                loadMemories()
+                val archivedCount = archiveDailySourceMemories()
+                _maintenanceMessage.value =
+                    "轻量维护完成：合并 ${result.deprecatedDuplicateCount} 条重复记忆，归档 $archivedCount 条原子记忆"
+                refreshMemoryData(settingsStore.settingsFlow.first())
             } finally {
                 _loading.value = false
             }
         }
+    }
+
+    private suspend fun archiveDailySourceMemories(): Int {
+        val assistantId = _selectedAssistantId.value
+        val active = memoryBankService.searchMemories(limit = 1000, assistantId = assistantId)
+        val byId = active.associateBy { it.id }
+        var archivedCount = 0
+        active.filter(MemoryBankEntity::isDailyArchive).forEach { archive ->
+            archive.sourceMemoryIds()
+                .mapNotNull(byId::get)
+                .filter(MemoryBankEntity::canArchiveUnderDailySummary)
+                .forEach { source ->
+                    memoryBankService.markMemoryDeprecated(
+                        memory = source,
+                        reason = "archived_into_daily:${archive.id}",
+                        supersededByMemoryId = archive.id.toString(),
+                    )
+                    archivedCount += 1
+                }
+        }
+        return archivedCount
     }
 
     fun setMemoryEmbeddingEnabled(enabled: Boolean) {
@@ -480,3 +551,35 @@ class MemoryBankVM(
         return null
     }
 }
+
+private fun collapseArchiveSources(memories: List<MemoryBankEntity>): List<MemoryBankEntity> {
+    val coveredIds = memories.asSequence()
+        .filter(MemoryBankEntity::isDailyArchive)
+        .flatMap { it.sourceMemoryIds().asSequence() }
+        .toSet()
+    if (coveredIds.isEmpty()) return memories
+    return memories.filter { memory -> memory.isDailyArchive() || memory.id !in coveredIds }
+}
+
+private fun MemoryBankEntity.isDailyArchive(): Boolean =
+    type == "daily_summary" || memoryKind == "daily_archive"
+
+private fun MemoryBankEntity.sourceMemoryIds(): List<Int> = runCatching {
+    JsonInstant.decodeFromString(
+        ListSerializer(String.serializer()),
+        sourceMemoryIdsJson ?: relatedMemoryIdsJson.orEmpty(),
+    ).mapNotNull(String::toIntOrNull)
+}.getOrDefault(emptyList())
+
+private fun MemoryBankEntity.canArchiveUnderDailySummary(): Boolean =
+    id > 0 &&
+        !deprecated &&
+        !pinned &&
+        type == "message" &&
+        memoryKind !in DAILY_ARCHIVE_PROTECTED_KINDS
+
+private val DAILY_ARCHIVE_PROTECTED_KINDS = setOf(
+    "user_boundary",
+    "promise",
+    "correction",
+)
