@@ -57,6 +57,7 @@ fun MemoryBankPage(
 ) {
     val vm: MemoryBankVM = koinViewModel()
     val memories by vm.memories.collectAsStateWithLifecycle()
+    val archiveSources by vm.archiveSources.collectAsStateWithLifecycle()
     val searchQuery by vm.searchQuery.collectAsStateWithLifecycle()
     val selectedType by vm.selectedType.collectAsStateWithLifecycle()
     val selectedAssistantId by vm.selectedAssistantId.collectAsStateWithLifecycle()
@@ -81,6 +82,7 @@ fun MemoryBankPage(
     var showClearAllDialog by remember { mutableStateOf(false) }
     var editMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
     var correctionMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
+    var expandedArchiveIds by remember { mutableStateOf<Set<Int>>(emptySet()) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -235,15 +237,57 @@ fun MemoryBankPage(
             }
 
             items(memories, key = { it.id }) { memory ->
-                MemoryCard(
-                    memory = memory,
-                    assistantLabels = assistantLabels,
-                    onDelete = { showDeleteDialog = memory },
-                    onOpenSource = onOpenSource,
-                    onEdit = { editMemory = memory },
-                    onTogglePinned = { vm.setPinned(memory, !memory.pinned) },
-                    onCorrect = { correctionMemory = memory },
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    MemoryCard(
+                        memory = memory,
+                        assistantLabels = assistantLabels,
+                        onDelete = { showDeleteDialog = memory },
+                        onOpenSource = onOpenSource,
+                        onEdit = { editMemory = memory },
+                        onTogglePinned = { vm.setPinned(memory, !memory.pinned) },
+                        onCorrect = { correctionMemory = memory },
+                    )
+                    val sources = archiveSources[memory.id].orEmpty()
+                    if (sources.isNotEmpty()) {
+                        val expanded = memory.id in expandedArchiveIds
+                        TextButton(
+                            onClick = {
+                                expandedArchiveIds = if (expanded) {
+                                    expandedArchiveIds - memory.id
+                                } else {
+                                    expandedArchiveIds + memory.id
+                                }
+                            },
+                        ) {
+                            Text(if (expanded) "收起原始记忆" else "查看原始记忆（${sources.size}）")
+                        }
+                        if (expanded) {
+                            Card(modifier = Modifier.fillMaxWidth()) {
+                                Column(
+                                    modifier = Modifier.padding(10.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    Text(
+                                        "这些原子记忆只作为证据回查，不再和每日总结平级参与普通召回。",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    sources.forEach { source ->
+                                        MemoryCard(
+                                            memory = source,
+                                            assistantLabels = assistantLabels,
+                                            onDelete = { showDeleteDialog = source },
+                                            onOpenSource = onOpenSource,
+                                            onEdit = { editMemory = source },
+                                            onTogglePinned = { vm.setPinned(source, !source.pinned) },
+                                            onCorrect = { correctionMemory = source },
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             if (memories.isEmpty() && !loading) {
@@ -270,7 +314,15 @@ fun MemoryBankPage(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = null },
             title = { Text("删除记忆") },
-            text = { Text("确定要删除这条记忆吗？此操作不可撤销。") },
+            text = {
+                Text(
+                    if (memory.type == "daily_summary" || memory.memoryKind == "daily_archive") {
+                        "删除这条每日总结后，它下面归档的原始记忆会恢复为独立记忆。"
+                    } else {
+                        "确定要删除这条记忆吗？此操作不可撤销。"
+                    },
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     vm.deleteMemory(memory.id)
