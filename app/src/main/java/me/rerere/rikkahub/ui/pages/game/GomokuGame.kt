@@ -63,7 +63,6 @@ internal fun GomokuGame(
 
     fun choose(cell: Int) {
         if (result != null || board[cell] != 0) return
-
         val afterUser = board.toMutableList().also { it[cell] = USER_STONE }
         val userMoveCount = moveCount + 1
         if (gomokuWinner(afterUser, cell) == USER_STONE) {
@@ -74,7 +73,6 @@ internal fun GomokuGame(
             finish("平局", afterUser, userMoveCount)
             return
         }
-
         val roleCell = chooseGomokuMove(afterUser, ROLE_STONE)
         val afterRole = afterUser.toMutableList().also { it[roleCell] = ROLE_STONE }
         val finalMoveCount = userMoveCount + 1
@@ -88,16 +86,12 @@ internal fun GomokuGame(
         }
     }
 
-    GameBody(
-        title = "五子棋",
-        subtitle = "你执黑子先手，$assistantName 执白子。棋步由本地规则引擎执行，角色只负责思考和回应。",
-    ) {
+    GameBody(title = "五子棋", subtitle = "") {
         Text(
             text = result?.let { "本局结束：$it" } ?: "轮到你落子 · 已走 $moveCount 手",
             color = if (result == null) MaterialTheme.colorScheme.onSurfaceVariant else GameColors.accent,
             fontWeight = if (result == null) FontWeight.Normal else FontWeight.SemiBold,
         )
-
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -148,13 +142,6 @@ internal fun GomokuGame(
                 }
             }
         }
-
-        Text(
-            "角色会优先完成自己的五连，也会拦截你下一手就能形成的五连；中盘会围绕已有棋形进攻。",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
         if (result != null) {
             GameResultText(result.orEmpty())
             Button(onClick = ::reset, modifier = Modifier.fillMaxWidth()) {
@@ -171,17 +158,13 @@ internal fun chooseGomokuMove(board: List<Int>, roleStone: Int): Int {
     val userStone = if (roleStone == USER_STONE) ROLE_STONE else USER_STONE
     val open = board.indices.filter { board[it] == 0 }
     require(open.isNotEmpty()) { "No open gomoku cells" }
-
     if (board.all { it == 0 }) return gomokuIndex(GOMOKU_SIZE / 2, GOMOKU_SIZE / 2)
-
     open.firstOrNull { cell ->
         board.toMutableList().also { it[cell] = roleStone }.let { gomokuWinner(it, cell) == roleStone }
     }?.let { return it }
-
     open.firstOrNull { cell ->
         board.toMutableList().also { it[cell] = userStone }.let { gomokuWinner(it, cell) == userStone }
     }?.let { return it }
-
     val candidates = open.filter { cell ->
         val row = cell / GOMOKU_SIZE
         val column = cell % GOMOKU_SIZE
@@ -196,7 +179,6 @@ internal fun chooseGomokuMove(board: List<Int>, roleStone: Int): Int {
             }
         }
     }.ifEmpty { open }
-
     return candidates.maxByOrNull { cell ->
         val attack = gomokuPlacementScore(board, cell, roleStone)
         val defence = gomokuPlacementScore(board, cell, userStone)
@@ -273,9 +255,4 @@ private fun countDirection(
 
 private fun gomokuIndex(row: Int, column: Int): Int = row * GOMOKU_SIZE + column
 
-private val GOMOKU_DIRECTIONS = listOf(
-    0 to 1,
-    1 to 0,
-    1 to 1,
-    1 to -1,
-)
+private val GOMOKU_DIRECTIONS = listOf(0 to 1, 1 to 0, 1 to 1, 1 to -1)
