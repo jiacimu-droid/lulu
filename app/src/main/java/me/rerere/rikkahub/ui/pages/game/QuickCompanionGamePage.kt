@@ -3,7 +3,6 @@ package me.rerere.rikkahub.ui.pages.game
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,7 +17,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -81,17 +79,11 @@ fun QuickCompanionGamePage(gameId: String) {
     val selectedAssistant = currentSettings.assistants.firstOrNull { it.id.toString() == selectedAssistantId }
         ?: currentSettings.getCurrentAssistant()
     val assistantName = selectedAssistant.name.ifBlank { "角色" }
-    var reactionLine by remember(game.wireName, selectedAssistantId) {
-        mutableStateOf("（开始游戏后，角色会根据真实对局和自己的记忆回应你）")
-    }
+    var reactionLine by remember(game.wireName, selectedAssistantId) { mutableStateOf("") }
     var isGeneratingReaction by remember { mutableStateOf(false) }
     var reactionRequestId by remember { mutableIntStateOf(0) }
 
-    suspend fun recordSharedGame(
-        title: String,
-        summary: String,
-        detailsJson: String,
-    ) {
+    suspend fun recordSharedGame(title: String, summary: String, detailsJson: String) {
         val assistantId = selectedAssistant.id.toString()
         val nowMillis = System.currentTimeMillis()
         companionRuntime.applyTurn(
@@ -120,7 +112,7 @@ fun QuickCompanionGamePage(gameId: String) {
     }
 
     suspend fun generateCompanionText(facts: String, instruction: String): String {
-        val fallback = "（角色回应生成失败，但游戏状态和结果仍然有效）"
+        val fallback = ""
         return runCatching {
             val settings = settingsStore.settingsFlow.first()
             val player = settings.assistants.firstOrNull { it.id.toString() == selectedAssistantId }
@@ -130,15 +122,6 @@ fun QuickCompanionGamePage(gameId: String) {
                 ?: return@runCatching fallback
             val providerSetting = model.findProvider(settings.providers) ?: return@runCatching fallback
             val provider = providerManager.getProviderByType(providerSetting)
-            val personaPrompt = buildString {
-                appendLine("你正在以‘${player.name.ifBlank { "角色" }}’的身份和用户一起玩游戏。")
-                appendLine("程序提供的题目真相、掷骰、棋局和分数都是不可修改的事实。")
-                appendLine("必须保持角色人设和关系连续性，不要默认活泼、亲密、温柔或吐槽。")
-                if (player.systemPrompt.isNotBlank()) {
-                    appendLine("角色人设：")
-                    appendLine(player.systemPrompt)
-                }
-            }.trim()
             val companionContext = companionRuntime.perception(
                 CompanionPerceptionInput(
                     assistantId = player.id.toString(),
@@ -148,11 +131,11 @@ fun QuickCompanionGamePage(gameId: String) {
                 ),
             ).toPromptContext()
             val messages = buildList {
-                add(UIMessage.system("你正在进行角色陪伴游戏。严格遵守玩法指令和不可变事实。"))
-                add(UIMessage.system(personaPrompt))
+                add(UIMessage.system("你正在以‘${player.name.ifBlank { "角色" }}’的身份和用户一起玩游戏。保持人设和关系连续性，严格接受程序给出的真实结果。"))
+                if (player.systemPrompt.isNotBlank()) add(UIMessage.system(player.systemPrompt))
                 if (companionContext.isNotBlank()) add(UIMessage.system(companionContext))
-                add(UIMessage.system("本次输出要求：$instruction"))
-                add(UIMessage.user("游戏事实：\n$facts"))
+                add(UIMessage.system(instruction))
+                add(UIMessage.user(facts))
             }.let { baseMessages ->
                 transformMessages(
                     messages = baseMessages,
@@ -181,22 +164,18 @@ fun QuickCompanionGamePage(gameId: String) {
                     usage = usage,
                 )
             }
-            chunk.choices.firstOrNull()?.message?.toText()?.trim()?.takeIf { it.isNotBlank() } ?: fallback
+            chunk.choices.firstOrNull()?.message?.toText()?.trim().orEmpty()
         }.getOrElse {
             if (it is CancellationException) throw it
             fallback
         }
     }
 
-    fun requestCompanionText(
-        facts: String,
-        instruction: String,
-        onResult: (String) -> Unit = {},
-    ) {
+    fun requestCompanionText(facts: String, instruction: String, onResult: (String) -> Unit = {}) {
         reactionRequestId += 1
         val requestId = reactionRequestId
         isGeneratingReaction = true
-        reactionLine = "（$assistantName 正在回应你）"
+        reactionLine = ""
         scope.launch {
             val generated = generateCompanionText(facts, instruction)
             if (requestId == reactionRequestId) {
@@ -211,15 +190,11 @@ fun QuickCompanionGamePage(gameId: String) {
         scope.launch { runCatching { recordSharedGame(title, summary, detailsJson) } }
     }
 
-    fun completeRuleGame(
-        title: String,
-        summary: String,
-        detailsJson: String,
-    ) {
+    fun completeRuleGame(title: String, summary: String, detailsJson: String) {
         saveCheckpoint(title, summary, detailsJson)
         requestCompanionText(
             facts = summary,
-            instruction = "只根据真实对局结果，以角色自己的语气当面对用户说 1-3 句。不得修改结果、虚构动作或使用系统播报口吻。",
+            instruction = "只根据真实结果，以角色自己的语气对用户说 1-3 句，不得修改结果。",
         )
     }
 
@@ -237,11 +212,7 @@ fun QuickCompanionGamePage(gameId: String) {
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(18.dp),
+            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
@@ -249,7 +220,6 @@ fun QuickCompanionGamePage(gameId: String) {
                     modifier = Modifier.fillMaxWidth().padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    Text("选择一起玩的角色", fontWeight = FontWeight.SemiBold)
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(currentSettings.assistants, key = { it.id }) { assistant ->
                             FilterChip(
@@ -259,43 +229,18 @@ fun QuickCompanionGamePage(gameId: String) {
                             )
                         }
                     }
-                    Text(
-                        when (game) {
-                            QuickCompanionGame.TURTLE_SOUP -> "这是海龟汤独立页面：题面和汤底由程序锁定，角色只负责主持与回应。"
-                            QuickCompanionGame.RAPPORT_QUIZ -> "这是默契问答独立页面：角色会读取人设、记忆和对你的印象后独立作答。"
-                            QuickCompanionGame.ROLEPLAY_ADVENTURE -> "这是跑团独立页面：程序负责 d20 判定和状态，角色负责同伴演出与剧情主持。"
-                            else -> "游戏引擎负责真实规则和结果，角色模型根据这些事实按人设回应。"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
             }
 
-            CompanionGameReactionCard(
-                assistantName = assistantName,
-                line = reactionLine,
-                isGenerating = isGeneratingReaction,
-            )
+            if (reactionLine.isNotBlank() || isGeneratingReaction) {
+                CompanionGameReactionCard(
+                    assistantName = assistantName,
+                    line = reactionLine,
+                    isGenerating = isGeneratingReaction,
+                )
+            }
 
             when (game) {
-                QuickCompanionGame.ROCK_PAPER_SCISSORS -> RockPaperScissorsGame(
-                    assistantName = assistantName,
-                    onCompleted = { userMove, roleMove, outcome ->
-                        val summary = "用户选择$userMove，角色选择$roleMove，结果：$outcome。"
-                        completeRuleGame(
-                            title = "一起玩完一轮猜拳",
-                            summary = summary,
-                            detailsJson = buildJsonObject {
-                                put("game", game.wireName)
-                                put("user_move", userMove)
-                                put("role_move", roleMove)
-                                put("outcome", outcome)
-                            }.toString(),
-                        )
-                    },
-                )
-
                 QuickCompanionGame.DICE_DUEL -> YachtDiceGame(
                     assistantName = assistantName,
                     onRoundCompleted = { round, userCategory, roleCategory, userScore, roleScore, outcome, userTotal, roleTotal ->
@@ -358,51 +303,18 @@ fun QuickCompanionGamePage(gameId: String) {
 }
 
 @Composable
-private fun CompanionGameReactionCard(
-    assistantName: String,
-    line: String,
-    isGenerating: Boolean,
-) {
+private fun CompanionGameReactionCard(assistantName: String, line: String, isGenerating: Boolean) {
     Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
-            Text("$assistantName 的游戏回应", style = MaterialTheme.typography.labelLarge, color = GameColors.accent)
-            Text(line, color = if (isGenerating) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface)
-        }
-    }
-}
-
-@Composable
-private fun RockPaperScissorsGame(
-    assistantName: String,
-    onCompleted: (String, String, String) -> Unit,
-) {
-    val moves = listOf("石头", "剪刀", "布")
-    var roleMove by remember { mutableStateOf<String?>(null) }
-    var userMove by remember { mutableStateOf<String?>(null) }
-    var outcome by remember { mutableStateOf<String?>(null) }
-
-    fun play(move: String) {
-        val role = moves.random()
-        val result = compareRockPaperScissors(move, role)
-        userMove = move
-        roleMove = role
-        outcome = result
-        onCompleted(move, role, result)
-    }
-
-    GameBody(title = "猜拳", subtitle = "你先出手，$assistantName 同一轮出手。每轮结果都会让角色通过 API 真正回应。") {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            moves.forEach { move ->
-                OutlinedButton(onClick = { play(move) }, modifier = Modifier.weight(1f)) {
-                    Text(move)
-                }
+            Text("$assistantName 的回应", style = MaterialTheme.typography.labelLarge, color = GameColors.accent)
+            if (isGenerating) {
+                Text("……", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                Text(line)
             }
-        }
-        if (outcome != null) {
-            GameResultText("你出$userMove · $assistantName 出$roleMove · $outcome")
         }
     }
 }
@@ -419,7 +331,9 @@ internal fun GameBody(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (subtitle.isNotBlank()) {
+                Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             content()
         }
     }
@@ -439,14 +353,6 @@ internal fun GameResultText(text: String) {
             fontWeight = FontWeight.SemiBold,
         )
     }
-}
-
-internal fun compareRockPaperScissors(userMove: String, roleMove: String): String = when {
-    userMove == roleMove -> "平局"
-    (userMove == "石头" && roleMove == "剪刀") ||
-        (userMove == "剪刀" && roleMove == "布") ||
-        (userMove == "布" && roleMove == "石头") -> "用户胜"
-    else -> "角色胜"
 }
 
 @Deprecated("井字棋已经替换为五子棋，仅保留给旧测试和历史数据兼容")
@@ -470,14 +376,9 @@ internal fun quickTicTacToeWinner(board: List<String?>): String? =
     }
 
 private val QUICK_TIC_TAC_TOE_LINES = listOf(
-    listOf(0, 1, 2),
-    listOf(3, 4, 5),
-    listOf(6, 7, 8),
-    listOf(0, 3, 6),
-    listOf(1, 4, 7),
-    listOf(2, 5, 8),
-    listOf(0, 4, 8),
-    listOf(2, 4, 6),
+    listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8),
+    listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8),
+    listOf(0, 4, 8), listOf(2, 4, 6),
 )
 
 internal enum class QuickCompanionGame(
@@ -485,12 +386,11 @@ internal enum class QuickCompanionGame(
     val title: String,
     val shortTitle: String,
 ) {
-    ROCK_PAPER_SCISSORS("rock_paper_scissors", "一起玩：猜拳", "猜拳"),
-    DICE_DUEL("dice_duel", "一起玩：快艇骰子", "快艇骰子"),
-    TIC_TAC_TOE("tic_tac_toe", "一起玩：五子棋", "五子棋"),
-    TURTLE_SOUP("turtle_soup", "一起玩：海龟汤", "海龟汤"),
-    RAPPORT_QUIZ("rapport_quiz", "一起玩：默契问答", "默契问答"),
-    ROLEPLAY_ADVENTURE("roleplay_adventure", "一起玩：轻量跑团", "跑团");
+    DICE_DUEL("dice_duel", "快艇骰子", "快艇骰子"),
+    TIC_TAC_TOE("tic_tac_toe", "五子棋", "五子棋"),
+    TURTLE_SOUP("turtle_soup", "海龟汤", "海龟汤"),
+    RAPPORT_QUIZ("rapport_quiz", "默契问答", "默契问答"),
+    ROLEPLAY_ADVENTURE("roleplay_adventure", "轻量跑团", "跑团");
 
     companion object {
         fun fromWireName(value: String): QuickCompanionGame = when (value) {
@@ -499,7 +399,7 @@ internal enum class QuickCompanionGame(
             "turtle_soup" -> TURTLE_SOUP
             "rapport_quiz" -> RAPPORT_QUIZ
             "roleplay_adventure", "trpg" -> ROLEPLAY_ADVENTURE
-            else -> entries.firstOrNull { it.wireName == value } ?: ROCK_PAPER_SCISSORS
+            else -> TIC_TAC_TOE
         }
     }
 }
