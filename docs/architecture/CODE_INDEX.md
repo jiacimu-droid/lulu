@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`be4dbe83e6b224a86ea4df2756501999eba4a5d8`
+- 基准提交：`19b07b3d1d8d9551c0f009e2758b6a358c7cd747`
 - 分支：`master`
-- 源码指纹：`9f009140db617860…`
+- 源码指纹：`b0be2c529127eb0e…`
 - 已索引文件：1197
-- 已索引代码/文本行：263127
-- 已发现类、接口、对象、函数及 Composable：5720
+- 已索引代码/文本行：262965
+- 已发现类、接口、对象、函数及 Composable：5722
 
 ## 仓库健康信号
 
@@ -116,7 +116,6 @@
 |---|---:|---:|
 | `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 126 | 3143 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 90 | 2295 |
-| `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt` | 90 | 612 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 89 | 1032 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 44 | 1166 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt` | 39 | 416 |
@@ -129,6 +128,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt` | 32 | 427 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 32 | 953 |
 | `ai/src/main/java/me/rerere/ai/provider/providers/GoogleProvider.kt` | 32 | 897 |
+| `app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt` | 30 | 902 |
 
 ## 模块概览
 
@@ -548,24 +548,24 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2091
-- 可检索完整符号：5104
+- 已解析本地导入边：2049
+- 可检索完整符号：5106
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 130 | 812 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 129 | 812 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 112 | 953 |
-| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 63 | 19 |
-| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 61 | 62 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 58 | 296 |
+| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
+| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 60 | 62 |
+| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 57 | 296 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 55 | 191 |
-| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
+| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 50 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 40 | 529 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 36 | 148 |
-| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 34 | 1032 |
+| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 34 | 248 |
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 34 | 50 |
+| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 33 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 30 | 141 |
 | `app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt` | 26 | 676 |
 <!-- reverse-index:end -->

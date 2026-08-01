@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T08:02:07.898400+00:00",
-  "commit": "be4dbe83e6b224a86ea4df2756501999eba4a5d8",
+  "generatedAt": "2026-08-01T08:03:17.517049+00:00",
+  "commit": "19b07b3d1d8d9551c0f009e2758b6a358c7cd747",
   "branch": "master",
-  "sourceFingerprint": "9f009140db617860286b80807521d1a3d4d9359a6ff98e2866bcc8fee5a63b65",
+  "sourceFingerprint": "b0be2c529127eb0e7649baee5b17e757a9f9aa287aa3ece7f05a3c115250b3fe",
   "summary": {
     "files": 1197,
-    "lines": 263127,
-    "symbols": 5720,
+    "lines": 262965,
+    "symbols": 5722,
     "productionCodeFiles": 859,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -68,7 +68,7 @@
       "界面": 339,
       "记忆": 49
     },
-    "resolvedImportEdges": 2091
+    "resolvedImportEdges": 2049
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -570,13 +570,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
-        "lines": 612,
-        "symbols": 16,
-        "localImportCount": 90,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
         "lines": 1032,
         "symbols": 77,
@@ -764,6 +757,13 @@
         "symbols": 18,
         "localImportCount": 26,
         "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationRoutes.kt",
+        "lines": 433,
+        "symbols": 4,
+        "localImportCount": 25,
+        "todoMarkers": 0
       }
     ],
     "todoMarkers": [
@@ -900,7 +900,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 130,
+        "importedByCount": 129,
         "todoMarkers": 0
       },
       {
@@ -916,7 +916,7 @@
         "lines": 19,
         "symbols": 1,
         "localImportCount": 0,
-        "importedByCount": 63,
+        "importedByCount": 62,
         "todoMarkers": 0
       },
       {
@@ -924,7 +924,7 @@
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
-        "importedByCount": 61,
+        "importedByCount": 60,
         "todoMarkers": 0
       },
       {
@@ -932,7 +932,7 @@
         "lines": 296,
         "symbols": 19,
         "localImportCount": 8,
-        "importedByCount": 58,
+        "importedByCount": 57,
         "todoMarkers": 0
       },
       {
@@ -948,7 +948,7 @@
         "lines": 29,
         "symbols": 3,
         "localImportCount": 3,
-        "importedByCount": 51,
+        "importedByCount": 50,
         "todoMarkers": 0
       },
       {
@@ -972,15 +972,7 @@
         "lines": 148,
         "symbols": 10,
         "localImportCount": 5,
-        "importedByCount": 36,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
-        "lines": 1032,
-        "symbols": 77,
-        "localImportCount": 89,
-        "importedByCount": 34,
+        "importedByCount": 35,
         "todoMarkers": 0
       },
       {
@@ -1000,6 +992,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "lines": 1032,
+        "symbols": 77,
+        "localImportCount": 89,
+        "importedByCount": 33,
+        "todoMarkers": 0
+      },
+      {
         "path": "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
         "lines": 141,
         "symbols": 19,
@@ -1016,14 +1016,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
-        "lines": 519,
-        "symbols": 33,
-        "localImportCount": 14,
-        "importedByCount": 20,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
         "lines": 196,
         "symbols": 6,
@@ -1032,11 +1024,19 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+        "lines": 519,
+        "symbols": 33,
+        "localImportCount": 14,
+        "importedByCount": 19,
+        "todoMarkers": 0
+      },
+      {
         "path": "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
         "lines": 57,
         "symbols": 4,
         "localImportCount": 3,
-        "importedByCount": 20,
+        "importedByCount": 19,
         "todoMarkers": 0
       },
       {
@@ -1064,14 +1064,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
-        "lines": 277,
-        "symbols": 25,
-        "localImportCount": 0,
-        "importedByCount": 16,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/Form.kt",
         "lines": 83,
         "symbols": 2,
@@ -1084,6 +1076,14 @@
         "lines": 335,
         "symbols": 14,
         "localImportCount": 20,
+        "importedByCount": 15,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
+        "lines": 277,
+        "symbols": 25,
+        "localImportCount": 0,
         "importedByCount": 15,
         "todoMarkers": 0
       },
@@ -1124,7 +1124,7 @@
         "lines": 3143,
         "symbols": 90,
         "localImportCount": 126,
-        "importedByCount": 13,
+        "importedByCount": 12,
         "todoMarkers": 0
       },
       {
@@ -1132,7 +1132,7 @@
         "lines": 321,
         "symbols": 13,
         "localImportCount": 0,
-        "importedByCount": 13,
+        "importedByCount": 12,
         "todoMarkers": 1
       }
     ]
@@ -2009,11 +2009,6 @@
       "imports": 29
     },
     {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.ai.tools",
-      "imports": 27
-    },
-    {
       "from": "me.rerere.rikkahub.data.ai.transformers",
       "to": "me.rerere.ai.ui.UIMessage",
       "imports": 26
@@ -2109,6 +2104,11 @@
       "imports": 14
     },
     {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.ai.tools",
+      "imports": 14
+    },
+    {
       "from": "me.rerere.rikkahub.service",
       "to": "me.rerere.rikkahub.data.ai.tools",
       "imports": 14
@@ -2159,16 +2159,6 @@
       "imports": 10
     },
     {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.datastore.SettingsStore",
-      "imports": 10
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.ai.transformers",
-      "imports": 10
-    },
-    {
       "from": "me.rerere.rikkahub.ui.components.ai",
       "to": "me.rerere.rikkahub.R",
       "imports": 10
@@ -2201,6 +2191,11 @@
     {
       "from": "me.rerere.rikkahub.data.db.dao",
       "to": "me.rerere.rikkahub.data.db.entity",
+      "imports": 9
+    },
+    {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.datastore.SettingsStore",
       "imports": 9
     },
     {
@@ -2359,16 +2354,6 @@
       "imports": 6
     },
     {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.companion.CompanionOutboundStatus",
-      "imports": 6
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.companion.CompanionCommitmentStatus",
-      "imports": 6
-    },
-    {
       "from": "me.rerere.rikkahub.ui.pages.backup",
       "to": "me.rerere.rikkahub.R",
       "imports": 6
@@ -2460,7 +2445,17 @@
     },
     {
       "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.utils.JsonInstant",
+      "to": "me.rerere.rikkahub.data.companion.CompanionOutboundStatus",
+      "imports": 5
+    },
+    {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.companion.CompanionCommitmentStatus",
+      "imports": 5
+    },
+    {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.ai.transformers",
       "imports": 5
     },
     {
@@ -2640,7 +2635,7 @@
     },
     {
       "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.ai.core.MessageRole",
+      "to": "me.rerere.rikkahub.utils.JsonInstant",
       "imports": 4
     },
     {
@@ -2656,21 +2651,6 @@
     {
       "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.datastore.ProactiveMessageSetting",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.companion.CompanionInteractionEventKind",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID",
-      "imports": 4
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.ai.ui.UIMessage",
       "imports": 4
     },
     {
@@ -2996,6 +2976,26 @@
     {
       "from": "me.rerere.rikkahub.data.ai",
       "to": "me.rerere.rikkahub.data.model.Assistant",
+      "imports": 3
+    },
+    {
+      "from": "me.rerere.rikkahub.data.ai.tools",
+      "to": "me.rerere.rikkahub.data.service.AmapService",
+      "imports": 3
+    },
+    {
+      "from": "me.rerere.rikkahub.data.ai.tools",
+      "to": "me.rerere.rikkahub.data.service.LocationService",
+      "imports": 3
+    },
+    {
+      "from": "me.rerere.rikkahub.data.ai.tools",
+      "to": "me.rerere.ai.ui.UIMessage",
+      "imports": 3
+    },
+    {
+      "from": "me.rerere.rikkahub.data.ai.transformers",
+      "to": "me.rerere.ai.ui.UIMessageAnnotation",
       "imports": 3
     }
   ],
@@ -3599,7 +3599,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Favorite.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/importer/ChatboxImporter.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
@@ -3746,7 +3745,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ToolUtils.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/WeatherTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ZipFilesTool.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/provider/PluginToolProvider.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -3899,7 +3897,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/datastore/DefaultProviders.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/importer/ChatboxImporter.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/importer/CherryStudioProviderImporter.kt",
@@ -4150,7 +4147,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/OcrTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
@@ -6077,7 +6073,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Favorite.kt",
         "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/importer/ChatboxImporter.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/provider/PluginToolProvider.kt",
@@ -8628,7 +8623,6 @@
         "highlight/src/main/java/me/rerere/highlight/Highlighter.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -8858,7 +8852,6 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionFinalBudgetTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -9212,7 +9205,6 @@
         "app/src/main/java/me/rerere/rikkahub/utils/StringUtils.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -9512,7 +9504,6 @@
         "app/src/main/java/me/rerere/rikkahub/utils/CollectionUtils.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -9870,7 +9861,6 @@
         "ai/src/main/java/me/rerere/ai/ui/Message.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt"
       ]
     },
@@ -10100,7 +10090,6 @@
         "ai/src/main/java/me/rerere/ai/ui/Message.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
       ]
@@ -10398,7 +10387,6 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -10533,7 +10521,6 @@
         "search/src/main/java/me/rerere/search/SearchService.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
       ]
@@ -10573,7 +10560,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/files/SkillManager.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
       ]
@@ -10697,7 +10683,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformerTest.kt"
@@ -10769,7 +10754,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/NotificationListenerService.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/SupabaseService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -10862,7 +10846,6 @@
         "ai/src/main/java/me/rerere/ai/ui/Message.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt"
@@ -11590,7 +11573,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPresence.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/voicecall/VoiceCallStreaming.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -11904,7 +11886,6 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
@@ -12085,7 +12066,6 @@
         "app/src/main/java/me/rerere/rikkahub/utils/TimeUtil.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -12413,7 +12393,6 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveMessageContextTest.kt",
@@ -12529,7 +12508,6 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/service/AssistantInteractionResetService.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt"
@@ -13448,7 +13426,6 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionLifeClaimOutputTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt"
@@ -13790,7 +13767,6 @@
       "localImports": [],
       "resolvedImports": [],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/CompanionChatTurnPlanner.kt",
@@ -13858,7 +13834,6 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
       ]
@@ -14125,7 +14100,6 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/CompanionPrivateImpressionSync.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
@@ -14274,7 +14248,6 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionLifeClaimOutputTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveMessageWorkerTest.kt",
@@ -14682,7 +14655,6 @@
       ],
       "resolvedImports": [],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
       ]
@@ -18376,7 +18348,6 @@
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SkillsTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/RepositoryModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -18562,7 +18533,6 @@
       "resolvedImports": [],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/health/HealthVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSystemToolsPage.kt"
@@ -18799,7 +18769,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/export/ExportSerializer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishRules.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -18979,7 +18948,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/db/migrations/Migration_6_7.kt",
         "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/AffectiveMemoryExtractionPlanner.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/importer/ChatboxImporter.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -19442,7 +19410,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/db/dao/ConversationDAO.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/AssistantInteractionResetService.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/RepositoryModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -21613,8 +21580,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 612,
-      "sha256": "4e6ccf221bc07c9f6bb8bbd48864575accf00fabb9f93707b765ebf76455df9b",
+      "lines": 450,
+      "sha256": "010770a0cf96fd3c2c196279bb40d652943d7c3e463d4176293cc6470a6d039b",
       "package": "me.rerere.rikkahub.data.service",
       "categories": [
         "主动代理"
@@ -21623,227 +21590,111 @@
         {
           "name": "ProactiveMessageScheduler",
           "kind": "object",
-          "line": 129
+          "line": 30
         },
         {
           "name": "requestCode",
           "kind": "function",
-          "line": 150
+          "line": 51
+        },
+        {
+          "name": "alarmIntent",
+          "kind": "function",
+          "line": 53
+        },
+        {
+          "name": "scheduleAlarm",
+          "kind": "function",
+          "line": 71
         },
         {
           "name": "scheduleNext",
           "kind": "function",
-          "line": 152
+          "line": 96
         },
         {
           "name": "scheduleNext",
           "kind": "function",
-          "line": 218
+          "line": 126
         },
         {
           "name": "scheduleAt",
           "kind": "function",
-          "line": 252
+          "line": 160
         },
         {
           "name": "scheduleTargeted",
           "kind": "function",
-          "line": 293
+          "line": 186
         },
         {
           "name": "scheduleAlwaysOnAnchorReview",
           "kind": "function",
-          "line": 359
+          "line": 237
         },
         {
           "name": "scheduleCommitment",
           "kind": "function",
-          "line": 397
+          "line": 264
         },
         {
           "name": "reconcileDurableCommitments",
           "kind": "function",
-          "line": 417
+          "line": 284
         },
         {
           "name": "clearTargetedQueue",
           "kind": "function",
-          "line": 461
+          "line": 328
         },
         {
           "name": "resetAssistantProjection",
           "kind": "function",
-          "line": 489
+          "line": 344
         },
         {
           "name": "popCurrentTargetedAndScheduleNext",
           "kind": "function",
-          "line": 512
+          "line": 362
         },
         {
           "name": "getNextTriggerTime",
           "kind": "function",
-          "line": 549
+          "line": 394
         },
         {
           "name": "cancel",
           "kind": "function",
-          "line": 555
+          "line": 400
         },
         {
           "name": "resetTimer",
           "kind": "function",
-          "line": 599
+          "line": 430
         },
         {
           "name": "triggerNow",
           "kind": "function",
-          "line": 603
+          "line": 434
         }
       ],
-      "localImportCount": 90,
+      "localImportCount": 6,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
-        "me.rerere.ai.core.MessageRole",
-        "me.rerere.ai.core.Tool",
-        "me.rerere.ai.provider.ModelType",
-        "me.rerere.ai.provider.ProviderManager",
-        "me.rerere.ai.ui.UIMessage",
-        "me.rerere.ai.ui.UIMessagePart",
-        "me.rerere.rikkahub.CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID",
-        "me.rerere.rikkahub.RouteActivity",
-        "me.rerere.rikkahub.data.ai.ApiUsageSource",
-        "me.rerere.rikkahub.data.ai.GenerationChunk",
-        "me.rerere.rikkahub.data.ai.GenerationHandler",
-        "me.rerere.rikkahub.data.ai.mcp.McpManager",
-        "me.rerere.rikkahub.data.ai.tools.LocalTools",
-        "me.rerere.rikkahub.data.ai.tools.SystemTools",
-        "me.rerere.rikkahub.data.ai.tools.activeModelTools",
-        "me.rerere.rikkahub.data.ai.tools.createAlarmTool",
-        "me.rerere.rikkahub.data.ai.tools.createCompanionGameTool",
-        "me.rerere.rikkahub.data.ai.tools.createSearchTools",
-        "me.rerere.rikkahub.data.ai.tools.createSkillTools",
-        "me.rerere.rikkahub.data.ai.tools.createTodayStudyPlanTool",
-        "me.rerere.rikkahub.data.ai.tools.deduplicateByToolName",
-        "me.rerere.rikkahub.data.ai.tools.selectCompanionToolsForGeneration",
-        "me.rerere.rikkahub.data.ai.tools.selectRelevantToolsForPrompt",
-        "me.rerere.rikkahub.data.ai.tools.withConciseToolDescriptions",
-        "me.rerere.rikkahub.data.ai.tools.withHumanLikeToolPrompts",
-        "me.rerere.rikkahub.data.ai.transformers.TemplateTransformer",
-        "me.rerere.rikkahub.data.ai.transformers.buildPromptInjectionPlannerContext",
-        "me.rerere.rikkahub.data.ai.transformers.companionInputTransformers",
-        "me.rerere.rikkahub.data.ai.transformers.companionModelPresence",
-        "me.rerere.rikkahub.data.ai.transformers.companionOutputTransformers",
-        "me.rerere.rikkahub.data.cihai.CihaiEntry",
-        "me.rerere.rikkahub.data.cihai.CihaiEntryKind",
-        "me.rerere.rikkahub.data.cihai.CihaiStore",
-        "me.rerere.rikkahub.data.companion.CompanionActionResult",
-        "me.rerere.rikkahub.data.companion.CompanionActionType",
-        "me.rerere.rikkahub.data.companion.CompanionAlwaysOnAnchorStatus",
         "me.rerere.rikkahub.data.companion.CompanionCommitment",
-        "me.rerere.rikkahub.data.companion.CompanionCommitmentStatus",
-        "me.rerere.rikkahub.data.companion.CompanionContextFact",
-        "me.rerere.rikkahub.data.companion.CompanionConversationTurn",
-        "me.rerere.rikkahub.data.companion.CompanionInteractionEvent",
-        "me.rerere.rikkahub.data.companion.CompanionInteractionEventKind",
-        "me.rerere.rikkahub.data.companion.CompanionLifeEvent",
-        "me.rerere.rikkahub.data.companion.CompanionLifeEventSource",
-        "me.rerere.rikkahub.data.companion.CompanionModelPresence",
-        "me.rerere.rikkahub.data.companion.CompanionOutboundStatus",
-        "me.rerere.rikkahub.data.companion.CompanionPerceptionInput",
         "me.rerere.rikkahub.data.companion.CompanionRuntime",
-        "me.rerere.rikkahub.data.companion.CompanionState",
-        "me.rerere.rikkahub.data.companion.CompanionToolExecution",
-        "me.rerere.rikkahub.data.companion.CompanionTurnMutation",
-        "me.rerere.rikkahub.data.companion.CompanionTurnRole",
-        "me.rerere.rikkahub.data.companion.buildCompanionStateFromTurn",
-        "me.rerere.rikkahub.data.companion.buildToolLifeEvent",
-        "me.rerere.rikkahub.data.companion.commitmentStatusesBySourceMessageId",
-        "me.rerere.rikkahub.data.companion.isSleepSupervisionGoal",
-        "me.rerere.rikkahub.data.companion.isSuccessfulToolExecution",
-        "me.rerere.rikkahub.data.companion.isWakeGoal",
-        "me.rerere.rikkahub.data.companion.retryMinutesOrDefault",
-        "me.rerere.rikkahub.data.companion.toPromptContext",
-        "me.rerere.rikkahub.data.companion.wakeTargetAtOrNull",
         "me.rerere.rikkahub.data.datastore.ProactiveMessageSetting",
         "me.rerere.rikkahub.data.datastore.Settings",
-        "me.rerere.rikkahub.data.datastore.SettingsStore",
-        "me.rerere.rikkahub.data.datastore.findModelById",
-        "me.rerere.rikkahub.data.datastore.findProvider",
         "me.rerere.rikkahub.data.datastore.getCurrentAssistant",
-        "me.rerere.rikkahub.data.datastore.getProactiveMessageSetting",
-        "me.rerere.rikkahub.data.files.SkillManager",
-        "me.rerere.rikkahub.data.gadgetbridge.GadgetbridgeReader",
-        "me.rerere.rikkahub.data.model.Assistant",
-        "me.rerere.rikkahub.data.model.Conversation",
-        "me.rerere.rikkahub.data.model.toMessageNode",
-        "me.rerere.rikkahub.data.repository.ConversationRepository",
-        "me.rerere.rikkahub.data.study.StudyStore",
-        "me.rerere.rikkahub.data.study.StudyTaskSource",
-        "me.rerere.rikkahub.data.voicecall.ProactiveCallManager",
-        "me.rerere.rikkahub.plugin.provider.PluginToolProvider",
-        "me.rerere.rikkahub.service.ChatService",
-        "me.rerere.rikkahub.service.CompanionDecisionMode",
-        "me.rerere.rikkahub.service.CompanionIntent",
-        "me.rerere.rikkahub.service.CompanionIntentDecision",
-        "me.rerere.rikkahub.service.CompanionIntentFallbackPlanner",
-        "me.rerere.rikkahub.service.CompanionIntentInput",
-        "me.rerere.rikkahub.service.CompanionIntentModelPlanner",
-        "me.rerere.rikkahub.service.ProactiveReminderPlan",
-        "me.rerere.rikkahub.service.collectCompanionPassivePerceptionFacts",
-        "me.rerere.rikkahub.service.toProactiveReminderPlan",
-        "me.rerere.rikkahub.utils.JsonInstant",
-        "me.rerere.rikkahub.utils.sendNotification"
+        "me.rerere.rikkahub.data.datastore.getProactiveMessageSetting"
       ],
       "resolvedImports": [
-        "ai/src/main/java/me/rerere/ai/core/MessageRole.kt",
-        "ai/src/main/java/me/rerere/ai/core/Tool.kt",
-        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
-        "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
-        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
-        "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpManager.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/AlarmTool.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SearchTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SkillsTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/SystemTools.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ToolUtils.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/TemplateTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/cihai/CihaiModels.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/cihai/CihaiStore.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionLifeEventFactory.kt",
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPresence.kt",
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntimeModels.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionScheduledToolEvent.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionWakePolicy.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/files/SkillManager.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/gadgetbridge/GadgetbridgeReader.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt",
-        "app/src/main/java/me/rerere/rikkahub/plugin/provider/PluginToolProvider.kt",
-        "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
-        "app/src/main/java/me/rerere/rikkahub/service/CompanionIntentPlanner.kt",
-        "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
-        "app/src/main/java/me/rerere/rikkahub/service/ProactiveReminderPlanner.kt",
-        "app/src/main/java/me/rerere/rikkahub/utils/NotificationUtil.kt"
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt"
       ],
       "importedBy": []
     },
@@ -23500,7 +23351,6 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishRules.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt",
@@ -24063,7 +23913,6 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformer.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
@@ -25091,7 +24940,6 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/RequestedVoiceCallTool.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantCallSettingsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallPage.kt"
@@ -26281,7 +26129,6 @@
         "app/src/main/java/me/rerere/rikkahub/plugin/model/PluginManifest.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/di/PluginModule.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
@@ -28132,7 +27979,6 @@
         "common/src/main/java/me/rerere/common/android/Logging.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/AppModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/ErrorCard.kt",
@@ -28730,7 +28576,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/ProactiveMessageContextTest.kt"
       ]
@@ -28778,7 +28623,6 @@
         "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt"
       ],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt"
       ]
     },
@@ -29144,7 +28988,6 @@
       "localImports": [],
       "resolvedImports": [],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt"
       ]
     },
@@ -46976,7 +46819,6 @@
       ],
       "resolvedImports": [],
       "importedBy": [
-        "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
       ]
@@ -78980,7 +78822,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "object",
-        "line": 129
+        "line": 30
       }
     ],
     "me.rerere.rikkahub.data.service.ProactiveMessageService": [
@@ -79177,6 +79019,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/NotificationListenerService.kt",
         "kind": "function",
         "line": 98
+      }
+    ],
+    "me.rerere.rikkahub.data.service.alarmIntent": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
+        "kind": "function",
+        "line": 53
       }
     ],
     "me.rerere.rikkahub.data.service.applyMemoryRerankResults": [
@@ -79447,7 +79296,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 555
+        "line": 400
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -79546,7 +79395,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 461
+        "line": 328
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -80267,7 +80116,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 549
+        "line": 394
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81007,7 +80856,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 512
+        "line": 362
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81103,7 +80952,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 417
+        "line": 284
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81178,7 +81027,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 150
+        "line": 51
       }
     ],
     "me.rerere.rikkahub.data.service.requestFreshLocation": [
@@ -81225,7 +81074,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 489
+        "line": 344
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81251,7 +81100,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 599
+        "line": 430
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81350,11 +81199,18 @@
         "line": 1733
       }
     ],
+    "me.rerere.rikkahub.data.service.scheduleAlarm": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
+        "kind": "function",
+        "line": 71
+      }
+    ],
     "me.rerere.rikkahub.data.service.scheduleAlwaysOnAnchorReview": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 359
+        "line": 237
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81366,14 +81222,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 252
+        "line": 160
       }
     ],
     "me.rerere.rikkahub.data.service.scheduleCommitment": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 397
+        "line": 264
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81390,12 +81246,12 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 152
+        "line": 96
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 218
+        "line": 126
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81434,7 +81290,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 293
+        "line": 186
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -81722,7 +81578,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "kind": "function",
-        "line": 603
+        "line": 434
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
