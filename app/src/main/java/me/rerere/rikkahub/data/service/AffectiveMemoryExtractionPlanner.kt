@@ -8,6 +8,8 @@ import java.security.MessageDigest
 
 const val DEFAULT_MEMORY_EXTRACTION_INTERVAL = 20
 const val DEFAULT_MEMORY_EXTRACTION_PROTECTED_RECENT_COUNT = 10
+private const val MAX_MEMORY_EXTRACTION_TURN_CHARS = 1_200
+private const val MAX_MEMORY_EXTRACTION_BATCH_CHARS = 18_000
 
 data class AffectiveMemoryExtractionPlan(
     val turns: List<MemoryExtractionTurn>,
@@ -65,9 +67,6 @@ fun buildAffectiveMemoryExtractionPlan(
     val stableTurns = logicalTurns.dropLast(protectedRecentCount.coerceAtLeast(0))
     if (stableTurns.size < extractionInterval) return null
 
-    // Only fixed, non-overlapping windows are valid: 1..N, N+1..2N, and so on.
-    // Never slide a window forward with every new message. Sliding windows produced legacy ranges
-    // such as 51..90, 53..92 and caused the same conversation area to be retried repeatedly.
     val pendingWindows = stableTurns
         .chunked(extractionInterval)
         .asSequence()
@@ -76,10 +75,6 @@ fun buildAffectiveMemoryExtractionPlan(
         .toList()
     if (pendingWindows.isEmpty()) return null
 
-    // A gap must always be repaired from the oldest complete aligned batch. RECENT_FIRST remains in
-    // the public call shape for compatibility, but it must not skip 1..40 in order to process a
-    // newer batch. This also makes manual retry deterministic instead of retrying an unrelated
-    // recent range.
     @Suppress("UNUSED_VARIABLE")
     val compatibilityDirection = direction
     val selectedTurns = pendingWindows.first()
@@ -90,18 +85,31 @@ fun buildAffectiveMemoryExtractionPlan(
     )
 }
 
-internal fun List<MessageNode>.toMemoryExtractionTurns(): List<MemoryExtractionTurn> =
-    mapNotNull { node ->
+internal fun List<MessageNode>.toMemoryExtractionTurns(): List<MemoryExtractionTurn> {
+    var remainingBatchChars = MAX_MEMORY_EXTRACTION_BATCH_CHARS
+    return mapNotNull { node ->
         val message = runCatching { node.currentMessage }.getOrNull() ?: return@mapNotNull null
         if (message.role != MessageRole.USER && message.role != MessageRole.ASSISTANT) return@mapNotNull null
-        val text = message.toText().trim()
-        if (text.isBlank()) return@mapNotNull null
+        if (remainingBatchChars <= 0) return@mapNotNull null
+
+        val rawText = message.toText().trim()
+        if (rawText.isBlank()) return@mapNotNull null
+        val compactText = rawText
+            .lineSequence()
+            .map(String::trim)
+            .filter(String::isNotBlank)
+            .joinToString("\n")
+            .take(minOf(MAX_MEMORY_EXTRACTION_TURN_CHARS, remainingBatchChars))
+        if (compactText.isBlank()) return@mapNotNull null
+        remainingBatchChars -= compactText.length
+
         MemoryExtractionTurn(
             nodeId = node.id.toString(),
             role = message.role.name.lowercase(),
-            text = text,
+            text = compactText,
             createdAtMillis = runCatching {
                 message.createdAt.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
             }.getOrDefault(0L),
         )
     }
+}
