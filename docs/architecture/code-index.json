@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T07:43:18.362274+00:00",
-  "commit": "ad9c2d187792629a7a755aeef297b5f0c3b8b958",
+  "generatedAt": "2026-08-01T08:01:36.494154+00:00",
+  "commit": "ec9190b6276bd74d3ae6771e30836fd46e5b1240",
   "branch": "master",
-  "sourceFingerprint": "54db2d35adeb54c8f673d29069f9c8b41e0990c136fed3443190b47cfeca7e6d",
+  "sourceFingerprint": "f7e34d8f544935e153d0025a00b271a5d95936139fca5ebb903c4ce0f33f99d8",
   "summary": {
-    "files": 1196,
-    "lines": 263036,
-    "symbols": 5718,
-    "productionCodeFiles": 858,
+    "files": 1197,
+    "lines": 263115,
+    "symbols": 5720,
+    "productionCodeFiles": 859,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 741,
+      "app": 742,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 809,
+      ".kt": 810,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -56,7 +56,7 @@
     },
     "byCategory": {
       "AI与上下文": 146,
-      "主动代理": 27,
+      "主动代理": 28,
       "关系与承诺": 18,
       "娱乐与数字生活": 28,
       "学习监督": 40,
@@ -1297,6 +1297,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/service/UnifiedProactiveAlarmReceiver.kt",
       "app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt",
       "app/src/main/java/me/rerere/rikkahub/service/ProactiveReminderPlanner.kt",
       "app/src/main/java/me/rerere/rikkahub/service/ProactiveToolPlanner.kt",
@@ -22652,6 +22653,36 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RikkaHubApp.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/service/UnifiedProactiveAlarmReceiver.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 79,
+      "sha256": "4b5639957b5d959db6c84d14bf5cd2e140bca6c91950eef38a7e6c916d5b35cf",
+      "package": "me.rerere.rikkahub.data.service",
+      "categories": [
+        "主动代理"
+      ],
+      "symbols": [
+        {
+          "name": "UnifiedProactiveAlarmReceiver",
+          "kind": "class",
+          "line": 19
+        },
+        {
+          "name": "onReceive",
+          "kind": "function",
+          "line": 20
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
@@ -79113,6 +79144,13 @@
         "line": 22
       }
     ],
+    "me.rerere.rikkahub.data.service.UnifiedProactiveAlarmReceiver": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/UnifiedProactiveAlarmReceiver.kt",
+        "kind": "class",
+        "line": 19
+      }
+    ],
     "me.rerere.rikkahub.data.service.accepts": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryCandidateQualityGate.kt",
@@ -80873,6 +80911,11 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/SupabaseSyncService.kt",
         "kind": "function",
         "line": 244
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/UnifiedProactiveAlarmReceiver.kt",
+        "kind": "function",
+        "line": 20
       }
     ],
     "me.rerere.rikkahub.data.service.onStartCommand": [

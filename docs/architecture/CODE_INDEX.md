@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`ad9c2d187792629a7a755aeef297b5f0c3b8b958`
+- 基准提交：`ec9190b6276bd74d3ae6771e30836fd46e5b1240`
 - 分支：`master`
-- 源码指纹：`54db2d35adeb54c8…`
-- 已索引文件：1196
-- 已索引代码/文本行：263036
-- 已发现类、接口、对象、函数及 Composable：5718
+- 源码指纹：`f7e34d8f544935e1…`
+- 已索引文件：1197
+- 已索引代码/文本行：263115
+- 已发现类、接口、对象、函数及 Composable：5720
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 858 |
+| 生产代码文件 | 859 |
 | 测试文件 | 148 |
 | ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 741 |
+| `app` | 742 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 809 |
+| `.kt` | 810 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -225,6 +225,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt`
+- `app/src/main/java/me/rerere/rikkahub/data/service/UnifiedProactiveAlarmReceiver.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt`
 - `app/src/main/java/me/rerere/rikkahub/service/ProactiveReminderPlanner.kt`
 - `app/src/main/java/me/rerere/rikkahub/service/ProactiveToolPlanner.kt`
@@ -548,7 +549,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：2091
-- 可检索完整符号：5103
+- 可检索完整符号：5104
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
