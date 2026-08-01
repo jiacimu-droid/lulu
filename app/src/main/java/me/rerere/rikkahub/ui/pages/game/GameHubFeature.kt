@@ -24,6 +24,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,36 +41,12 @@ internal fun GameHubFeaturePage() {
     val navController = LocalNavController.current
     val games = remember {
         listOf(
-            GameHubTile(
-                title = "满分男",
-                subtitle = "轮流描述和猜分",
-                onClick = { navController.navigate(Screen.PerfectManGame) },
-            ),
-            GameHubTile(
-                title = "轻量跑团",
-                subtitle = "自由行动与判定",
-                onClick = { navController.navigate(Screen.QuickCompanionGame("roleplay_adventure")) },
-            ),
-            GameHubTile(
-                title = "海龟汤",
-                subtitle = "自由提问，还原真相",
-                onClick = { navController.navigate(Screen.QuickCompanionGame("turtle_soup")) },
-            ),
-            GameHubTile(
-                title = "默契问答",
-                subtitle = "看看彼此有多了解",
-                onClick = { navController.navigate(Screen.QuickCompanionGame("rapport_quiz")) },
-            ),
-            GameHubTile(
-                title = "快艇骰子",
-                subtitle = "掷骰与计分",
-                onClick = { navController.navigate(Screen.QuickCompanionGame("yacht_dice")) },
-            ),
-            GameHubTile(
-                title = "五子棋",
-                subtitle = "和角色下一局",
-                onClick = { navController.navigate(Screen.QuickCompanionGame("gomoku")) },
-            ),
+            GameHubTile("满分男", "轮流描述和猜分") { navController.navigate(Screen.PerfectManGame) },
+            GameHubTile("轻量跑团", "自由行动与判定") { navController.navigate(Screen.QuickCompanionGame("roleplay_adventure")) },
+            GameHubTile("海龟汤", "自由提问，还原真相") { navController.navigate(Screen.QuickCompanionGame("turtle_soup")) },
+            GameHubTile("默契问答", "看看彼此有多了解") { navController.navigate(Screen.QuickCompanionGame("rapport_quiz")) },
+            GameHubTile("快艇骰子", "掷骰与计分") { navController.navigate(Screen.QuickCompanionGame("yacht_dice")) },
+            GameHubTile("五子棋", "和角色下一局") { navController.navigate(Screen.QuickCompanionGame("gomoku")) },
         )
     }
 
@@ -93,9 +70,7 @@ internal fun GameHubFeaturePage() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(start = 18.dp, top = 12.dp, end = 18.dp, bottom = 24.dp),
         ) {
-            items(games, key = { it.title }) { game ->
-                GameHubTileCard(game)
-            }
+            items(games, key = { it.title }) { game -> GameHubTileCard(game) }
         }
     }
 }
@@ -103,10 +78,7 @@ internal fun GameHubFeaturePage() {
 @Composable
 private fun GameHubTileCard(game: GameHubTile) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .clickable(onClick = game.onClick),
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).clickable(onClick = game.onClick),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
         tonalElevation = 4.dp,
     ) {
