@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T10:30:31.719916+00:00",
-  "commit": "7c1f76ca09477ae3c317e52fdc889c46f229ebe3",
+  "generatedAt": "2026-08-01T11:01:40.648459+00:00",
+  "commit": "7ebc550d4bf3ef44841bb6e2fc06a93fd5c20f51",
   "branch": "master",
-  "sourceFingerprint": "13969c738dab0593a203fef605601c6fce451501d6e03d19c4619622a290c72a",
+  "sourceFingerprint": "b0b4c8a8a6fd04959387c7643c6d7cb7c61f7e5b16c20bc4422160001843bbc5",
   "summary": {
     "files": 1197,
-    "lines": 262922,
+    "lines": 262975,
     "symbols": 5722,
     "productionCodeFiles": 859,
     "testFiles": 148,
@@ -44138,8 +44138,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 124,
-      "sha256": "5faccd9365c621b074eb00e4c7cbd48aec1f644190ce8e1c034f86151c8c2aad",
+      "lines": 177,
+      "sha256": "7232d33c53e0f7ef5e05a31f1d3142bcd0669d567020f965843dca621d91bd49",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -44149,27 +44149,27 @@
         {
           "name": "PomodoroInAppOverlayController",
           "kind": "object",
-          "line": 21
+          "line": 20
         },
         {
           "name": "show",
           "kind": "function",
-          "line": 26
+          "line": 28
         },
         {
           "name": "dp",
           "kind": "function",
-          "line": 37
+          "line": 39
         },
         {
           "name": "run",
           "kind": "function",
-          "line": 104
+          "line": 157
         },
         {
           "name": "hide",
           "kind": "function",
-          "line": 118
+          "line": 171
         }
       ],
       "localImportCount": 1,
@@ -97597,7 +97597,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
         "kind": "object",
-        "line": 21
+        "line": 20
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroThemePickerDialog": [
@@ -98052,7 +98052,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
         "kind": "function",
-        "line": 37
+        "line": 39
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.draw": [
@@ -98148,7 +98148,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
         "kind": "function",
-        "line": 118
+        "line": 171
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.loadDrawVideo": [
@@ -98295,7 +98295,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
         "kind": "function",
-        "line": 104
+        "line": 157
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.secondsText": [
@@ -98316,7 +98316,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt",
         "kind": "function",
-        "line": 26
+        "line": 28
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.showMiniBar": [
