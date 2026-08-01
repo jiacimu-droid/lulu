@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T11:03:05.955505+00:00",
-  "commit": "e54270d1c7842cdbe4be53d205004ac0788d7d37",
+  "generatedAt": "2026-08-01T11:03:55.822729+00:00",
+  "commit": "483268e80a82321c3620e7d6c708bde395b55e14",
   "branch": "master",
-  "sourceFingerprint": "9587b0bfbce8d89205f7606fccaab099b6f1cf3fb3c90b5ae1a0e6eeb6ac15ff",
+  "sourceFingerprint": "1e536aa3e14c9914fcc14642e047559a1696b307510c0637594aea663d8e72ed",
   "summary": {
     "files": 1197,
-    "lines": 262802,
-    "symbols": 5720,
+    "lines": 262702,
+    "symbols": 5717,
     "productionCodeFiles": 859,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -39384,8 +39384,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 505,
-      "sha256": "cf4b7bd9e020e8b1910d18e64eeddab4513349521975d61902b5ea3fb7348049",
+      "lines": 405,
+      "sha256": "6aca3b8c7f1515ca655da6c22c4b4b5bfce2e204cd98edd882debf53fca0fc6a",
       "package": "me.rerere.rikkahub.ui.pages.game",
       "categories": [
         "界面"
@@ -39394,82 +39394,67 @@
         {
           "name": "QuickCompanionGamePage",
           "kind": "composable",
-          "line": 71
+          "line": 69
         },
         {
           "name": "recordSharedGame",
           "kind": "function",
-          "line": 90
+          "line": 86
         },
         {
           "name": "generateCompanionText",
           "kind": "function",
-          "line": 122
+          "line": 114
         },
         {
           "name": "requestCompanionText",
           "kind": "function",
-          "line": 191
+          "line": 174
         },
         {
           "name": "saveCheckpoint",
           "kind": "function",
-          "line": 210
+          "line": 189
         },
         {
           "name": "completeRuleGame",
           "kind": "function",
-          "line": 214
+          "line": 193
         },
         {
           "name": "CompanionGameReactionCard",
           "kind": "composable",
-          "line": 361
-        },
-        {
-          "name": "RockPaperScissorsGame",
-          "kind": "composable",
-          "line": 378
-        },
-        {
-          "name": "play",
-          "kind": "function",
-          "line": 387
+          "line": 306
         },
         {
           "name": "GameBody",
           "kind": "composable",
-          "line": 411
+          "line": 323
         },
         {
           "name": "GameResultText",
           "kind": "composable",
-          "line": 429
-        },
-        {
-          "name": "compareRockPaperScissors",
-          "kind": "function",
-          "line": 444
+          "line": 343
         },
         {
           "name": "chooseTicTacToeMove",
           "kind": "function",
-          "line": 453
+          "line": 359
         },
         {
           "name": "quickTicTacToeWinner",
           "kind": "function",
-          "line": 467
+          "line": 373
         },
         {
           "name": "QuickCompanionGame",
           "kind": "class",
-          "line": 483
+          "line": 384
         },
         {
           "name": "fromWireName",
           "kind": "function",
-          "line": 496
+          "line": 396
         }
       ],
       "localImportCount": 25,
@@ -94074,7 +94059,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 361
+        "line": 306
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.CompanionNarrativeRequest": [
@@ -94088,7 +94073,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 411
+        "line": 323
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameColors": [
@@ -94137,7 +94122,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 429
+        "line": 343
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GomokuGame": [
@@ -94242,14 +94227,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "class",
-        "line": 483
+        "line": 384
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.QuickCompanionGamePage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 71
+        "line": 69
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.QuickCompanionGameTest": [
@@ -94264,13 +94249,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/NarrativeCompanionGames.kt",
         "kind": "composable",
         "line": 175
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.game.RockPaperScissorsGame": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "kind": "composable",
-        "line": 378
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.RoleYachtTurn": [
@@ -94445,21 +94423,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 453
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.game.compareRockPaperScissors": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "kind": "function",
-        "line": 444
+        "line": 359
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.completeRuleGame": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 214
+        "line": 193
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.countDirection": [
@@ -94494,14 +94465,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 496
+        "line": 396
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.generateCompanionText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 122
+        "line": 114
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.generatePerfectManText": [
@@ -94574,18 +94545,11 @@
         "line": 36
       }
     ],
-    "me.rerere.rikkahub.ui.pages.game.play": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "kind": "function",
-        "line": 387
-      }
-    ],
     "me.rerere.rikkahub.ui.pages.game.quickTicTacToeWinner": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 467
+        "line": 373
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.recordCompletedRound": [
@@ -94599,14 +94563,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 90
+        "line": 86
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.requestCompanionText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 191
+        "line": 174
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.reset": [
@@ -94641,7 +94605,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 210
+        "line": 189
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.score": [
