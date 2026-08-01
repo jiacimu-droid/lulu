@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`5719fb9a01c754ca551dd446bdf07e6d33777b9c`
+- 基准提交：`4d953750bb964a25789c973d6a8e418d61c67877`
 - 分支：`master`
-- 源码指纹：`d731d3464642977b…`
-- 已索引文件：1195
-- 已索引代码/文本行：262952
-- 已发现类、接口、对象、函数及 Composable：5713
+- 源码指纹：`bdcb620e811c08fe…`
+- 已索引文件：1196
+- 已索引代码/文本行：263035
+- 已发现类、接口、对象、函数及 Composable：5718
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 857 |
+| 生产代码文件 | 858 |
 | 测试文件 | 148 |
 | ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 740 |
+| `app` | 741 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 808 |
+| `.kt` | 809 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -211,10 +211,11 @@
 - `ai/src/main/java/me/rerere/ai/util/ErrorParser.kt`
 - `ai/src/main/java/me/rerere/ai/util/FileEncoder.kt`
 - `ai/src/main/java/me/rerere/ai/util/Json.kt`
-- ……另有 115 个文件，见 `code-index.json`
+- ……另有 116 个文件，见 `code-index.json`
 
 ### 主动代理
 
+- `app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentReducer.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentRuntime.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt`
@@ -546,14 +547,14 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2089
-- 可检索完整符号：5099
+- 已解析本地导入边：2091
+- 可检索完整符号：5103
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 129 | 812 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 130 | 812 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 112 | 953 |
-| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
+| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 63 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 61 | 62 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 58 | 296 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 55 | 191 |

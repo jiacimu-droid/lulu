@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T06:18:54.290867+00:00",
-  "commit": "5719fb9a01c754ca551dd446bdf07e6d33777b9c",
+  "generatedAt": "2026-08-01T06:29:34.209904+00:00",
+  "commit": "4d953750bb964a25789c973d6a8e418d61c67877",
   "branch": "master",
-  "sourceFingerprint": "d731d3464642977b63e4d7eb3232e0b907047ccfe5f4bf9d616db5eccb3bec92",
+  "sourceFingerprint": "bdcb620e811c08fe4c4cd680834effd3e89f389cebab0edc68f9ab1fb400081e",
   "summary": {
-    "files": 1195,
-    "lines": 262952,
-    "symbols": 5713,
-    "productionCodeFiles": 857,
+    "files": 1196,
+    "lines": 263035,
+    "symbols": 5718,
+    "productionCodeFiles": 858,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 740,
+      "app": 741,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 808,
+      ".kt": 809,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -55,8 +55,8 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 145,
-      "主动代理": 26,
+      "AI与上下文": 146,
+      "主动代理": 27,
       "关系与承诺": 18,
       "娱乐与数字生活": 28,
       "学习监督": 40,
@@ -68,7 +68,7 @@
       "界面": 339,
       "记忆": 49
     },
-    "resolvedImportEdges": 2089
+    "resolvedImportEdges": 2091
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -900,7 +900,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 129,
+        "importedByCount": 130,
         "todoMarkers": 0
       },
       {
@@ -916,7 +916,7 @@
         "lines": 19,
         "symbols": 1,
         "localImportCount": 0,
-        "importedByCount": 62,
+        "importedByCount": 63,
         "todoMarkers": 0
       },
       {
@@ -1237,6 +1237,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/OcrTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PlaceholderTransformer.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/RegexOutputTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformer.kt",
@@ -1286,6 +1287,7 @@
       "app/src/test/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantInteractionGenerationTest.kt"
     ],
     "主动代理": [
+      "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentReducer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentRuntime.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt",
@@ -2013,7 +2015,7 @@
     {
       "from": "me.rerere.rikkahub.data.ai.transformers",
       "to": "me.rerere.ai.ui.UIMessage",
-      "imports": 25
+      "imports": 26
     },
     {
       "from": "me.rerere.rikkahub.ui.components.ai",
@@ -2058,6 +2060,11 @@
     {
       "from": "me.rerere.rikkahub.data.ai.transformers",
       "to": "me.rerere.ai.ui.UIMessagePart",
+      "imports": 17
+    },
+    {
+      "from": "me.rerere.rikkahub.data.ai.transformers",
+      "to": "me.rerere.ai.core.MessageRole",
       "imports": 16
     },
     {
@@ -2083,11 +2090,6 @@
     {
       "from": "me.rerere.rikkahub",
       "to": "me.rerere.rikkahub.ui.pages.setting",
-      "imports": 15
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.core.MessageRole",
       "imports": 15
     },
     {
@@ -3585,6 +3587,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/InlineVoiceMessageTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/OcrTransformer.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/RegexOutputTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ThinkTagTransformer.kt",
@@ -6056,6 +6059,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/OcrTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PlaceholderTransformer.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/RegexOutputTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformer.kt",
@@ -11296,8 +11300,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionTransformerPipeline.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 31,
-      "sha256": "41829f15de81043346876464aa9d6cf8dc1e257d0ba4b64fb90c192b58538732",
+      "lines": 34,
+      "sha256": "58ce05ab2b12e701e3ed7b8d2f11b714ac3746a3ea325af71e06f4ce201706aa",
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文"
@@ -11306,7 +11310,7 @@
         {
           "name": "withRequiredAssistantPromptContext",
           "kind": "function",
-          "line": 30
+          "line": 33
         }
       ],
       "localImportCount": 0,
@@ -11761,6 +11765,59 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 80,
+      "sha256": "a59caacde028bcc4b5a348d99d256c526b80f76cbe6b88fd33a750ba4ba2ad0f",
+      "package": "me.rerere.rikkahub.data.ai.transformers",
+      "categories": [
+        "AI与上下文",
+        "主动代理"
+      ],
+      "symbols": [
+        {
+          "name": "ProactiveContinuityTransformer",
+          "kind": "object",
+          "line": 16
+        },
+        {
+          "name": "transform",
+          "kind": "function",
+          "line": 17
+        },
+        {
+          "name": "injectProactiveContinuity",
+          "kind": "function",
+          "line": 23
+        },
+        {
+          "name": "visibleText",
+          "kind": "function",
+          "line": 69
+        },
+        {
+          "name": "compactPreview",
+          "kind": "function",
+          "line": 75
+        }
+      ],
+      "localImportCount": 3,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.core.MessageRole",
+        "me.rerere.ai.ui.UIMessage",
+        "me.rerere.ai.ui.UIMessagePart"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/MessageRole.kt",
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
@@ -71216,6 +71273,13 @@
         "line": 137
       }
     ],
+    "me.rerere.rikkahub.data.ai.transformers.ProactiveContinuityTransformer": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
+        "kind": "object",
+        "line": 16
+      }
+    ],
     "me.rerere.rikkahub.data.ai.transformers.PromptInjectionTransformer": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
@@ -71457,6 +71521,13 @@
         "line": 118
       }
     ],
+    "me.rerere.rikkahub.data.ai.transformers.compactPreview": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
+        "kind": "function",
+        "line": 75
+      }
+    ],
     "me.rerere.rikkahub.data.ai.transformers.compactRuntime": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionRuntimeCompactTransformer.kt",
@@ -71579,6 +71650,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/TemplateTransformer.kt",
         "kind": "function",
         "line": 53
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.transformers.injectProactiveContinuity": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
+        "kind": "function",
+        "line": 23
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.inlineVoiceMatchKey": [
@@ -71949,6 +72027,11 @@
         "line": 140
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
+        "kind": "function",
+        "line": 17
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
         "kind": "function",
         "line": 19
@@ -72007,6 +72090,13 @@
         "line": 19
       }
     ],
+    "me.rerere.rikkahub.data.ai.transformers.visibleText": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/ProactiveContinuityTransformer.kt",
+        "kind": "function",
+        "line": 69
+      }
+    ],
     "me.rerere.rikkahub.data.ai.transformers.visualTransform": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/LuluExpressionOutputTransformer.kt",
@@ -72040,7 +72130,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/CompanionTransformerPipeline.kt",
         "kind": "function",
-        "line": 30
+        "line": 33
       }
     ],
     "me.rerere.rikkahub.data.ai.transformers.withoutMessageTimeContext": [
