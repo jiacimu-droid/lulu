@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T04:44:42.530497+00:00",
-  "commit": "b8a191fc382ac30c9ec15949463e4b2c067b36cf",
+  "generatedAt": "2026-08-01T04:52:18.972804+00:00",
+  "commit": "f17453421e472ee329c491b76f9f9aa671bd51b7",
   "branch": "master",
-  "sourceFingerprint": "60dc5c76809753caf52f8367dc05a0ad75f22f12f9d69de56fbd4d88c01c8117",
+  "sourceFingerprint": "94f4d390b95f29da825c702c11efcc48ae42602fab37aff301a1fa6f58366104",
   "summary": {
     "files": 1193,
-    "lines": 262148,
-    "symbols": 5680,
+    "lines": 262251,
+    "symbols": 5686,
     "productionCodeFiles": 855,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -463,6 +463,13 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "lines": 585,
+        "symbols": 33,
+        "localImportCount": 21,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
         "lines": 519,
         "symbols": 33,
@@ -509,13 +516,6 @@
         "lines": 340,
         "symbols": 28,
         "localImportCount": 5,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
-        "lines": 482,
-        "symbols": 27,
-        "localImportCount": 20,
         "todoMarkers": 0
       },
       {
@@ -40475,8 +40475,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 482,
-      "sha256": "5928e231e12c892e6c489a2328b482b30af777f0c20aeaa0d8029ba6122cbc78",
+      "lines": 585,
+      "sha256": "d9bdd89aa2630233f2ea0022705d1c49642d529b9ad5ba89db4056b53225439d",
       "package": "me.rerere.rikkahub.ui.pages.memory",
       "categories": [
         "记忆",
@@ -40486,140 +40486,170 @@
         {
           "name": "MemoryBatchOverview",
           "kind": "class",
-          "line": 35
+          "line": 38
         },
         {
           "name": "MemoryBankVM",
           "kind": "class",
-          "line": 44
+          "line": 47
         },
         {
           "name": "loadMemories",
           "kind": "function",
-          "line": 88
+          "line": 94
         },
         {
           "name": "refreshMemoryData",
           "kind": "function",
-          "line": 113
+          "line": 119
+        },
+        {
+          "name": "loadArchiveSources",
+          "kind": "function",
+          "line": 144
         },
         {
           "name": "buildBatchOverviews",
           "kind": "function",
-          "line": 137
+          "line": 165
         },
         {
           "name": "repairMemoriesFromHistory",
           "kind": "function",
-          "line": 182
+          "line": 210
         },
         {
           "name": "continueHistoricalMemoryRepair",
           "kind": "function",
-          "line": 184
+          "line": 212
         },
         {
           "name": "rebuildAllHistoricalMemories",
           "kind": "function",
-          "line": 186
+          "line": 214
         },
         {
           "name": "retryExtractionBatch",
           "kind": "function",
-          "line": 188
+          "line": 216
         },
         {
           "name": "reorganizeMemories",
           "kind": "function",
-          "line": 209
+          "line": 237
         },
         {
           "name": "recoverMemoriesFromHistory",
           "kind": "function",
-          "line": 231
+          "line": 259
         },
         {
           "name": "setSearchQuery",
           "kind": "function",
-          "line": 276
+          "line": 304
         },
         {
           "name": "setSelectedType",
           "kind": "function",
-          "line": 281
+          "line": 309
         },
         {
           "name": "setSelectedAssistantId",
           "kind": "function",
-          "line": 286
+          "line": 314
         },
         {
           "name": "deleteMemory",
           "kind": "function",
-          "line": 291
+          "line": 319
         },
         {
           "name": "clearLongTermMemories",
           "kind": "function",
-          "line": 298
+          "line": 346
         },
         {
           "name": "updateMemory",
           "kind": "function",
-          "line": 321
+          "line": 369
         },
         {
           "name": "setPinned",
           "kind": "function",
-          "line": 328
+          "line": 376
         },
         {
           "name": "markDeprecated",
           "kind": "function",
-          "line": 335
+          "line": 383
         },
         {
           "name": "rebuildIndex",
           "kind": "function",
-          "line": 342
+          "line": 390
         },
         {
           "name": "processPendingVectors",
           "kind": "function",
-          "line": 365
+          "line": 413
         },
         {
           "name": "runLightMaintenance",
           "kind": "function",
-          "line": 401
+          "line": 449
+        },
+        {
+          "name": "archiveDailySourceMemories",
+          "kind": "function",
+          "line": 464
         },
         {
           "name": "setMemoryEmbeddingEnabled",
           "kind": "function",
-          "line": 414
+          "line": 485
         },
         {
           "name": "setMemoryEmbeddingModel",
           "kind": "function",
-          "line": 431
+          "line": 502
         },
         {
           "name": "setMemoryEmbeddingDimensions",
           "kind": "function",
-          "line": 452
+          "line": 523
         },
         {
           "name": "embeddingModels",
           "kind": "function",
-          "line": 461
+          "line": 532
         },
         {
           "name": "memoryVectorBlocker",
           "kind": "function",
-          "line": 465
+          "line": 536
+        },
+        {
+          "name": "collapseArchiveSources",
+          "kind": "function",
+          "line": 555
+        },
+        {
+          "name": "isDailyArchive",
+          "kind": "function",
+          "line": 564
+        },
+        {
+          "name": "sourceMemoryIds",
+          "kind": "function",
+          "line": 567
+        },
+        {
+          "name": "canArchiveUnderDailySummary",
+          "kind": "function",
+          "line": 574
         }
       ],
-      "localImportCount": 20,
+      "localImportCount": 21,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -40643,7 +40673,8 @@
         "me.rerere.rikkahub.data.service.buildRelationshipEventsFromMemoryCandidates",
         "me.rerere.rikkahub.data.service.buildSelectedConversationBranchId",
         "me.rerere.rikkahub.service.ChatService",
-        "me.rerere.rikkahub.service.MemoryReorganizationMode"
+        "me.rerere.rikkahub.service.MemoryReorganizationMode",
+        "me.rerere.rikkahub.utils.JsonInstant"
       ],
       "resolvedImports": [
         "ai/src/main/java/me/rerere/ai/provider/Model.kt",
@@ -94958,14 +94989,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "class",
-        "line": 44
+        "line": 47
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryBatchOverview": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "class",
-        "line": 35
+        "line": 38
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryCard": [
@@ -95031,6 +95062,13 @@
         "line": 182
       }
     ],
+    "me.rerere.rikkahub.ui.pages.memory.archiveDailySourceMemories": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "kind": "function",
+        "line": 464
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.memory.batchStatusLabel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
@@ -95049,7 +95087,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 137
+        "line": 165
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.buildMemoryAssistantLabels": [
@@ -95066,32 +95104,46 @@
         "line": 36
       }
     ],
+    "me.rerere.rikkahub.ui.pages.memory.canArchiveUnderDailySummary": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "kind": "function",
+        "line": 574
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.memory.clearLongTermMemories": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 298
+        "line": 346
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.memory.collapseArchiveSources": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "kind": "function",
+        "line": 555
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.continueHistoricalMemoryRepair": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 184
+        "line": 212
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.deleteMemory": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 291
+        "line": 319
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.embeddingModels": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 461
+        "line": 532
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.firstSourceNodeId": [
@@ -95108,137 +95160,151 @@
         "line": 240
       }
     ],
+    "me.rerere.rikkahub.ui.pages.memory.isDailyArchive": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "kind": "function",
+        "line": 564
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.memory.loadArchiveSources": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "kind": "function",
+        "line": 144
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.memory.loadMemories": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 88
+        "line": 94
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.markDeprecated": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 335
+        "line": 383
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.memoryVectorBlocker": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 465
+        "line": 536
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.processPendingVectors": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 365
+        "line": 413
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.rebuildAllHistoricalMemories": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 186
+        "line": 214
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.rebuildIndex": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 342
+        "line": 390
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.recoverMemoriesFromHistory": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 231
+        "line": 259
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.refreshMemoryData": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 113
+        "line": 119
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.reorganizeMemories": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 209
+        "line": 237
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.repairMemoriesFromHistory": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 182
+        "line": 210
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.retryExtractionBatch": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 188
+        "line": 216
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.runLightMaintenance": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 401
+        "line": 449
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.setMemoryEmbeddingDimensions": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 452
+        "line": 523
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.setMemoryEmbeddingEnabled": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 414
+        "line": 485
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.setMemoryEmbeddingModel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 431
+        "line": 502
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.setPinned": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 328
+        "line": 376
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.setSearchQuery": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 276
+        "line": 304
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.setSelectedAssistantId": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 286
+        "line": 314
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.setSelectedType": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 281
+        "line": 309
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.shortAssistantId": [
@@ -95248,11 +95314,18 @@
         "line": 217
       }
     ],
+    "me.rerere.rikkahub.ui.pages.memory.sourceMemoryIds": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "kind": "function",
+        "line": 567
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.memory.updateMemory": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "kind": "function",
-        "line": 321
+        "line": 369
       }
     ],
     "me.rerere.rikkahub.ui.pages.search.SearchPage": [
