@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.getProactiveMessageSetting
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.uuid.Uuid
 
@@ -29,6 +30,7 @@ internal data class TargetedProactiveWorkSpec(
 }
 
 private const val FALLBACK_GRACE_MILLIS = 2L * 60L * 1000L
+private const val PROJECTION_CLOCK_TOLERANCE_MILLIS = 5_000L
 private const val INPUT_PROJECTED_TRIGGER_AT = "projected_trigger_at"
 private const val KEY_NEXT_TRIGGER_TIME = "next_trigger_time"
 private const val KEY_LAST_TRIGGERED_TIME = "last_triggered_time"
@@ -45,11 +47,7 @@ internal fun buildTargetedProactiveWorkSpec(
     commitmentId = commitmentId.trim(),
 )
 
-/**
- * WorkManager is a recovery path, never a second primary trigger.
- * AlarmManager gets the first delivery attempt. This worker waits for a grace
- * period and verifies the exact projection is still pending before dispatching.
- */
+/** WorkManager is a stale-checked recovery path, never a second primary trigger. */
 class ProactiveMessageWorker(
     context: Context,
     params: WorkerParameters,
@@ -88,7 +86,6 @@ class ProactiveMessageWorker(
             val safeDelayMinutes = delayMinutes.coerceAtLeast(1)
             val projectedTriggerAt = System.currentTimeMillis() +
                 TimeUnit.MINUTES.toMillis(safeDelayMinutes.toLong())
-
             val workRequest = OneTimeWorkRequestBuilder<ProactiveMessageWorker>()
                 .setInputData(
                     Data.Builder()
@@ -102,15 +99,11 @@ class ProactiveMessageWorker(
                     TimeUnit.MILLISECONDS,
                 )
                 .build()
-
             WorkManager.getInstance(context).enqueueUniqueWork(
                 autonomousWorkName(setting.assistantId),
                 ExistingWorkPolicy.REPLACE,
                 workRequest,
             )
-
-            // Scheduler owns the canonical trigger projection. Do not overwrite it
-            // with a second independently calculated WorkManager timestamp.
             Log.d(TAG, "Scheduled delayed autonomous fallback in $safeDelayMinutes minutes + grace")
         }
 
@@ -136,7 +129,6 @@ class ProactiveMessageWorker(
                 commitmentId = commitmentId,
             )
             if (!spec.isTargeted) return
-
             val workRequest = OneTimeWorkRequestBuilder<ProactiveMessageWorker>()
                 .setInputData(
                     Data.Builder()
@@ -148,7 +140,6 @@ class ProactiveMessageWorker(
                 .addTag(assistantWorkTag(spec.assistantId))
                 .setInitialDelay(spec.delayMillis, TimeUnit.MILLISECONDS)
                 .build()
-
             WorkManager.getInstance(context).enqueueUniqueWork(
                 spec.uniqueWorkName,
                 ExistingWorkPolicy.REPLACE,
@@ -174,10 +165,9 @@ class ProactiveMessageWorker(
             return (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).canScheduleExactAlarms()
         }
 
-        fun isIgnoringBatteryOptimizations(context: Context): Boolean {
-            return (context.getSystemService(Context.POWER_SERVICE) as PowerManager)
+        fun isIgnoringBatteryOptimizations(context: Context): Boolean =
+            (context.getSystemService(Context.POWER_SERVICE) as PowerManager)
                 .isIgnoringBatteryOptimizations(context.packageName)
-        }
     }
 
     override suspend fun doWork(): Result {
@@ -208,8 +198,10 @@ class ProactiveMessageWorker(
             prefs.getLong(KEY_NEXT_TRIGGER_TIME, 0L)
         }
         val lastTriggeredAt = prefs.getLong(KEY_LAST_TRIGGERED_TIME, 0L)
-        val projectionMatches = projectedTriggerAt > 0L && canonicalTriggerAt == projectedTriggerAt
-        val primaryAlreadyRan = lastTriggeredAt >= projectedTriggerAt && projectedTriggerAt > 0L
+        val projectionMatches = projectedTriggerAt > 0L &&
+            abs(canonicalTriggerAt - projectedTriggerAt) <= PROJECTION_CLOCK_TOLERANCE_MILLIS
+        val primaryAlreadyRan = projectedTriggerAt > 0L &&
+            lastTriggeredAt >= projectedTriggerAt - PROJECTION_CLOCK_TOLERANCE_MILLIS
 
         if (!projectionMatches || primaryAlreadyRan) {
             Log.d(
@@ -235,7 +227,6 @@ class ProactiveMessageWorker(
         val wakeLock = (applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ProactiveMessage::WorkerWakeLock")
         wakeLock.acquire(5 * 60 * 1000L)
-
         try {
             return when (
                 val dispatch = dispatcher.dispatch(
@@ -246,10 +237,7 @@ class ProactiveMessageWorker(
                 )
             ) {
                 ProactiveTurnDispatchResult.Disabled -> Result.success()
-                is ProactiveTurnDispatchResult.Busy -> {
-                    Log.d(TAG, "Another proactive turn owns the lease: ${dispatch.executionId}")
-                    Result.success()
-                }
+                is ProactiveTurnDispatchResult.Busy -> Result.success()
                 is ProactiveTurnDispatchResult.InvalidTarget -> Result.failure()
                 is ProactiveTurnDispatchResult.Dispatched -> Result.success()
             }
