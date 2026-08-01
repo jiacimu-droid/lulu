@@ -5,15 +5,16 @@ import android.content.Intent
 import android.os.Build
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.getProactiveMessageSetting
+import java.util.UUID
 import kotlin.uuid.Uuid
 
+private const val EXECUTION_PREFS = "proactive_execution_leases"
+private const val EXECUTION_LEASE_MILLIS = 10L * 60L * 1000L
+
 /**
- * Delivery boundary for proactive turns.
- *
- * Scheduling policy stays in the scheduler, generation stays in
- * ProactiveMessageService, and this class owns only resolving the requested role
- * and handing the work to the Android service. This prevents workers from
- * accumulating generation and commitment logic.
+ * Resolves a proactive target and atomically leases one execution per assistant.
+ * A later Alarm/Worker/app fallback for the same role is merged instead of
+ * starting another generation coroutine.
  */
 class ProactiveTurnDispatcher(
     private val settingsStore: SettingsStore,
@@ -22,6 +23,7 @@ class ProactiveTurnDispatcher(
         context: Context,
         assistantId: String?,
         commitmentId: String?,
+        triggerId: String = UUID.randomUUID().toString(),
     ): ProactiveTurnDispatchResult {
         val targeted = !assistantId.isNullOrBlank() && !commitmentId.isNullOrBlank()
         val parsedAssistantId = assistantId
@@ -38,28 +40,121 @@ class ProactiveTurnDispatcher(
             return ProactiveTurnDispatchResult.Disabled
         }
 
-        val intent = Intent(context, ProactiveMessageTriggerService::class.java).apply {
-            putExtra(ProactiveMessageService.EXTRA_ASSISTANT_ID, proactiveSetting.assistantId)
-            commitmentId?.takeIf(String::isNotBlank)?.let {
-                putExtra(ProactiveMessageService.EXTRA_COMMITMENT_ID, it)
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent)
-        } else {
-            context.startService(intent)
-        }
-        return ProactiveTurnDispatchResult.Dispatched(
-            assistantId = proactiveSetting.assistantId,
-            targeted = targeted,
+        val resolvedAssistantId = proactiveSetting.assistantId
+        val executionId = claimExecutionLease(
+            context = context,
+            assistantId = resolvedAssistantId,
+            triggerId = triggerId,
+        ) ?: return ProactiveTurnDispatchResult.Busy(
+            assistantId = resolvedAssistantId,
+            executionId = activeExecutionId(context, resolvedAssistantId).orEmpty(),
         )
+
+        return runCatching {
+            val intent = Intent(context, ProactiveMessageTriggerService::class.java).apply {
+                putExtra(ProactiveMessageService.EXTRA_ASSISTANT_ID, resolvedAssistantId)
+                putExtra(EXTRA_PROACTIVE_EXECUTION_ID, executionId)
+                putExtra(EXTRA_PROACTIVE_TRIGGER_ID, triggerId)
+                commitmentId?.takeIf(String::isNotBlank)?.let {
+                    putExtra(ProactiveMessageService.EXTRA_COMMITMENT_ID, it)
+                }
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+            ProactiveTurnDispatchResult.Dispatched(
+                assistantId = resolvedAssistantId,
+                targeted = targeted,
+                executionId = executionId,
+            )
+        }.getOrElse { error ->
+            releaseExecutionLease(context, resolvedAssistantId, executionId)
+            throw error
+        }
     }
+}
+
+internal const val EXTRA_PROACTIVE_EXECUTION_ID = "proactive_execution_id"
+internal const val EXTRA_PROACTIVE_TRIGGER_ID = "proactive_trigger_id"
+
+internal fun claimExecutionLease(
+    context: Context,
+    assistantId: String,
+    triggerId: String,
+    nowMillis: Long = System.currentTimeMillis(),
+): String? {
+    val prefs = context.getSharedPreferences(EXECUTION_PREFS, Context.MODE_PRIVATE)
+    val key = "lease:${assistantId.trim()}"
+    synchronized(ProactiveExecutionLeaseLock) {
+        val current = prefs.getString(key, null)?.decodeLease()
+        if (current != null && current.expiresAt > nowMillis) {
+            return null
+        }
+        val executionId = "${assistantId.trim()}:${nowMillis}:${triggerId.hashCode()}"
+        val lease = ProactiveExecutionLease(
+            executionId = executionId,
+            triggerId = triggerId,
+            expiresAt = nowMillis + EXECUTION_LEASE_MILLIS,
+        )
+        // commit() is intentional: claiming must be synchronous and visible before
+        // another entry point can pass the same gate.
+        val saved = prefs.edit().putString(key, lease.encode()).commit()
+        return executionId.takeIf { saved }
+    }
+}
+
+internal fun releaseExecutionLease(
+    context: Context,
+    assistantId: String,
+    executionId: String,
+) {
+    val prefs = context.getSharedPreferences(EXECUTION_PREFS, Context.MODE_PRIVATE)
+    val key = "lease:${assistantId.trim()}"
+    synchronized(ProactiveExecutionLeaseLock) {
+        val current = prefs.getString(key, null)?.decodeLease()
+        if (current?.executionId == executionId) {
+            prefs.edit().remove(key).commit()
+        }
+    }
+}
+
+private fun activeExecutionId(context: Context, assistantId: String): String? {
+    val prefs = context.getSharedPreferences(EXECUTION_PREFS, Context.MODE_PRIVATE)
+    return prefs.getString("lease:${assistantId.trim()}", null)?.decodeLease()?.executionId
+}
+
+private object ProactiveExecutionLeaseLock
+
+private data class ProactiveExecutionLease(
+    val executionId: String,
+    val triggerId: String,
+    val expiresAt: Long,
+) {
+    fun encode(): String = listOf(executionId, triggerId, expiresAt.toString()).joinToString("|")
+}
+
+private fun String.decodeLease(): ProactiveExecutionLease? {
+    val parts = split('|', limit = 3)
+    if (parts.size != 3) return null
+    return ProactiveExecutionLease(
+        executionId = parts[0],
+        triggerId = parts[1],
+        expiresAt = parts[2].toLongOrNull() ?: return null,
+    )
 }
 
 sealed interface ProactiveTurnDispatchResult {
     data class Dispatched(
         val assistantId: String,
         val targeted: Boolean,
+        val executionId: String,
+    ) : ProactiveTurnDispatchResult
+
+    data class Busy(
+        val assistantId: String,
+        val executionId: String,
     ) : ProactiveTurnDispatchResult
 
     data object Disabled : ProactiveTurnDispatchResult
