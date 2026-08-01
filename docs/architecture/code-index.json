@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T04:31:48.700794+00:00",
-  "commit": "42b86b3bc8b8a11b71abd29d10d4eba368e8dc50",
+  "generatedAt": "2026-08-01T04:44:42.530497+00:00",
+  "commit": "b8a191fc382ac30c9ec15949463e4b2c067b36cf",
   "branch": "master",
-  "sourceFingerprint": "2c3864afba33280515cc1ef7375b1a952cf80773ccae6b5c3ed82e6d78c94334",
+  "sourceFingerprint": "60dc5c76809753caf52f8367dc05a0ad75f22f12f9d69de56fbd4d88c01c8117",
   "summary": {
     "files": 1193,
-    "lines": 262186,
-    "symbols": 5677,
+    "lines": 262148,
+    "symbols": 5680,
     "productionCodeFiles": 855,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -2130,6 +2130,11 @@
       "imports": 12
     },
     {
+      "from": "me.rerere.rikkahub.ui.pages.memory",
+      "to": "me.rerere.rikkahub.data.db.entity",
+      "imports": 12
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.ai",
       "to": "me.rerere.hugeicons.HugeIcons",
       "imports": 11
@@ -2142,11 +2147,6 @@
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
       "to": "me.rerere.rikkahub.data.model.Assistant",
-      "imports": 11
-    },
-    {
-      "from": "me.rerere.rikkahub.ui.pages.memory",
-      "to": "me.rerere.rikkahub.data.db.entity",
       "imports": 11
     },
     {
@@ -40417,8 +40417,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 445,
-      "sha256": "1d3be39e211c0e17319ae929c71044b520f6edca24f981e9863d3971f003314c",
+      "lines": 407,
+      "sha256": "309dd2bfdae6aa6af54774d00dfa4a79de3a42791e0f5f62f5127c7d64e06d32",
       "package": "me.rerere.rikkahub.ui.pages.memory",
       "categories": [
         "记忆",
@@ -40428,10 +40428,25 @@
         {
           "name": "MemoryBankPage",
           "kind": "composable",
-          "line": 55
+          "line": 54
+        },
+        {
+          "name": "AlignedBatchRow",
+          "kind": "class",
+          "line": 332
+        },
+        {
+          "name": "buildAlignedBatchRows",
+          "kind": "function",
+          "line": 339
+        },
+        {
+          "name": "AlignedMemoryBatchRow",
+          "kind": "composable",
+          "line": 362
         }
       ],
-      "localImportCount": 10,
+      "localImportCount": 11,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -40445,6 +40460,7 @@
         "me.rerere.hugeicons.stroke.Search01",
         "me.rerere.hugeicons.stroke.Tools",
         "me.rerere.rikkahub.data.db.entity.MemoryBankEntity",
+        "me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchEntity",
         "me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus"
       ],
       "resolvedImports": [
@@ -94882,6 +94898,20 @@
         "line": 418
       }
     ],
+    "me.rerere.rikkahub.ui.pages.memory.AlignedBatchRow": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
+        "kind": "class",
+        "line": 332
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.memory.AlignedMemoryBatchRow": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
+        "kind": "composable",
+        "line": 362
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.memory.AssistantFilterRow": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
@@ -94921,7 +94951,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
         "kind": "composable",
-        "line": 55
+        "line": 54
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.MemoryBankVM": [
@@ -95006,6 +95036,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "kind": "function",
         "line": 219
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.memory.buildAlignedBatchRows": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankPage.kt",
+        "kind": "function",
+        "line": 339
       }
     ],
     "me.rerere.rikkahub.ui.pages.memory.buildBatchOverviews": [
