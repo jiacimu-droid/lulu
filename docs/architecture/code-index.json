@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T04:53:10.143327+00:00",
-  "commit": "e51a79a55fe65fec2fa224f7e291543c9e670743",
+  "generatedAt": "2026-08-01T05:15:45.750399+00:00",
+  "commit": "5975095b96d344ed3ddad82662aad7adfad9e30a",
   "branch": "master",
-  "sourceFingerprint": "6fd179506f48edec87b6e351cedaff434e96b28203c4ebe944e06092826a1781",
+  "sourceFingerprint": "e11e4325c9d58eadbe867487f317fe14572f0a15de694561880598df37c1101c",
   "summary": {
-    "files": 1193,
-    "lines": 262303,
-    "symbols": 5686,
-    "productionCodeFiles": 855,
+    "files": 1194,
+    "lines": 262355,
+    "symbols": 5690,
+    "productionCodeFiles": 856,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 738,
+      "app": 739,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 806,
+      ".kt": 807,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -19020,6 +19020,46 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/favorite/FavoriteVM.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 52,
+      "sha256": "69fd864b16aa1cd5c8d397dd310ff3c6d6e42aea718653bc7dec52c1964a90c3",
+      "package": "me.rerere.rikkahub.data.model",
+      "categories": [],
+      "symbols": [
+        {
+          "name": "GroupChatMember",
+          "kind": "class",
+          "line": 10
+        },
+        {
+          "name": "GroupChatSpec",
+          "kind": "class",
+          "line": 16
+        },
+        {
+          "name": "toConversationSystemPrompt",
+          "kind": "function",
+          "line": 28
+        },
+        {
+          "name": "decodeGroupChatSpec",
+          "kind": "function",
+          "line": 36
+        }
+      ],
+      "localImportCount": 1,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.utils.JsonInstant"
+      ],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/model/Leaderboard.kt",
@@ -77402,6 +77442,20 @@
         "line": 11
       }
     ],
+    "me.rerere.rikkahub.data.model.GroupChatMember": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
+        "kind": "class",
+        "line": 10
+      }
+    ],
+    "me.rerere.rikkahub.data.model.GroupChatSpec": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
+        "kind": "class",
+        "line": 16
+      }
+    ],
     "me.rerere.rikkahub.data.model.Image": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Avatar.kt",
@@ -77519,6 +77573,13 @@
         "line": 136
       }
     ],
+    "me.rerere.rikkahub.data.model.decodeGroupChatSpec": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
+        "kind": "function",
+        "line": 36
+      }
+    ],
     "me.rerere.rikkahub.data.model.extractContextForMatching": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
@@ -77608,6 +77669,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "kind": "function",
         "line": 161
+      }
+    ],
+    "me.rerere.rikkahub.data.model.toConversationSystemPrompt": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
+        "kind": "function",
+        "line": 28
       }
     ],
     "me.rerere.rikkahub.data.model.toMessageNode": [
