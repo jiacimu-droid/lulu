@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T06:29:34.209904+00:00",
-  "commit": "4d953750bb964a25789c973d6a8e418d61c67877",
+  "generatedAt": "2026-08-01T06:30:05.105249+00:00",
+  "commit": "1ebf009da9d083847662e4abe452e908ca01a43f",
   "branch": "master",
-  "sourceFingerprint": "bdcb620e811c08fe4c4cd680834effd3e89f389cebab0edc68f9ab1fb400081e",
+  "sourceFingerprint": "0f29ac6218e7857cda6c6c3b4151fc68fbae813b56c2c02de52bfe844545c5f6",
   "summary": {
     "files": 1196,
     "lines": 263035,
@@ -11771,7 +11771,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 80,
-      "sha256": "a59caacde028bcc4b5a348d99d256c526b80f76cbe6b88fd33a750ba4ba2ad0f",
+      "sha256": "79ce269353fb106ddeb6b8ce1d9a3b40f4791239a52f5f4c93c0941872274c90",
       "package": "me.rerere.rikkahub.data.ai.transformers",
       "categories": [
         "AI与上下文",
