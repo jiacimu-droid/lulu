@@ -32,26 +32,14 @@
   <uses-permission android:name="android.permission.WRITE_CALENDAR" />
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-  <uses-feature
-    android:name="android.hardware.camera"
-    android:required="false" />
-  <uses-feature
-    android:name="android.hardware.camera.autofocus"
-    android:required="false" />
+  <uses-feature android:name="android.hardware.camera" android:required="false" />
+  <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
   <queries>
-    <intent>
-      <action android:name="android.intent.action.TTS_SERVICE" />
-    </intent>
-    <intent>
-      <action android:name="android.intent.action.SET_ALARM" />
-    </intent>
-    <intent>
-      <action android:name="android.intent.action.SHOW_ALARMS" />
-    </intent>
-    <intent>
-      <action android:name="android.intent.action.DISMISS_ALARM" />
-    </intent>
+    <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+    <intent><action android:name="android.intent.action.SET_ALARM" /></intent>
+    <intent><action android:name="android.intent.action.SHOW_ALARMS" /></intent>
+    <intent><action android:name="android.intent.action.DISMISS_ALARM" /></intent>
   </queries>
 
   <application
@@ -68,11 +56,13 @@
     android:theme="@style/Theme.Rikkahub"
     android:usesCleartextTraffic="true"
     tools:targetApi="33">
+
     <activity
       android:name=".ui.activity.SafeModeActivity"
       android:exported="false"
       android:label="@string/title_activity_safe_mode"
       android:theme="@style/Theme.Rikkahub" />
+
     <activity
       android:name=".RouteActivity"
       android:configChanges="keyboardHidden|orientation|screenSize"
@@ -82,47 +72,34 @@
       android:windowSoftInputMode="adjustResize">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
-
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
       <intent-filter>
         <action android:name="android.intent.action.SEND" />
-
         <category android:name="android.intent.category.DEFAULT" />
-
         <data android:mimeType="text/plain" />
       </intent-filter>
       <intent-filter>
         <action android:name="android.intent.action.PROCESS_TEXT" />
-
         <category android:name="android.intent.category.DEFAULT" />
-
         <data android:mimeType="text/plain" />
       </intent-filter>
-
-      <meta-data
-        android:name="android.app.shortcuts"
-        android:resource="@xml/shortcuts" />
+      <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
     </activity>
+
     <activity
       android:name=".ui.activity.ShortcutHandlerActivity"
       android:exported="true"
       android:theme="@android:style/Theme.Translucent.NoTitleBar">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
-
         <category android:name="android.intent.category.DEFAULT" />
-
-        <data
-          android:host="shortcut"
-          android:scheme="rikkahub" />
+        <data android:host="shortcut" android:scheme="rikkahub" />
       </intent-filter>
     </activity>
-    <activity
-      android:name="com.yalantis.ucrop.UCropActivity"
-      android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
-    <!-- Shizuku provider for Gadgetbridge data access -->
+    <activity android:name="com.yalantis.ucrop.UCropActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
     <provider
       android:name="rikka.shizuku.ShizukuProvider"
       android:authorities="${applicationId}.shizuku"
@@ -134,9 +111,7 @@
       android:name=".service.WebServerService"
       android:exported="false"
       android:foregroundServiceType="specialUse">
-      <property
-        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="local web server for LLM chat UI" />
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="local web server for LLM chat UI" />
     </service>
 
     <service
@@ -144,7 +119,6 @@
       android:exported="false"
       android:foregroundServiceType="microphone" />
 
-    <!-- Notification Listener Service for system tools -->
     <service
       android:name=".data.service.RikkaNotificationListenerService"
       android:exported="true"
@@ -154,103 +128,72 @@
       </intent-filter>
     </service>
 
-    <receiver
-      android:name=".data.voicecall.ProactiveCallActionReceiver"
-      android:exported="false" />
+    <receiver android:name=".data.voicecall.ProactiveCallActionReceiver" android:exported="false" />
 
-    <!-- Internal explicit PendingIntent receiver. External apps cannot forge generation extras. -->
-    <receiver
-      android:name=".data.service.ProactiveMessageReceiver"
-      android:exported="false" />
+    <!-- Kept temporarily so old PendingIntents from an installed previous build fail safely. -->
+    <receiver android:name=".data.service.ProactiveMessageReceiver" android:exported="false" />
 
-    <!-- Boot receiver only restores schedules and never forwards broadcast extras. -->
-    <receiver
-      android:name=".data.service.ProactiveBootReceiver"
-      android:exported="true">
-      <intent-filter>
-        <action android:name="android.intent.action.BOOT_COMPLETED" />
-      </intent-filter>
+    <!-- All newly scheduled proactive alarms enter through the shared dispatcher lease. -->
+    <receiver android:name=".data.service.UnifiedProactiveAlarmReceiver" android:exported="false" />
+
+    <receiver android:name=".data.service.ProactiveBootReceiver" android:exported="true">
+      <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
     </receiver>
 
-
-    <!-- Proactive Message Trigger Service -->
     <service
       android:name=".data.service.ProactiveMessageTriggerService"
       android:exported="false"
       android:foregroundServiceType="specialUse">
-      <property
-        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="proactive message scheduling" />
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="proactive message scheduling" />
     </service>
 
-    <!-- Supabase Sync Service -->
     <service
       android:name=".data.service.SupabaseSyncService"
       android:exported="false"
       android:foregroundServiceType="specialUse">
-      <property
-        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="supabase data sync" />
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="supabase data sync" />
     </service>
 
-    <!-- Device Event Tracking Service (realtime screen on/off + boot push to Supabase) -->
     <service
       android:name=".data.service.DeviceEventTrackingService"
       android:exported="false"
       android:foregroundServiceType="specialUse">
-      <property
-        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="device boot/screen event tracking for supabase sync" />
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="device boot/screen event tracking for supabase sync" />
     </service>
 
-    <!-- Supabase Sync Receiver -->
-    <receiver
-      android:name=".data.service.SupabaseSyncReceiver"
-      android:exported="true">
+    <receiver android:name=".data.service.SupabaseSyncReceiver" android:exported="true">
       <intent-filter>
         <action android:name="me.rerere.rikkahub.SUPABASE_SYNC" />
         <action android:name="android.intent.action.BOOT_COMPLETED" />
       </intent-filter>
     </receiver>
 
-    <!-- Daily Cron Receiver (handles daily_cron alarm and boot completed) -->
-    <receiver
-      android:name=".data.service.DailySummaryReceiver"
-      android:exported="true">
+    <receiver android:name=".data.service.DailySummaryReceiver" android:exported="true">
       <intent-filter>
         <action android:name="me.rerere.rikkahub.DAILY_CRON" />
         <action android:name="android.intent.action.BOOT_COMPLETED" />
       </intent-filter>
     </receiver>
 
-    <!-- Daily Cron Trigger Service -->
     <service
       android:name=".data.service.DailySummaryTriggerService"
       android:exported="false"
       android:foregroundServiceType="specialUse">
-      <property
-        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="daily cron execution for plugin hooks" />
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="daily cron execution for plugin hooks" />
     </service>
 
-    <!-- Pomodoro Timer Service -->
     <service
       android:name=".plugin.webview.PomodoroTimerService"
       android:exported="false"
       android:foregroundServiceType="specialUse">
-      <property
-        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="pomodoro timer countdown notification" />
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="pomodoro timer countdown notification" />
     </service>
 
-    <!-- Music Player Service -->
     <service
       android:name=".plugin.webview.MusicPlayerService"
       android:exported="false"
       android:foregroundServiceType="specialUse">
-      <property
-        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="background music playback" />
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="background music playback" />
     </service>
 
     <provider
@@ -258,10 +201,9 @@
       android:authorities="${applicationId}.fileprovider"
       android:exported="false"
       android:grantUriPermissions="true">
-      <meta-data
-        android:name="android.support.FILE_PROVIDER_PATHS"
-        android:resource="@xml/file_paths" />
+      <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
     </provider>
+
     <provider
       android:name="androidx.startup.InitializationProvider"
       android:authorities="${applicationId}.androidx-startup"
@@ -273,5 +215,4 @@
         tools:node="remove" />
     </provider>
   </application>
-
 </manifest>
