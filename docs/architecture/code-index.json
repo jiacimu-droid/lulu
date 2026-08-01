@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T06:36:39.501861+00:00",
-  "commit": "902f47581b1771119d2de5a9d0f6ec7753c32b10",
+  "generatedAt": "2026-08-01T07:43:18.362274+00:00",
+  "commit": "ad9c2d187792629a7a755aeef297b5f0c3b8b958",
   "branch": "master",
-  "sourceFingerprint": "b3b6cb50dc0880b09e9fd1f250f763cbba4bd5cb1b89b0a1bdf982cc44de0c71",
+  "sourceFingerprint": "54db2d35adeb54c8f673d29069f9c8b41e0990c136fed3443190b47cfeca7e6d",
   "summary": {
     "files": 1196,
-    "lines": 263037,
+    "lines": 263036,
     "symbols": 5718,
     "productionCodeFiles": 858,
     "testFiles": 148,
@@ -37237,8 +37237,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/GroupChatSettingsDialog.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 168,
-      "sha256": "ee5b6e31e341842fe7339c1e7f636cb04b61af6646ae444b8678dde085ebb501",
+      "lines": 167,
+      "sha256": "7e3b09d6992a7fd4929c7a392dec511031aea5cfc821bad0c256c8a6f1ecb936",
       "package": "me.rerere.rikkahub.ui.pages.chat",
       "categories": [
         "界面"
@@ -37247,7 +37247,7 @@
         {
           "name": "GroupChatSettingsDialog",
           "kind": "composable",
-          "line": 32
+          "line": 31
         }
       ],
       "localImportCount": 4,
@@ -92636,7 +92636,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/GroupChatSettingsDialog.kt",
         "kind": "composable",
-        "line": 32
+        "line": 31
       }
     ],
     "me.rerere.rikkahub.ui.pages.chat.ImageExportOptions": [
