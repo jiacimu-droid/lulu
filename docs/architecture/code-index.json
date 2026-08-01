@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T05:15:45.750399+00:00",
-  "commit": "5975095b96d344ed3ddad82662aad7adfad9e30a",
+  "generatedAt": "2026-08-01T05:17:06.813671+00:00",
+  "commit": "b33683da8631b5d4678403ce4da59e89a27e3a79",
   "branch": "master",
-  "sourceFingerprint": "e11e4325c9d58eadbe867487f317fe14572f0a15de694561880598df37c1101c",
+  "sourceFingerprint": "8a9ec5083a372bdc11ea712b4c018d0639f63b2f3040dd2fab09e67cc544f226",
   "summary": {
     "files": 1194,
-    "lines": 262355,
-    "symbols": 5690,
+    "lines": 262564,
+    "symbols": 5692,
     "productionCodeFiles": 856,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -68,7 +68,7 @@
       "界面": 338,
       "记忆": 49
     },
-    "resolvedImportEdges": 2084
+    "resolvedImportEdges": 2085
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -717,6 +717,13 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
+        "lines": 679,
+        "symbols": 12,
+        "localImportCount": 27,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatList.kt",
         "lines": 820,
         "symbols": 9,
@@ -755,13 +762,6 @@
         "path": "app/src/main/java/me/rerere/rikkahub/web/routes/ConversationRoutes.kt",
         "lines": 433,
         "symbols": 4,
-        "localImportCount": 25,
-        "todoMarkers": 0
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSpeechPage.kt",
-        "lines": 894,
-        "symbols": 7,
         "localImportCount": 25,
         "todoMarkers": 0
       }
@@ -19059,7 +19059,9 @@
         "me.rerere.rikkahub.utils.JsonInstant"
       ],
       "resolvedImports": [],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt"
+      ]
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/model/Leaderboard.kt",
@@ -37775,8 +37777,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 470,
-      "sha256": "ed0c8488e5f9be846a6683d68f6ac707e206fb5a724480902b731118e4bb224e",
+      "lines": 679,
+      "sha256": "13be958d8cb78a2713576f3563df0d3dbe71625dc4d16f455888ccc1e21038b9",
       "package": "me.rerere.rikkahub.ui.pages.desktop",
       "categories": [
         "界面"
@@ -37785,55 +37787,65 @@
         {
           "name": "DesktopPage",
           "kind": "composable",
-          "line": 81
+          "line": 88
         },
         {
           "name": "openAssistantChat",
           "kind": "function",
-          "line": 92
+          "line": 99
         },
         {
           "name": "ChatRoomsPage",
           "kind": "composable",
-          "line": 187
+          "line": 194
+        },
+        {
+          "name": "CreateGroupChatDialog",
+          "kind": "composable",
+          "line": 322
+        },
+        {
+          "name": "GroupChatRoomRow",
+          "kind": "composable",
+          "line": 396
         },
         {
           "name": "UserProfilePage",
           "kind": "composable",
-          "line": 241
+          "line": 450
         },
         {
           "name": "updateProfile",
           "kind": "function",
-          "line": 246
+          "line": 455
         },
         {
           "name": "DesktopHero",
           "kind": "composable",
-          "line": 324
+          "line": 533
         },
         {
           "name": "DesktopAppIcon",
           "kind": "composable",
-          "line": 374
+          "line": 583
         },
         {
           "name": "ChatRoomRow",
           "kind": "composable",
-          "line": 412
+          "line": 621
         },
         {
           "name": "DesktopApp",
           "kind": "class",
-          "line": 455
+          "line": 664
         },
         {
           "name": "relativeTime",
           "kind": "function",
-          "line": 462
+          "line": 671
         }
       ],
-      "localImportCount": 23,
+      "localImportCount": 27,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -37856,6 +37868,10 @@
         "me.rerere.rikkahub.data.desktop.DesktopStore",
         "me.rerere.rikkahub.data.model.Assistant",
         "me.rerere.rikkahub.data.model.Conversation",
+        "me.rerere.rikkahub.data.model.GroupChatMember",
+        "me.rerere.rikkahub.data.model.GroupChatSpec",
+        "me.rerere.rikkahub.data.model.groupChatSpec",
+        "me.rerere.rikkahub.data.model.toConversationSystemPrompt",
         "me.rerere.rikkahub.data.repository.ConversationRepository",
         "me.rerere.rikkahub.ui.components.ui.UIAvatar",
         "me.rerere.rikkahub.ui.context.LocalNavController",
@@ -37868,6 +37884,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/desktop/DesktopStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/model/GroupChat.kt",
         "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/UIAvatar.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt"
@@ -93195,70 +93212,84 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "composable",
-        "line": 412
+        "line": 621
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.ChatRoomsPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "composable",
-        "line": 187
+        "line": 194
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.desktop.CreateGroupChatDialog": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
+        "kind": "composable",
+        "line": 322
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.DesktopApp": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "class",
-        "line": 455
+        "line": 664
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.DesktopAppIcon": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "composable",
-        "line": 374
+        "line": 583
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.DesktopHero": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "composable",
-        "line": 324
+        "line": 533
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.DesktopPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "composable",
-        "line": 81
+        "line": 88
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.desktop.GroupChatRoomRow": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
+        "kind": "composable",
+        "line": 396
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.UserProfilePage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "composable",
-        "line": 241
+        "line": 450
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.openAssistantChat": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "function",
-        "line": 92
+        "line": 99
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.relativeTime": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "function",
-        "line": 462
+        "line": 671
       }
     ],
     "me.rerere.rikkahub.ui.pages.desktop.updateProfile": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/desktop/DesktopPage.kt",
         "kind": "function",
-        "line": 246
+        "line": 455
       }
     ],
     "me.rerere.rikkahub.ui.pages.developer.DetailLine": [
