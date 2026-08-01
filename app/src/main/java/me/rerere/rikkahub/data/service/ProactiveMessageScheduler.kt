@@ -2,128 +2,29 @@ package me.rerere.rikkahub.data.service
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
-import android.os.BatteryManager
-import android.os.PowerManager
+import android.os.Build
 import android.util.Log
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
+import kotlin.uuid.Uuid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import androidx.core.app.NotificationCompat
-import android.os.Build
-import me.rerere.ai.core.MessageRole
-import me.rerere.ai.core.Tool
-import me.rerere.ai.provider.ModelType
-import me.rerere.ai.provider.ProviderManager
-import me.rerere.ai.ui.UIMessage
-import me.rerere.ai.ui.UIMessagePart
-import me.rerere.rikkahub.data.ai.ApiUsageSource
-import me.rerere.rikkahub.data.ai.GenerationChunk
-import me.rerere.rikkahub.data.ai.GenerationHandler
-import me.rerere.rikkahub.data.ai.transformers.TemplateTransformer
-import me.rerere.rikkahub.data.ai.transformers.buildPromptInjectionPlannerContext
-import me.rerere.rikkahub.data.ai.transformers.companionInputTransformers
-import me.rerere.rikkahub.data.ai.transformers.companionModelPresence
-import me.rerere.rikkahub.data.ai.transformers.companionOutputTransformers
-import me.rerere.rikkahub.data.ai.tools.LocalTools
-import me.rerere.rikkahub.data.ai.tools.SystemTools
-import me.rerere.rikkahub.data.ai.tools.createAlarmTool
-import me.rerere.rikkahub.data.ai.tools.createSearchTools
-import me.rerere.rikkahub.data.ai.tools.createSkillTools
-import me.rerere.rikkahub.data.ai.tools.createTodayStudyPlanTool
-import me.rerere.rikkahub.data.ai.tools.createCompanionGameTool
-import me.rerere.rikkahub.data.ai.tools.deduplicateByToolName
-import me.rerere.rikkahub.data.ai.tools.activeModelTools
-import me.rerere.rikkahub.data.ai.tools.selectRelevantToolsForPrompt
-import me.rerere.rikkahub.data.ai.tools.selectCompanionToolsForGeneration
-import me.rerere.rikkahub.data.ai.tools.withConciseToolDescriptions
-import me.rerere.rikkahub.data.ai.tools.withHumanLikeToolPrompts
-import me.rerere.rikkahub.data.ai.mcp.McpManager
-import me.rerere.rikkahub.data.files.SkillManager
-import me.rerere.rikkahub.plugin.provider.PluginToolProvider
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.longOrNull
-import me.rerere.rikkahub.CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID
+import me.rerere.rikkahub.data.companion.CompanionCommitment
+import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.datastore.ProactiveMessageSetting
 import me.rerere.rikkahub.data.datastore.Settings
-import me.rerere.rikkahub.data.datastore.SettingsStore
-import me.rerere.rikkahub.data.companion.CompanionActionResult
-import me.rerere.rikkahub.data.companion.CompanionActionType
-import me.rerere.rikkahub.data.companion.CompanionCommitment
-import me.rerere.rikkahub.data.companion.CompanionCommitmentStatus
-import me.rerere.rikkahub.data.companion.CompanionAlwaysOnAnchorStatus
-import me.rerere.rikkahub.data.companion.CompanionContextFact
-import me.rerere.rikkahub.data.companion.CompanionConversationTurn
-import me.rerere.rikkahub.data.companion.CompanionInteractionEvent
-import me.rerere.rikkahub.data.companion.CompanionInteractionEventKind
-import me.rerere.rikkahub.data.companion.CompanionOutboundStatus
-import me.rerere.rikkahub.data.companion.CompanionModelPresence
-import me.rerere.rikkahub.data.companion.CompanionPerceptionInput
-import me.rerere.rikkahub.data.companion.CompanionRuntime
-import me.rerere.rikkahub.data.companion.CompanionState
-import me.rerere.rikkahub.data.companion.CompanionTurnMutation
-import me.rerere.rikkahub.data.companion.CompanionTurnRole
-import me.rerere.rikkahub.data.companion.CompanionLifeEvent
-import me.rerere.rikkahub.data.companion.CompanionLifeEventSource
-import me.rerere.rikkahub.data.companion.CompanionToolExecution
-import me.rerere.rikkahub.data.companion.buildToolLifeEvent
-import me.rerere.rikkahub.data.companion.isSuccessfulToolExecution
-import me.rerere.rikkahub.data.companion.buildCompanionStateFromTurn
-import me.rerere.rikkahub.data.companion.commitmentStatusesBySourceMessageId
-import me.rerere.rikkahub.data.companion.isSleepSupervisionGoal
-import me.rerere.rikkahub.data.companion.isWakeGoal
-import me.rerere.rikkahub.data.companion.retryMinutesOrDefault
-import me.rerere.rikkahub.data.companion.toPromptContext
-import me.rerere.rikkahub.data.companion.wakeTargetAtOrNull
-import me.rerere.rikkahub.data.cihai.CihaiStore
-import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getCurrentAssistant
-import me.rerere.rikkahub.data.datastore.findModelById
 import me.rerere.rikkahub.data.datastore.getProactiveMessageSetting
-import me.rerere.rikkahub.data.cihai.CihaiEntry
-import me.rerere.rikkahub.data.cihai.CihaiEntryKind
-import me.rerere.rikkahub.data.gadgetbridge.GadgetbridgeReader
-import me.rerere.rikkahub.data.model.Assistant
-import me.rerere.rikkahub.data.voicecall.ProactiveCallManager
-import me.rerere.rikkahub.utils.JsonInstant
-import me.rerere.rikkahub.RouteActivity
-import me.rerere.rikkahub.data.model.Conversation
-import me.rerere.rikkahub.data.model.toMessageNode
-import me.rerere.rikkahub.data.repository.ConversationRepository
-import me.rerere.rikkahub.data.study.StudyStore
-import me.rerere.rikkahub.data.study.StudyTaskSource
-import me.rerere.rikkahub.service.ChatService
-import me.rerere.rikkahub.service.CompanionDecisionMode
-import me.rerere.rikkahub.service.CompanionIntent
-import me.rerere.rikkahub.service.CompanionIntentDecision
-import me.rerere.rikkahub.service.CompanionIntentFallbackPlanner
-import me.rerere.rikkahub.service.CompanionIntentInput
-import me.rerere.rikkahub.service.CompanionIntentModelPlanner
-import me.rerere.rikkahub.service.collectCompanionPassivePerceptionFacts
-import me.rerere.rikkahub.service.ProactiveReminderPlan
-import me.rerere.rikkahub.service.toProactiveReminderPlan
-import me.rerere.rikkahub.utils.sendNotification
-import java.time.Instant
-import java.time.ZoneId
-import kotlin.uuid.Uuid
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
+import org.koin.core.context.GlobalContext
 
 /** Android scheduling, queue recovery and trigger dispatch for proactive turns. */
 internal object ProactiveMessageScheduler {
@@ -149,69 +50,76 @@ internal object ProactiveMessageScheduler {
 
     private fun requestCode(base: Int, identity: String): Int = base xor identity.hashCode()
 
+    private fun alarmIntent(
+        context: Context,
+        data: Uri,
+        assistantId: String,
+        reason: String? = null,
+        userText: String? = null,
+        kind: String? = null,
+        commitmentId: String? = null,
+    ): Intent = Intent(context, UnifiedProactiveAlarmReceiver::class.java).apply {
+        action = ACTION_PROACTIVE_MESSAGE
+        this.data = data
+        putExtra(EXTRA_ASSISTANT_ID, assistantId)
+        reason?.takeIf { it.isNotBlank() }?.let { putExtra(EXTRA_TARGETED_REASON, it) }
+        userText?.takeIf { it.isNotBlank() }?.let { putExtra(EXTRA_TARGETED_USER_TEXT, it) }
+        kind?.takeIf { it.isNotBlank() }?.let { putExtra(EXTRA_TARGETED_KIND, it) }
+        commitmentId?.takeIf { it.isNotBlank() }?.let { putExtra(EXTRA_COMMITMENT_ID, it) }
+    }
+
+    private fun scheduleAlarm(
+        context: Context,
+        triggerAtMillis: Long,
+        requestCode: Int,
+        intent: Intent,
+    ) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+                Log.w(TAG, "Exact alarm permission not granted, using inexact alarm")
+            } else {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            }
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        }
+    }
+
     fun scheduleNext(context: Context, setting: ProactiveMessageSetting) {
         if (!setting.enabled) {
             cancel(context, setting.assistantId)
             return
         }
-
         val minMinutes = if (setting.naturalScheduling) 45 else setting.minIntervalMinutes.coerceAtLeast(1)
         val maxMinutes = if (setting.naturalScheduling) 90 else setting.maxIntervalMinutes.coerceAtLeast(minMinutes)
         val delayMinutes = Random.nextInt(minMinutes, maxMinutes + 1)
-        val triggerTime = java.lang.System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(delayMinutes.toLong())
+        val triggerTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(delayMinutes.toLong())
 
-        // 保存下次触发时间到SharedPreferences
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putLong(KEY_NEXT_TRIGGER_TIME, triggerTime)
             .putString(EXTRA_ASSISTANT_ID, setting.assistantId)
             .apply()
 
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, ProactiveMessageReceiver::class.java).apply {
-            action = ACTION_PROACTIVE_MESSAGE
-            data = Uri.parse("rikka://proactive/autonomous/${setting.assistantId}")
-            putExtra(EXTRA_ASSISTANT_ID, setting.assistantId)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode(REQUEST_CODE, setting.assistantId),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        scheduleAlarm(
+            context = context,
+            triggerAtMillis = triggerTime,
+            requestCode = requestCode(REQUEST_CODE, setting.assistantId),
+            intent = alarmIntent(
+                context = context,
+                data = Uri.parse("rikka://proactive/autonomous/${setting.assistantId}"),
+                assistantId = setting.assistantId,
+            ),
         )
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            // Android 12+ needs canScheduleExactAlarms() check
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        triggerTime,
-                        pendingIntent
-                    )
-                } else {
-                    // Fallback: use inexact alarm if exact alarm permission not granted
-                    alarmManager.setAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        triggerTime,
-                        pendingIntent
-                    )
-                    Log.w(TAG, "Exact alarm permission not granted, using inexact alarm")
-                }
-            } else {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerTime,
-                    pendingIntent
-                )
-            }
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-        }
-
-        Log.d(TAG, "Scheduled proactive message in $delayMinutes minutes, trigger at ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(triggerTime))}")
-
-        // Also schedule via WorkManager as a more reliable fallback
+        Log.d(TAG, "Scheduled proactive message in $delayMinutes minutes")
         ProactiveMessageWorker.scheduleNext(context, setting)
     }
 
@@ -228,10 +136,10 @@ internal object ProactiveMessageScheduler {
         }
         val assistant = settings.assistants.find { it.id.toString() == setting.assistantId }
             ?: settings.getCurrentAssistant()
-        val nowMillis = java.lang.System.currentTimeMillis()
+        val nowMillis = System.currentTimeMillis()
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val activeTargetedTrigger = prefs.getLong(KEY_TARGETED_TRIGGER_TIME, 0L)
-        val companionRuntime = org.koin.core.context.GlobalContext.get().get<CompanionRuntime>()
+        val companionRuntime = GlobalContext.get().get<CompanionRuntime>()
         val snapshot = companionRuntime.snapshot(assistant.id.toString())
         val pulseInput = CompanionAutonomousPulseInput(
             setting = setting,
@@ -255,39 +163,24 @@ internal object ProactiveMessageScheduler {
         triggerAtMillis: Long,
         logReason: String,
     ) {
-        if (!setting.enabled || triggerAtMillis <= java.lang.System.currentTimeMillis()) return
-
+        if (!setting.enabled || triggerAtMillis <= System.currentTimeMillis()) return
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putLong(KEY_NEXT_TRIGGER_TIME, triggerAtMillis)
             .putString("next_trigger_reason", logReason)
             .putString(EXTRA_ASSISTANT_ID, setting.assistantId)
             .apply()
-
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, ProactiveMessageReceiver::class.java).apply {
-            action = ACTION_PROACTIVE_MESSAGE
-            data = Uri.parse("rikka://proactive/autonomous/${setting.assistantId}")
-            putExtra(EXTRA_ASSISTANT_ID, setting.assistantId)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode(REQUEST_CODE, setting.assistantId),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        scheduleAlarm(
+            context = context,
+            triggerAtMillis = triggerAtMillis,
+            requestCode = requestCode(REQUEST_CODE, setting.assistantId),
+            intent = alarmIntent(
+                context = context,
+                data = Uri.parse("rikka://proactive/autonomous/${setting.assistantId}"),
+                assistantId = setting.assistantId,
+            ),
         )
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            } else {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            }
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        }
-
-        Log.d(TAG, "Scheduled autonomous proactive pulse reason=$logReason at ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(triggerAtMillis))}")
+        Log.d(TAG, "Scheduled autonomous proactive pulse reason=$logReason at $triggerAtMillis")
     }
 
     fun scheduleTargeted(
@@ -300,8 +193,7 @@ internal object ProactiveMessageScheduler {
         assistantId: String = setting.assistantId,
         commitmentId: String? = null,
     ) {
-        if (!setting.enabled || triggerAtMillis <= java.lang.System.currentTimeMillis()) return
-
+        if (!setting.enabled || triggerAtMillis <= System.currentTimeMillis()) return
         val preferencesEditor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putLong(KEY_NEXT_TRIGGER_TIME, triggerAtMillis)
@@ -317,34 +209,21 @@ internal object ProactiveMessageScheduler {
         }
         preferencesEditor.apply()
 
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, ProactiveMessageReceiver::class.java).apply {
-            action = ACTION_PROACTIVE_MESSAGE
-            data = Uri.parse("rikka://proactive/targeted/$assistantId/${commitmentId.orEmpty()}")
-            putExtra(EXTRA_ASSISTANT_ID, assistantId)
-            putExtra(EXTRA_TARGETED_REASON, reason)
-            putExtra(EXTRA_TARGETED_USER_TEXT, userText)
-            putExtra(EXTRA_TARGETED_KIND, kind)
-            commitmentId?.takeIf { it.isNotBlank() }?.let { putExtra(EXTRA_COMMITMENT_ID, it) }
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode(TARGETED_REQUEST_CODE, "$assistantId:${commitmentId.orEmpty()}") ,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        scheduleAlarm(
+            context = context,
+            triggerAtMillis = triggerAtMillis,
+            requestCode = requestCode(TARGETED_REQUEST_CODE, "$assistantId:${commitmentId.orEmpty()}"),
+            intent = alarmIntent(
+                context = context,
+                data = Uri.parse("rikka://proactive/targeted/$assistantId/${commitmentId.orEmpty()}"),
+                assistantId = assistantId,
+                reason = reason,
+                userText = userText,
+                kind = kind,
+                commitmentId = commitmentId,
+            ),
         )
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            } else {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            }
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        }
-
-        Log.d(TAG, "Scheduled targeted proactive message kind=$kind at ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(triggerAtMillis))}")
+        Log.d(TAG, "Scheduled targeted proactive message kind=$kind at $triggerAtMillis")
         commitmentId?.takeIf { it.isNotBlank() }?.let { id ->
             ProactiveMessageWorker.scheduleTargeted(
                 context = context,
@@ -355,7 +234,6 @@ internal object ProactiveMessageScheduler {
         }
     }
 
-    /** Schedule the nightly review that turns always-on responsibilities into real actions. */
     fun scheduleAlwaysOnAnchorReview(
         context: Context,
         settings: Settings,
@@ -367,30 +245,19 @@ internal object ProactiveMessageScheduler {
         val triggerAtMillis = nextAlwaysOnAnchorReviewAt(nowMillis)
         val reason = "检查角色的常驻责任锚点，并在有真实证据时执行今晚需要完成的事情。"
         val userText = "夜间责任检查：读取常驻锚点、睡眠、应用使用和健康数据，完成必要的次日作息动作。"
-        val intent = Intent(context, ProactiveMessageReceiver::class.java).apply {
-            action = ACTION_PROACTIVE_MESSAGE
-            data = Uri.parse("rikka://proactive/responsibility/${assistantId}")
-            putExtra(EXTRA_ASSISTANT_ID, assistantId.toString())
-            putExtra(EXTRA_TARGETED_REASON, reason)
-            putExtra(EXTRA_TARGETED_USER_TEXT, userText)
-            putExtra(EXTRA_TARGETED_KIND, "always_on_anchor_review")
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode(RESPONSIBILITY_REVIEW_REQUEST_CODE, assistantId.toString()),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        scheduleAlarm(
+            context = context,
+            triggerAtMillis = triggerAtMillis,
+            requestCode = requestCode(RESPONSIBILITY_REVIEW_REQUEST_CODE, assistantId.toString()),
+            intent = alarmIntent(
+                context = context,
+                data = Uri.parse("rikka://proactive/responsibility/$assistantId"),
+                assistantId = assistantId.toString(),
+                reason = reason,
+                userText = userText,
+                kind = "always_on_anchor_review",
+            ),
         )
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            } else {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            }
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        }
         Log.d(TAG, "Scheduled responsibility review at $triggerAtMillis")
     }
 
@@ -420,7 +287,7 @@ internal object ProactiveMessageScheduler {
         nowMillis: Long = System.currentTimeMillis(),
     ): Boolean {
         clearTargetedQueue(context)
-        val runtime = org.koin.core.context.GlobalContext.get().get<CompanionRuntime>()
+        val runtime = GlobalContext.get().get<CompanionRuntime>()
         repeat(MAX_RECONCILE_COMMITMENTS) {
             val commitment = runtime.nextCommitment(nowMillis) ?: return false
             if (nowMillis - commitment.dueAt > STALE_UNDELIVERED_COMMITMENT_MILLIS) {
@@ -468,18 +335,6 @@ internal object ProactiveMessageScheduler {
             .remove(KEY_TARGETED_COMMITMENT_ID)
             .remove(KEY_TARGETED_QUEUE)
             .apply()
-
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, ProactiveMessageReceiver::class.java).apply {
-            action = ACTION_PROACTIVE_MESSAGE
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            TARGETED_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-        )
-        pendingIntent?.let { alarmManager.cancel(it) }
         ProactiveMessageWorker.cancelTargeted(context)
     }
 
@@ -494,7 +349,6 @@ internal object ProactiveMessageScheduler {
         val id = assistantId.toString()
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         if (!shouldResetProactiveProjection(prefs.getString(EXTRA_ASSISTANT_ID, null), id)) return
-
         clearTargetedQueue(context)
         cancel(context)
         prefs.edit()
@@ -502,11 +356,7 @@ internal object ProactiveMessageScheduler {
             .remove("last_triggered_time")
             .remove("next_trigger_reason")
             .apply()
-        scheduleNext(
-            context = context,
-            settings = settings,
-            assistantId = assistantId,
-        )
+        scheduleNext(context = context, settings = settings, assistantId = assistantId)
     }
 
     internal fun popCurrentTargetedAndScheduleNext(
@@ -514,16 +364,14 @@ internal object ProactiveMessageScheduler {
         setting: ProactiveMessageSetting,
     ): Boolean {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val now = java.lang.System.currentTimeMillis()
+        val now = System.currentTimeMillis()
         val queue = runCatching {
             (Json.parseToJsonElement(prefs.getString(KEY_TARGETED_QUEUE, "[]").orEmpty()) as? JsonArray)
                 ?.mapNotNull { it as? JsonObject }
         }.getOrNull().orEmpty()
-        val remaining = queue
-            .drop(1)
-            .filter { item ->
-                (item["triggerAtMillis"]?.jsonPrimitive?.contentOrNull?.toLongOrNull() ?: 0L) > now
-            }
+        val remaining = queue.drop(1).filter { item ->
+            (item["triggerAtMillis"]?.jsonPrimitive?.contentOrNull?.toLongOrNull() ?: 0L) > now
+        }
         val next = remaining.minByOrNull {
             it["triggerAtMillis"]?.jsonPrimitive?.contentOrNull?.toLongOrNull() ?: Long.MAX_VALUE
         }
@@ -531,10 +379,7 @@ internal object ProactiveMessageScheduler {
             clearTargetedQueue(context)
             return false
         }
-
-        prefs.edit()
-            .putString(KEY_TARGETED_QUEUE, JsonArray(remaining).toString())
-            .apply()
+        prefs.edit().putString(KEY_TARGETED_QUEUE, JsonArray(remaining).toString()).apply()
         scheduleTargeted(
             context = context,
             setting = setting,
@@ -547,51 +392,37 @@ internal object ProactiveMessageScheduler {
     }
 
     fun getNextTriggerTime(context: Context): Long? {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val triggerTime = prefs.getLong(KEY_NEXT_TRIGGER_TIME, 0L)
-        return if (triggerTime > 0) triggerTime else null
+        val triggerTime = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(KEY_NEXT_TRIGGER_TIME, 0L)
+        return triggerTime.takeIf { it > 0L }
     }
 
     fun cancel(context: Context, assistantId: String? = null) {
-        // 清除保存的触发时间
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .remove(KEY_NEXT_TRIGGER_TIME)
             .apply()
-
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, ProactiveMessageReceiver::class.java).apply {
-            action = ACTION_PROACTIVE_MESSAGE
-            assistantId?.takeIf(String::isNotBlank)?.let { id ->
-                data = Uri.parse("rikka://proactive/autonomous/$id")
+        val identities = buildList {
+            assistantId?.takeIf { it.isNotBlank() }?.let { add(it) }
+        }
+        identities.forEach { id ->
+            listOf(
+                Triple(REQUEST_CODE, "rikka://proactive/autonomous/$id", requestCode(REQUEST_CODE, id)),
+                Triple(RESPONSIBILITY_REVIEW_REQUEST_CODE, "rikka://proactive/responsibility/$id", requestCode(RESPONSIBILITY_REVIEW_REQUEST_CODE, id)),
+            ).forEach { (_, uri, code) ->
+                val intent = Intent(context, UnifiedProactiveAlarmReceiver::class.java).apply {
+                    action = ACTION_PROACTIVE_MESSAGE
+                    data = Uri.parse(uri)
+                }
+                PendingIntent.getBroadcast(
+                    context,
+                    code,
+                    intent,
+                    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+                )?.let { alarmManager.cancel(it) }
             }
         }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            assistantId?.takeIf(String::isNotBlank)?.let { requestCode(REQUEST_CODE, it) } ?: REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-        )
-        pendingIntent?.let {
-            alarmManager.cancel(it)
-            Log.d(TAG, "Cancelled proactive message alarm")
-        }
-        PendingIntent.getBroadcast(
-            context,
-            assistantId?.takeIf(String::isNotBlank)?.let { requestCode(RESPONSIBILITY_REVIEW_REQUEST_CODE, it) }
-                ?: RESPONSIBILITY_REVIEW_REQUEST_CODE,
-            intent.apply {
-                assistantId?.takeIf(String::isNotBlank)?.let { id ->
-                    data = Uri.parse("rikka://proactive/responsibility/$id")
-                }
-            },
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
-        )?.let { reviewIntent ->
-            alarmManager.cancel(reviewIntent)
-            Log.d(TAG, "Cancelled responsibility review alarm")
-        }
-
-        // Also cancel WorkManager fallback
         ProactiveMessageWorker.cancel(context, assistantId)
         ProactiveMessageWorker.cancelTargeted(context, assistantId = assistantId)
     }
@@ -601,12 +432,19 @@ internal object ProactiveMessageScheduler {
     }
 
     fun triggerNow(context: Context, setting: ProactiveMessageSetting) {
-        // 先安排下一次（写入SP让UI立即显示），再立即触发
         scheduleNext(context, setting)
-        // 立即触发：直接启动TriggerService
-        val serviceIntent = Intent(context, ProactiveMessageTriggerService::class.java).apply {
-            putExtra(EXTRA_ASSISTANT_ID, setting.assistantId)
+        val applicationContext = context.applicationContext
+        CoroutineScope(Dispatchers.IO).launch {
+            runCatching {
+                GlobalContext.get().get<ProactiveTurnDispatcher>().dispatch(
+                    context = applicationContext,
+                    assistantId = setting.assistantId,
+                    commitmentId = null,
+                    triggerId = "manual:${setting.assistantId}:${System.currentTimeMillis()}",
+                )
+            }.onFailure { error ->
+                Log.e(TAG, "Failed to dispatch manual proactive trigger", error)
+            }
         }
-        context.startForegroundService(serviceIntent)
     }
 }
