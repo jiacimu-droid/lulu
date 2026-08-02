@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T12:30:27.176900+00:00",
-  "commit": "a5138bc19b027291edd120734f3576d60412bf82",
+  "generatedAt": "2026-08-02T12:39:47.094828+00:00",
+  "commit": "c1ee25387631b90c6c53d8ceabc510833ea78650",
   "branch": "master",
-  "sourceFingerprint": "7223b9bcb6102f6497a1cbd7ca0cdd18d56fa792c7d29624cd9168bdeee7216e",
+  "sourceFingerprint": "74c7ab27aada6b1699b45451d94dacb4a8635025b4bcd3b41bf1c5fa42e0a99e",
   "summary": {
     "files": 1202,
-    "lines": 264198,
+    "lines": 264271,
     "symbols": 5754,
     "productionCodeFiles": 864,
     "testFiles": 148,
@@ -39044,8 +39044,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 662,
-      "sha256": "3614cb884827eb47eb642140c367a4b45e8981c58dd712ef5e03f3630e31eebd",
+      "lines": 735,
+      "sha256": "856abfd7c5bf5e9997e67ddc97541351883ba7b944534f1dd0e9ac242dfc551f",
       "package": "me.rerere.rikkahub.ui.pages.game",
       "categories": [
         "界面"
@@ -39059,77 +39059,77 @@
         {
           "name": "RoleplaySave",
           "kind": "class",
-          "line": 93
+          "line": 168
         },
         {
           "name": "TrpgColors",
           "kind": "object",
-          "line": 109
+          "line": 184
         },
         {
           "name": "RoleplaySaveStore",
           "kind": "class",
-          "line": 124
+          "line": 198
         },
         {
           "name": "load",
           "kind": "function",
-          "line": 127
+          "line": 201
         },
         {
           "name": "save",
           "kind": "function",
-          "line": 153
+          "line": 227
         },
         {
           "name": "toStringList",
           "kind": "function",
-          "line": 176
+          "line": 250
         },
         {
           "name": "FormalRoleplayCampaignGame",
           "kind": "composable",
-          "line": 181
+          "line": 255
         },
         {
           "name": "persist",
           "kind": "function",
-          "line": 195
+          "line": 269
         },
         {
           "name": "RoleplayArchive",
           "kind": "composable",
-          "line": 265
+          "line": 339
         },
         {
           "name": "RoleplayCreator",
           "kind": "composable",
-          "line": 330
+          "line": 404
         },
         {
           "name": "RoleplayTable",
           "kind": "composable",
-          "line": 397
+          "line": 473
         },
         {
           "name": "runAction",
           "kind": "function",
-          "line": 414
+          "line": 490
         },
         {
           "name": "NeonPanel",
           "kind": "composable",
-          "line": 619
+          "line": 692
         },
         {
           "name": "MiniBadge",
           "kind": "composable",
-          "line": 637
+          "line": 710
         },
         {
           "name": "StatusRune",
           "kind": "composable",
-          "line": 650
+          "line": 723
         }
       ],
       "localImportCount": 1,
@@ -94535,7 +94535,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "composable",
-        "line": 181
+        "line": 255
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameBody": [
@@ -94605,7 +94605,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "composable",
-        "line": 637
+        "line": 710
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.NarrativeCompanionGamesTest": [
@@ -94619,7 +94619,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "composable",
-        "line": 619
+        "line": 692
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.PerfectManActionCard": [
@@ -94752,35 +94752,35 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "composable",
-        "line": 265
+        "line": 339
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.RoleplayCreator": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "composable",
-        "line": 330
+        "line": 404
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.RoleplaySave": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "class",
-        "line": 93
+        "line": 168
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.RoleplaySaveStore": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "class",
-        "line": 124
+        "line": 198
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.RoleplayTable": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "composable",
-        "line": 397
+        "line": 473
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.RoleplayWorld": [
@@ -94857,14 +94857,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "composable",
-        "line": 650
+        "line": 723
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.TrpgColors": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "object",
-        "line": 109
+        "line": 184
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.TurtleSoupCase": [
@@ -95053,7 +95053,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "function",
-        "line": 127
+        "line": 201
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.newGameWireNamesRemainStable": [
@@ -95095,7 +95095,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "function",
-        "line": 195
+        "line": 269
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.quickTicTacToeWinner": [
@@ -95158,14 +95158,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "function",
-        "line": 414
+        "line": 490
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.save": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "function",
-        "line": 153
+        "line": 227
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.saveCheckpoint": [
@@ -95249,7 +95249,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/FormalRoleplayCampaign.kt",
         "kind": "function",
-        "line": 176
+        "line": 250
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.yachtScore": [
