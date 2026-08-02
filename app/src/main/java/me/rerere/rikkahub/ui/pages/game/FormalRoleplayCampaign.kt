@@ -46,9 +46,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.rerere.rikkahub.ui.context.LocalSettings
 import org.json.JSONArray
 import org.json.JSONObject
-import me.rerere.rikkahub.ui.context.LocalSettings
 import kotlin.random.Random
 
 private data class RoleplayWorld(
@@ -56,7 +56,9 @@ private data class RoleplayWorld(
     val title: String,
     val system: String,
     val premise: String,
+    val narrativeStyle: String,
     val accent: Color,
+    val sanityRisk: Boolean = false,
 )
 
 private val ROLEPLAY_WORLDS = listOf(
@@ -65,28 +67,101 @@ private val ROLEPLAY_WORLDS = listOf(
         title = "雾港失踪案",
         system = "都市秘闻 · 调查恐怖 · d20",
         premise = "终年起雾的港城里，每逢午夜都会出现一条不存在的街道。最近失踪的人，都曾收到一张写着自己死亡日期的旧车票。",
+        narrativeStyle = "都市怪谈与硬派调查风。强化潮湿雾气、旧楼回声、路灯死角、港口腥味和城市传闻；现实应从细微处逐渐失真。线索必须可追踪，恐怖来自你们发现城市一直在观察自己。同行角色要有不同推理、怀疑与保护反应。",
         accent = Color(0xFF28C2D8),
+        sanityRisk = true,
     ),
     RoleplayWorld(
         id = "fantasy_ruin",
         title = "失落王庭",
-        system = "高魔幻想 · 遗迹探索 · d20",
+        system = "高魔幻想 · 遗迹史诗 · d20",
         premise = "沉入地底三百年的王城突然重新升起。王座仍在等待继承者，而所有进入王城的人都会逐渐忘记自己的名字。",
+        narrativeStyle = "史诗奇幻与遗迹冒险风。描写宏大尺度、古老魔法、失落礼仪、历史残响和壮丽危险；战斗之外要有谜题、阵营、古代誓约与身份诱惑。同行角色会因权力、记忆与牺牲产生立场变化，关系线与王庭秘密同步推进。",
         accent = Color(0xFFF0A94A),
     ),
     RoleplayWorld(
         id = "space_derelict",
         title = "静默星舰",
-        system = "太空惊悚 · 生存探索 · d20",
+        system = "太空惊悚 · 生存悬疑 · d20",
         premise = "一艘失联二十年的殖民星舰向你们发送求救信号。登舰后，主脑坚持声称船员仍全部存活。",
+        narrativeStyle = "冷峻科幻惊悚风。强调失重、金属回声、红色警报、维生系统噪声、舷窗外的绝对黑暗和宇宙尺度孤独。信息应通过终端、监控、残缺录音和错误人工智能逐步拼合。同行角色要真实讨论资源、风险与是否信任主脑。",
         accent = Color(0xFF7C8CFF),
+        sanityRisk = true,
     ),
     RoleplayWorld(
         id = "academy_secret",
         title = "第十三间教室",
         system = "校园怪谈 · 心理恐怖 · d20",
         premise = "学校平面图上只有十二间教室，但每个雨夜，走廊尽头都会出现第十三扇门。门后的课表写着你们所有人的名字。",
+        narrativeStyle = "高浓度校园心理恐怖。强化雨声、灯管嗡鸣、粉笔灰、潮湿校服、冷空气、脚步远近错位和熟悉场景的细微异常；允许寂静、错觉、被注视感、不可靠记忆和无法确认的人影。恐怖要逐步逼近，不靠单纯血腥。同行角色必须出现恐惧、逞强、保护、怀疑或依赖等真实反应。",
         accent = Color(0xFFFF4F91),
+        sanityRisk = true,
+    ),
+    RoleplayWorld(
+        id = "romance_target_me",
+        title = "全员都在攻略我",
+        system = "恋爱修罗场 · 被攻略 · 关系判定",
+        premise = "你进入一档无法退出的沉浸式恋爱实验。同行角色都收到秘密任务：在七天内让你主动选择他，但每个人隐藏的真实目的并不相同。",
+        narrativeStyle = "高张力恋爱修罗场与被攻略风。重点写眼神停顿、距离变化、话里有话、吃醋、试探、偏爱、误会和公开场合下的暗流。同行角色必须主动制定各自攻略方式，既有甜蜜心动也有竞争和秘密。不要让外部反派抢走关系主线；每次行动都应推动至少一条关系或揭开一个真实目的。",
+        accent = Color(0xFFFF6FAE),
+    ),
+    RoleplayWorld(
+        id = "romance_i_target",
+        title = "心动对象观察日志",
+        system = "主动攻略 · 都市恋爱 · d20",
+        premise = "你获得一本会显示‘心动波动’的观察日志，却看不到具体数值。只有通过行动、对话与共同经历，才能判断谁正在对你动心。",
+        narrativeStyle = "细腻都市恋爱与主动攻略风。文笔要克制、暧昧、生活化，重视聊天节奏、微表情、未说出口的话和日常陪伴。骰子决定行动是否自然、是否被误解或意外制造心动。同行角色不能轻易表白，要通过持续互动形成未知探索感。",
+        accent = Color(0xFFFFB26B),
+    ),
+    RoleplayWorld(
+        id = "system_mission",
+        title = "系统说今天必须心动",
+        system = "系统任务 · 轻喜剧 · 恋爱冒险",
+        premise = "一个不太靠谱的系统绑定了你们，天天发布离谱任务：交换身份、假装情侣、在敌人面前演戏、说出一句无法撤回的真心话。失败惩罚通常比任务更荒唐。",
+        narrativeStyle = "快节奏轻喜剧与系统文风。系统提示要简短、有梗、偶尔故障，但不能替玩家决定行动。重点写任务引发的尴尬、误会、嘴硬、互相拆台和突然心动；笑点来自角色性格碰撞，不要只靠网络段子。关键场景仍要有真情绪和关系推进。",
+        accent = Color(0xFFFFD84D),
+    ),
+    RoleplayWorld(
+        id = "palace_scheme",
+        title = "今夜谁在宫门外",
+        system = "古风宫廷 · 权谋关系 · d20",
+        premise = "新帝登基后的第一个雪夜，宫门外出现一具没有影子的尸体。你们被卷入储位、旧案与禁军之间的秘密角力。",
+        narrativeStyle = "古风权谋与克制情感风。语言雅致但清楚，重视礼法、身份、称谓、试探、沉默和一句话中的多重含义。阴谋必须可推理，角色不会无缘无故降智。同行者之间既可能结盟也可能互相隐瞒，感情线通过危险中的选择与信任变化展开。",
+        accent = Color(0xFFD8A45B),
+    ),
+    RoleplayWorld(
+        id = "cyber_memory",
+        title = "霓虹雨中的假记忆",
+        system = "赛博都市 · 身份悬疑 · d20",
+        premise = "在可以购买记忆的城市里，你们发现彼此都拥有同一段童年，但那段童年只可能属于一个人。",
+        narrativeStyle = "赛博朋克悬疑与身份关系风。强化霓虹雨、广告噪声、义体触觉、数据残影和贫富割裂；用黑客行动、记忆交易与企业追踪推进谜团。核心不是打公司，而是谁的记忆被改写、同行者之间还能否相信彼此。",
+        accent = Color(0xFF37E3B5),
+        sanityRisk = true,
+    ),
+    RoleplayWorld(
+        id = "apocalypse_store",
+        title = "废土便利店最后营业日",
+        system = "末日生存 · 公路治愈 · d20",
+        premise = "世界毁灭后的第九年，你们经营着荒原上最后一家便利店。某天，一位客人用一张灾难发生前的崭新车票购买了最后一盒草莓糖。",
+        narrativeStyle = "末日公路、资源生存与温柔治愈并存。描写风沙、废墟、旧商品、微小食物带来的慰藉和人与人之间艰难建立的信任。危险真实但不要持续压抑；允许幽默、日常经营、互相照顾和偶尔灿烂的希望。",
+        accent = Color(0xFFFF8A5B),
+    ),
+    RoleplayWorld(
+        id = "cultivation_comedy",
+        title = "小师弟把魔尊契约当话本",
+        system = "仙侠轻喜剧 · 契约冒险 · d20",
+        premise = "一纸写错名字的上古契约，把你们与刚苏醒的魔尊绑在一起。解除契约需要完成九项试炼，但第一项竟是‘让契约双方真心称赞对方一次’。",
+        narrativeStyle = "仙侠冒险与欢喜冤家轻喜剧。保持东方奇幻意象、门派规矩、法器和秘境奇观，同时让笑点来自契约限制、角色嘴硬和身份反差。战斗、修炼和情感变化相互服务，避免一直打怪升级。",
+        accent = Color(0xFF8BE0C5),
+    ),
+    RoleplayWorld(
+        id = "time_loop_date",
+        title = "约会结束前世界会重启",
+        system = "时间循环 · 恋爱悬疑 · d20",
+        premise = "每天晚上十一点五十九分，世界都会回到你们第一次见面的早晨。只有同行小队保留记忆，而某个人似乎每次都在偷偷改变结局。",
+        narrativeStyle = "时间循环、恋爱悬疑与渐进反转。重复场景要通过细节偏差、记忆累积和关系变化产生新鲜感；每次循环都应揭开一点秘密，同时让角色对死亡、重逢、遗忘和选择产生不同心理。浪漫来自共同记得，而不是无条件甜宠。",
+        accent = Color(0xFFA98CFF),
+        sanityRisk = true,
     ),
 )
 
@@ -110,7 +185,6 @@ private object TrpgColors {
     val backgroundTop = Color(0xFF070A16)
     val backgroundBottom = Color(0xFF15102A)
     val panel = Color(0xFF13182D)
-    val panelRaised = Color(0xFF1A2140)
     val border = Color(0xFF425079)
     val text = Color(0xFFF3F5FF)
     val muted = Color(0xFFAAB2D2)
@@ -349,7 +423,8 @@ private fun RoleplayCreator(
                         label = { Text("存档名称（可留空）") },
                     )
                 }
-                items(ROLEPLAY_WORLDS) { world ->
+                item { Text("选择世界（${ROLEPLAY_WORLDS.size}个）", fontWeight = FontWeight.SemiBold) }
+                items(ROLEPLAY_WORLDS, key = { it.id }) { world ->
                     Surface(
                         modifier = Modifier.fillMaxWidth().clickable { selectedWorld = world },
                         shape = RoundedCornerShape(16.dp),
@@ -362,6 +437,7 @@ private fun RoleplayCreator(
                         }
                     }
                 }
+                item { Text("选择同行角色（最多3位）", fontWeight = FontWeight.SemiBold) }
                 items(assistantChoices.chunked(3)) { row ->
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         row.forEach { (id, name) ->
@@ -435,15 +511,10 @@ private fun RoleplayTable(
             busy = true
             action = ""
             val party = save.assistantNames.joinToString("、")
-            val styleDirection = when (world.id) {
-                "academy_secret" -> "本世界必须恐怖加辣：强化雨声、灯光、气味、温度、触感、远近声源等五感；用熟悉事物的细微异常制造心理压迫；允许短暂寂静、错觉、被注视感与不可靠细节。恐怖来自逐步逼近和未知，不要只靠血腥。"
-                "occult_city" -> "强调潮湿雾气、旧城区声音、都市传闻和逐渐失真的现实感。"
-                "space_derelict" -> "强调失重、金属回声、生命维持系统噪声、幽闭感和宇宙尺度的孤独。"
-                else -> "强调遗迹尺度、魔法异象、历史残响与危险中的壮丽感。"
-            }
             request(
                 """
                 跑团世界：${world.title}
+                玩法标签：${world.system}
                 世界设定：${world.premise}
                 当前场景编号：${save.scene}
                 玩家本人：用户。叙事中的“你”只能指用户本人。
@@ -453,20 +524,21 @@ private fun RoleplayTable(
                 用户本轮行动：$cleanAction
                 d20真实结果：$roll，难度：$difficulty，判定：$lastOutcome
                 最近记录：${save.log.takeLast(5).joinToString("；")}
-                风格要求：$styleDirection
+                本世界专属文风：${world.narrativeStyle}
                 """.trimIndent(),
                 """
                 你是长篇沉浸式跑团主持人兼小说叙事者。严格服从骰子结果，不得偷偷改判定。
                 视角必须清楚：用第二人称“你”称呼用户；同行角色必须直接写名字。不要用含混的“我抬头提醒你”，除非那句话明确处于某位角色的引号对白中。
-                每轮写约800至1400个汉字，即使用户动作很小，也要通过环境、五感、心理压力、微动作、空间变化和细节伏笔把这一刻写得充分。
-                同行角色必须真实参与：至少安排两次有意义的同行互动，可包含对白、主动观察、保护、争执、试探、分工、恐惧反应或对用户选择的情绪反馈。互动必须符合各自人设，不能只写“他跟在后面”。
-                故事要像主角小队小说：用户是可行动的核心，但同行角色有自己的判断、发现和关系变化。外部谜团与角色关系同时推进。
-                失败不等于什么都没发生；失败应带来代价、误导、暴露、压力或更危险的新信息。成功也要留下后续风险和伏笔。
-                不替用户决定下一步，不擅自写用户已经答应、逃跑、拥抱或攻击。结尾自然给出2至3个可选方向，同时允许自由行动。不要写规则说明、幕后分析或字数提示。
+                每轮写约800至1400个汉字，即使用户动作很小，也要通过环境、五感、心理、微动作、空间变化、对白和细节伏笔把这一刻写充分。
+                同行角色必须真实参与：至少安排两次有意义的同行互动，可包含对白、主动观察、保护、争执、试探、分工、恐惧反应、吃醋、心动或对用户选择的情绪反馈。互动要符合各自人设，不能只写“他跟在后面”。
+                故事要像主角小队小说：用户是可行动核心，但同行角色有自己的判断、秘密、发现和关系变化。世界主线与人物关系同时推进。
+                失败不等于什么都没发生；失败应带来代价、误导、暴露、尴尬、压力或更危险的新信息。成功也要留下风险、伏笔或新的关系变化。
+                服从本世界专属文风，不同世界不得使用同一种叙事口吻。恋爱世界重关系与未知探索；轻喜剧世界要好笑但不降智；恐怖世界重压迫与感官；权谋世界重逻辑和言外之意。
+                不替用户决定下一步，不擅自写用户已经答应、逃跑、拥抱、告白或攻击。结尾自然给出2至3个可选方向，同时允许自由行动。不要写规则说明、幕后分析或字数提示。
                 """.trimIndent(),
             ) { narration ->
                 val hpLoss = if (!success && roll <= 5) 2 else if (!success) 1 else 0
-                val sanityLoss = if (!success && world.id in listOf("academy_secret", "occult_city", "space_derelict")) 1 else 0
+                val sanityLoss = if (!success && world.sanityRisk) 1 else 0
                 val updated = save.copy(
                     scene = save.scene + 1,
                     hp = (save.hp - hpLoss).coerceAtLeast(0),
@@ -503,6 +575,7 @@ private fun RoleplayTable(
                     Text("SCENE ${save.scene}", color = world.accent, fontWeight = FontWeight.Bold)
                 }
                 Text(save.title, color = TrpgColors.text, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                Text(world.system, color = world.accent, style = MaterialTheme.typography.labelLarge)
                 Text(save.assistantNames.joinToString(" · "), color = TrpgColors.text)
             }
         }
@@ -568,7 +641,7 @@ private fun RoleplayTable(
                     onValueChange = { action = it },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("你要做什么？") },
-                    placeholder = { Text("调查、交涉、潜行、战斗，或任何自由行动") },
+                    placeholder = { Text("调查、交涉、潜行、战斗、攻略，或任何自由行动") },
                     minLines = 3,
                     maxLines = 7,
                     colors = OutlinedTextFieldDefaults.colors(
