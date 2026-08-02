@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`af23cc9d4f850a77c31b7f9e79bcf2abe44c10df`
+- 基准提交：`5906143f646819cb7af8df914dbc60759a969194`
 - 分支：`master`
-- 源码指纹：`e8154325778a36cf…`
-- 已索引文件：1203
-- 已索引代码/文本行：264084
-- 已发现类、接口、对象、函数及 Composable：5765
+- 源码指纹：`a372037d2f97b8fb…`
+- 已索引文件：1204
+- 已索引代码/文本行：264192
+- 已发现类、接口、对象、函数及 Composable：5766
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 865 |
+| 生产代码文件 | 866 |
 | 测试文件 | 148 |
 | ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 748 |
+| `app` | 749 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 816 |
+| `.kt` | 817 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -211,7 +211,7 @@
 - `ai/src/main/java/me/rerere/ai/util/ErrorParser.kt`
 - `ai/src/main/java/me/rerere/ai/util/FileEncoder.kt`
 - `ai/src/main/java/me/rerere/ai/util/Json.kt`
-- ……另有 117 个文件，见 `code-index.json`
+- ……另有 118 个文件，见 `code-index.json`
 
 ### 主动代理
 
@@ -549,18 +549,18 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2073
-- 可检索完整符号：5148
+- 已解析本地导入边：2077
+- 可检索完整符号：5149
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 130 | 812 |
+| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 131 | 812 |
 | `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 114 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
 | `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 61 | 62 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 57 | 296 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 54 | 191 |
-| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 50 | 29 |
+| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 40 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |

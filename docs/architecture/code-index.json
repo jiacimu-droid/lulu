@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T15:15:42.558128+00:00",
-  "commit": "af23cc9d4f850a77c31b7f9e79bcf2abe44c10df",
+  "generatedAt": "2026-08-02T15:16:17.997313+00:00",
+  "commit": "5906143f646819cb7af8df914dbc60759a969194",
   "branch": "master",
-  "sourceFingerprint": "e8154325778a36cfebb43785fcf86464bc705f156054e280f69b256b209136e4",
+  "sourceFingerprint": "a372037d2f97b8fbf2a6096deac1f345e7cc6384b7865fc220210a84e0a6ed45",
   "summary": {
-    "files": 1203,
-    "lines": 264084,
-    "symbols": 5765,
-    "productionCodeFiles": 865,
+    "files": 1204,
+    "lines": 264192,
+    "symbols": 5766,
+    "productionCodeFiles": 866,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 748,
+      "app": 749,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 816,
+      ".kt": 817,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -55,7 +55,7 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 147,
+      "AI与上下文": 148,
       "主动代理": 29,
       "关系与承诺": 18,
       "娱乐与数字生活": 28,
@@ -68,7 +68,7 @@
       "界面": 344,
       "记忆": 49
     },
-    "resolvedImportEdges": 2073
+    "resolvedImportEdges": 2077
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -900,7 +900,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 130,
+        "importedByCount": 131,
         "todoMarkers": 0
       },
       {
@@ -948,7 +948,7 @@
         "lines": 29,
         "symbols": 3,
         "localImportCount": 3,
-        "importedByCount": 50,
+        "importedByCount": 51,
         "todoMarkers": 0
       },
       {
@@ -1211,6 +1211,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CalendarTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CameraTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionTheaterReadingTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ExploreNearbyTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
@@ -2033,17 +2034,17 @@
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.core.Tool",
-      "imports": 21
+      "imports": 22
     },
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.ui.UIMessagePart",
-      "imports": 21
+      "imports": 22
     },
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.core.InputSchema",
-      "imports": 18
+      "imports": 19
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.assistant",
@@ -3740,6 +3741,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CalendarTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CameraTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionTheaterReadingTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ExploreNearbyTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/LocalTools.kt",
@@ -6044,6 +6046,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CalendarTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CameraTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionTheaterReadingTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ExploreNearbyTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/GadgetbridgeTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/InlineVoiceSynthesizer.kt",
@@ -10109,6 +10112,43 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionTheaterReadingTool.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 108,
+      "sha256": "b588898af21606be5fc4d1e3e3c57721d4a1a5c123369354e50548bcbadf9bdc",
+      "package": "me.rerere.rikkahub.data.ai.tools",
+      "categories": [
+        "AI与上下文"
+      ],
+      "symbols": [
+        {
+          "name": "createCompanionTheaterReadingTool",
+          "kind": "function",
+          "line": 18
+        }
+      ],
+      "localImportCount": 6,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.core.InputSchema",
+        "me.rerere.ai.core.Tool",
+        "me.rerere.ai.ui.UIMessagePart",
+        "me.rerere.rikkahub.data.starwish.StarWishStore",
+        "me.rerere.rikkahub.data.starwish.StarWishTheaterReadingNote",
+        "me.rerere.rikkahub.data.starwish.companionTheaterProgressKey"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/Tool.kt",
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishStore.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ExploreNearbyTool.kt",
@@ -22743,6 +22783,7 @@
       "localImports": [],
       "resolvedImports": [],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionTheaterReadingTool.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiReadingPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishHomeComponents.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
@@ -22896,6 +22937,7 @@
         "app/src/main/java/me/rerere/rikkahub/RikkaHubApp.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionTheaterReadingTool.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiReadingPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
@@ -70974,6 +71016,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionGameTool.kt",
         "kind": "function",
         "line": 19
+      }
+    ],
+    "me.rerere.rikkahub.data.ai.tools.createCompanionTheaterReadingTool": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/tools/CompanionTheaterReadingTool.kt",
+        "kind": "function",
+        "line": 18
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.createDigitalLifeTool": [
