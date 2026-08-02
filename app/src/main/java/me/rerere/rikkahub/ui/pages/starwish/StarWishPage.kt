@@ -429,7 +429,7 @@ fun StarWishTheaterPage(
                             }
                             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                                 DropdownMenuItem(
-                                    text = { Text("重新生成剧情规划") },
+                                    text = { Text("剧情规划") },
                                     onClick = {
                                         showMenu = false
                                         plotVM.clear()
