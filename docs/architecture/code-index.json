@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T14:50:31.377681+00:00",
-  "commit": "88dc29a9751b82168a35ee13eac279195e5a9ed1",
+  "generatedAt": "2026-08-02T14:57:48.355731+00:00",
+  "commit": "c90466fcd5de82c5b8918d037e5e47fef6cf859d",
   "branch": "master",
-  "sourceFingerprint": "f0067886e704dd542edb8d7f77bf4b1b6b8b3e8da0a11085237a63a18daa1120",
+  "sourceFingerprint": "e8b94e208b480eaff53642f719af81b9e987dd88e10b389ff3011d49b785bf21",
   "summary": {
     "files": 1203,
-    "lines": 264073,
-    "symbols": 5758,
+    "lines": 264097,
+    "symbols": 5761,
     "productionCodeFiles": 865,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -43843,8 +43843,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 251,
-      "sha256": "9c9eb35dde4452a0726e42dcd918de2eb4b0dd4339dd947f3f28aaffa054f9c2",
+      "lines": 275,
+      "sha256": "5ed2c9e2570ebf634bc4246890e80afa9ceee062735b3bce135a63e63bedf86d",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
@@ -43853,52 +43853,67 @@
         {
           "name": "StarWishPlotCandidate",
           "kind": "class",
-          "line": 30
+          "line": 32
         },
         {
           "name": "toGuide",
           "kind": "function",
-          "line": 39
+          "line": 47
         },
         {
           "name": "StarWishPlotGeneratorVM",
           "kind": "class",
-          "line": 51
+          "line": 65
         },
         {
           "name": "clear",
           "kind": "function",
-          "line": 67
+          "line": 79
         },
         {
           "name": "generate",
           "kind": "function",
-          "line": 72
+          "line": 84
         },
         {
           "name": "applyToExisting",
           "kind": "function",
-          "line": 88
+          "line": 100
         },
         {
           "name": "createFromCandidate",
           "kind": "function",
-          "line": 96
+          "line": 108
         },
         {
           "name": "generateCandidates",
           "kind": "function",
-          "line": 115
+          "line": 127
         },
         {
-          "name": "parseCandidates",
+          "name": "parseJsonCandidates",
           "kind": "function",
-          "line": 222
+          "line": 208
+        },
+        {
+          "name": "candidateFromJson",
+          "kind": "function",
+          "line": 226
+        },
+        {
+          "name": "text",
+          "kind": "function",
+          "line": 227
+        },
+        {
+          "name": "parseLooseCandidates",
+          "kind": "function",
+          "line": 256
         },
         {
           "name": "value",
           "kind": "function",
-          "line": 227
+          "line": 260
         }
       ],
       "localImportCount": 19,
@@ -97649,7 +97664,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "class",
-        "line": 30
+        "line": 32
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotEditorPage": [
@@ -97670,7 +97685,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "class",
-        "line": 51
+        "line": 65
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishSection": [
@@ -97747,21 +97762,28 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "function",
-        "line": 88
+        "line": 100
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.candidateFromJson": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 226
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.clear": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "function",
-        "line": 67
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.createFromCandidate": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "function",
-        "line": 96
+        "line": 108
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.createNextChapter": [
@@ -97831,14 +97853,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "function",
-        "line": 72
+        "line": 84
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.generateCandidates": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "function",
-        "line": 115
+        "line": 127
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.generateTheaterChapterContent": [
@@ -97869,11 +97891,18 @@
         "line": 7
       }
     ],
-    "me.rerere.rikkahub.ui.pages.starwish.parseCandidates": [
+    "me.rerere.rikkahub.ui.pages.starwish.parseJsonCandidates": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "function",
-        "line": 222
+        "line": 208
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.parseLooseCandidates": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 256
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.playVideo": [
@@ -97918,11 +97947,18 @@
         "line": 301
       }
     ],
+    "me.rerere.rikkahub.ui.pages.starwish.text": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 227
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.starwish.toGuide": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "function",
-        "line": 39
+        "line": 47
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.unlockNextVideoOrPlayRandom": [
@@ -97936,7 +97972,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "function",
-        "line": 227
+        "line": 260
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.AppStats": [
