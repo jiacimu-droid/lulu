@@ -12,12 +12,12 @@
 
 ## 索引状态
 
-- 基准提交：`ee3dc4d28b45d6a2ce28d7440c708b488a82762d`
+- 基准提交：`580d7957e3b5b8954eb0c1d03594225802bc3cc0`
 - 分支：`master`
-- 源码指纹：`afcc99c0b367ea21…`
+- 源码指纹：`b93d5a8da6b29a50…`
 - 已索引文件：1203
-- 已索引代码/文本行：264093
-- 已发现类、接口、对象、函数及 Composable：5762
+- 已索引代码/文本行：264064
+- 已发现类、接口、对象、函数及 Composable：5763
 
 ## 仓库健康信号
 
@@ -549,8 +549,8 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2072
-- 可检索完整符号：5145
+- 已解析本地导入边：2073
+- 可检索完整符号：5146
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
@@ -562,7 +562,7 @@
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 54 | 191 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 50 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
-| `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 39 | 529 |
+| `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 40 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
 | `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 34 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 34 | 248 |
