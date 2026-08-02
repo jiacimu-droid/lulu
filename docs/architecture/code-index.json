@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T10:40:38.014438+00:00",
-  "commit": "ccfb41e88da5685efd7ef85ef169cc8a8d03b022",
+  "generatedAt": "2026-08-02T10:41:32.605966+00:00",
+  "commit": "759fa936a05efdba75afec8653aee167041d87ae",
   "branch": "master",
-  "sourceFingerprint": "5e094371f4a02462d7d7d2445bcfc34521a36bf911370f7c5ce15b6518a9bc89",
+  "sourceFingerprint": "b46963568c135428da9b1c1a1d9660373ba8ff495e952de1c12898fb8b6843ca",
   "summary": {
     "files": 1202,
-    "lines": 264018,
+    "lines": 264020,
     "symbols": 5750,
     "productionCodeFiles": 864,
     "testFiles": 148,
@@ -39602,8 +39602,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 405,
-      "sha256": "6aca3b8c7f1515ca655da6c22c4b4b5bfce2e204cd98edd882debf53fca0fc6a",
+      "lines": 407,
+      "sha256": "4aca5d8fdebf9ff774d599891a7ca96ab2252c4f70054f1cc63318e6ca1c4f5a",
       "package": "me.rerere.rikkahub.ui.pages.game",
       "categories": [
         "界面"
@@ -39612,67 +39612,67 @@
         {
           "name": "QuickCompanionGamePage",
           "kind": "composable",
-          "line": 69
+          "line": 70
         },
         {
           "name": "recordSharedGame",
           "kind": "function",
-          "line": 86
+          "line": 87
         },
         {
           "name": "generateCompanionText",
           "kind": "function",
-          "line": 114
+          "line": 121
         },
         {
           "name": "requestCompanionText",
           "kind": "function",
-          "line": 174
+          "line": 181
         },
         {
           "name": "saveCheckpoint",
           "kind": "function",
-          "line": 189
+          "line": 196
         },
         {
           "name": "completeRuleGame",
           "kind": "function",
-          "line": 193
+          "line": 200
         },
         {
           "name": "CompanionGameReactionCard",
           "kind": "composable",
-          "line": 306
+          "line": 314
         },
         {
           "name": "GameBody",
           "kind": "composable",
-          "line": 323
+          "line": 327
         },
         {
           "name": "GameResultText",
           "kind": "composable",
-          "line": 343
+          "line": 345
         },
         {
           "name": "chooseTicTacToeMove",
           "kind": "function",
-          "line": 359
+          "line": 361
         },
         {
           "name": "quickTicTacToeWinner",
           "kind": "function",
-          "line": 373
+          "line": 375
         },
         {
           "name": "QuickCompanionGame",
           "kind": "class",
-          "line": 384
+          "line": 386
         },
         {
           "name": "fromWireName",
           "kind": "function",
-          "line": 396
+          "line": 398
         }
       ],
       "localImportCount": 25,
@@ -94496,7 +94496,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 306
+        "line": 314
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.CompanionNarrativeRequest": [
@@ -94517,7 +94517,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 323
+        "line": 327
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GameColors": [
@@ -94566,7 +94566,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 343
+        "line": 345
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.GomokuGame": [
@@ -94671,14 +94671,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "class",
-        "line": 384
+        "line": 386
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.QuickCompanionGamePage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "composable",
-        "line": 69
+        "line": 70
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.QuickCompanionGameTest": [
@@ -94916,14 +94916,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 359
+        "line": 361
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.completeRuleGame": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 193
+        "line": 200
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.countDirection": [
@@ -94958,14 +94958,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 396
+        "line": 398
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.generateCompanionText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 114
+        "line": 121
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.generatePerfectManText": [
@@ -95056,7 +95056,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 373
+        "line": 375
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.recordCompletedRound": [
@@ -95070,14 +95070,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 86
+        "line": 87
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.requestCompanionText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 174
+        "line": 181
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.reset": [
@@ -95119,7 +95119,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "kind": "function",
-        "line": 189
+        "line": 196
       }
     ],
     "me.rerere.rikkahub.ui.pages.game.score": [
