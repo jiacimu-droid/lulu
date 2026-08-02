@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.AiImage
+import me.rerere.hugeicons.stroke.ArrowLeft02
 import me.rerere.hugeicons.stroke.BookOpen02
 import me.rerere.hugeicons.stroke.Image03
 import me.rerere.hugeicons.stroke.MoreVertical
@@ -405,8 +406,10 @@ fun StarWishTheaterPage(
     val isGeneratingPlot by plotVM.isGenerating.collectAsStateWithLifecycle()
     val plotError by plotVM.error.collectAsStateWithLifecycle()
     val theater = StarWishRules.allTheaters(state.customTheaters).firstOrNull { it.title == theaterTitle }
+    val currentGuide = theater?.let { state.theaterGuides[it.title] ?: StarWishRules.defaultTheaterGuide(it) }
     var showMenu by remember(theaterTitle) { mutableStateOf(false) }
     var showPlotGenerator by remember(theaterTitle) { mutableStateOf(false) }
+    var showPlotEditor by remember(theaterTitle) { mutableStateOf(false) }
     var showChapterNavigation by remember(theaterTitle) { mutableStateOf(false) }
 
     Scaffold(
@@ -414,15 +417,23 @@ fun StarWishTheaterPage(
             TopAppBar(
                 title = {
                     Text(
-                        theaterTitle,
+                        if (showPlotEditor) "剧情规划" else theaterTitle,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.titleMedium,
                     )
                 },
-                navigationIcon = { BackButton() },
+                navigationIcon = {
+                    if (showPlotEditor) {
+                        IconButton(onClick = { showPlotEditor = false }) {
+                            Icon(HugeIcons.ArrowLeft02, contentDescription = "返回阅读")
+                        }
+                    } else {
+                        BackButton()
+                    }
+                },
                 actions = {
-                    if (theater != null) {
+                    if (theater != null && !showPlotEditor) {
                         Box {
                             IconButton(onClick = { showMenu = true }) {
                                 Icon(HugeIcons.MoreVertical, contentDescription = "更多")
@@ -432,8 +443,7 @@ fun StarWishTheaterPage(
                                     text = { Text("剧情规划") },
                                     onClick = {
                                         showMenu = false
-                                        plotVM.clear()
-                                        showPlotGenerator = true
+                                        showPlotEditor = true
                                     },
                                 )
                                 DropdownMenuItem(
@@ -460,41 +470,58 @@ fun StarWishTheaterPage(
         },
         containerColor = StarWishColors.paper,
     ) { padding ->
-        if (theater == null) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("这本小剧场暂时找不到了")
+        when {
+            theater == null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("这本小剧场暂时找不到了")
+                }
             }
-        } else {
-            StarWishImmersiveTheaterContent(
-                theater = theater,
-                chapters = state.theaterChapters[theater.title].orEmpty(),
-                rareFragments = studyState.inventory.theaterFragments,
-                isGenerating = isGeneratingChapter,
-                error = chapterError,
-                costPerChapter = StarWishRules.RARE_FRAGMENTS_PER_CHAPTER,
-                showChapterNavigation = showChapterNavigation,
-                onDismissChapterNavigation = { showChapterNavigation = false },
-                onCreateChapter = { influence -> vm.createNextChapter(theater.title, influence) },
-                onDeleteChapter = { chapterId -> vm.deleteChapter(theater.title, chapterId) },
-                modifier = Modifier.padding(padding),
-            )
+            showPlotEditor && currentGuide != null -> {
+                StarWishPlotEditorPage(
+                    theater = theater,
+                    guide = currentGuide,
+                    onSave = { guide -> vm.saveTheaterGuide(theater.title, guide) },
+                    onRegenerate = {
+                        plotVM.clear()
+                        showPlotGenerator = true
+                    },
+                    modifier = Modifier.padding(padding),
+                )
+            }
+            else -> {
+                StarWishImmersiveTheaterContent(
+                    theater = theater,
+                    chapters = state.theaterChapters[theater.title].orEmpty(),
+                    rareFragments = studyState.inventory.theaterFragments,
+                    isGenerating = isGeneratingChapter,
+                    error = chapterError,
+                    costPerChapter = StarWishRules.RARE_FRAGMENTS_PER_CHAPTER,
+                    showChapterNavigation = showChapterNavigation,
+                    onDismissChapterNavigation = { showChapterNavigation = false },
+                    onCreateChapter = { influence -> vm.createNextChapter(theater.title, influence) },
+                    onDeleteChapter = { chapterId -> vm.deleteChapter(theater.title, chapterId) },
+                    modifier = Modifier.padding(padding),
+                )
+            }
         }
     }
 
     if (theater != null && showPlotGenerator) {
+        val premise = currentGuide?.worldview?.ifBlank { theater.prompt } ?: theater.prompt
         StarWishPlotGeneratorDialog(
             existingTitle = theater.title,
-            existingPremise = theater.prompt,
+            existingPremise = premise,
             candidates = plotCandidates,
             isGenerating = isGeneratingPlot,
             error = plotError,
-            onGenerate = { direction -> plotVM.generate(theater.title, theater.prompt, direction) },
+            onGenerate = { direction -> plotVM.generate(theater.title, premise, direction) },
             onApply = { candidate ->
                 plotVM.applyToExisting(theater.title, candidate)
                 showPlotGenerator = false
+                showPlotEditor = true
             },
             onDismiss = { showPlotGenerator = false },
         )
