@@ -9,6 +9,8 @@ data class StarWishState(
     val theaterChapters: Map<String, List<StarWishTheaterChapter>> = emptyMap(),
     val theaterGuides: Map<String, StarWishTheaterGuide> = emptyMap(),
     val customTheaters: List<StarWishTheaterSeed> = emptyList(),
+    val companionTheaterProgress: Map<String, Int> = emptyMap(),
+    val companionTheaterNotes: List<StarWishTheaterReadingNote> = emptyList(),
     val hiddenScrollTitles: Set<String> = emptySet(),
     val hiddenTheaterTitles: Set<String> = emptySet(),
     val hiddenImageLaunchIds: Set<String> = emptySet(),
@@ -66,6 +68,24 @@ data class StarWishTheaterGuide(
         wordCount = wordCount.trim().ifBlank { "1200-2200" },
     )
 }
+
+@Serializable
+data class StarWishTheaterReadingNote(
+    val id: String,
+    val assistantId: String,
+    val assistantName: String,
+    val theaterTitle: String,
+    val chapterId: String,
+    val chapterNumber: Int,
+    val chapterTitle: String,
+    val reaction: String,
+    val questionForUser: String = "",
+    val createdAt: Long,
+    val sharedWithUser: Boolean = false,
+)
+
+fun companionTheaterProgressKey(assistantId: String, theaterTitle: String): String =
+    "$assistantId::$theaterTitle"
 
 @Serializable
 data class StarWishVideoItem(
