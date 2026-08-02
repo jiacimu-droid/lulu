@@ -53,8 +53,6 @@ class SystemTools(private val context: Context, private val settings: Settings) 
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     }
 
-    // ==================== 位置工具 ====================
-
     val locationTool: Tool by lazy {
         Tool(
             name = "get_location",
@@ -127,8 +125,6 @@ class SystemTools(private val context: Context, private val settings: Settings) 
         )
     }
 
-    // ==================== 通知工具 ====================
-
     val notificationsTool: Tool by lazy {
         Tool(
             name = "get_notifications",
@@ -155,7 +151,7 @@ class SystemTools(private val context: Context, private val settings: Settings) 
                         ))
                     }
 
-                    val arr = kotlinx.serialization.json.buildJsonArray {
+                    val arr = buildJsonArray {
                         notifications.forEach { notif ->
                             add(buildJsonObject {
                                 put("app_name", notif.appName)
@@ -176,8 +172,6 @@ class SystemTools(private val context: Context, private val settings: Settings) 
         )
     }
 
-    // ==================== 外部工具实例 ====================
-
     private val appUsageTool by lazy { createAppUsageTool(context) }
     private val exploreNearbyTool by lazy { createExploreNearbyTool(context, settings) }
     private val cameraTool by lazy { createCameraTool(context) }
@@ -190,13 +184,18 @@ class SystemTools(private val context: Context, private val settings: Settings) 
     private val requestedVoiceCallTool by lazy {
         createRequestedVoiceCallTool(context, settings.getCurrentAssistant().id.toString())
     }
-
-    // ==================== 获取工具列表 ====================
+    private val theaterReadingTool by lazy {
+        val assistant = settings.getCurrentAssistant()
+        createCompanionTheaterReadingTool(
+            assistantId = assistant.id.toString(),
+            assistantName = assistant.name,
+        )
+    }
 
     fun getTools(enabledTools: Set<SystemToolOption>): List<Tool> {
         val tools = mutableListOf<Tool>()
-        // Explicitly requested calls are a core character action, not an optional random-call setting.
         tools.add(requestedVoiceCallTool)
+        tools.add(theaterReadingTool)
         if (SystemToolOption.Location in enabledTools) tools.add(locationTool)
         if (SystemToolOption.Notifications in enabledTools) tools.add(notificationsTool)
         if (SystemToolOption.AppUsage in enabledTools) tools.add(appUsageTool)
