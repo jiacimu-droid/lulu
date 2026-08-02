@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T10:41:32.605966+00:00",
-  "commit": "759fa936a05efdba75afec8653aee167041d87ae",
+  "generatedAt": "2026-08-02T10:42:41.922360+00:00",
+  "commit": "eccb645ce30eb99af61f50165554be8fa9d34632",
   "branch": "master",
-  "sourceFingerprint": "b46963568c135428da9b1c1a1d9660373ba8ff495e952de1c12898fb8b6843ca",
+  "sourceFingerprint": "05fc5899fbf3d6eaa88cde9390065705c5327a2698956a0cc1e93cf54e4a0a9b",
   "summary": {
     "files": 1202,
-    "lines": 264020,
+    "lines": 264057,
     "symbols": 5750,
     "productionCodeFiles": 864,
     "testFiles": 148,
@@ -68,7 +68,7 @@
       "界面": 343,
       "记忆": 49
     },
-    "resolvedImportEdges": 2070
+    "resolvedImportEdges": 2071
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -22885,6 +22885,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiReadingPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt"
@@ -43745,8 +43746,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 170,
-      "sha256": "22492e5c37db3aec9d64c9047aa79bfad03f6c8cbcde6eb13bd1a2209b695250",
+      "lines": 207,
+      "sha256": "ec754039c29518d8a4076314db3d9b239ca693234d0c398705fd00a34fbe2561",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
@@ -43755,15 +43756,19 @@
         {
           "name": "StarWishPlotGeneratorDialog",
           "kind": "composable",
-          "line": 33
+          "line": 36
         }
       ],
-      "localImportCount": 0,
+      "localImportCount": 1,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
-      "localImports": [],
-      "resolvedImports": [],
+      "localImports": [
+        "me.rerere.rikkahub.data.starwish.StarWishStore"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishStore.kt"
+      ],
       "importedBy": []
     },
     {
@@ -97548,7 +97553,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
         "kind": "composable",
-        "line": 33
+        "line": 36
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotGeneratorVM": [
