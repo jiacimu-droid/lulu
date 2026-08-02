@@ -378,7 +378,34 @@ class StarWishVM(
                 nowMillis = System.currentTimeMillis(),
             ),
         ).toPromptContext()
-        val prompt = StarWishRules.theaterChapterPrompt(seed, chapters, nextChapter, influence, guide)
+        val basePrompt = StarWishRules.theaterChapterPrompt(seed, chapters, nextChapter, influence, guide)
+        val previous = chapters.lastOrNull()
+        val continuityPrompt = buildString {
+            appendLine(basePrompt)
+            appendLine()
+            appendLine("【续写优先级与连续性协议】")
+            appendLine("1. 用户在‘影响下一章’中写下的内容拥有最高剧情优先级。只要不直接违背角色底层人设与安全边界，就先服从用户选择。")
+            appendLine("2. 剧情大纲是导航和伏笔地图，不是不可偏离的铁轨。若用户行为与本章规划冲突，应让主线延迟、改道、拆分或通过后续事件重新汇合，不得无视用户行为硬拉回原计划。")
+            appendLine("3. 新章必须从上一章最后一个有效状态继续。禁止重新演一遍上一章已经完成的动作、对白、到达、拥抱、战斗、决定或发现。")
+            appendLine("4. 开篇前先在内部确认：人物当前所在位置、姿势、距离、情绪、已知信息、正在进行但尚未完成的动作、已埋未收的伏笔。不要把这份检查过程输出给读者。")
+            appendLine("5. 若需要时间跳跃或场景切换，必须用自然过渡明确交代经过，不能突然重置人物状态。")
+            appendLine("6. 续写应像连续小说而不是独立短篇：承接上一章语气、节奏、关系温度和未完句意，同时推进新的事件。")
+            appendLine("7. 文风采用成熟类型小说技法：具体意象、五感、空间关系、动作细节、心理变化、对白潜台词、留白与节奏变化。不要只做事件流水账，也不要堆砌空泛形容词。")
+            appendLine("8. 伏笔必须有生命周期：新埋伏笔要有可识别载体；回收旧伏笔时要让读者产生‘原来如此’而不是生硬解释。明线、暗线与关系线至少推进其中两条。")
+            if (influence.isNotBlank()) {
+                appendLine()
+                appendLine("【本章用户最高优先级影响】")
+                appendLine(influence)
+            }
+            if (previous != null) {
+                appendLine()
+                appendLine("【上一章末尾连续性锚点】")
+                appendLine("上一章编号：${previous.chapter}")
+                appendLine("上一章用户影响：${previous.userInfluence.ifBlank { "无" }}")
+                appendLine("上一章最后约1200字（新章必须从这里之后继续，禁止重演）：")
+                appendLine(previous.content.takeLast(1200))
+            }
+        }.trim()
         val messages = transformMessages(
             messages = listOf(
                 UIMessage.system(buildString {
@@ -386,6 +413,8 @@ class StarWishVM(
                         "小剧场中的核心陪伴角色是 ${assistant.name.ifBlank { "当前角色" }}，" +
                             "必须遵守其人设、关系边界与语言习惯。",
                     )
+                    appendLine("你正在写同一本连续小说。输出只能是本章正文，不得输出大纲、分析、连续性检查、写作说明或JSON。")
+                    appendLine("不得模仿具体在世作者的独特文风；应使用类型文学的通用高水平技法，形成自然、细腻、有意境但清晰可读的中文叙事。")
                     if (assistant.systemPrompt.isNotBlank()) {
                         appendLine("角色人设：")
                         appendLine(assistant.systemPrompt)
@@ -396,7 +425,7 @@ class StarWishVM(
                     }
                 }.trim()),
                 companionContext.takeIf(String::isNotBlank)?.let(UIMessage::system),
-                UIMessage.user(prompt),
+                UIMessage.user(continuityPrompt),
             ).filterNotNull(),
             assistant = assistant,
             modeInjections = settings.modeInjections,
@@ -407,9 +436,9 @@ class StarWishVM(
             messages = messages,
             params = TextGenerationParams(
                 model = model,
-                temperature = 0.9f,
-                topP = 0.95f,
-                maxTokens = 3200,
+                temperature = 0.82f,
+                topP = 0.93f,
+                maxTokens = 4200,
                 reasoningLevel = ReasoningLevel.OFF,
             ),
         )
