@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T02:57:34.561287+00:00",
-  "commit": "791f9b8bdf965cb32c2f75d80e259f79fc4dec01",
+  "generatedAt": "2026-08-02T02:58:01.537186+00:00",
+  "commit": "7c0e3e49a3bba216215121f8ea7936558bc566bd",
   "branch": "master",
-  "sourceFingerprint": "24f806c7482e0b8974c8cc857ea8a17785a44f61337ecb51b0d2ef076bf5023b",
+  "sourceFingerprint": "05aea7c9a60eb65c95c8498d7d32b9ed7040c82bd2878c6c99c6f968728c4a58",
   "summary": {
     "files": 1198,
-    "lines": 263027,
-    "symbols": 5728,
+    "lines": 262754,
+    "symbols": 5726,
     "productionCodeFiles": 860,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -68,7 +68,7 @@
       "界面": 339,
       "记忆": 49
     },
-    "resolvedImportEdges": 2057
+    "resolvedImportEdges": 2056
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -924,7 +924,7 @@
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
-        "importedByCount": 61,
+        "importedByCount": 60,
         "todoMarkers": 0
       },
       {
@@ -1004,7 +1004,7 @@
         "lines": 141,
         "symbols": 19,
         "localImportCount": 6,
-        "importedByCount": 31,
+        "importedByCount": 30,
         "todoMarkers": 1
       },
       {
@@ -3922,7 +3922,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankControls.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
@@ -4094,7 +4093,6 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/PropertyEditor.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
-        "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
@@ -20857,7 +20855,9 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/NotificationUtil.kt"
       ],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt"
+      ]
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/data/service/LocationService.kt",
@@ -40230,8 +40230,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 508,
-      "sha256": "839a2ff96d62628223d40e94fe2e38cac368534172100cc984876ea44dc8d23f",
+      "lines": 235,
+      "sha256": "8fba8189ee4c3d48ce20aa6792fd062114657ceb75d0958cb9375eb6dd3aa630",
       "package": "me.rerere.rikkahub.ui.pages.imggen",
       "categories": [
         "界面"
@@ -40240,147 +40240,130 @@
         {
           "name": "GeneratedImage",
           "kind": "class",
-          "line": 43
+          "line": 30
         },
         {
           "name": "toGeneratedImage",
           "kind": "function",
-          "line": 51
+          "line": 38
         },
         {
           "name": "mergeEffectiveReferenceImages",
           "kind": "function",
-          "line": 64
-        },
-        {
-          "name": "promptWithFaceReferenceFallback",
-          "kind": "function",
-          "line": 73
+          "line": 50
         },
         {
           "name": "ImgGenVM",
           "kind": "class",
-          "line": 82
+          "line": 59
         },
         {
           "name": "updatePrompt",
           "kind": "function",
-          "line": 123
+          "line": 102
         },
         {
           "name": "updateNumberOfImages",
           "kind": "function",
-          "line": 127
+          "line": 106
         },
         {
           "name": "updateAspectRatio",
           "kind": "function",
-          "line": 131
+          "line": 110
         },
         {
           "name": "applyInitialRequest",
           "kind": "function",
-          "line": 135
+          "line": 114
         },
         {
           "name": "addReferenceImages",
           "kind": "function",
-          "line": 147
+          "line": 124
         },
         {
           "name": "removeReferenceImage",
           "kind": "function",
-          "line": 151
+          "line": 128
         },
         {
           "name": "clearReferenceImages",
           "kind": "function",
-          "line": 156
+          "line": 133
         },
         {
           "name": "clearError",
           "kind": "function",
-          "line": 161
+          "line": 138
         },
         {
           "name": "startNewSession",
           "kind": "function",
-          "line": 165
+          "line": 142
         },
         {
           "name": "generateImage",
           "kind": "function",
-          "line": 176
+          "line": 151
         },
         {
           "name": "editImage",
           "kind": "function",
-          "line": 248
+          "line": 160
+        },
+        {
+          "name": "enqueueBackgroundGeneration",
+          "kind": "function",
+          "line": 164
         },
         {
           "name": "cancelGeneration",
           "kind": "function",
-          "line": 386
-        },
-        {
-          "name": "saveImageToStorage",
-          "kind": "function",
-          "line": 393
-        },
-        {
-          "name": "downloadGeneratedImageToFile",
-          "kind": "function",
-          "line": 430
+          "line": 187
         },
         {
           "name": "deleteImage",
           "kind": "function",
-          "line": 454
+          "line": 193
         },
         {
           "name": "deleteReferenceFiles",
           "kind": "function",
-          "line": 472
+          "line": 205
         },
         {
           "name": "toSafeFileNamePart",
           "kind": "function",
-          "line": 490
+          "line": 217
         },
         {
           "name": "toFriendlyImageError",
           "kind": "function",
-          "line": 497
+          "line": 224
         }
       ],
-      "localImportCount": 13,
+      "localImportCount": 7,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
-        "me.rerere.ai.provider.ImageEditParams",
-        "me.rerere.ai.provider.ImageGenerationParams",
-        "me.rerere.ai.provider.ModelType",
         "me.rerere.ai.provider.ProviderManager",
         "me.rerere.ai.ui.ImageAspectRatio",
-        "me.rerere.ai.ui.ImageGenerationItem",
         "me.rerere.rikkahub.data.datastore.SettingsStore",
-        "me.rerere.rikkahub.data.datastore.findModelById",
-        "me.rerere.rikkahub.data.datastore.findProvider",
-        "me.rerere.rikkahub.data.datastore.getCurrentAssistant",
         "me.rerere.rikkahub.data.db.entity.GenMediaEntity",
         "me.rerere.rikkahub.data.files.FilesManager",
-        "me.rerere.rikkahub.data.repository.GenMediaRepository"
+        "me.rerere.rikkahub.data.repository.GenMediaRepository",
+        "me.rerere.rikkahub.data.service.ImageGenerationWorker"
       ],
       "resolvedImports": [
-        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
-        "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
         "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
         "ai/src/main/java/me/rerere/ai/ui/Image.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
         "app/src/main/java/me/rerere/rikkahub/data/db/entity/GenMediaEntity.kt",
         "app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/repository/GenMediaRepository.kt"
+        "app/src/main/java/me/rerere/rikkahub/data/repository/GenMediaRepository.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt"
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
@@ -95156,7 +95139,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "class",
-        "line": 43
+        "line": 30
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.ImageGalleryScreen": [
@@ -95198,7 +95181,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "class",
-        "line": 82
+        "line": 59
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.InputBar": [
@@ -95226,14 +95209,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 147
+        "line": 124
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.applyInitialRequest": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 135
+        "line": 114
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.assistantFaceReferenceIsMergedFirstBeforeManualReferences": [
@@ -95247,133 +95230,119 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 386
+        "line": 187
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.clearError": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 161
+        "line": 138
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.clearReferenceImages": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 156
+        "line": 133
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.deleteImage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 454
+        "line": 193
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.deleteReferenceFiles": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 472
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.imggen.downloadGeneratedImageToFile": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
-        "kind": "function",
-        "line": 430
+        "line": 205
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.editImage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 248
+        "line": 160
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.imggen.enqueueBackgroundGeneration": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
+        "kind": "function",
+        "line": 164
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.generateImage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 176
+        "line": 151
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.mergeEffectiveReferenceImages": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 64
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.imggen.promptWithFaceReferenceFallback": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
-        "kind": "function",
-        "line": 73
+        "line": 50
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.removeReferenceImage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 151
-      }
-    ],
-    "me.rerere.rikkahub.ui.pages.imggen.saveImageToStorage": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
-        "kind": "function",
-        "line": 393
+        "line": 128
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.startNewSession": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 165
+        "line": 142
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.toFriendlyImageError": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 497
+        "line": 224
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.toGeneratedImage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 51
+        "line": 38
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.toSafeFileNamePart": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 490
+        "line": 217
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.updateAspectRatio": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 131
+        "line": 110
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.updateNumberOfImages": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 127
+        "line": 106
       }
     ],
     "me.rerere.rikkahub.ui.pages.imggen.updatePrompt": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "kind": "function",
-        "line": 123
+        "line": 102
       }
     ],
     "me.rerere.rikkahub.ui.pages.log.DetailSection": [
