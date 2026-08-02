@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T10:27:35.226410+00:00",
-  "commit": "472537e9e710504646d1760ae22d53cd070dbb8a",
+  "generatedAt": "2026-08-02T10:27:58.328786+00:00",
+  "commit": "33bb68c1a50f71660b02c640c62ec4879798d407",
   "branch": "master",
-  "sourceFingerprint": "925c60645a7a8931acad8af329629f5f8bd1b7eace4c0e5cccfc4859fb269295",
+  "sourceFingerprint": "736ded2fa03992cf302fb2fbd4f854be5b0c954461a977f8fbdc869736aa53dc",
   "summary": {
-    "files": 1200,
-    "lines": 263270,
-    "symbols": 5737,
-    "productionCodeFiles": 862,
+    "files": 1201,
+    "lines": 263440,
+    "symbols": 5738,
+    "productionCodeFiles": 863,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 745,
+      "app": 746,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 813,
+      ".kt": 814,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -65,7 +65,7 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 341,
+      "界面": 342,
       "记忆": 49
     },
     "resolvedImportEdges": 2069
@@ -1850,6 +1850,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishHomeComponents.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishStyle.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishTheaterComponents.kt",
@@ -43655,6 +43656,31 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 170,
+      "sha256": "22492e5c37db3aec9d64c9047aa79bfad03f6c8cbcde6eb13bd1a2209b695250",
+      "package": "me.rerere.rikkahub.ui.pages.starwish",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "StarWishPlotGeneratorDialog",
+          "kind": "composable",
+          "line": 33
+        }
+      ],
+      "localImportCount": 0,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [],
+      "resolvedImports": [],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
@@ -97346,6 +97372,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "kind": "class",
         "line": 30
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotGeneratorDialog": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
+        "kind": "composable",
+        "line": 33
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotGeneratorVM": [
