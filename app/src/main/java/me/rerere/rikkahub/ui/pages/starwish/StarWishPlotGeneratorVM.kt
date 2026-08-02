@@ -26,20 +26,34 @@ import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.starwish.StarWishStore
 import me.rerere.rikkahub.data.starwish.StarWishTheaterGuide
 import me.rerere.rikkahub.data.starwish.StarWishTheaterSeed
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class StarWishPlotCandidate(
     val title: String,
+    val worldview: String,
     val hook: String,
     val relationshipCore: String,
+    val mainLine: String,
+    val hiddenLine: String,
+    val foreshadowing: String,
+    val emotionalArc: String,
+    val proseStyle: String,
     val highlights: String,
     val overview: String,
     val chapters: List<String>,
     val wordCount: String,
 ) {
     fun toGuide(): StarWishTheaterGuide = StarWishTheaterGuide(
+        worldview = worldview,
         overview = buildString {
             appendLine(overview.trim())
             if (relationshipCore.isNotBlank()) appendLine("\n关系主线：${relationshipCore.trim()}")
+            if (mainLine.isNotBlank()) appendLine("\n明线：${mainLine.trim()}")
+            if (hiddenLine.isNotBlank()) appendLine("\n暗线：${hiddenLine.trim()}")
+            if (foreshadowing.isNotBlank()) appendLine("\n伏笔系统：${foreshadowing.trim()}")
+            if (emotionalArc.isNotBlank()) appendLine("\n情绪曲线：${emotionalArc.trim()}")
+            if (proseStyle.isNotBlank()) appendLine("\n文风：${proseStyle.trim()}")
             if (hook.isNotBlank()) appendLine("\n核心钩子：${hook.trim()}")
             if (highlights.isNotBlank()) appendLine("\n亮点与爽点：${highlights.trim()}")
         }.trim(),
@@ -57,10 +71,8 @@ class StarWishPlotGeneratorVM(
 ) : ViewModel() {
     private val _isGenerating = MutableStateFlow(false)
     val isGenerating = _isGenerating.asStateFlow()
-
     private val _candidates = MutableStateFlow<List<StarWishPlotCandidate>>(emptyList())
     val candidates = _candidates.asStateFlow()
-
     private val _error = MutableStateFlow<String?>(null)
     val error = _error.asStateFlow()
 
@@ -99,7 +111,7 @@ class StarWishPlotGeneratorVM(
             val seed = StarWishTheaterSeed(
                 id = "generated-${System.currentTimeMillis()}-${cleanTitle.hashCode()}",
                 title = cleanTitle,
-                prompt = candidate.overview.trim(),
+                prompt = candidate.worldview.ifBlank { candidate.overview }.trim(),
                 createdAt = System.currentTimeMillis(),
             )
             store.update { current ->
@@ -112,15 +124,10 @@ class StarWishPlotGeneratorVM(
         }
     }
 
-    private suspend fun generateCandidates(
-        existingTitle: String?,
-        existingPremise: String?,
-        direction: String,
-    ): List<StarWishPlotCandidate> {
+    private suspend fun generateCandidates(existingTitle: String?, existingPremise: String?, direction: String): List<StarWishPlotCandidate> {
         val settings = settingsStore.settingsFlow.first()
         val selectedModel: Model? = settings.theaterModelId?.let { settings.findModelById(it) }
-        val model = selectedModel
-            ?.takeIf { it.type == ModelType.CHAT }
+        val model = selectedModel?.takeIf { it.type == ModelType.CHAT }
             ?: error("请先在默认模型里设置“小剧场模型”。")
         val providerSetting = model.findProvider(settings.providers)
             ?: error("小剧场模型没有找到对应提供商。")
@@ -134,55 +141,34 @@ class StarWishPlotGeneratorVM(
                 nowMillis = System.currentTimeMillis(),
             ),
         ).toPromptContext()
-
         val task = buildString {
-            appendLine("你是一名擅长商业网文、角色关系和情绪张力的剧情策划。请一次提出 3 套差异显著、真正有阅读吸引力的小剧场方案。")
-            appendLine("核心陪伴角色：${assistant.name.ifBlank { "当前角色" }}。必须尊重角色人设、关系边界与语言习惯。")
-            if (!existingTitle.isNullOrBlank()) appendLine("这是为已有小说《$existingTitle》重新规划走向。")
-            if (!existingPremise.isNullOrBlank()) appendLine("原始设定可借鉴但不必拘泥：$existingPremise")
-            if (direction.isNotBlank()) appendLine("用户给出的偏好方向：$direction")
-            else appendLine("用户没有给方向，请主动创造意外但合理的好故事。")
+            appendLine("你是成熟的长篇类型小说总策划。一次设计3套差异明显、能够真正展开成小说的小剧场方案。")
+            appendLine("核心陪伴角色：${assistant.name.ifBlank { "当前角色" }}。必须遵守角色人设、关系边界与语言习惯。")
+            if (!existingTitle.isNullOrBlank()) appendLine("正在为已有小说《$existingTitle》重新规划；新方案不能只换名字。")
+            if (!existingPremise.isNullOrBlank()) appendLine("原始世界观与当前规划：$existingPremise")
+            appendLine(if (direction.isBlank()) "用户未指定方向，请主动创造新鲜但自洽的故事。" else "用户最高优先级偏好：$direction")
             appendLine()
-            appendLine("三套方案必须使用不同的核心驱动力，优先从下列类型中轮换，不得三套都写成打反派：")
-            appendLine("1. 双人关系变化、暧昧拉扯、信任建立、误会与和解、身份差带来的张力。")
-            appendLine("2. 共同秘密、契约、同居或同行、日常细节中逐步升级的情感。")
-            appendLine("3. 身份反转、时间循环、记忆错位、立场冲突、不得不合作。")
-            appendLine("4. 冒险、悬疑或反派线，但外部事件必须服务于人物关系，而不是只打怪升级。")
-            appendLine("5. 轻喜剧、治愈、甜中带刀、酸涩克制或高张力强强对抗等不同情绪风格。")
+            appendLine("三套方案核心驱动力必须不同：关系变化、共同秘密/契约、身份反转/循环、冒险悬疑、轻喜剧治愈、甜中带刀、强强对抗等轮换。不得三套都依赖反派。")
+            appendLine("外部冲突只负责施压，人物选择、关系变化和未知探索才是核心。")
+            appendLine("用成熟类型文学技法：具体场景、动作与可回收细节；不要模仿或复刻任何具体作者的独特文风。")
             appendLine()
-            appendLine("每套都要有：一眼想点开的世界观钩子；明确的双人关系主线；持续升级的矛盾；伏笔与回收；至少一个意外反转；中段高潮；终局高潮；独特爽点或心动点。")
-            appendLine("避免空泛词语，章节规划必须写出具体事件、人物选择和关系变化。规划 6 章，每章 2—4 句。")
+            appendLine("每套必须详细设计：")
+            appendLine("1. 世界规则、人物处境和一眼想读的开篇钩子。")
+            appendLine("2. 明线目标、暗线真相、关系主线、阶段性矛盾和最终选择。")
+            appendLine("3. 至少4个伏笔，逐项写清埋设章节、表面含义、真实含义、回收章节和回收效果。")
+            appendLine("4. 读者情绪曲线：好奇、心动/爽点、压迫或误会、中段高潮、反转、终局释放与余韵。")
+            appendLine("5. 6章详细规划，每章写具体事件、人物主动选择、关系变化、埋伏笔/收伏笔、章节结尾钩子；每章不少于100字。")
+            appendLine("6. 文风应描述可执行技法，例如镜头距离、五感密度、对白节奏、留白、意象、心理描写比例；不要只写‘唯美’‘细腻’。")
             appendLine()
-            appendLine("严格按以下纯文本格式输出，不要写额外说明：")
-            appendLine("===方案1===")
-            appendLine("标题：")
-            appendLine("钩子：")
-            appendLine("关系主线：")
-            appendLine("亮点：")
-            appendLine("总览：")
-            appendLine("字数：1200-2200")
-            appendLine("第1章：")
-            appendLine("第2章：")
-            appendLine("第3章：")
-            appendLine("第4章：")
-            appendLine("第5章：")
-            appendLine("第6章：")
-            appendLine("===方案2===（同格式）")
-            appendLine("===方案3===（同格式）")
+            appendLine("只输出JSON，不要Markdown代码块，不要解释。顶层必须是数组，恰好3个对象。字段严格如下：")
+            appendLine("[{\"title\":\"\",\"worldview\":\"\",\"hook\":\"\",\"relationshipCore\":\"\",\"mainLine\":\"\",\"hiddenLine\":\"\",\"foreshadowing\":\"\",\"emotionalArc\":\"\",\"proseStyle\":\"\",\"highlights\":\"\",\"overview\":\"\",\"wordCount\":\"1600-2600\",\"chapters\":[\"\",\"\",\"\",\"\",\"\",\"\"]}]")
         }
-
         val messages = transformMessages(
             messages = listOf(
                 UIMessage.system(buildString {
-                    appendLine("你必须把人物关系变化放在故事核心。外部反派和任务只能作为压力装置，不得喧宾夺主。")
-                    if (assistant.systemPrompt.isNotBlank()) {
-                        appendLine("角色人设：")
-                        appendLine(assistant.systemPrompt)
-                    }
-                    if (assistant.appearancePrompt.isNotBlank()) {
-                        appendLine("角色外貌：")
-                        appendLine(assistant.appearancePrompt)
-                    }
+                    appendLine("人物关系与用户探索感优先。方案要像上帝视角的小说设计，不是宣传简介。严格返回可解析JSON。")
+                    if (assistant.systemPrompt.isNotBlank()) appendLine("角色人设：\n${assistant.systemPrompt}")
+                    if (assistant.appearancePrompt.isNotBlank()) appendLine("角色外貌：\n${assistant.appearancePrompt}")
                 }.trim()),
                 companionContext.takeIf(String::isNotBlank)?.let(UIMessage::system),
                 UIMessage.user(task),
@@ -191,15 +177,14 @@ class StarWishPlotGeneratorVM(
             modeInjections = settings.modeInjections,
             lorebooks = settings.lorebooks,
         )
-
         val chunk = provider.generateText(
             providerSetting = providerSetting,
             messages = messages,
             params = TextGenerationParams(
                 model = model,
-                temperature = 1.05f,
-                topP = 0.98f,
-                maxTokens = 4200,
+                temperature = 0.92f,
+                topP = 0.95f,
+                maxTokens = 7000,
                 reasoningLevel = ReasoningLevel.OFF,
             ),
         )
@@ -215,37 +200,76 @@ class StarWishPlotGeneratorVM(
         val text = chunk.choices.firstOrNull()?.message?.toText()?.trim()
             ?.takeIf { it.isNotBlank() }
             ?: error("剧情生成器没有返回内容。")
-        return parseCandidates(text).takeIf { it.isNotEmpty() }
-            ?: error("剧情方案格式解析失败，请重新生成一次。")
+        val candidates = parseJsonCandidates(text).ifEmpty { parseLooseCandidates(text) }
+        return candidates.take(3).takeIf { it.isNotEmpty() }
+            ?: error("剧情已经生成，但格式仍无法识别。请保留错误日志后再试一次。")
     }
 
-    private fun parseCandidates(text: String): List<StarWishPlotCandidate> {
-        val blocks = text.split(Regex("===\\s*方案\\s*\\d+\\s*===", RegexOption.IGNORE_CASE))
-            .map(String::trim)
-            .filter(String::isNotBlank)
+    private fun parseJsonCandidates(raw: String): List<StarWishPlotCandidate> = runCatching {
+        var clean = raw.trim()
+            .removePrefix("```json").removePrefix("```")
+            .removeSuffix("```").trim()
+            .replace('“', '"').replace('”', '"')
+            .replace(Regex(",\\s*([}\\]])"), "$1")
+        val firstArray = clean.indexOf('[')
+        val lastArray = clean.lastIndexOf(']')
+        if (firstArray >= 0 && lastArray > firstArray) clean = clean.substring(firstArray, lastArray + 1)
+        val array = JSONArray(clean)
+        buildList {
+            for (index in 0 until array.length()) {
+                val obj = array.optJSONObject(index) ?: continue
+                candidateFromJson(obj)?.let(::add)
+            }
+        }
+    }.getOrDefault(emptyList())
+
+    private fun candidateFromJson(obj: JSONObject): StarWishPlotCandidate? {
+        fun text(vararg keys: String): String = keys.firstNotNullOfOrNull { key ->
+            obj.optString(key).trim().takeIf(String::isNotBlank)
+        }.orEmpty()
+        val chaptersArray = obj.optJSONArray("chapters") ?: obj.optJSONArray("章节")
+        val chapters = buildList {
+            if (chaptersArray != null) {
+                for (i in 0 until chaptersArray.length()) add(chaptersArray.optString(i).trim())
+            }
+        }
+        val title = text("title", "标题")
+        val overview = text("overview", "总览", "总纲")
+        if (title.isBlank() || overview.isBlank() || chapters.count(String::isNotBlank) < 4) return null
+        return StarWishPlotCandidate(
+            title = title,
+            worldview = text("worldview", "世界观", "世界设定"),
+            hook = text("hook", "钩子"),
+            relationshipCore = text("relationshipCore", "关系主线"),
+            mainLine = text("mainLine", "明线"),
+            hiddenLine = text("hiddenLine", "暗线"),
+            foreshadowing = text("foreshadowing", "伏笔", "伏笔系统"),
+            emotionalArc = text("emotionalArc", "情绪曲线"),
+            proseStyle = text("proseStyle", "文风", "叙事风格"),
+            highlights = text("highlights", "亮点", "爽点"),
+            overview = overview,
+            chapters = chapters,
+            wordCount = text("wordCount", "字数").ifBlank { "1600-2600" },
+        )
+    }
+
+    private fun parseLooseCandidates(text: String): List<StarWishPlotCandidate> {
+        val blocks = text.split(Regex("(?:^|\\n)\\s*(?:={2,}|#{1,4})?\\s*方案\\s*[一二三123]\\s*(?:={2,})?", setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)))
+            .map(String::trim).filter(String::isNotBlank)
         return blocks.mapNotNull { block ->
-            fun value(label: String, nextLabels: List<String>): String {
-                val end = nextLabels.joinToString("|") { Regex.escape(it) }
-                val pattern = if (end.isBlank()) {
-                    Regex("${Regex.escape(label)}[：:]\\s*([\\s\\S]*)")
-                } else {
-                    Regex("${Regex.escape(label)}[：:]\\s*([\\s\\S]*?)(?=\\n(?:$end)[：:]|$)")
-                }
-                return pattern.find(block)?.groupValues?.getOrNull(1)?.trim().orEmpty()
+            fun value(vararg labels: String): String {
+                val allLabels = listOf("标题", "世界观", "钩子", "关系主线", "明线", "暗线", "伏笔系统", "情绪曲线", "文风", "亮点", "总览", "总纲", "字数") + (1..12).map { "第${it}章" }
+                val labelPattern = labels.joinToString("|") { Regex.escape(it) }
+                val nextPattern = allLabels.filterNot { it in labels }.joinToString("|") { Regex.escape(it) }
+                return Regex("(?:^|\\n)\\s*(?:[-*#]+\\s*)?(?:$labelPattern)[：:]\\s*([\\s\\S]*?)(?=\\n\\s*(?:[-*#]+\\s*)?(?:$nextPattern)[：:]|$)", RegexOption.IGNORE_CASE)
+                    .find(block)?.groupValues?.getOrNull(1)?.trim().orEmpty()
             }
-            val labels = listOf("标题", "钩子", "关系主线", "亮点", "总览", "字数") + (1..6).map { "第${it}章" }
-            val title = value("标题", labels.drop(1))
-            val hook = value("钩子", labels.drop(2))
-            val relation = value("关系主线", labels.drop(3))
-            val highlights = value("亮点", labels.drop(4))
-            val overview = value("总览", labels.drop(5))
-            val wordCount = value("字数", labels.drop(6)).ifBlank { "1200-2200" }
-            val chapters = (1..6).map { index ->
-                val label = "第${index}章"
-                value(label, labels.dropWhile { it != label }.drop(1))
-            }
-            if (title.isBlank() || overview.isBlank() || chapters.count(String::isNotBlank) < 4) null
-            else StarWishPlotCandidate(title, hook, relation, highlights, overview, chapters, wordCount)
+            val chapters = (1..12).map { value("第${it}章") }.takeWhile { it.isNotBlank() }.ifEmpty { (1..6).map { value("第${it}章") } }
+            val title = value("标题")
+            val overview = value("总览", "总纲")
+            if (title.isBlank() || overview.isBlank() || chapters.count(String::isNotBlank) < 4) null else StarWishPlotCandidate(
+                title, value("世界观"), value("钩子"), value("关系主线"), value("明线"), value("暗线"), value("伏笔系统"), value("情绪曲线"), value("文风"), value("亮点"), overview, chapters, value("字数").ifBlank { "1600-2600" },
+            )
         }
     }
 }
