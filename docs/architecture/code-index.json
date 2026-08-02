@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T10:01:37.857453+00:00",
-  "commit": "f289d3d36b2ad3c6bb8b29fde648524a5c2ba7ec",
+  "generatedAt": "2026-08-02T10:27:35.226410+00:00",
+  "commit": "472537e9e710504646d1760ae22d53cd070dbb8a",
   "branch": "master",
-  "sourceFingerprint": "c22b219a92de0630852687abd20fd3995ecc279d3cb839b575a37fa9703c91c0",
+  "sourceFingerprint": "925c60645a7a8931acad8af329629f5f8bd1b7eace4c0e5cccfc4859fb269295",
   "summary": {
-    "files": 1199,
-    "lines": 263019,
-    "symbols": 5727,
-    "productionCodeFiles": 861,
+    "files": 1200,
+    "lines": 263270,
+    "symbols": 5737,
+    "productionCodeFiles": 862,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 744,
+      "app": 745,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 812,
+      ".kt": 813,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 340,
+      "界面": 341,
       "记忆": 49
     },
-    "resolvedImportEdges": 2057
+    "resolvedImportEdges": 2069
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -900,7 +900,7 @@
         "lines": 812,
         "symbols": 49,
         "localImportCount": 4,
-        "importedByCount": 129,
+        "importedByCount": 130,
         "todoMarkers": 0
       },
       {
@@ -908,7 +908,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 113,
+        "importedByCount": 114,
         "todoMarkers": 0
       },
       {
@@ -924,7 +924,7 @@
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
-        "importedByCount": 60,
+        "importedByCount": 61,
         "todoMarkers": 0
       },
       {
@@ -1004,7 +1004,7 @@
         "lines": 141,
         "symbols": 19,
         "localImportCount": 6,
-        "importedByCount": 30,
+        "importedByCount": 31,
         "todoMarkers": 1
       },
       {
@@ -1016,6 +1016,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
+        "lines": 57,
+        "symbols": 4,
+        "localImportCount": 3,
+        "importedByCount": 21,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/ui/CardGroup.kt",
         "lines": 196,
         "symbols": 6,
@@ -1024,10 +1032,10 @@
         "todoMarkers": 0
       },
       {
-        "path": "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
-        "lines": 57,
-        "symbols": 4,
-        "localImportCount": 3,
+        "path": "ai/src/main/java/me/rerere/ai/core/Reasoning.kt",
+        "lines": 32,
+        "symbols": 2,
+        "localImportCount": 0,
         "importedByCount": 20,
         "todoMarkers": 0
       },
@@ -1036,14 +1044,6 @@
         "lines": 519,
         "symbols": 33,
         "localImportCount": 14,
-        "importedByCount": 19,
-        "todoMarkers": 0
-      },
-      {
-        "path": "ai/src/main/java/me/rerere/ai/core/Reasoning.kt",
-        "lines": 32,
-        "symbols": 2,
-        "localImportCount": 0,
         "importedByCount": 19,
         "todoMarkers": 0
       },
@@ -1088,6 +1088,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
+        "lines": 216,
+        "symbols": 15,
+        "localImportCount": 0,
+        "importedByCount": 15,
+        "todoMarkers": 0
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/utils/StringUtils.kt",
         "lines": 132,
         "symbols": 14,
@@ -1104,14 +1112,6 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
-        "lines": 216,
-        "symbols": 15,
-        "localImportCount": 0,
-        "importedByCount": 14,
-        "todoMarkers": 0
-      },
-      {
         "path": "ai/src/main/java/me/rerere/ai/core/Usage.kt",
         "lines": 36,
         "symbols": 2,
@@ -1120,20 +1120,20 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
-        "lines": 3143,
-        "symbols": 90,
-        "localImportCount": 126,
-        "importedByCount": 12,
-        "todoMarkers": 0
-      },
-      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
         "lines": 321,
         "symbols": 13,
         "localImportCount": 0,
-        "importedByCount": 12,
+        "importedByCount": 13,
         "todoMarkers": 1
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
+        "lines": 138,
+        "symbols": 8,
+        "localImportCount": 3,
+        "importedByCount": 13,
+        "todoMarkers": 0
       }
     ]
   },
@@ -1850,6 +1850,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishHomeComponents.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishStyle.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishTheaterComponents.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -2838,7 +2839,17 @@
     },
     {
       "from": "me.rerere.rikkahub.ui.pages.starwish",
+      "to": "me.rerere.rikkahub.data.starwish.StarWishTheaterSeed",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.starwish",
       "to": "me.rerere.rikkahub.data.starwish.StarWishRules",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.ui.pages.starwish",
+      "to": "me.rerere.rikkahub.data.starwish.StarWishTheaterGuide",
       "imports": 4
     },
     {
@@ -2989,16 +3000,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.ui.UIMessage",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.ui.UIMessageAnnotation",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.rikkahub.data.ai.tools",
       "imports": 3
     }
   ],
@@ -3678,6 +3679,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingModelCards.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "app/src/main/java/me/rerere/rikkahub/web/dto/WebDto.kt"
@@ -3932,6 +3934,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelForm.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelList.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/translator/TranslatorPage.kt",
@@ -4095,6 +4098,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/AILoggingManagerTest.kt"
@@ -4165,6 +4169,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingProviderModelList.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt"
       ]
@@ -6113,6 +6118,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/ProviderConnectionTester.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
         "app/src/main/java/me/rerere/rikkahub/utils/ChatUtil.kt",
@@ -8864,6 +8870,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantDetailVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt",
@@ -11896,6 +11903,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt"
       ]
     },
@@ -13779,6 +13787,7 @@
         "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/test/java/me/rerere/rikkahub/data/service/CompanionWakeGoalTest.kt",
         "app/src/test/java/me/rerere/rikkahub/service/AssistantInteractionIntentCadenceTest.kt",
@@ -14073,6 +14082,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/PerfectManGameFeature.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/game/QuickCompanionGamePage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/memory/MemoryBankVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt"
       ]
     },
@@ -15013,6 +15023,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingWebPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/share/handler/ShareHandlerVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt",
@@ -22722,6 +22733,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishHomeComponents.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishTheaterComponents.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVideoComponents.kt",
@@ -22871,6 +22883,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiReadingPage.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt"
       ]
@@ -43642,6 +43655,109 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt"
       ]
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 251,
+      "sha256": "f3c2875e2adfe1e37259dabd9493651f7d1ab4127009d4fab2148cbe72813443",
+      "package": "me.rerere.rikkahub.ui.pages.starwish",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "StarWishPlotCandidate",
+          "kind": "class",
+          "line": 30
+        },
+        {
+          "name": "toGuide",
+          "kind": "function",
+          "line": 39
+        },
+        {
+          "name": "StarWishPlotGeneratorVM",
+          "kind": "class",
+          "line": 51
+        },
+        {
+          "name": "clear",
+          "kind": "function",
+          "line": 67
+        },
+        {
+          "name": "generate",
+          "kind": "function",
+          "line": 72
+        },
+        {
+          "name": "applyToExisting",
+          "kind": "function",
+          "line": 88
+        },
+        {
+          "name": "createFromCandidate",
+          "kind": "function",
+          "line": 96
+        },
+        {
+          "name": "generateCandidates",
+          "kind": "function",
+          "line": 115
+        },
+        {
+          "name": "parseCandidates",
+          "kind": "function",
+          "line": 222
+        },
+        {
+          "name": "value",
+          "kind": "function",
+          "line": 227
+        }
+      ],
+      "localImportCount": 19,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.core.ReasoningLevel",
+        "me.rerere.ai.provider.Model",
+        "me.rerere.ai.provider.ModelType",
+        "me.rerere.ai.provider.ProviderManager",
+        "me.rerere.ai.provider.TextGenerationParams",
+        "me.rerere.ai.ui.UIMessage",
+        "me.rerere.rikkahub.data.ai.ApiUsageSource",
+        "me.rerere.rikkahub.data.ai.ApiUsageStore",
+        "me.rerere.rikkahub.data.ai.transformers.transformMessages",
+        "me.rerere.rikkahub.data.companion.CompanionPerceptionInput",
+        "me.rerere.rikkahub.data.companion.CompanionRuntime",
+        "me.rerere.rikkahub.data.companion.toPromptContext",
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.findModelById",
+        "me.rerere.rikkahub.data.datastore.findProvider",
+        "me.rerere.rikkahub.data.datastore.getCurrentAssistant",
+        "me.rerere.rikkahub.data.starwish.StarWishStore",
+        "me.rerere.rikkahub.data.starwish.StarWishTheaterGuide",
+        "me.rerere.rikkahub.data.starwish.StarWishTheaterSeed"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/core/Reasoning.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
+        "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
+        "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/ApiUsageStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/PromptInjectionTransformer.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionRuntime.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishStore.kt"
+      ],
+      "importedBy": []
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishStyle.kt",
@@ -97225,6 +97341,20 @@
         "line": 81
       }
     ],
+    "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotCandidate": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "class",
+        "line": 30
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotGeneratorVM": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "class",
+        "line": 51
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishSection": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
@@ -97295,6 +97425,27 @@
         "line": 439
       }
     ],
+    "me.rerere.rikkahub.ui.pages.starwish.applyToExisting": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 88
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.clear": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 67
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.createFromCandidate": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 96
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.starwish.createNextChapter": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -97344,6 +97495,20 @@
         "line": 202
       }
     ],
+    "me.rerere.rikkahub.ui.pages.starwish.generate": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 72
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.generateCandidates": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 115
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.starwish.generateTheaterChapterContent": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -97370,6 +97535,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishStyle.kt",
         "kind": "function",
         "line": 7
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.parseCandidates": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 222
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.playVideo": [
@@ -97414,11 +97586,25 @@
         "line": 301
       }
     ],
+    "me.rerere.rikkahub.ui.pages.starwish.toGuide": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 39
+      }
+    ],
     "me.rerere.rikkahub.ui.pages.starwish.unlockNextVideoOrPlayRandom": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "kind": "function",
         "line": 161
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.value": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
+        "kind": "function",
+        "line": 227
       }
     ],
     "me.rerere.rikkahub.ui.pages.stats.AppStats": [
