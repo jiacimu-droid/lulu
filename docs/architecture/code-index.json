@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T10:27:58.328786+00:00",
-  "commit": "33bb68c1a50f71660b02c640c62ec4879798d407",
+  "generatedAt": "2026-08-02T10:28:14.661832+00:00",
+  "commit": "c0b5c34f791e4b05d52f0fbee7aff1cde1007ac9",
   "branch": "master",
-  "sourceFingerprint": "736ded2fa03992cf302fb2fbd4f854be5b0c954461a977f8fbdc869736aa53dc",
+  "sourceFingerprint": "b935cadf463db813e763b901a4c048622005b6ad9d5df896a71f7c16477860dc",
   "summary": {
     "files": 1201,
-    "lines": 263440,
+    "lines": 263442,
     "symbols": 5738,
     "productionCodeFiles": 863,
     "testFiles": 148,
@@ -68,7 +68,7 @@
       "界面": 342,
       "记忆": 49
     },
-    "resolvedImportEdges": 2069
+    "resolvedImportEdges": 2070
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -25476,14 +25476,14 @@
       "path": "app/src/main/java/me/rerere/rikkahub/di/ViewModelModule.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 78,
-      "sha256": "7161cc97fcebb61f304cf820d96c610c8212a149f838c08a8bba8b05d655cd29",
+      "lines": 80,
+      "sha256": "d6ccaa44a1a3889b0da7dc4a64ac03558b7653a08a6272e4edcb82693d073118",
       "package": "me.rerere.rikkahub.di",
       "categories": [
         "界面"
       ],
       "symbols": [],
-      "localImportCount": 22,
+      "localImportCount": 23,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -25506,6 +25506,7 @@
         "me.rerere.rikkahub.ui.pages.search.SearchVM",
         "me.rerere.rikkahub.ui.pages.setting.SettingVM",
         "me.rerere.rikkahub.ui.pages.share.handler.ShareHandlerVM",
+        "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotGeneratorVM",
         "me.rerere.rikkahub.ui.pages.starwish.StarWishVM",
         "me.rerere.rikkahub.ui.pages.stats.StatsVM",
         "me.rerere.rikkahub.ui.pages.study.StudyVM",
@@ -25530,6 +25531,7 @@
         "app/src/main/java/me/rerere/rikkahub/ui/pages/search/SearchVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/share/handler/ShareHandlerVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/stats/StatsVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt",
@@ -43783,7 +43785,9 @@
         "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishStore.kt"
       ],
-      "importedBy": []
+      "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/di/ViewModelModule.kt"
+      ]
     },
     {
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishStyle.kt",
