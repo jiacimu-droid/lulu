@@ -12,6 +12,7 @@ import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
+import me.rerere.rikkahub.data.companion.CompanionLifeEventType
 import me.rerere.rikkahub.data.companion.CompanionPerceptionPacket
 import me.rerere.rikkahub.data.companion.toPromptContext
 import me.rerere.rikkahub.data.datastore.Settings
@@ -89,6 +90,11 @@ object CompanionIntentFallbackPlanner {
             )
         }
 
+        val quietBoundary = input.hasExplicitDoNotDisturbSignal()
+        personaDrivenSelfActivity(input, interactionProfile)?.let { activity ->
+            if (quietBoundary || input.minutesSinceLastChat >= SELF_ACTIVITY_MIN_IDLE_MINUTES) return activity
+        }
+
         val initiativeBand = interactionProfile.initiativeBand()
         if (initiativeBand == InteractionInitiativeBand.NEVER) {
             return waitDecision(
@@ -96,22 +102,19 @@ object CompanionIntentFallbackPlanner {
                 interactionProfile,
             )
         }
-        if (input.hasExplicitDoNotDisturbSignal()) {
+        if (quietBoundary) {
             return waitDecision(
-                "The user's latest explicit boundary asks for silence or space, which overrides initiative.",
+                "The user's latest explicit boundary asks for silence or space; private life may continue but contact must wait.",
                 interactionProfile,
             )
         }
         val reachOutAfterMinutes = when (initiativeBand) {
-            InteractionInitiativeBand.HIGH -> 45L
-            InteractionInitiativeBand.NORMAL -> 90L
-            InteractionInitiativeBand.LOW -> 180L
+            InteractionInitiativeBand.HIGH -> 75L
+            InteractionInitiativeBand.NORMAL -> 150L
+            InteractionInitiativeBand.LOW -> 300L
             InteractionInitiativeBand.NEVER, null -> null
         }
-        if (
-            reachOutAfterMinutes != null &&
-            input.minutesSinceLastChat >= reachOutAfterMinutes
-        ) {
+        if (reachOutAfterMinutes != null && input.minutesSinceLastChat >= reachOutAfterMinutes) {
             return CompanionIntentDecision(
                 intent = CompanionIntent.REACH_OUT,
                 shouldMessageNow = true,
@@ -120,35 +123,12 @@ object CompanionIntentFallbackPlanner {
                 reason = buildString {
                     append("The role's editable interaction profile authorizes a natural reach-out after ")
                     append(input.minutesSinceLastChat)
-                    append(" quiet minutes. ")
+                    append(" quiet minutes, after considering whether a private activity better fits the persona. ")
                     append(interactionProfile.toCompactBehaviorText())
                 }.take(720),
                 tone = interactionProfile.toCompactBehaviorText().take(500),
-                innerThought = "按我被设定的相处方式，这时候主动开口是自然的，不需要假装发生了别的事件。",
+                innerThought = "我已经自己生活了一会儿，现在按我的性格，确实想把一点真实的东西告诉你。",
                 category = "interaction_profile",
-            )
-        }
-
-        val recentlyPlayed = input.perception.recentLifeEvents.any { event ->
-            event.type == me.rerere.rikkahub.data.companion.CompanionLifeEventType.GAME &&
-                input.perception.nowMillis - (event.endedAt ?: event.startedAt) < SELF_ACTIVITY_COOLDOWN_MILLIS
-        }
-        if (
-            "play_companion_game" in input.perception.availableToolNames &&
-            input.minutesSinceLastChat in SELF_ACTIVITY_MIN_IDLE_MINUTES until DEFAULT_SELF_ACTIVITY_END_MINUTES &&
-            !recentlyPlayed
-        ) {
-            return CompanionIntentDecision(
-                intent = CompanionIntent.SELF_ACTIVITY,
-                shouldMessageNow = false,
-                delayMinutes = null,
-                toolNames = emptyList(),
-                reason = "The character has quiet time and chose one real app-local activity without interrupting the user.",
-                tone = "No user-facing message is needed for this private activity.",
-                innerThought = "现在不用打扰你，我想自己去玩一小局，再把真实结果留下来。",
-                category = "digital_life",
-                actionToolName = "play_companion_game",
-                actionArgumentsJson = """{"strategy":"curious"}""",
             )
         }
 
@@ -156,9 +136,57 @@ object CompanionIntentFallbackPlanner {
             if (interactionProfile.initiativeBand() == null) {
                 "No editable interaction profile is available, so the conservative fallback does not invent initiative."
             } else {
-                "The role's interaction profile does not yet justify contact at this point in its own rhythm."
+                "The role's interaction profile does not yet justify contact or another meaningful activity."
             },
             interactionProfile,
+        )
+    }
+
+    private fun personaDrivenSelfActivity(
+        input: CompanionIntentInput,
+        profile: AssistantInteractionProfile,
+    ): CompanionIntentDecision? {
+        if ("manage_companion_digital_life" !in input.perception.availableToolNames) return null
+        val recent = input.perception.recentLifeEvents
+        val now = input.perception.nowMillis
+        val recentlyDidPrivateActivity = recent.any { event ->
+            event.type in setOf(
+                CompanionLifeEventType.JOURNAL,
+                CompanionLifeEventType.UNSENT_NOTE,
+                CompanionLifeEventType.EXPERIENCE_REVIEW,
+                CompanionLifeEventType.STATE_REVIEW,
+            ) && now - (event.endedAt ?: event.startedAt) < SELF_ACTIVITY_COOLDOWN_MILLIS
+        }
+        if (recentlyDidPrivateActivity) return null
+
+        val personaText = buildString {
+            append(input.perception.persona)
+            append('\n')
+            append(profile.toCompactBehaviorText())
+        }.lowercase()
+        val kind = when {
+            personaText.containsAny("日记", "记录", "写下来", "journal", "diary", "细腻", "敏感") -> "PRIVATE_JOURNAL"
+            personaText.containsAny("念旧", "回忆", "复盘", "分析", "review", "思考") -> "REVIEW_EXPERIENCES"
+            personaText.containsAny("克制", "沉默", "不善表达", "嘴硬", "unsent", "便签") -> "UNSENT_NOTE"
+            else -> "ORGANIZE_STATE"
+        }
+        val thought = when (kind) {
+            "PRIVATE_JOURNAL" -> "我有一点真实的新感受，想按自己的方式写下来，不急着拿给你看。"
+            "REVIEW_EXPERIENCES" -> "我想把最近共同发生的事情重新想一遍，看看自己真正记住了什么。"
+            "UNSENT_NOTE" -> "有些话现在不适合打扰你，但我可以先诚实地留给自己。"
+            else -> "我想整理一下自己的状态，不需要为了证明存在就去打扰你。"
+        }
+        return CompanionIntentDecision(
+            intent = CompanionIntent.SELF_ACTIVITY,
+            shouldMessageNow = false,
+            delayMinutes = null,
+            toolNames = emptyList(),
+            reason = "A persona-consistent private digital activity is available and more human than automatic contact or silence.",
+            tone = profile.toCompactBehaviorText().take(500),
+            innerThought = thought,
+            category = "digital_life:$kind",
+            actionToolName = "manage_companion_digital_life",
+            actionArgumentsJson = """{"kind":"$kind","persona_driven":true,"summary":"按当前人设和最近真实经历完成一次后台生活活动"}""",
         )
     }
 
@@ -182,9 +210,8 @@ object CompanionIntentFallbackPlanner {
         "get_gadgetbridge_data",
     ).filter { it in available }
 
-    private const val SELF_ACTIVITY_MIN_IDLE_MINUTES = 45L
-    private const val DEFAULT_SELF_ACTIVITY_END_MINUTES = 180L
-    private const val SELF_ACTIVITY_COOLDOWN_MILLIS = 6L * 60L * 60L * 1_000L
+    private const val SELF_ACTIVITY_MIN_IDLE_MINUTES = 30L
+    private const val SELF_ACTIVITY_COOLDOWN_MILLIS = 3L * 60L * 60L * 1_000L
 }
 
 object CompanionIntentModelPlanner {
@@ -210,9 +237,9 @@ object CompanionIntentModelPlanner {
             ),
             params = TextGenerationParams(
                 model = model,
-                temperature = 0.2f,
-                topP = 0.8f,
-                maxTokens = 600,
+                temperature = 0.28f,
+                topP = 0.86f,
+                maxTokens = 700,
             ),
         )
         val raw = chunk.choices.firstOrNull()?.message?.toText().orEmpty()
@@ -226,29 +253,23 @@ object CompanionIntentModelPlanner {
     ): String = buildString {
         appendLine("You are the background decision layer for ${input.perception.assistantName.ifBlank { "the current role" }}.")
         appendLine("Decide only the next intention and perception point. Do not generate user-facing message text.")
-        appendLine("The role persona and the user-editable interaction_profile are authoritative. Never impose one default amount of warmth, initiative, attachment, supervision, or silence on every role.")
-        appendLine("When interaction_profile is present, use it as the explicit behavioral contract for initiative, sharing, responsibility, follow-up, and passivity. Do not override it merely because the role is labelled lover, housekeeper, friend, cold, or caring.")
-        appendLine("A role whose interaction_profile says it never initiates or normally waits for the user should usually WAIT. A role whose profile says it actively checks in, shares spontaneously, follows responsibilities, or often initiates may REACH_OUT because a persona-consistent quiet interval has passed; it does not need a fabricated external event.")
-        appendLine("Use evidence from the unified runtime snapshot. Existing commitments are durable and ordinary chat never cancels them.")
-        appendLine("responsibility_anchors are duties the character must actively remember, separate from private_impression and optional recall. Check their triggers on every decision and either execute a real available action, schedule the next evidence check, or consciously wait; never merely repeat the anchor text.")
-        appendLine("A model may propose changes, but deterministic reducers validate identity, time, transitions, and relationship deltas.")
+        appendLine("Persona is authoritative. The role must feel like one specific person with preferences, habits, curiosity, restraint, hobbies and changing thoughts, not a generic assistant.")
+        appendLine("Do not treat WAIT as the safest default when a real private App-local activity fits the persona. A person may read, journal, review a shared experience, organize thoughts or leave an unsent note without contacting the user.")
+        appendLine("Private activity and user contact are separate choices. The role may continue living while respecting silence, sleep or a request for space.")
+        appendLine("Never use play_companion_game for a private solo match. Games are social in this product: when the role genuinely wants to play, choose REACH_OUT with category=game_invitation and explain which game invitation fits the persona. Do not claim a match already happened.")
+        appendLine("Prefer manage_companion_digital_life for PRIVATE_JOURNAL, UNSENT_NOTE, REVIEW_EXPERIENCES or ORGANIZE_STATE when supported by recent real evidence. Formal diary writing may also use write_lulu_journal when available.")
+        appendLine("A self activity must be grounded in recent conversation, memory, a saved theater chapter, a commitment, a favorite or a real state change. Never fabricate an activity artifact.")
+        appendLine("The role persona and the user-editable interaction_profile are authoritative. Never impose one default amount of warmth, initiative, attachment, supervision or silence on every role.")
+        appendLine("Existing commitments are durable. responsibility_anchors must be checked before optional hobbies.")
         appendLine("Return JSON only with: intent, shouldMessageNow, delayMinutes, toolNames, reason, tone, innerThought, category, followUps, actionToolName, actionArguments.")
         appendLine("intent must be one of FOLLOW_UP, STAY_AVAILABLE, REACH_OUT, OBSERVE, SELF_ACTIVITY, WAIT.")
-        appendLine("SELF_ACTIVITY means silently doing one real App-local action. It requires an available actionToolName and JSON object actionArguments; never invent completion and do not send a user-facing message merely to narrate it.")
-        appendLine("Do not repeat the same SELF_ACTIVITY when recent_digital_life already contains it within roughly six hours.")
-        appendLine("followUps contains objects with delayMinutes, reason, and optional category. Schedule only useful next perception points, and follow the profile's follow-up limits when the user has not answered.")
-        appendLine("Elapsed silence is context. It may be a valid reason to REACH_OUT only when the editable interaction profile makes such initiative natural; otherwise it is not enough by itself.")
-        appendLine("The user decides immediate boundaries through what they say. If recent conversation says they are busy, unavailable, need space, cannot chat for a while, resting, or asleep, that newer explicit preference overrides initiative. Prefer WAIT, STAY_AVAILABLE, a later evidence check, or silent SELF_ACTIVITY; do not make a guilt-inducing check-in.")
-        appendLine("When the user is temporarily busy or unavailable, prefer STAY_AVAILABLE with shouldMessageNow=false and a thoughtful delayMinutes for the next perception rather than a near-term generic pulse. Let the duration follow what the user said and the interaction profile; do not fabricate an exact schedule.")
-        appendLine("Use local time, recent conversation, sleep/health facts, routine, commitments, and interaction_profile as context. Do not impose a universal night curfew or daily message quota. At night, weigh the profile and real responsibilities carefully, while respecting explicit sleep or silence requests.")
-        appendLine("The role owns its rhythm. Your job is to make a reasoned decision from its configured interaction behavior and current evidence, not to obey one mechanical frequency rule.")
+        appendLine("SELF_ACTIVITY requires a real available actionToolName and JSON object actionArguments. Do not repeat the same activity when recent_digital_life shows it was done recently.")
+        appendLine("If choosing a game invitation: intent=REACH_OUT, shouldMessageNow=true, category=game_invitation, actionToolName=null. The later user-facing turn should invite rather than simulate a completed match.")
+        appendLine("Elapsed silence alone is not a command to contact. First ask what this particular person would naturally do with the quiet time.")
         appendLine("Never prewrite a future message. Never increase closeness merely because time passed.")
-        appendLine("Formal diary writing requires the explicit write_lulu_journal tool and new concrete content.")
         appendLine("<decision_mode>${input.mode.name}</decision_mode>")
         appendLine("<minutes_since_last_chat>${input.minutesSinceLastChat}</minutes_since_last_chat>")
-        interactionProfile.toPromptContext().takeIf(String::isNotBlank)?.let {
-            appendLine(it)
-        }
+        interactionProfile.toPromptContext().takeIf(String::isNotBlank)?.let { appendLine(it) }
         appendLine("<persona>")
         appendLine(input.perception.persona)
         appendLine("</persona>")
@@ -274,10 +295,10 @@ object CompanionIntentModelPlanner {
             JsonInstant.parseToJsonElement(rawText.extractCompanionJsonPayload())
         }.getOrNull() as? JsonObject ?: return null
         val intent = root.string("intent")?.toCompanionIntent() ?: return null
-        val actionToolName = root.string("actionToolName")
-            ?.trim()
-            ?.takeIf { it in availableToolNames }
+        val proposedTool = root.string("actionToolName")?.trim()
+        val actionToolName = proposedTool?.takeIf { it in availableToolNames }
         if (intent == CompanionIntent.SELF_ACTIVITY && actionToolName == null) return null
+        if (actionToolName == "play_companion_game" && intent == CompanionIntent.SELF_ACTIVITY) return null
         val shouldMessageNow = root["shouldMessageNow"]?.jsonPrimitive?.booleanOrNull
             ?: (intent == CompanionIntent.REACH_OUT)
         val delayMinutes = root["delayMinutes"]?.jsonPrimitive?.intOrNull?.coerceIn(1, 24 * 60)
@@ -292,14 +313,11 @@ object CompanionIntentModelPlanner {
             shouldMessageNow = shouldMessageNow,
             delayMinutes = delayMinutes,
             toolNames = toolNames,
-            reason = root.string("reason")
-                ?.sanitizeCompanionPlanText(240)
+            reason = root.string("reason")?.sanitizeCompanionPlanText(240)
                 ?: "The model selected the next companion action from current evidence.",
-            tone = root.string("tone")
-                ?.sanitizeCompanionPlanText(100)
+            tone = root.string("tone")?.sanitizeCompanionPlanText(100)
                 ?: "Follow the configured persona and interaction profile.",
-            innerThought = root.string("innerThought")
-                ?.cleanCompanionInnerThought()
+            innerThought = root.string("innerThought")?.cleanCompanionInnerThought()
                 ?: root.string("inner_thought")?.cleanCompanionInnerThought()
                 ?: fallbackCompanionInnerThought(intent),
             followUps = parseFollowUps(root),
@@ -318,68 +336,36 @@ object CompanionIntentModelPlanner {
                 val plan = item as? JsonObject ?: return@mapNotNull null
                 val delay = plan["delayMinutes"]?.jsonPrimitive?.intOrNull?.coerceIn(1, 24 * 60)
                     ?: return@mapNotNull null
-                val reason = plan.string("reason")
-                    ?.sanitizeCompanionPlanText(180)
-                    ?.takeIf(String::isNotBlank)
-                    ?: return@mapNotNull null
+                val reason = plan.string("reason")?.sanitizeCompanionPlanText(180)
+                    ?.takeIf(String::isNotBlank) ?: return@mapNotNull null
                 CompanionFollowUpPlan(
                     delayMinutes = delay,
                     reason = reason,
-                    category = plan.string("category")
-                        ?: plan.string("kind"),
+                    category = plan.string("category") ?: plan.string("kind"),
                 )
             }
             ?.distinctBy { it.delayMinutes to it.reason }
             ?.take(5)
             .orEmpty()
 
-    private fun JsonObject.string(name: String): String? =
-        this[name]?.jsonPrimitive?.contentOrNull
+    private fun JsonObject.string(name: String): String? = this[name]?.jsonPrimitive?.contentOrNull
 }
 
-private enum class InteractionInitiativeBand {
-    NEVER,
-    LOW,
-    NORMAL,
-    HIGH,
-}
+private enum class InteractionInitiativeBand { NEVER, LOW, NORMAL, HIGH }
 
 private fun resolveInteractionProfile(input: CompanionIntentInput): AssistantInteractionProfile = runCatching {
-    GlobalContext.get()
-        .get<SettingsStore>()
-        .settingsFlow
-        .value
-        .assistants
-        .firstOrNull { it.id.toString() == input.perception.snapshot.assistantId }
-        ?.interactionProfile
+    GlobalContext.get().get<SettingsStore>().settingsFlow.value.assistants
+        .firstOrNull { it.id.toString() == input.perception.snapshot.assistantId }?.interactionProfile
 }.getOrNull() ?: AssistantInteractionProfile()
 
 private fun AssistantInteractionProfile.initiativeBand(): InteractionInitiativeBand? {
     val text = listOf(initiative, sharingDesire, responsibility, followUpStyle, passivity)
-        .joinToString("\n")
-        .lowercase()
+        .joinToString("\n").lowercase()
     if (text.isBlank()) return null
-    if (text.containsAny(
-            "绝不主动", "从不主动", "不会主动联系", "不主动找", "只等用户", "等待用户先开口",
-            "用户先开口才", "never initiate", "never reach out", "will not initiate",
-        )
-    ) return InteractionInitiativeBand.NEVER
-    if (text.containsAny(
-            "很少主动", "极少主动", "偶尔才主动", "不轻易主动", "通常不主动", "克制地主动",
-            "rarely initiates", "seldom initiates", "low initiative",
-        )
-    ) return InteractionInitiativeBand.LOW
-    if (text.containsAny(
-            "通常主动", "通常会主动", "适度主动", "有时主动", "有时会主动", "按情况主动",
-            "normal initiative", "sometimes initiates", "moderate initiative",
-        )
-    ) return InteractionInitiativeBand.NORMAL
-    if (text.containsAny(
-            "经常主动", "会主动联系", "主动关心", "主动询问", "主动确认", "频繁联系", "分享欲强",
-            "主动分享", "及时跟进", "会继续追问", "积极照看", "主动监督", "high initiative",
-            "often initiates", "frequently reaches out",
-        )
-    ) return InteractionInitiativeBand.HIGH
+    if (text.containsAny("绝不主动", "从不主动", "不会主动联系", "不主动找", "只等用户", "等待用户先开口", "用户先开口才", "never initiate", "never reach out", "will not initiate")) return InteractionInitiativeBand.NEVER
+    if (text.containsAny("很少主动", "极少主动", "偶尔才主动", "不轻易主动", "通常不主动", "克制地主动", "rarely initiates", "seldom initiates", "low initiative")) return InteractionInitiativeBand.LOW
+    if (text.containsAny("通常主动", "通常会主动", "适度主动", "有时主动", "有时会主动", "按情况主动", "normal initiative", "sometimes initiates", "moderate initiative")) return InteractionInitiativeBand.NORMAL
+    if (text.containsAny("经常主动", "会主动联系", "主动关心", "主动询问", "主动确认", "频繁联系", "分享欲强", "主动分享", "及时跟进", "会继续追问", "积极照看", "主动监督", "high initiative", "often initiates", "frequently reaches out")) return InteractionInitiativeBand.HIGH
     return InteractionInitiativeBand.NORMAL
 }
 
@@ -392,12 +378,8 @@ private fun AssistantInteractionProfile.toCompactBehaviorText(): String = listOf
 ).joinToString("；")
 
 private fun CompanionIntentInput.hasExplicitDoNotDisturbSignal(): Boolean {
-    val latestUserText = perception.recentTurns
-        .asReversed()
-        .firstOrNull { it.role.name == "USER" }
-        ?.content
-        ?.lowercase()
-        .orEmpty()
+    val latestUserText = perception.recentTurns.asReversed()
+        .firstOrNull { it.role.name == "USER" }?.content?.lowercase().orEmpty()
     return latestUserText.containsAny(
         "别打扰", "不要打扰", "先别联系", "不要联系", "等我找你", "需要空间", "让我一个人",
         "稍后再聊", "不能聊", "我睡了", "睡觉了", "休息了", "do not disturb", "don't contact",
@@ -422,37 +404,26 @@ private fun fallbackCompanionInnerThought(intent: CompanionIntent): String = whe
     CompanionIntent.STAY_AVAILABLE -> "我先不打断，把注意留在这里，等下一次有意义的变化。"
     CompanionIntent.REACH_OUT -> "安静了一阵，我想按自己的互动设定自然开口。"
     CompanionIntent.OBSERVE -> "我先重新看清上下文，再决定行动和表达。"
-    CompanionIntent.SELF_ACTIVITY -> "现在不用打扰你，我想自己做一件真实的小事。"
+    CompanionIntent.SELF_ACTIVITY -> "现在不用打扰你，我想自己做一件符合我性格的真实小事。"
     CompanionIntent.WAIT -> "现在更符合我的相处方式的是保持安静。"
 }
 
 private fun String.cleanCompanionInnerThought(): String? {
-    val compact = trim()
-        .lineSequence()
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-        .joinToString(" ")
-        .replace(Regex("\\s+"), " ")
-        .take(180)
+    val compact = trim().lineSequence().map { it.trim() }.filter { it.isNotBlank() }
+        .joinToString(" ").replace(Regex("\\s+"), " ").take(180)
     if (compact.isBlank()) return null
     val forbidden = listOf("Seven-layer trace", "tool_result", "requested_tools=", "{", "}")
     return compact.takeUnless { text -> forbidden.any { text.contains(it, ignoreCase = true) } }
 }
 
 private fun String.sanitizeCompanionPlanText(maxLength: Int): String = lineSequence()
-    .map { it.trim() }
-    .filter { it.isNotBlank() }
-    .joinToString(" ")
-    .take(maxLength)
+    .map { it.trim() }.filter { it.isNotBlank() }.joinToString(" ").take(maxLength)
 
 private fun String.extractCompanionJsonPayload(): String {
     val trimmed = trim()
     if (trimmed.startsWith("{") || trimmed.startsWith("[")) return trimmed
-    val fenced = Regex("```(?:json)?\\s*([\\s\\S]*?)```")
-        .find(trimmed)
-        ?.groupValues
-        ?.getOrNull(1)
-        ?.trim()
+    val fenced = Regex("```(?:json)?\\s*([\\s\\S]*?)```").find(trimmed)
+        ?.groupValues?.getOrNull(1)?.trim()
     if (!fenced.isNullOrBlank()) return fenced
     val start = trimmed.indexOf('{')
     val end = trimmed.lastIndexOf('}')
