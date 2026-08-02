@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -59,6 +60,7 @@ internal fun StarWishImmersiveTheaterContent(
             .filter { it.content.isNotBlank() }
             .sortedBy { it.chapter }
     }
+    val listState = rememberLazyListState()
     var selectedChapterId by rememberSaveable(theater.title) {
         mutableStateOf(readableChapters.lastOrNull()?.id)
     }
@@ -69,12 +71,16 @@ internal fun StarWishImmersiveTheaterContent(
 
     LaunchedEffect(readableChapters.map { it.id }) {
         val latestChapter = readableChapters.lastOrNull()
+        val generatedNewChapter = readableChapters.size > knownChapterCount
         when {
-            readableChapters.size > knownChapterCount -> selectedChapterId = latestChapter?.id
+            generatedNewChapter -> selectedChapterId = latestChapter?.id
             selectedChapterId == null -> selectedChapterId = latestChapter?.id
             readableChapters.none { it.id == selectedChapterId } -> selectedChapterId = latestChapter?.id
         }
         knownChapterCount = readableChapters.size
+        if (generatedNewChapter) {
+            listState.scrollToItem(0)
+        }
     }
 
     val selectedChapter = readableChapters.firstOrNull { it.id == selectedChapterId }
@@ -83,6 +89,7 @@ internal fun StarWishImmersiveTheaterContent(
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 22.dp, end = 22.dp, top = 18.dp, bottom = 190.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
