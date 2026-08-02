@@ -19,6 +19,7 @@ import me.rerere.rikkahub.ui.pages.extensions.SkillDetailVM
 import me.rerere.rikkahub.ui.pages.extensions.SkillsVM
 import me.rerere.rikkahub.ui.pages.setting.SettingVM
 import me.rerere.rikkahub.ui.pages.share.handler.ShareHandlerVM
+import me.rerere.rikkahub.ui.pages.starwish.StarWishPlotGeneratorVM
 import me.rerere.rikkahub.ui.pages.starwish.StarWishVM
 import me.rerere.rikkahub.ui.pages.study.StudyVM
 import me.rerere.rikkahub.ui.pages.translator.TranslatorVM
@@ -75,4 +76,5 @@ val viewModelModule = module {
     viewModelOf(::MemoryBankVM)
     viewModelOf(::StudyVM)
     viewModelOf(::StarWishVM)
+    viewModelOf(::StarWishPlotGeneratorVM)
 }
