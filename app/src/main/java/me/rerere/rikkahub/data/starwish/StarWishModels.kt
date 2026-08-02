@@ -54,11 +54,13 @@ data class StarWishTheaterSeed(
 
 @Serializable
 data class StarWishTheaterGuide(
+    val worldview: String = "",
     val overview: String = "",
     val chapters: List<String> = List(6) { "" },
     val wordCount: String = "1200-2200",
 ) {
     fun normalized(): StarWishTheaterGuide = copy(
+        worldview = worldview.trim(),
         overview = overview.trim(),
         chapters = chapters.ifEmpty { List(6) { "" } }.map { it.trim() },
         wordCount = wordCount.trim().ifBlank { "1200-2200" },
