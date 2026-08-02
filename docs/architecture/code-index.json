@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T09:29:56.509460+00:00",
-  "commit": "1f73295b53dc6462c6ccff32a099d97b51b3dd95",
+  "generatedAt": "2026-08-02T10:00:41.236355+00:00",
+  "commit": "c684016e62e8ebf11deb80920ce972efe197f7dc",
   "branch": "master",
-  "sourceFingerprint": "bfdb8b0e7e5f88308c6ff830c33fecf6bc28e8b4a3140832f8bc36e5c8b0b133",
+  "sourceFingerprint": "a0dcc04b71a5ef4f2e9802a277fcb9b46b45d41ce0e3b2830bf8e4a39e23dcc6",
   "summary": {
-    "files": 1198,
-    "lines": 262773,
-    "symbols": 5726,
-    "productionCodeFiles": 860,
+    "files": 1199,
+    "lines": 263001,
+    "symbols": 5727,
+    "productionCodeFiles": 861,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 743,
+      "app": 744,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 811,
+      ".kt": 812,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -65,10 +65,10 @@
       "数据库": 75,
       "构建与发布": 13,
       "电话与语音": 52,
-      "界面": 339,
+      "界面": 340,
       "记忆": 49
     },
-    "resolvedImportEdges": 2056
+    "resolvedImportEdges": 2057
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -1848,6 +1848,7 @@
       "app/src/main/java/me/rerere/rikkahub/ui/pages/share/handler/ShareHandlerPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/share/handler/ShareHandlerVM.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishHomeComponents.kt",
+      "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishStyle.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishTheaterComponents.kt",
@@ -22719,6 +22720,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiReadingPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishHomeComponents.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishTheaterComponents.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
@@ -43537,6 +43539,36 @@
         "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishRules.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/components/ui/ImagePreviewDialog.kt"
+      ],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 228,
+      "sha256": "2797a2c3068a5a9b4894f518cfe1b645e63f1c99decc9e881e9410364c77d3d4",
+      "package": "me.rerere.rikkahub.ui.pages.starwish",
+      "categories": [
+        "界面"
+      ],
+      "symbols": [
+        {
+          "name": "StarWishImmersiveTheaterContent",
+          "kind": "composable",
+          "line": 43
+        }
+      ],
+      "localImportCount": 2,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.rikkahub.data.starwish.StarWishTheaterChapter",
+        "me.rerere.rikkahub.data.starwish.StarWishTheaterSeed"
+      ],
+      "resolvedImports": [
+        "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt"
       ],
       "importedBy": []
     },
@@ -97170,6 +97202,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishHomeComponents.kt",
         "kind": "composable",
         "line": 163
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.StarWishImmersiveTheaterContent": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
+        "kind": "composable",
+        "line": 43
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishListRow": [
