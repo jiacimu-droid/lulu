@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`483268e80a82321c3620e7d6c708bde395b55e14`
+- 基准提交：`791f9b8bdf965cb32c2f75d80e259f79fc4dec01`
 - 分支：`master`
-- 源码指纹：`1e536aa3e14c9914…`
-- 已索引文件：1197
-- 已索引代码/文本行：262702
-- 已发现类、接口、对象、函数及 Composable：5717
+- 源码指纹：`24f806c7482e0b89…`
+- 已索引文件：1198
+- 已索引代码/文本行：263027
+- 已发现类、接口、对象、函数及 Composable：5728
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 859 |
+| 生产代码文件 | 860 |
 | 测试文件 | 148 |
 | ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 742 |
+| `app` | 743 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 810 |
+| `.kt` | 811 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -211,7 +211,7 @@
 - `ai/src/main/java/me/rerere/ai/util/ErrorParser.kt`
 - `ai/src/main/java/me/rerere/ai/util/FileEncoder.kt`
 - `ai/src/main/java/me/rerere/ai/util/Json.kt`
-- ……另有 116 个文件，见 `code-index.json`
+- ……另有 117 个文件，见 `code-index.json`
 
 ### 主动代理
 
@@ -220,6 +220,7 @@
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentRuntime.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt`
+- `app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/NotificationListenerService.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt`
@@ -548,26 +549,26 @@
 
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
-- 已解析本地导入边：2046
-- 可检索完整符号：5101
+- 已解析本地导入边：2057
+- 可检索完整符号：5111
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
 | `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 129 | 812 |
-| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 112 | 953 |
+| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 113 | 953 |
 | `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
-| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 60 | 62 |
+| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 61 | 62 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 57 | 296 |
 | `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 54 | 191 |
 | `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 50 | 29 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
 | `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 39 | 529 |
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
+| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 34 | 1032 |
 | `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 34 | 248 |
 | `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 34 | 50 |
-| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 33 | 1032 |
-| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 30 | 141 |
-| `app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt` | 26 | 676 |
+| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 31 | 141 |
+| `app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt` | 27 | 676 |
 <!-- reverse-index:end -->
 
 ## 索引边界

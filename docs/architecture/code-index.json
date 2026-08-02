@@ -1,20 +1,20 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-01T11:03:55.822729+00:00",
-  "commit": "483268e80a82321c3620e7d6c708bde395b55e14",
+  "generatedAt": "2026-08-02T02:57:34.561287+00:00",
+  "commit": "791f9b8bdf965cb32c2f75d80e259f79fc4dec01",
   "branch": "master",
-  "sourceFingerprint": "1e536aa3e14c9914fcc14642e047559a1696b307510c0637594aea663d8e72ed",
+  "sourceFingerprint": "24f806c7482e0b8974c8cc857ea8a17785a44f61337ecb51b0d2ef076bf5023b",
   "summary": {
-    "files": 1197,
-    "lines": 262702,
-    "symbols": 5717,
-    "productionCodeFiles": 859,
+    "files": 1198,
+    "lines": 263027,
+    "symbols": 5728,
+    "productionCodeFiles": 860,
     "testFiles": 148,
     "largeProductionFiles": 28,
     "veryLargeProductionFiles": 3,
     "todoMarkers": 38,
     "byModule": {
-      "app": 742,
+      "app": 743,
       "web-ui": 131,
       "document": 76,
       "ai": 47,
@@ -36,7 +36,7 @@
       "gradle": 2
     },
     "byExtension": {
-      ".kt": 810,
+      ".kt": 811,
       ".tsx": 74,
       ".java": 64,
       ".md": 60,
@@ -55,8 +55,8 @@
       ".toml": 2
     },
     "byCategory": {
-      "AI与上下文": 146,
-      "主动代理": 28,
+      "AI与上下文": 147,
+      "主动代理": 29,
       "关系与承诺": 18,
       "娱乐与数字生活": 28,
       "学习监督": 40,
@@ -68,7 +68,7 @@
       "界面": 339,
       "记忆": 49
     },
-    "resolvedImportEdges": 2046
+    "resolvedImportEdges": 2057
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -908,7 +908,7 @@
         "lines": 953,
         "symbols": 30,
         "localImportCount": 32,
-        "importedByCount": 112,
+        "importedByCount": 113,
         "todoMarkers": 0
       },
       {
@@ -924,7 +924,7 @@
         "lines": 62,
         "symbols": 8,
         "localImportCount": 0,
-        "importedByCount": 60,
+        "importedByCount": 61,
         "todoMarkers": 0
       },
       {
@@ -976,6 +976,14 @@
         "todoMarkers": 0
       },
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "lines": 1032,
+        "symbols": 77,
+        "localImportCount": 89,
+        "importedByCount": 34,
+        "todoMarkers": 0
+      },
+      {
         "path": "ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt",
         "lines": 248,
         "symbols": 26,
@@ -992,19 +1000,11 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
-        "lines": 1032,
-        "symbols": 77,
-        "localImportCount": 89,
-        "importedByCount": 33,
-        "todoMarkers": 0
-      },
-      {
         "path": "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
         "lines": 141,
         "symbols": 19,
         "localImportCount": 6,
-        "importedByCount": 30,
+        "importedByCount": 31,
         "todoMarkers": 1
       },
       {
@@ -1012,7 +1012,7 @@
         "lines": 676,
         "symbols": 37,
         "localImportCount": 9,
-        "importedByCount": 26,
+        "importedByCount": 27,
         "todoMarkers": 0
       },
       {
@@ -1024,18 +1024,18 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
-        "lines": 519,
-        "symbols": 33,
-        "localImportCount": 14,
-        "importedByCount": 19,
-        "todoMarkers": 0
-      },
-      {
         "path": "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
         "lines": 57,
         "symbols": 4,
         "localImportCount": 3,
+        "importedByCount": 20,
+        "todoMarkers": 0
+      },
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+        "lines": 519,
+        "symbols": 33,
+        "localImportCount": 14,
         "importedByCount": 19,
         "todoMarkers": 0
       },
@@ -1246,6 +1246,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/TimeReminderTransformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/Transformer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/VoiceMessageTransformer.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/ai/AsrButton.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/ai/AssistantPicker.kt",
       "app/src/main/java/me/rerere/rikkahub/ui/components/ai/AttachmentChips.kt",
@@ -1292,6 +1293,7 @@
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionCommitmentRuntime.kt",
       "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionConcernReducer.kt",
       "app/src/main/java/me/rerere/rikkahub/data/datastore/ProactiveMessageSetting.kt",
+      "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/NotificationListenerService.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
       "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -2089,6 +2091,11 @@
       "imports": 15
     },
     {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.db.entity",
+      "imports": 15
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.ui",
       "to": "me.rerere.hugeicons.HugeIcons",
       "imports": 15
@@ -2097,11 +2104,6 @@
       "from": "me.rerere.rikkahub.ui.pages.setting",
       "to": "me.rerere.rikkahub.ui.components.nav",
       "imports": 15
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.db.entity",
-      "imports": 14
     },
     {
       "from": "me.rerere.rikkahub.data.service",
@@ -2159,6 +2161,11 @@
       "imports": 10
     },
     {
+      "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.data.datastore.SettingsStore",
+      "imports": 10
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.ai",
       "to": "me.rerere.rikkahub.R",
       "imports": 10
@@ -2191,11 +2198,6 @@
     {
       "from": "me.rerere.rikkahub.data.db.dao",
       "to": "me.rerere.rikkahub.data.db.entity",
-      "imports": 9
-    },
-    {
-      "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.datastore.SettingsStore",
       "imports": 9
     },
     {
@@ -2650,6 +2652,11 @@
     },
     {
       "from": "me.rerere.rikkahub.data.service",
+      "to": "me.rerere.rikkahub.CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID",
+      "imports": 4
+    },
+    {
+      "from": "me.rerere.rikkahub.data.service",
       "to": "me.rerere.rikkahub.data.datastore.getProactiveMessageSetting",
       "imports": 4
     },
@@ -2991,11 +2998,6 @@
     {
       "from": "me.rerere.rikkahub.data.ai.transformers",
       "to": "me.rerere.rikkahub.data.ai.tools",
-      "imports": 3
-    },
-    {
-      "from": "me.rerere.rikkahub.data.ai.transformers",
-      "to": "me.rerere.ai.provider.Model",
       "imports": 3
     }
   ],
@@ -3896,6 +3898,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/Transformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/DefaultProviders.kt",
         "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/importer/ChatboxImporter.kt",
@@ -4080,6 +4083,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/OcrTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginBridgeWebViewClient.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginOverlayController.kt",
@@ -4146,6 +4150,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/OcrTransformer.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
@@ -5725,6 +5730,7 @@
         "ai/src/main/java/me/rerere/ai/provider/providers/ClaudeProvider.kt",
         "ai/src/main/java/me/rerere/ai/provider/providers/GoogleProvider.kt",
         "ai/src/main/java/me/rerere/ai/provider/providers/OpenAIProvider.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenPage.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt"
       ]
@@ -8623,6 +8629,7 @@
         "highlight/src/main/java/me/rerere/highlight/Highlighter.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/voicecall/ProactiveCallManager.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
@@ -14928,6 +14935,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/AssistantInteractionResetService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/CompanionAutonomousPulsePlanner.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/DeviceEventTrackingService.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageScheduler.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
@@ -16551,6 +16559,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/db/AppDatabase.kt",
         "app/src/main/java/me/rerere/rikkahub/data/db/dao/GenMediaDAO.kt",
         "app/src/main/java/me/rerere/rikkahub/data/repository/GenMediaRepository.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt"
       ]
     },
@@ -18200,6 +18209,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/ai/mcp/McpManager.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/transformers/Base64ImageToLocalFileTransformer.kt",
         "app/src/main/java/me/rerere/rikkahub/data/repository/ConversationRepository.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/S3Sync.kt",
         "app/src/main/java/me/rerere/rikkahub/data/sync/webdav/WebDavSync.kt",
         "app/src/main/java/me/rerere/rikkahub/di/RepositoryModule.kt",
@@ -19642,6 +19652,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/db/entity/GenMediaEntity.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/di/RepositoryModule.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt"
@@ -20740,6 +20751,112 @@
       "isProductionCode": true,
       "localImports": [],
       "resolvedImports": [],
+      "importedBy": []
+    },
+    {
+      "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+      "module": "app",
+      "extension": ".kt",
+      "lines": 325,
+      "sha256": "b9e360ef526ef6060d99d5cce2b5cde477bd88beae1e39db3f8b9a00fa678321",
+      "package": "me.rerere.rikkahub.data.service",
+      "categories": [
+        "AI与上下文",
+        "主动代理"
+      ],
+      "symbols": [
+        {
+          "name": "ImageGenerationWorker",
+          "kind": "class",
+          "line": 50
+        },
+        {
+          "name": "doWork",
+          "kind": "function",
+          "line": 55
+        },
+        {
+          "name": "saveImage",
+          "kind": "function",
+          "line": 159
+        },
+        {
+          "name": "download",
+          "kind": "function",
+          "line": 191
+        },
+        {
+          "name": "createForegroundInfo",
+          "kind": "function",
+          "line": 212
+        },
+        {
+          "name": "notifyFinished",
+          "kind": "function",
+          "line": 227
+        },
+        {
+          "name": "notifyFailed",
+          "kind": "function",
+          "line": 241
+        },
+        {
+          "name": "openAppIntent",
+          "kind": "function",
+          "line": 254
+        },
+        {
+          "name": "cleanupTaskFiles",
+          "kind": "function",
+          "line": 263
+        },
+        {
+          "name": "notificationId",
+          "kind": "function",
+          "line": 267
+        },
+        {
+          "name": "enqueue",
+          "kind": "function",
+          "line": 282
+        }
+      ],
+      "localImportCount": 17,
+      "todoMarkers": 0,
+      "isTest": false,
+      "isProductionCode": true,
+      "localImports": [
+        "me.rerere.ai.provider.ImageEditParams",
+        "me.rerere.ai.provider.ImageGenerationParams",
+        "me.rerere.ai.provider.ModelType",
+        "me.rerere.ai.provider.ProviderManager",
+        "me.rerere.ai.ui.ImageAspectRatio",
+        "me.rerere.ai.ui.ImageGenerationItem",
+        "me.rerere.rikkahub.CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID",
+        "me.rerere.rikkahub.CHAT_LIVE_UPDATE_NOTIFICATION_CHANNEL_ID",
+        "me.rerere.rikkahub.RouteActivity",
+        "me.rerere.rikkahub.data.datastore.SettingsStore",
+        "me.rerere.rikkahub.data.datastore.findModelById",
+        "me.rerere.rikkahub.data.datastore.findProvider",
+        "me.rerere.rikkahub.data.db.entity.GenMediaEntity",
+        "me.rerere.rikkahub.data.files.FilesManager",
+        "me.rerere.rikkahub.data.repository.GenMediaRepository",
+        "me.rerere.rikkahub.ui.pages.imggen.toSafeFileNamePart",
+        "me.rerere.rikkahub.utils.NotificationUtil"
+      ],
+      "resolvedImports": [
+        "ai/src/main/java/me/rerere/ai/provider/Model.kt",
+        "ai/src/main/java/me/rerere/ai/provider/Provider.kt",
+        "ai/src/main/java/me/rerere/ai/provider/ProviderManager.kt",
+        "ai/src/main/java/me/rerere/ai/ui/Image.kt",
+        "app/src/main/java/me/rerere/rikkahub/RouteActivity.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/db/entity/GenMediaEntity.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/repository/GenMediaRepository.kt",
+        "app/src/main/java/me/rerere/rikkahub/ui/pages/imggen/ImgGenVM.kt",
+        "app/src/main/java/me/rerere/rikkahub/utils/NotificationUtil.kt"
+      ],
       "importedBy": []
     },
     {
@@ -40266,6 +40383,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/repository/GenMediaRepository.kt"
       ],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/di/ViewModelModule.kt"
       ]
     },
@@ -46781,6 +46899,7 @@
       ],
       "resolvedImports": [],
       "importedBy": [
+        "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt"
       ]
@@ -78556,6 +78675,13 @@
         "line": 13
       }
     ],
+    "me.rerere.rikkahub.data.service.ImageGenerationWorker": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "class",
+        "line": 50
+      }
+    ],
     "me.rerere.rikkahub.data.service.InvalidTarget": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveTurnDispatcher.kt",
@@ -79332,6 +79458,13 @@
         "line": 2217
       }
     ],
+    "me.rerere.rikkahub.data.service.cleanupTaskFiles": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 263
+      }
+    ],
     "me.rerere.rikkahub.data.service.clearAssistantRecords": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/AssistantInteractionResetService.kt",
@@ -79417,6 +79550,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryVector.kt",
         "kind": "function",
         "line": 8
+      }
+    ],
+    "me.rerere.rikkahub.data.service.createForegroundInfo": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 212
       }
     ],
     "me.rerere.rikkahub.data.service.createMissingDailyArchives": [
@@ -79611,9 +79751,21 @@
     ],
     "me.rerere.rikkahub.data.service.doWork": [
       {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 55
+      },
+      {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageWorker.kt",
         "kind": "function",
         "line": 173
+      }
+    ],
+    "me.rerere.rikkahub.data.service.download": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 191
       }
     ],
     "me.rerere.rikkahub.data.service.dynamicRecallLimit": [
@@ -79649,6 +79801,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryVector.kt",
         "kind": "function",
         "line": 25
+      }
+    ],
+    "me.rerere.rikkahub.data.service.enqueue": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 282
       }
     ],
     "me.rerere.rikkahub.data.service.equals": [
@@ -80579,6 +80738,27 @@
         "line": 208
       }
     ],
+    "me.rerere.rikkahub.data.service.notificationId": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 267
+      }
+    ],
+    "me.rerere.rikkahub.data.service.notifyFailed": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 241
+      }
+    ],
+    "me.rerere.rikkahub.data.service.notifyFinished": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 227
+      }
+    ],
     "me.rerere.rikkahub.data.service.onBind": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/DailySummaryService.kt",
@@ -80756,6 +80936,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/LocationService.kt",
         "kind": "function",
         "line": 231
+      }
+    ],
+    "me.rerere.rikkahub.data.service.openAppIntent": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 254
       }
     ],
     "me.rerere.rikkahub.data.service.parseConversationalCorrectionClauses": [
@@ -81145,6 +81332,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt",
         "kind": "function",
         "line": 537
+      }
+    ],
+    "me.rerere.rikkahub.data.service.saveImage": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/service/ImageGenerationWorker.kt",
+        "kind": "function",
+        "line": 159
       }
     ],
     "me.rerere.rikkahub.data.service.saveManualMemory": [
