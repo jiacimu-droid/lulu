@@ -28,6 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.rerere.rikkahub.data.starwish.StarWishStore
+import org.koin.compose.koinInject
 
 @Composable
 internal fun StarWishPlotGeneratorDialog(
@@ -40,120 +43,154 @@ internal fun StarWishPlotGeneratorDialog(
     onApply: (StarWishPlotCandidate) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val store = koinInject<StarWishStore>()
+    val state by store.state.collectAsStateWithLifecycle()
+    val currentGuide = existingTitle?.let { state.theaterGuides[it] }
     var direction by remember(existingTitle) { mutableStateOf("") }
     var expandedIndex by remember { mutableStateOf<Int?>(null) }
+    var regenerationMode by remember(existingTitle) { mutableStateOf(existingTitle == null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(if (existingTitle == null) "剧情生成器" else "重新规划《$existingTitle》")
+            Text(if (existingTitle == null) "剧情生成器" else "剧情规划 · $existingTitle")
         },
         text = {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                item {
-                    Text(
-                        if (existingTitle == null) {
-                            "露露会一次写出三套不同方向的小说方案。你不需要先想好，也可以留空让它自由发挥。"
-                        } else {
-                            "新方案不会立即覆盖现在的大纲。先生成三套候选，只有你点“采用”后才会替换。"
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    OutlinedTextField(
-                        value = direction,
-                        onValueChange = { direction = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("可选的引导方向") },
-                        placeholder = { Text("例如：更暧昧、强强对抗、不要反派、甜中带刀……") },
-                        minLines = 2,
-                        maxLines = 4,
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Button(
-                        onClick = { onGenerate(direction.trim()) },
-                        enabled = !isGenerating,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        if (isGenerating) {
-                            CircularProgressIndicator(strokeWidth = 2.dp)
-                        } else {
-                            Text(if (candidates.isEmpty()) "生成三套剧情" else "换一批剧情")
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (existingTitle != null && !regenerationMode && candidates.isEmpty()) {
+                    item {
+                        Text("当前剧情规划", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            currentGuide?.overview?.takeIf { it.isNotBlank() }
+                                ?: existingPremise.orEmpty().ifBlank { "这本书还没有完整的大纲。" },
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                    currentGuide?.chapters.orEmpty().forEachIndexed { index, chapter ->
+                        if (chapter.isNotBlank()) {
+                            item {
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = MaterialTheme.shapes.medium,
+                                    tonalElevation = 1.dp,
+                                ) {
+                                    Column(Modifier.padding(12.dp)) {
+                                        Text("第 ${index + 1} 章", fontWeight = FontWeight.SemiBold)
+                                        Spacer(Modifier.height(4.dp))
+                                        Text(chapter, style = MaterialTheme.typography.bodySmall)
+                                    }
+                                }
+                            }
                         }
                     }
-                    if (!error.isNullOrBlank()) {
-                        Spacer(Modifier.height(8.dp))
-                        Text(error, color = MaterialTheme.colorScheme.error)
+                    item {
+                        Button(
+                            onClick = { regenerationMode = true },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text("重新生成三套剧情规划")
+                        }
                     }
-                }
+                } else {
+                    item {
+                        Text(
+                            if (existingTitle == null) {
+                                "露露会一次写出三套不同方向的小说方案。你可以留空，让它自由发挥。"
+                            } else {
+                                "新方案不会立即覆盖当前大纲。只有你点“采用这套”后才会替换。"
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.height(10.dp))
+                        OutlinedTextField(
+                            value = direction,
+                            onValueChange = { direction = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("可选的引导方向") },
+                            placeholder = { Text("例如：更暧昧、强强对抗、不要反派、甜中带刀……") },
+                            minLines = 2,
+                            maxLines = 4,
+                        )
+                        Spacer(Modifier.height(10.dp))
+                        Button(
+                            onClick = { onGenerate(direction.trim()) },
+                            enabled = !isGenerating,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            if (isGenerating) {
+                                CircularProgressIndicator(strokeWidth = 2.dp)
+                            } else {
+                                Text(if (candidates.isEmpty()) "生成三套剧情" else "换一批剧情")
+                            }
+                        }
+                        if (!error.isNullOrBlank()) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(error, color = MaterialTheme.colorScheme.error)
+                        }
+                    }
 
-                itemsIndexed(candidates) { index, candidate ->
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large,
-                        tonalElevation = 2.dp,
-                    ) {
-                        Column(Modifier.padding(14.dp)) {
-                            Text(
-                                "方案 ${index + 1} · ${candidate.title}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Spacer(Modifier.height(6.dp))
-                            Text(candidate.hook, style = MaterialTheme.typography.bodyMedium)
-                            if (candidate.relationshipCore.isNotBlank()) {
-                                Spacer(Modifier.height(8.dp))
+                    itemsIndexed(candidates) { index, candidate ->
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.large,
+                            tonalElevation = 2.dp,
+                        ) {
+                            Column(Modifier.padding(14.dp)) {
                                 Text(
-                                    "关系主线：${candidate.relationshipCore}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    "方案 ${index + 1} · ${candidate.title}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
                                 )
-                            }
-                            if (candidate.highlights.isNotBlank()) {
                                 Spacer(Modifier.height(6.dp))
-                                Text(
-                                    "亮点：${candidate.highlights}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Spacer(Modifier.height(10.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                OutlinedButton(
-                                    onClick = {
-                                        expandedIndex = if (expandedIndex == index) null else index
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                ) {
-                                    Text(if (expandedIndex == index) "收起大纲" else "查看大纲")
+                                Text(candidate.hook, style = MaterialTheme.typography.bodyMedium)
+                                if (candidate.relationshipCore.isNotBlank()) {
+                                    Spacer(Modifier.height(8.dp))
+                                    Text(
+                                        "关系主线：${candidate.relationshipCore}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
                                 }
-                                Button(
-                                    onClick = { onApply(candidate) },
-                                    modifier = Modifier.weight(1f),
-                                ) {
-                                    Text("采用这套")
+                                if (candidate.highlights.isNotBlank()) {
+                                    Spacer(Modifier.height(6.dp))
+                                    Text(
+                                        "亮点：${candidate.highlights}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
                                 }
-                            }
-                            if (expandedIndex == index) {
-                                Spacer(Modifier.height(12.dp))
-                                HorizontalDivider()
                                 Spacer(Modifier.height(10.dp))
-                                Text(candidate.overview, style = MaterialTheme.typography.bodyMedium)
-                                candidate.chapters.forEachIndexed { chapterIndex, chapter ->
-                                    if (chapter.isNotBlank()) {
-                                        Spacer(Modifier.height(8.dp))
-                                        Text(
-                                            "第 ${chapterIndex + 1} 章",
-                                            fontWeight = FontWeight.SemiBold,
-                                        )
-                                        Text(chapter, style = MaterialTheme.typography.bodySmall)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    OutlinedButton(
+                                        onClick = { expandedIndex = if (expandedIndex == index) null else index },
+                                        modifier = Modifier.weight(1f),
+                                    ) {
+                                        Text(if (expandedIndex == index) "收起大纲" else "查看大纲")
+                                    }
+                                    Button(
+                                        onClick = { onApply(candidate) },
+                                        modifier = Modifier.weight(1f),
+                                    ) {
+                                        Text("采用这套")
+                                    }
+                                }
+                                if (expandedIndex == index) {
+                                    Spacer(Modifier.height(12.dp))
+                                    HorizontalDivider()
+                                    Spacer(Modifier.height(10.dp))
+                                    Text(candidate.overview, style = MaterialTheme.typography.bodyMedium)
+                                    candidate.chapters.forEachIndexed { chapterIndex, chapter ->
+                                        if (chapter.isNotBlank()) {
+                                            Spacer(Modifier.height(8.dp))
+                                            Text("第 ${chapterIndex + 1} 章", fontWeight = FontWeight.SemiBold)
+                                            Text(chapter, style = MaterialTheme.typography.bodySmall)
+                                        }
                                     }
                                 }
                             }
