@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T02:58:01.537186+00:00",
-  "commit": "7c0e3e49a3bba216215121f8ea7936558bc566bd",
+  "generatedAt": "2026-08-02T09:29:56.509460+00:00",
+  "commit": "1f73295b53dc6462c6ccff32a099d97b51b3dd95",
   "branch": "master",
-  "sourceFingerprint": "05aea7c9a60eb65c95c8498d7d32b9ed7040c82bd2878c6c99c6f968728c4a58",
+  "sourceFingerprint": "bfdb8b0e7e5f88308c6ff830c33fecf6bc28e8b4a3140832f8bc36e5c8b0b133",
   "summary": {
     "files": 1198,
-    "lines": 262754,
+    "lines": 262773,
     "symbols": 5726,
     "productionCodeFiles": 860,
     "testFiles": 148,
@@ -45552,8 +45552,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 180,
-      "sha256": "940c14986c8ee310b237f7a05ee0154d79c1df1b24955f381c05de2f7a15b6e1",
+      "lines": 199,
+      "sha256": "b7fce6008e298deecd97efb530cbf6a42c61a3a102ad752420a4b99c7a19614d",
       "package": "me.rerere.rikkahub.ui.pages.voicecall",
       "categories": [
         "电话与语音",
@@ -45583,42 +45583,42 @@
         {
           "name": "buildSleepTalkPrompt",
           "kind": "function",
-          "line": 81
+          "line": 88
         },
         {
           "name": "miniStatusText",
           "kind": "function",
-          "line": 92
+          "line": 101
         },
         {
           "name": "buildVoiceCallOpeningPrompt",
           "kind": "function",
-          "line": 103
+          "line": 112
         },
         {
           "name": "isUsableVoiceCallReply",
           "kind": "function",
-          "line": 136
+          "line": 155
         },
         {
           "name": "shouldCommitVoiceTranscript",
           "kind": "function",
-          "line": 142
+          "line": 161
         },
         {
           "name": "voiceCallEndOfSpeechDelayMillis",
           "kind": "function",
-          "line": 154
+          "line": 173
         },
         {
           "name": "cleanRoleLineForUser",
           "kind": "function",
-          "line": 164
+          "line": 183
         },
         {
           "name": "formatTime",
           "kind": "function",
-          "line": 178
+          "line": 197
         }
       ],
       "localImportCount": 6,
@@ -98728,21 +98728,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 81
+        "line": 88
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.buildVoiceCallOpeningPrompt": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 103
+        "line": 112
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.cleanRoleLineForUser": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 164
+        "line": 183
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.createStreamSpeaker": [
@@ -98763,21 +98763,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 178
+        "line": 197
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.isUsableVoiceCallReply": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 136
+        "line": 155
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.miniStatusText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 92
+        "line": 101
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.saveAssistantSleepLine": [
@@ -98798,7 +98798,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 142
+        "line": 161
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.shouldStartVoiceCallListening": [
@@ -98840,7 +98840,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/voicecall/VoiceCallSupport.kt",
         "kind": "function",
-        "line": 154
+        "line": 173
       }
     ],
     "me.rerere.rikkahub.ui.pages.voicecall.waitForTtsPlayback": [
