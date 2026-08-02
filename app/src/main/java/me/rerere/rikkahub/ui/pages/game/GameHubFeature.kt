@@ -42,7 +42,7 @@ internal fun GameHubFeaturePage() {
     val games = remember {
         listOf(
             GameHubTile("满分男", "轮流描述和猜分") { navController.navigate(Screen.PerfectManGame) },
-            GameHubTile("轻量跑团", "自由行动与判定") { navController.navigate(Screen.QuickCompanionGame("roleplay_adventure")) },
+            GameHubTile("跑团", "组建主角小队，进入不同世界冒险") { navController.navigate(Screen.QuickCompanionGame("roleplay_adventure")) },
             GameHubTile("海龟汤", "自由提问，还原真相") { navController.navigate(Screen.QuickCompanionGame("turtle_soup")) },
             GameHubTile("默契问答", "看看彼此有多了解") { navController.navigate(Screen.QuickCompanionGame("rapport_quiz")) },
             GameHubTile("快艇骰子", "掷骰与计分") { navController.navigate(Screen.QuickCompanionGame("yacht_dice")) },
