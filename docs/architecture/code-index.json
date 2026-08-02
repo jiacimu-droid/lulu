@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T14:45:09.825770+00:00",
-  "commit": "29dc3bc98ef4d98260d748dcc572ec9e42f1a298",
+  "generatedAt": "2026-08-02T14:45:25.695188+00:00",
+  "commit": "bd2121156471354ccf47d63dd7dab975a4d96bec",
   "branch": "master",
-  "sourceFingerprint": "81c5c8e147129880a31c51d09b4f35d2392d832dbb7a151a6da9b8c9785afb34",
+  "sourceFingerprint": "2a3f5a76524ea1f2a1f23523a5e71513d5322aa1e93cab8edc4339370e494e3f",
   "summary": {
     "files": 1203,
-    "lines": 264456,
+    "lines": 264458,
     "symbols": 5757,
     "productionCodeFiles": 865,
     "testFiles": 148,
@@ -22669,8 +22669,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 91,
-      "sha256": "b16a5c1b3bd738646c596870cf79db423163e9af56058593b7f8e144f690d14c",
+      "lines": 93,
+      "sha256": "8d7560f98a6df0dfb983a999f726854fe74b465dfd98bdadcd39f2b6f3a7d32a",
       "package": "me.rerere.rikkahub.data.starwish",
       "categories": [],
       "symbols": [
@@ -22707,22 +22707,22 @@
         {
           "name": "normalized",
           "kind": "function",
-          "line": 61
+          "line": 62
         },
         {
           "name": "StarWishVideoItem",
           "kind": "class",
-          "line": 69
+          "line": 71
         },
         {
           "name": "StarWishGeneratedImage",
           "kind": "class",
-          "line": 77
+          "line": 79
         },
         {
           "name": "StarWishVideoUnlockResult",
           "kind": "class",
-          "line": 86
+          "line": 88
         }
       ],
       "localImportCount": 0,
@@ -82150,7 +82150,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 77
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishImageLaunch": [
@@ -82227,14 +82227,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 69
+        "line": 71
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishVideoUnlockResult": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 86
+        "line": 88
       }
     ],
     "me.rerere.rikkahub.data.starwish.allTheaters": [
@@ -82318,7 +82318,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "function",
-        "line": 61
+        "line": 62
       }
     ],
     "me.rerere.rikkahub.data.starwish.scrollForOutfit": [
