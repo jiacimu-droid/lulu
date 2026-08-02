@@ -27,6 +27,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -61,12 +62,19 @@ internal fun StarWishImmersiveTheaterContent(
     var selectedChapterId by rememberSaveable(theater.title) {
         mutableStateOf(readableChapters.lastOrNull()?.id)
     }
+    var knownChapterCount by rememberSaveable(theater.title) {
+        mutableIntStateOf(readableChapters.size)
+    }
     var influence by rememberSaveable(theater.title) { mutableStateOf("") }
 
     LaunchedEffect(readableChapters.map { it.id }) {
-        if (selectedChapterId == null || readableChapters.none { it.id == selectedChapterId }) {
-            selectedChapterId = readableChapters.lastOrNull()?.id
+        val latestChapter = readableChapters.lastOrNull()
+        when {
+            readableChapters.size > knownChapterCount -> selectedChapterId = latestChapter?.id
+            selectedChapterId == null -> selectedChapterId = latestChapter?.id
+            readableChapters.none { it.id == selectedChapterId } -> selectedChapterId = latestChapter?.id
         }
+        knownChapterCount = readableChapters.size
     }
 
     val selectedChapter = readableChapters.firstOrNull { it.id == selectedChapterId }
