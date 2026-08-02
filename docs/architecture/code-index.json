@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T10:42:41.922360+00:00",
-  "commit": "eccb645ce30eb99af61f50165554be8fa9d34632",
+  "generatedAt": "2026-08-02T10:44:34.243092+00:00",
+  "commit": "db55951b8d496c9f222900ac4d3b9ef01b71a794",
   "branch": "master",
-  "sourceFingerprint": "05fc5899fbf3d6eaa88cde9390065705c5327a2698956a0cc1e93cf54e4a0a9b",
+  "sourceFingerprint": "ec55e3ab262ad419620513037ac6910d5e80721b4488db8e1d7484554a79c292",
   "summary": {
     "files": 1202,
     "lines": 264057,
@@ -43677,7 +43677,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 502,
-      "sha256": "c5507ab9230e04c57dd13c6ce98717bb3886156a1bb2dd678869411e6d325eb4",
+      "sha256": "7a3dabee0a3baade20945604b5bab4bf13237c5541b725cf48b0552c5a62dda8",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
