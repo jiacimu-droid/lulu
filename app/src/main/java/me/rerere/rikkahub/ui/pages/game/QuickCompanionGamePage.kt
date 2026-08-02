@@ -1,7 +1,6 @@
 package me.rerere.rikkahub.ui.pages.game
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -140,6 +139,12 @@ fun QuickCompanionGamePage(gameId: String) {
             val messages = buildList {
                 add(UIMessage.system("你正在以‘${player.name.ifBlank { "角色" }}’的身份和用户一起玩游戏。保持人设和关系连续性，严格接受程序给出的真实结果。"))
                 if (player.systemPrompt.isNotBlank()) add(UIMessage.system(player.systemPrompt))
+                if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) {
+                    val partyProfiles = settings.assistants.joinToString("\n\n") { assistant ->
+                        "同行角色【${assistant.name.ifBlank { "未命名角色" }}】的人设：\n${assistant.systemPrompt.ifBlank { "遵循该角色当前设定与关系状态。" }}"
+                    }
+                    add(UIMessage.system("跑团中的同行角色资料如下。只让事实中明确列入队伍的角色出场，并保持每个人说话和行动方式不同：\n$partyProfiles"))
+                }
                 if (companionContext.isNotBlank()) add(UIMessage.system(companionContext))
                 add(UIMessage.system(instruction))
                 add(UIMessage.user(facts))
@@ -156,9 +161,9 @@ fun QuickCompanionGamePage(gameId: String) {
                 messages = messages,
                 params = TextGenerationParams(
                     model = model,
-                    temperature = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 0.94f else 0.82f,
-                    topP = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 0.96f else 0.9f,
-                    maxTokens = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 900 else 260,
+                    temperature = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 0.96f else 0.82f,
+                    topP = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 0.97f else 0.9f,
+                    maxTokens = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 1700 else 260,
                     reasoningLevel = ReasoningLevel.OFF,
                 ),
             )
@@ -205,8 +210,17 @@ fun QuickCompanionGamePage(gameId: String) {
         )
     }
 
+    if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) {
+        FormalRoleplayCampaignGame(
+            request = { facts, instruction, onResult -> requestCompanionText(facts, instruction, onResult) },
+            checkpoint = { title, summary, details -> saveCheckpoint(title, summary, details) },
+            onExit = { navController.popBackStack() },
+        )
+        return
+    }
+
     Scaffold(
-        containerColor = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) androidx.compose.ui.graphics.Color(0xFF151311) else GameColors.background,
+        containerColor = GameColors.background,
         topBar = {
             TopAppBar(
                 title = { Text(game.title) },
@@ -218,93 +232,84 @@ fun QuickCompanionGamePage(gameId: String) {
             )
         },
     ) { padding ->
-        if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-                FormalRoleplayCampaignGame(
-                    request = { facts, instruction, onResult -> requestCompanionText(facts, instruction, onResult) },
-                    checkpoint = { title, summary, details -> saveCheckpoint(title, summary, details) },
-                )
-            }
-        } else {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(currentSettings.assistants, key = { it.id }) { assistant ->
-                                FilterChip(
-                                    selected = assistant.id.toString() == selectedAssistantId,
-                                    onClick = { selectedAssistantId = assistant.id.toString() },
-                                    label = { Text(assistant.name.ifBlank { "未命名角色" }) },
-                                )
-                            }
+        Column(
+            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(currentSettings.assistants, key = { it.id }) { assistant ->
+                            FilterChip(
+                                selected = assistant.id.toString() == selectedAssistantId,
+                                onClick = { selectedAssistantId = assistant.id.toString() },
+                                label = { Text(assistant.name.ifBlank { "未命名角色" }) },
+                            )
                         }
                     }
                 }
+            }
 
-                if (reactionLine.isNotBlank() || isGeneratingReaction) {
-                    CompanionGameReactionCard(
-                        assistantName = assistantName,
-                        line = reactionLine,
-                        isGenerating = isGeneratingReaction,
-                    )
-                }
+            if (reactionLine.isNotBlank() || isGeneratingReaction) {
+                CompanionGameReactionCard(
+                    assistantName = assistantName,
+                    line = reactionLine,
+                    isGenerating = isGeneratingReaction,
+                )
+            }
 
-                when (game) {
-                    QuickCompanionGame.DICE_DUEL -> YachtDiceGame(
-                        assistantName = assistantName,
-                        onRoundCompleted = { round, userCategory, roleCategory, userScore, roleScore, outcome, userTotal, roleTotal ->
-                            val summary = "快艇骰子第 $round 轮：用户将${userCategory}记为$userScore 分，角色将${roleCategory}记为$roleScore 分；$outcome。当前总分用户$userTotal，角色$roleTotal。"
-                            completeRuleGame(
-                                title = "一起完成一轮快艇骰子",
-                                summary = summary,
-                                detailsJson = buildJsonObject {
-                                    put("game", "yacht_dice")
-                                    put("round", round)
-                                    put("user_category", userCategory)
-                                    put("role_category", roleCategory)
-                                    put("user_score", userScore)
-                                    put("role_score", roleScore)
-                                    put("user_total", userTotal)
-                                    put("role_total", roleTotal)
-                                    put("outcome", outcome)
-                                }.toString(),
-                            )
-                        },
-                    )
-                    QuickCompanionGame.TIC_TAC_TOE -> GomokuGame(
-                        assistantName = assistantName,
-                        onCompleted = { outcome, moves, board ->
-                            val summary = "用户执黑、角色执白完成一局 15×15 五子棋，共走 $moves 手，结果：$outcome。"
-                            completeRuleGame(
-                                title = "一起玩完一局五子棋",
-                                summary = summary,
-                                detailsJson = buildJsonObject {
-                                    put("game", "gomoku")
-                                    put("outcome", outcome)
-                                    put("moves", moves)
-                                    put("board", board.joinToString(","))
-                                }.toString(),
-                            )
-                        },
-                    )
-                    QuickCompanionGame.TURTLE_SOUP -> TurtleSoupGame(
-                        assistantName = assistantName,
-                        request = { facts, instruction, onResult -> requestCompanionText(facts, instruction, onResult) },
-                        checkpoint = { title, summary, details -> saveCheckpoint(title, summary, details) },
-                    )
-                    QuickCompanionGame.RAPPORT_QUIZ -> RapportQuizGame(
-                        assistantName = assistantName,
-                        request = { facts, instruction, onResult -> requestCompanionText(facts, instruction, onResult) },
-                        checkpoint = { title, summary, details -> saveCheckpoint(title, summary, details) },
-                    )
-                    QuickCompanionGame.ROLEPLAY_ADVENTURE -> Unit
-                }
+            when (game) {
+                QuickCompanionGame.DICE_DUEL -> YachtDiceGame(
+                    assistantName = assistantName,
+                    onRoundCompleted = { round, userCategory, roleCategory, userScore, roleScore, outcome, userTotal, roleTotal ->
+                        val summary = "快艇骰子第 $round 轮：用户将${userCategory}记为$userScore 分，角色将${roleCategory}记为$roleScore 分；$outcome。当前总分用户$userTotal，角色$roleTotal。"
+                        completeRuleGame(
+                            title = "一起完成一轮快艇骰子",
+                            summary = summary,
+                            detailsJson = buildJsonObject {
+                                put("game", "yacht_dice")
+                                put("round", round)
+                                put("user_category", userCategory)
+                                put("role_category", roleCategory)
+                                put("user_score", userScore)
+                                put("role_score", roleScore)
+                                put("user_total", userTotal)
+                                put("role_total", roleTotal)
+                                put("outcome", outcome)
+                            }.toString(),
+                        )
+                    },
+                )
+                QuickCompanionGame.TIC_TAC_TOE -> GomokuGame(
+                    assistantName = assistantName,
+                    onCompleted = { outcome, moves, board ->
+                        val summary = "用户执黑、角色执白完成一局 15×15 五子棋，共走 $moves 手，结果：$outcome。"
+                        completeRuleGame(
+                            title = "一起玩完一局五子棋",
+                            summary = summary,
+                            detailsJson = buildJsonObject {
+                                put("game", "gomoku")
+                                put("outcome", outcome)
+                                put("moves", moves)
+                                put("board", board.joinToString(","))
+                            }.toString(),
+                        )
+                    },
+                )
+                QuickCompanionGame.TURTLE_SOUP -> TurtleSoupGame(
+                    assistantName = assistantName,
+                    request = { facts, instruction, onResult -> requestCompanionText(facts, instruction, onResult) },
+                    checkpoint = { title, summary, details -> saveCheckpoint(title, summary, details) },
+                )
+                QuickCompanionGame.RAPPORT_QUIZ -> RapportQuizGame(
+                    assistantName = assistantName,
+                    request = { facts, instruction, onResult -> requestCompanionText(facts, instruction, onResult) },
+                    checkpoint = { title, summary, details -> saveCheckpoint(title, summary, details) },
+                )
+                QuickCompanionGame.ROLEPLAY_ADVENTURE -> Unit
             }
         }
     }
