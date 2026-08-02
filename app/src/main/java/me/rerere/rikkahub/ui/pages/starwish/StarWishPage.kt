@@ -5,7 +5,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -56,7 +55,6 @@ import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.starwish.StarWishOutfitPrompts
 import me.rerere.rikkahub.data.starwish.StarWishRules
 import me.rerere.rikkahub.data.starwish.StarWishScroll
-import me.rerere.rikkahub.data.starwish.StarWishTheaterGuide
 import me.rerere.rikkahub.data.starwish.StarWishVideoItem
 import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.ui.components.nav.BackButton
@@ -78,12 +76,18 @@ private enum class ScrollSubsection(val label: String) {
 }
 
 @Composable
-fun StarWishPage(vm: StarWishVM = koinViewModel()) {
+fun StarWishPage(
+    vm: StarWishVM = koinViewModel(),
+    plotVM: StarWishPlotGeneratorVM = koinViewModel(),
+) {
     val navController = LocalNavController.current
     val settings = LocalSettings.current
     val state by vm.state.collectAsStateWithLifecycle()
     val generatedImages by vm.generatedImages.collectAsStateWithLifecycle()
     val studyState by vm.studyState.collectAsStateWithLifecycle()
+    val plotCandidates by plotVM.candidates.collectAsStateWithLifecycle()
+    val isGeneratingPlot by plotVM.isGenerating.collectAsStateWithLifecycle()
+    val plotError by plotVM.error.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
@@ -92,6 +96,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     var section by remember { mutableStateOf(StarWishSection.Scrolls) }
     var scrollSubsection by remember { mutableStateOf(ScrollSubsection.Prompts) }
     var selectedScroll by remember { mutableStateOf<Pair<String, StarWishScroll>?>(null) }
+    var showPlotGenerator by remember { mutableStateOf(false) }
     val companionAssistant = remember(settings.assistants, settings.assistantId, studyState.selectedAssistantId) {
         val selected = studyState.selectedAssistantId
         settings.assistants.firstOrNull { it.id.toString() == selected }
@@ -230,15 +235,29 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                     }
                 }
                 StarWishSection.Theaters -> {
+                    item {
+                        Button(
+                            onClick = {
+                                plotVM.clear()
+                                showPlotGenerator = true
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text("剧情生成器 · 给我三套好看的故事")
+                        }
+                    }
                     val theaters = StarWishRules.allTheaters(state.customTheaters)
                         .filterNot { it.title in state.hiddenTheaterTitles }
                     if (theaters.isEmpty()) {
                         item {
                             StarWishEmptyCard(
                                 title = "书架还是空的",
-                                subtitle = "获得剧场后，它会作为一本书出现在这里。",
+                                subtitle = "用上面的剧情生成器挑一套喜欢的故事。",
                                 icon = HugeIcons.BookOpen02,
-                                onClick = {},
+                                onClick = {
+                                    plotVM.clear()
+                                    showPlotGenerator = true
+                                },
                             )
                         }
                     } else {
@@ -353,22 +372,41 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     selectedVideo?.let { video ->
         StarWishVideoPlayerDialog(video = video, onDismiss = { selectedVideo = null })
     }
+
+    if (showPlotGenerator) {
+        StarWishPlotGeneratorDialog(
+            existingTitle = null,
+            existingPremise = null,
+            candidates = plotCandidates,
+            isGenerating = isGeneratingPlot,
+            error = plotError,
+            onGenerate = { direction -> plotVM.generate(null, null, direction) },
+            onApply = { candidate ->
+                plotVM.createFromCandidate(candidate)
+                showPlotGenerator = false
+            },
+            onDismiss = { showPlotGenerator = false },
+        )
+    }
 }
 
 @Composable
 fun StarWishTheaterPage(
     theaterTitle: String,
     vm: StarWishVM = koinViewModel(),
+    plotVM: StarWishPlotGeneratorVM = koinViewModel(),
 ) {
     val navController = LocalNavController.current
     val state by vm.state.collectAsStateWithLifecycle()
     val studyState by vm.studyState.collectAsStateWithLifecycle()
     val isGeneratingChapter by vm.isGeneratingChapter.collectAsStateWithLifecycle()
     val chapterError by vm.chapterError.collectAsStateWithLifecycle()
+    val plotCandidates by plotVM.candidates.collectAsStateWithLifecycle()
+    val isGeneratingPlot by plotVM.isGenerating.collectAsStateWithLifecycle()
+    val plotError by plotVM.error.collectAsStateWithLifecycle()
     val theater = StarWishRules.allTheaters(state.customTheaters).firstOrNull { it.title == theaterTitle }
-    val guide = theater?.let { state.theaterGuides[it.title] ?: StarWishRules.defaultTheaterGuide(it) }
     var showMenu by remember(theaterTitle) { mutableStateOf(false) }
-    var showGuideEditor by remember(theaterTitle) { mutableStateOf(false) }
+    var showPlotGenerator by remember(theaterTitle) { mutableStateOf(false) }
     var showChapterNavigation by remember(theaterTitle) { mutableStateOf(false) }
 
     Scaffold(
@@ -384,17 +422,18 @@ fun StarWishTheaterPage(
                 },
                 navigationIcon = { BackButton() },
                 actions = {
-                    if (theater != null && guide != null) {
+                    if (theater != null) {
                         Box {
                             IconButton(onClick = { showMenu = true }) {
                                 Icon(HugeIcons.MoreVertical, contentDescription = "更多")
                             }
                             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                                 DropdownMenuItem(
-                                    text = { Text("剧情规划") },
+                                    text = { Text("重新生成剧情规划") },
                                     onClick = {
                                         showMenu = false
-                                        showGuideEditor = true
+                                        plotVM.clear()
+                                        showPlotGenerator = true
                                     },
                                 )
                                 DropdownMenuItem(
@@ -445,16 +484,19 @@ fun StarWishTheaterPage(
         }
     }
 
-    if (theater != null && guide != null && showGuideEditor) {
-        TheaterGuideDialog(
-            theaterTitle = theater.title,
-            guide = guide,
-            overviewFallback = theater.prompt,
-            onDismiss = { showGuideEditor = false },
-            onSave = {
-                vm.saveTheaterGuide(theater.title, it)
-                showGuideEditor = false
+    if (theater != null && showPlotGenerator) {
+        StarWishPlotGeneratorDialog(
+            existingTitle = theater.title,
+            existingPremise = theater.prompt,
+            candidates = plotCandidates,
+            isGenerating = isGeneratingPlot,
+            error = plotError,
+            onGenerate = { direction -> plotVM.generate(theater.title, theater.prompt, direction) },
+            onApply = { candidate ->
+                plotVM.applyToExisting(theater.title, candidate)
+                showPlotGenerator = false
             },
+            onDismiss = { showPlotGenerator = false },
         )
     }
 }
