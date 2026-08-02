@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T14:58:32.569285+00:00",
-  "commit": "f2c6b3cc79e60b86eee9369c7668594897b350e9",
+  "generatedAt": "2026-08-02T15:00:38.475627+00:00",
+  "commit": "ee3dc4d28b45d6a2ce28d7440c708b488a82762d",
   "branch": "master",
-  "sourceFingerprint": "5aa2bad06bc41cf9eab661506979daf494e9b21316939f87881af9a2a484dc4f",
+  "sourceFingerprint": "afcc99c0b367ea21ac1f72075c0173d9abf1a6775507e2d77fdb9694ddb70172",
   "summary": {
     "files": 1203,
-    "lines": 264064,
+    "lines": 264093,
     "symbols": 5762,
     "productionCodeFiles": 865,
     "testFiles": 148,
@@ -613,7 +613,7 @@
       },
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
-        "lines": 455,
+        "lines": 484,
         "symbols": 19,
         "localImportCount": 34,
         "todoMarkers": 0
@@ -44059,8 +44059,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 455,
-      "sha256": "824b8c3c2a2aba5a833496198bdc68948f7c5f30ccced411e2d9d0e340c970e8",
+      "lines": 484,
+      "sha256": "efdc6236c898b5270eeb18fe10520c4313f69836d59cd900ac65dd0ea65a210e",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
@@ -44154,12 +44154,12 @@
         {
           "name": "GeneratedTheaterChapterContent",
           "kind": "class",
-          "line": 434
+          "line": 463
         },
         {
           "name": "addCustomTheater",
           "kind": "function",
-          "line": 439
+          "line": 468
         }
       ],
       "localImportCount": 34,
@@ -97585,7 +97585,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "kind": "class",
-        "line": 434
+        "line": 463
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.PlannerSection": [
@@ -97767,7 +97767,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "kind": "function",
-        "line": 439
+        "line": 468
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.applyToExisting": [
