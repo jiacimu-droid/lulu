@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T10:28:14.661832+00:00",
-  "commit": "c0b5c34f791e4b05d52f0fbee7aff1cde1007ac9",
+  "generatedAt": "2026-08-02T10:29:22.294066+00:00",
+  "commit": "98cf4803edd1f8c520c8437e49c3221f1e06fe5b",
   "branch": "master",
-  "sourceFingerprint": "b935cadf463db813e763b901a4c048622005b6ad9d5df896a71f7c16477860dc",
+  "sourceFingerprint": "1f4c37c6cef4f88396ce54acacf0760db75a9e7fd6b941d4a24cc9d916875860",
   "summary": {
     "files": 1201,
-    "lines": 263442,
+    "lines": 263484,
     "symbols": 5738,
     "productionCodeFiles": 863,
     "testFiles": 148,
@@ -2849,11 +2849,6 @@
       "imports": 4
     },
     {
-      "from": "me.rerere.rikkahub.ui.pages.starwish",
-      "to": "me.rerere.rikkahub.data.starwish.StarWishTheaterGuide",
-      "imports": 4
-    },
-    {
       "from": "me.rerere.rikkahub.ui.pages.stats",
       "to": "me.rerere.rikkahub.data.db.dao",
       "imports": 4
@@ -3001,6 +2996,11 @@
     {
       "from": "me.rerere.rikkahub.data.ai.tools",
       "to": "me.rerere.ai.ui.UIMessage",
+      "imports": 3
+    },
+    {
+      "from": "me.rerere.rikkahub.data.ai.transformers",
+      "to": "me.rerere.ai.ui.UIMessageAnnotation",
       "imports": 3
     }
   ],
@@ -43592,8 +43592,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 460,
-      "sha256": "72320d3ae293252ee55ff831c615cde739830d3f37f4026ff5349747a9f2adbb",
+      "lines": 502,
+      "sha256": "c5507ab9230e04c57dd13c6ce98717bb3886156a1bb2dd678869411e6d325eb4",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
@@ -43602,25 +43602,25 @@
         {
           "name": "StarWishSection",
           "kind": "class",
-          "line": 69
+          "line": 67
         },
         {
           "name": "ScrollSubsection",
           "kind": "class",
-          "line": 75
+          "line": 73
         },
         {
           "name": "StarWishPage",
           "kind": "composable",
-          "line": 81
+          "line": 79
         },
         {
           "name": "StarWishTheaterPage",
           "kind": "composable",
-          "line": 359
+          "line": 394
         }
       ],
-      "localImportCount": 19,
+      "localImportCount": 18,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
@@ -43636,7 +43636,6 @@
         "me.rerere.rikkahub.data.starwish.StarWishOutfitPrompts",
         "me.rerere.rikkahub.data.starwish.StarWishRules",
         "me.rerere.rikkahub.data.starwish.StarWishScroll",
-        "me.rerere.rikkahub.data.starwish.StarWishTheaterGuide",
         "me.rerere.rikkahub.data.starwish.StarWishVideoItem",
         "me.rerere.rikkahub.data.study.StudyRules",
         "me.rerere.rikkahub.ui.components.nav.BackButton",
@@ -97305,7 +97304,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "kind": "class",
-        "line": 75
+        "line": 73
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishColors": [
@@ -97368,7 +97367,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "kind": "composable",
-        "line": 81
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotCandidate": [
@@ -97396,14 +97395,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "kind": "class",
-        "line": 69
+        "line": 67
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishTheaterPage": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPage.kt",
         "kind": "composable",
-        "line": 359
+        "line": 394
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishVM": [
