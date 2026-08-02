@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T14:57:48.355731+00:00",
-  "commit": "c90466fcd5de82c5b8918d037e5e47fef6cf859d",
+  "generatedAt": "2026-08-02T14:58:32.569285+00:00",
+  "commit": "f2c6b3cc79e60b86eee9369c7668594897b350e9",
   "branch": "master",
-  "sourceFingerprint": "e8b94e208b480eaff53642f719af81b9e987dd88e10b389ff3011d49b785bf21",
+  "sourceFingerprint": "5aa2bad06bc41cf9eab661506979daf494e9b21316939f87881af9a2a484dc4f",
   "summary": {
     "files": 1203,
-    "lines": 264097,
-    "symbols": 5761,
+    "lines": 264064,
+    "symbols": 5762,
     "productionCodeFiles": 865,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -43814,8 +43814,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 207,
-      "sha256": "ec754039c29518d8a4076314db3d9b239ca693234d0c398705fd00a34fbe2561",
+      "lines": 174,
+      "sha256": "1e608b335f051136238913e4c11e72886d83a1e05deaaa57bc7533cee8c803bf",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
@@ -43825,6 +43825,11 @@
           "name": "StarWishPlotGeneratorDialog",
           "kind": "composable",
           "line": 36
+        },
+        {
+          "name": "CandidateSection",
+          "kind": "composable",
+          "line": 169
         }
       ],
       "localImportCount": 1,
@@ -97567,6 +97572,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishTheaterComponents.kt",
         "kind": "composable",
         "line": 296
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.CandidateSection": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotGeneratorDialog.kt",
+        "kind": "composable",
+        "line": 169
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.GeneratedTheaterChapterContent": [
