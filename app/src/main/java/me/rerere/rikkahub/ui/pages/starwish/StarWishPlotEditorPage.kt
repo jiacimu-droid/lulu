@@ -27,6 +27,18 @@ import androidx.compose.ui.unit.dp
 import me.rerere.rikkahub.data.starwish.StarWishTheaterGuide
 import me.rerere.rikkahub.data.starwish.StarWishTheaterSeed
 
+private const val WORLDVIEW_PREFIX = "【世界观与故事设定】\n"
+private const val OVERVIEW_PREFIX = "\n\n【剧情总纲】\n"
+
+private fun displayOverview(guide: StarWishTheaterGuide): String {
+    val encodedPrefix = WORLDVIEW_PREFIX + guide.worldview + OVERVIEW_PREFIX
+    return if (guide.worldview.isNotBlank() && guide.overview.startsWith(encodedPrefix)) {
+        guide.overview.removePrefix(encodedPrefix)
+    } else {
+        guide.overview
+    }
+}
+
 @Composable
 internal fun StarWishPlotEditorPage(
     theater: StarWishTheaterSeed,
@@ -38,19 +50,32 @@ internal fun StarWishPlotEditorPage(
     var worldview by remember(theater.title, guide) {
         mutableStateOf(guide.worldview.ifBlank { theater.prompt })
     }
-    var overview by remember(theater.title, guide) { mutableStateOf(guide.overview) }
+    var overview by remember(theater.title, guide) {
+        mutableStateOf(displayOverview(guide))
+    }
     var wordCount by remember(theater.title, guide) { mutableStateOf(guide.wordCount) }
     var chapters by remember(theater.title, guide) {
         mutableStateOf(guide.chapters.ifEmpty { List(6) { "" } })
     }
     var savedNotice by remember(theater.title) { mutableStateOf(false) }
 
-    fun currentGuide(): StarWishTheaterGuide = StarWishTheaterGuide(
-        worldview = worldview,
-        overview = overview,
-        chapters = chapters,
-        wordCount = wordCount,
-    ).normalized()
+    fun currentGuide(): StarWishTheaterGuide {
+        val cleanWorldview = worldview.trim()
+        val cleanOverview = overview.trim()
+        return StarWishTheaterGuide(
+            worldview = cleanWorldview,
+            overview = buildString {
+                if (cleanWorldview.isNotBlank()) {
+                    append(WORLDVIEW_PREFIX)
+                    append(cleanWorldview)
+                    append(OVERVIEW_PREFIX)
+                }
+                append(cleanOverview)
+            },
+            chapters = chapters,
+            wordCount = wordCount,
+        ).normalized()
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
