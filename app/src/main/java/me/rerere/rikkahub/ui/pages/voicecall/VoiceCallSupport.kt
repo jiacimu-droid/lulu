@@ -78,15 +78,24 @@ internal suspend fun speakInSegments(
     }
 }
 
+private const val VOICE_CALL_SCENE_PROMPT =
+    """【当前场景：实时语音通话】
+你此刻正通过电话与用户实时交谈，不是在发送文字消息，也不是面对面交流。你应始终明确知道双方仍在通话中，直到电话被挂断。
+回复必须适合直接从电话里说出口：自然、口语化、简短、有即时反应。可以在符合人设时自然使用“电话里”“听见你说”“我在听”等通话表达，但不要每句话都刻意强调打电话。
+不要说“我看到你的消息”“我打字”“我发给你”等文字聊天表达；也不得声称看见用户、用户表情、动作或周围环境。若语音内容含糊，可以按角色口吻自然确认，但不要假装看见或知道现实中未提供的信息。
+只输出角色真正说出口的话，不输出动作描写、心理活动、旁白、Markdown、标签或后台说明。保持角色原本人设、关系边界、世界观和此前聊天连续性，不要解释这些规则。"""
+
 internal fun buildSleepTalkPrompt(
     assistantName: String,
     sequence: Int,
 ): String =
     """
-    你正在以用户设定的“$assistantName”角色进行一通持续的语音通话，用户开启了哄睡模式。
-    最高优先级：始终遵守该角色原本的人设、关系类型、边界、世界观和说话方式；“哄睡”只是当前场景，不能把角色改写成默认温柔、亲密或恋爱型陪伴者。
+    $VOICE_CALL_SCENE_PROMPT
+
+    你正在以用户设定的“$assistantName”角色继续这通尚未挂断的电话，用户开启了哄睡模式。
+    最高优先级：始终遵守该角色原本的人设、关系类型、边界、世界观和说话方式；“哄睡”只是当前电话场景，不能把角色改写成默认温柔、亲密或恋爱型陪伴者。
     结合此前聊天与本次电话已经发生的内容，自然接着说一小段适合该角色的睡前话。可以安静、讲故事、闲聊或停顿，但不要重复上一段。
-    这是第${sequence + 1}段。只输出真正说出口的话，1到3句，不要动作、心理、旁白、标签或后台说明。
+    这是第${sequence + 1}段。只输出真正从电话里说出口的话，1到3句。
     """.trimIndent()
 
 internal fun miniStatusText(stage: CallStage, isSpeaking: Boolean): String {
@@ -112,26 +121,36 @@ internal fun buildVoiceCallOpeningPrompt(
         .joinToString("\n") { "- ${it.take(180)}" }
         .ifBlank { "- 无" }
     val callOrigin = if (incomingReason.isNullOrBlank()) {
-        "这是用户刚打来的一通语音电话，现在已经接通。"
+        "这是用户刚打给你的一通电话，现在已经接通。你能听见用户，用户也能听见你。"
     } else {
-        "这是你根据自己的判断主动打给用户的一通语音电话，用户刚刚接听。你决定来电时的内部理由是：$incomingReason。理由只帮助你保持动机连续，不要求逐字说出。"
+        "这是你根据自己的判断主动打给用户的一通电话，用户刚刚接听。你们现在已经处于实时通话中。你决定来电时的内部理由是：$incomingReason。理由只帮助你保持动机连续，不要求逐字说出。"
     }
     return """
+        $VOICE_CALL_SCENE_PROMPT
+
         $callOrigin
         你是用户设定的“$assistantName”。最高优先级是完整遵守该角色原本的人设、关系类型、边界、世界观和说话方式；电话场景不能把角色改写成默认温柔、亲密或恋爱型陪伴者。
         请结合跨聊天与电话的最近上下文，像同一个人自然接起电话。若上次有未说完的话、明确立场或承诺，可以顺势承接，但不要复述记忆资料。
-        主动说第一句话，1到2句，只输出真正说出口的话，不要动作、心理、环境、标签或后台说明。
+        主动从电话里说第一句话，1到2句。
         最近用过的开场如下，避免相同句式、相同问法和相同节奏：
         $recent
         变化种子：$variationSeed。重试：$retry。
     """.trimIndent()
 }
 
-internal const val VOICE_CALL_REPLY_PROMPT =
-    "保持用户设定的人设、关系类型和说话方式，承接刚才与更早的有效上下文；直接回应用户最后一句。只输出1到3句真正说出口的话，不要动作、心理、环境、感受、标签或后台说明。"
+internal val VOICE_CALL_REPLY_PROMPT: String =
+    """
+    $VOICE_CALL_SCENE_PROMPT
 
-internal const val VOICE_CALL_RETRY_PROMPT =
-    "上一轮电话回复生成不完整。保持原人设与连续上下文，直接回应用户刚才那句话；只输出1到2句说出口的话，不要解释故障，不要让用户重复，也不要说没听清。"
+    这通电话仍在进行中。保持用户设定的人设、关系类型和说话方式，承接刚才与更早的有效上下文，直接回应用户最后说出口的那句话。回复1到3句，像实时电话中的自然回应，不要把它当成文字消息。
+    """.trimIndent()
+
+internal val VOICE_CALL_RETRY_PROMPT: String =
+    """
+    $VOICE_CALL_SCENE_PROMPT
+
+    这通电话仍在进行中。上一轮电话回复生成不完整；保持原人设与连续上下文，直接回应用户刚才说出口的那句话。只说1到2句，不要解释故障，不要无依据地说没听清，也不要把回复写成聊天消息。
+    """.trimIndent()
 
 internal fun isUsableVoiceCallReply(text: String?): Boolean {
     val clean = text?.cleanRoleLineForUser().orEmpty()
