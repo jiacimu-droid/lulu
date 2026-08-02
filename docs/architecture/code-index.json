@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T10:29:22.294066+00:00",
-  "commit": "98cf4803edd1f8c520c8437e49c3221f1e06fe5b",
+  "generatedAt": "2026-08-02T10:37:47.044432+00:00",
+  "commit": "2367bd44c05ebbab1ce1cd8bde204022c42fa906",
   "branch": "master",
-  "sourceFingerprint": "1f4c37c6cef4f88396ce54acacf0760db75a9e7fd6b941d4a24cc9d916875860",
+  "sourceFingerprint": "d09ce324aeda97f6f8192f8cc971baa16157357a06fbdc2da570564fbed544d3",
   "summary": {
     "files": 1201,
-    "lines": 263484,
+    "lines": 263492,
     "symbols": 5738,
     "productionCodeFiles": 863,
     "testFiles": 148,
@@ -43562,8 +43562,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 228,
-      "sha256": "2797a2c3068a5a9b4894f518cfe1b645e63f1c99decc9e881e9410364c77d3d4",
+      "lines": 236,
+      "sha256": "252f518ad9ea69e568fe6a6e9e757550d57df5602373c45bf82f9ef48db9961f",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
@@ -43572,7 +43572,7 @@
         {
           "name": "StarWishImmersiveTheaterContent",
           "kind": "composable",
-          "line": 43
+          "line": 44
         }
       ],
       "localImportCount": 2,
@@ -97353,7 +97353,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishImmersiveTheater.kt",
         "kind": "composable",
-        "line": 43
+        "line": 44
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishListRow": [
