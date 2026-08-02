@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T15:14:08.149256+00:00",
-  "commit": "580d7957e3b5b8954eb0c1d03594225802bc3cc0",
+  "generatedAt": "2026-08-02T15:15:42.558128+00:00",
+  "commit": "af23cc9d4f850a77c31b7f9e79bcf2abe44c10df",
   "branch": "master",
-  "sourceFingerprint": "b93d5a8da6b29a50bda6b71dbdfc85f3a2fb0e49eee665ac044b9d824685a614",
+  "sourceFingerprint": "e8154325778a36cfebb43785fcf86464bc705f156054e280f69b256b209136e4",
   "summary": {
     "files": 1203,
-    "lines": 264064,
-    "symbols": 5763,
+    "lines": 264084,
+    "symbols": 5765,
     "productionCodeFiles": 865,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -22670,8 +22670,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 93,
-      "sha256": "8d7560f98a6df0dfb983a999f726854fe74b465dfd98bdadcd39f2b6f3a7d32a",
+      "lines": 113,
+      "sha256": "576ec004686aec519f7b44c76db89ca546c9d29d3f9a7e97ad5f1f8897402343",
       "package": "me.rerere.rikkahub.data.starwish",
       "categories": [],
       "symbols": [
@@ -22683,47 +22683,57 @@
         {
           "name": "StarWishOutfitPrompts",
           "kind": "class",
-          "line": 23
+          "line": 25
         },
         {
           "name": "StarWishImageLaunch",
           "kind": "class",
-          "line": 29
+          "line": 31
         },
         {
           "name": "StarWishTheaterChapter",
           "kind": "class",
-          "line": 37
+          "line": 39
         },
         {
           "name": "StarWishTheaterSeed",
           "kind": "class",
-          "line": 48
+          "line": 50
         },
         {
           "name": "StarWishTheaterGuide",
           "kind": "class",
-          "line": 56
+          "line": 58
         },
         {
           "name": "normalized",
           "kind": "function",
-          "line": 62
+          "line": 64
+        },
+        {
+          "name": "StarWishTheaterReadingNote",
+          "kind": "class",
+          "line": 73
+        },
+        {
+          "name": "companionTheaterProgressKey",
+          "kind": "function",
+          "line": 87
         },
         {
           "name": "StarWishVideoItem",
           "kind": "class",
-          "line": 71
+          "line": 91
         },
         {
           "name": "StarWishGeneratedImage",
           "kind": "class",
-          "line": 79
+          "line": 99
         },
         {
           "name": "StarWishVideoUnlockResult",
           "kind": "class",
-          "line": 88
+          "line": 108
         }
       ],
       "localImportCount": 0,
@@ -82184,21 +82194,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 79
+        "line": 99
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishImageLaunch": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 29
+        "line": 31
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishOutfitPrompts": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 23
+        "line": 25
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishRules": [
@@ -82240,35 +82250,42 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 37
+        "line": 39
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishTheaterGuide": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 56
+        "line": 58
+      }
+    ],
+    "me.rerere.rikkahub.data.starwish.StarWishTheaterReadingNote": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
+        "kind": "class",
+        "line": 73
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishTheaterSeed": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 48
+        "line": 50
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishVideoItem": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 71
+        "line": 91
       }
     ],
     "me.rerere.rikkahub.data.starwish.StarWishVideoUnlockResult": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "class",
-        "line": 88
+        "line": 108
       }
     ],
     "me.rerere.rikkahub.data.starwish.allTheaters": [
@@ -82304,6 +82321,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishRules.kt",
         "kind": "function",
         "line": 322
+      }
+    ],
+    "me.rerere.rikkahub.data.starwish.companionTheaterProgressKey": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
+        "kind": "function",
+        "line": 87
       }
     ],
     "me.rerere.rikkahub.data.starwish.defaultTheaterGuide": [
@@ -82352,7 +82376,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/data/starwish/StarWishModels.kt",
         "kind": "function",
-        "line": 62
+        "line": 64
       }
     ],
     "me.rerere.rikkahub.data.starwish.scrollForOutfit": [
