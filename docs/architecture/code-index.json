@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-02T14:45:25.695188+00:00",
-  "commit": "bd2121156471354ccf47d63dd7dab975a4d96bec",
+  "generatedAt": "2026-08-02T14:46:39.461130+00:00",
+  "commit": "722b4324af4110fbb751d4f9eec7ccb148b4d4ba",
   "branch": "master",
-  "sourceFingerprint": "2a3f5a76524ea1f2a1f23523a5e71513d5322aa1e93cab8edc4339370e494e3f",
+  "sourceFingerprint": "c55f7c41078bed75cc5a2660d7b80e0b56821085ae6ab1c7785c7d620da493b1",
   "summary": {
     "files": 1203,
-    "lines": 264458,
-    "symbols": 5757,
+    "lines": 264483,
+    "symbols": 5758,
     "productionCodeFiles": 865,
     "testFiles": 148,
     "largeProductionFiles": 28,
@@ -43768,27 +43768,32 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotEditorPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 185,
-      "sha256": "08a8cbf64334697877207e085a4f6bdf01bdcc243048b6fe8981bd70a38233a9",
+      "lines": 210,
+      "sha256": "7a27399f5acae2f669a4b81e2346f3b2830410ded9375bc306101a8e571033f7",
       "package": "me.rerere.rikkahub.ui.pages.starwish",
       "categories": [
         "界面"
       ],
       "symbols": [
         {
+          "name": "displayOverview",
+          "kind": "function",
+          "line": 33
+        },
+        {
           "name": "StarWishPlotEditorPage",
           "kind": "composable",
-          "line": 31
+          "line": 43
         },
         {
           "name": "currentGuide",
           "kind": "function",
-          "line": 48
+          "line": 62
         },
         {
           "name": "PlannerSection",
           "kind": "composable",
-          "line": 168
+          "line": 193
         }
       ],
       "localImportCount": 2,
@@ -97559,7 +97564,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotEditorPage.kt",
         "kind": "composable",
-        "line": 168
+        "line": 193
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.ScrollDetailDialog": [
@@ -97650,7 +97655,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotEditorPage.kt",
         "kind": "composable",
-        "line": 31
+        "line": 43
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.StarWishPlotGeneratorDialog": [
@@ -97769,7 +97774,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotEditorPage.kt",
         "kind": "function",
-        "line": 48
+        "line": 62
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.deleteChapter": [
@@ -97812,6 +97817,13 @@
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "kind": "function",
         "line": 202
+      }
+    ],
+    "me.rerere.rikkahub.ui.pages.starwish.displayOverview": [
+      {
+        "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishPlotEditorPage.kt",
+        "kind": "function",
+        "line": 33
       }
     ],
     "me.rerere.rikkahub.ui.pages.starwish.generate": [
