@@ -19,13 +19,12 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -36,10 +35,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -93,13 +92,12 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     var section by remember { mutableStateOf(StarWishSection.Scrolls) }
     var scrollSubsection by remember { mutableStateOf(ScrollSubsection.Prompts) }
     var selectedScroll by remember { mutableStateOf<Pair<String, StarWishScroll>?>(null) }
-    var showAddTheater by remember { mutableStateOf(false) }
     val companionAssistant = remember(settings.assistants, settings.assistantId, studyState.selectedAssistantId) {
         val selected = studyState.selectedAssistantId
         settings.assistants.firstOrNull { it.id.toString() == selected }
             ?: settings.getCurrentAssistant()
     }
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
     LaunchedEffect(state.lastSection) {
         section = StarWishSection.entries.firstOrNull { it.name == state.lastSection } ?: StarWishSection.Scrolls
     }
@@ -111,26 +109,43 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                vm.refreshGeneratedImages()
-            }
+            if (event == Lifecycle.Event.ON_RESUME) vm.refreshGeneratedImages()
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     val videoPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let(vm::importVideo)
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            LargeFlexibleTopAppBar(
-                title = { Text("星愿馆") },
+            TopAppBar(
                 navigationIcon = { BackButton() },
-                scrollBehavior = scrollBehavior,
+                title = {
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        StarWishSection.entries.forEach { item ->
+                            FilterChip(
+                                selected = section == item,
+                                onClick = {
+                                    section = item
+                                    vm.rememberSection(item.name)
+                                },
+                                label = { Text(item.label, maxLines = 1) },
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    if (section == StarWishSection.Theaters) {
+                        Text(
+                            "碎片 ${studyState.inventory.theaterFragments}",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(end = 12.dp),
+                        )
+                    }
+                },
                 colors = CustomColors.topBarColors,
             )
         },
@@ -142,14 +157,8 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                 .fillMaxSize()
                 .background(StarWishColors.paper),
             contentPadding = padding + PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item {
-                StarWishHero(section = section, onSection = {
-                    section = it
-                    vm.rememberSection(it.name)
-                })
-            }
             when (section) {
                 StarWishSection.Scrolls -> {
                     item {
@@ -170,7 +179,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                                 item {
                                     StarWishEmptyCard(
                                         title = "还没有画卷图片",
-                                        subtitle = "点亮任意画卷后，在提示词里选择独美或互动生成，这里会留下从星愿馆发起的记录。",
+                                        subtitle = "点亮画卷后选择独美或互动生成，完成的图片会留在这里。",
                                         icon = HugeIcons.Image03,
                                         onClick = { scrollSubsection = ScrollSubsection.Prompts },
                                     )
@@ -193,7 +202,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                                 item {
                                     StarWishEmptyCard(
                                         title = "查看图片库",
-                                        subtitle = "已生成出的图片会保存在生图页图库里。",
+                                        subtitle = "已生成图片会保存在生图页图库里。",
                                         icon = HugeIcons.AiImage,
                                         onClick = { navController.navigate(Screen.ImageGen()) },
                                     )
@@ -201,7 +210,8 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                             }
                         }
                         ScrollSubsection.Prompts -> {
-                            val scrollEntries = StudyRules.outfitNames.map { outfit -> outfit to StarWishRules.scrollForOutfit(outfit) }
+                            val scrollEntries = StudyRules.outfitNames
+                                .map { outfit -> outfit to StarWishRules.scrollForOutfit(outfit) }
                                 .filterNot { (_, scroll) -> scroll.title in state.hiddenScrollTitles }
                             items(scrollEntries) { (outfit, scroll) ->
                                 val unlocked = StarWishRules.scrollUnlockedForOutfit(studyState, outfit)
@@ -220,33 +230,42 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                     }
                 }
                 StarWishSection.Theaters -> {
-                    item {
-                        TheaterWalletCard(
-                            rareFragments = studyState.inventory.theaterFragments,
-                            onAdd = { showAddTheater = true },
-                        )
-                    }
-                    items(StarWishRules.allTheaters(state.customTheaters).filterNot { it.title in state.hiddenTheaterTitles }) { theater ->
-                        val credits = StarWishRules.chapterCredits(studyState)
-                        val chapters = state.theaterChapters[theater.title].orEmpty()
-                            .filterNot { it.isPromptPlaceholder(theater) }
-                            .size
-                        val canCreate = studyState.inventory.theaterFragments >= StarWishRules.RARE_FRAGMENTS_PER_CHAPTER
-                        val hasChapter = chapters > 0
-                        StarWishListRow(
-                            title = theater.title,
-                            subtitle = if (hasChapter) "已生成 $chapters 章 · 再花 1 枚剧场碎片续写" else "候选剧场 · 花 1 枚剧场碎片生成第一章",
-                            unlocked = canCreate || hasChapter,
-                            progress = (studyState.inventory.theaterFragments.coerceAtMost(StarWishRules.RARE_FRAGMENTS_PER_CHAPTER)) / StarWishRules.RARE_FRAGMENTS_PER_CHAPTER.toFloat(),
-                            icon = HugeIcons.BookOpen02,
-                            onClick = {
-                                if (canCreate || hasChapter) {
-                                    vm.rememberSection(StarWishSection.Theaters.name)
-                                    navController.navigate(Screen.StarWishTheater(theater.title))
-                                }
-                            },
-                            onDelete = { vm.deleteTheater(theater.title) },
-                        )
+                    val theaters = StarWishRules.allTheaters(state.customTheaters)
+                        .filterNot { it.title in state.hiddenTheaterTitles }
+                    if (theaters.isEmpty()) {
+                        item {
+                            StarWishEmptyCard(
+                                title = "书架还是空的",
+                                subtitle = "获得剧场后，它会作为一本书出现在这里。",
+                                icon = HugeIcons.BookOpen02,
+                                onClick = {},
+                            )
+                        }
+                    } else {
+                        items(theaters) { theater ->
+                            val chapters = state.theaterChapters[theater.title].orEmpty()
+                                .filterNot { it.isPromptPlaceholder(theater) }
+                                .size
+                            val canCreate = studyState.inventory.theaterFragments >= StarWishRules.RARE_FRAGMENTS_PER_CHAPTER
+                            StarWishListRow(
+                                title = theater.title,
+                                subtitle = when {
+                                    chapters > 0 -> "$chapters 章 · 点击继续阅读"
+                                    canCreate -> "尚未开篇 · 点击生成第一章"
+                                    else -> "尚未开篇 · 剧场碎片不足"
+                                },
+                                unlocked = canCreate || chapters > 0,
+                                progress = if (chapters > 0) 1f else 0f,
+                                icon = HugeIcons.BookOpen02,
+                                onClick = {
+                                    if (canCreate || chapters > 0) {
+                                        vm.rememberSection(StarWishSection.Theaters.name)
+                                        navController.navigate(Screen.StarWishTheater(theater.title))
+                                    }
+                                },
+                                onDelete = { vm.deleteTheater(theater.title) },
+                            )
+                        }
                     }
                 }
                 StarWishSection.Video -> {
@@ -266,7 +285,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
                         item {
                             StarWishEmptyCard(
                                 title = "还没有视频",
-                                subtitle = "先上传 AI 生成的视频；它会以灰色锁定状态进入视频柜，使用视频碎片后解锁。",
+                                subtitle = "上传 AI 生成的视频后，可使用视频碎片解锁。",
                                 icon = HugeIcons.Play,
                                 onClick = { videoPickerLauncher.launch("video/*") },
                             )
@@ -332,24 +351,7 @@ fun StarWishPage(vm: StarWishVM = koinViewModel()) {
     }
 
     selectedVideo?.let { video ->
-        StarWishVideoPlayerDialog(
-            video = video,
-            onDismiss = { selectedVideo = null },
-        )
-    }
-
-    if (showAddTheater) {
-        AddTheaterDialog(
-            dialogTitle = "添加小剧场",
-            description = "添加后会出现在小剧场列表里；未花剧场碎片生成章节前，它仍然只是候选。",
-            promptLabel = "剧情提示词",
-            promptRequired = true,
-            onDismiss = { showAddTheater = false },
-            onAdd = { title, prompt ->
-                vm.addCustomTheater(title, prompt)
-                showAddTheater = false
-            },
-        )
+        StarWishVideoPlayerDialog(video = video, onDismiss = { selectedVideo = null })
     }
 }
 
@@ -358,41 +360,56 @@ fun StarWishTheaterPage(
     theaterTitle: String,
     vm: StarWishVM = koinViewModel(),
 ) {
+    val navController = LocalNavController.current
     val state by vm.state.collectAsStateWithLifecycle()
     val studyState by vm.studyState.collectAsStateWithLifecycle()
     val isGeneratingChapter by vm.isGeneratingChapter.collectAsStateWithLifecycle()
     val chapterError by vm.chapterError.collectAsStateWithLifecycle()
     val theater = StarWishRules.allTheaters(state.customTheaters).firstOrNull { it.title == theaterTitle }
     val guide = theater?.let { state.theaterGuides[it.title] ?: StarWishRules.defaultTheaterGuide(it) }
-    var showGuideMenu by remember(theaterTitle) { mutableStateOf(false) }
+    var showMenu by remember(theaterTitle) { mutableStateOf(false) }
     var showGuideEditor by remember(theaterTitle) { mutableStateOf(false) }
-    val saveGuide: (StarWishTheaterGuide) -> Unit = { updatedGuide ->
-        theater?.let { vm.saveTheaterGuide(it.title, updatedGuide) }
-    }
+    var showChapterNavigation by remember(theaterTitle) { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
-            LargeFlexibleTopAppBar(
-                title = { Text(theaterTitle) },
+            TopAppBar(
+                title = {
+                    Text(
+                        theaterTitle,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                },
                 navigationIcon = { BackButton() },
                 actions = {
                     if (theater != null && guide != null) {
                         Box {
-                            IconButton(onClick = { showGuideMenu = true }) {
-                                Icon(HugeIcons.MoreVertical, contentDescription = "剧情规划")
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(HugeIcons.MoreVertical, contentDescription = "更多")
                             }
-                            DropdownMenu(expanded = showGuideMenu, onDismissRequest = { showGuideMenu = false }) {
+                            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                                 DropdownMenuItem(
                                     text = { Text("剧情规划") },
                                     onClick = {
-                                        showGuideMenu = false
+                                        showMenu = false
                                         showGuideEditor = true
                                     },
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("增加章节") },
+                                    text = { Text("章节导航") },
                                     onClick = {
-                                        showGuideMenu = false
-                                        saveGuide(guide.copy(chapters = guide.chapters + ""))
+                                        showMenu = false
+                                        showChapterNavigation = true
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("清空本书", color = MaterialTheme.colorScheme.error) },
+                                    onClick = {
+                                        showMenu = false
+                                        vm.deleteTheater(theater.title)
+                                        navController.popBackStack()
                                     },
                                 )
                             }
@@ -409,24 +426,25 @@ fun StarWishTheaterPage(
                 modifier = Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("这个小剧场暂时找不到了")
+                Text("这本小剧场暂时找不到了")
             }
         } else {
-            TheaterDetailContent(
+            StarWishImmersiveTheaterContent(
                 theater = theater,
-                credits = StarWishRules.chapterCredits(studyState),
-                rareFragments = studyState.inventory.theaterFragments,
                 chapters = state.theaterChapters[theater.title].orEmpty(),
+                rareFragments = studyState.inventory.theaterFragments,
                 isGenerating = isGeneratingChapter,
                 error = chapterError,
-                modifier = Modifier.padding(padding).padding(horizontal = 16.dp, vertical = 14.dp),
                 costPerChapter = StarWishRules.RARE_FRAGMENTS_PER_CHAPTER,
-                fragmentLabel = "剧场碎片",
+                showChapterNavigation = showChapterNavigation,
+                onDismissChapterNavigation = { showChapterNavigation = false },
                 onCreateChapter = { influence -> vm.createNextChapter(theater.title, influence) },
                 onDeleteChapter = { chapterId -> vm.deleteChapter(theater.title, chapterId) },
+                modifier = Modifier.padding(padding),
             )
         }
     }
+
     if (theater != null && guide != null && showGuideEditor) {
         TheaterGuideDialog(
             theaterTitle = theater.title,
@@ -434,7 +452,7 @@ fun StarWishTheaterPage(
             overviewFallback = theater.prompt,
             onDismiss = { showGuideEditor = false },
             onSave = {
-                saveGuide(it)
+                vm.saveTheaterGuide(theater.title, it)
                 showGuideEditor = false
             },
         )
