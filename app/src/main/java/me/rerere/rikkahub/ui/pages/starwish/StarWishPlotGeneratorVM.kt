@@ -27,7 +27,7 @@ import me.rerere.rikkahub.data.starwish.StarWishStore
 import me.rerere.rikkahub.data.starwish.StarWishTheaterGuide
 import me.rerere.rikkahub.data.starwish.StarWishTheaterSeed
 
-internal data class StarWishPlotCandidate(
+data class StarWishPlotCandidate(
     val title: String,
     val hook: String,
     val relationshipCore: String,
