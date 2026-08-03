@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-03T09:21:58.395904+00:00",
-  "commit": "989def2f744d3769903316065e15f1d6dd6f1f4b",
+  "generatedAt": "2026-08-03T09:22:34.079757+00:00",
+  "commit": "6d5d8dbd1eeaae4fdf262dd2afff19031dae2b1e",
   "branch": "master",
-  "sourceFingerprint": "06a37a5f2e0d5668906a9f9bba2d080365fe17073fdd0113755522218990a528",
+  "sourceFingerprint": "69fe99ad7178716e172869aaf5a4d6e6b8a26677e91ba61dd13c00fe87db95e5",
   "summary": {
     "files": 1204,
-    "lines": 264202,
+    "lines": 264227,
     "symbols": 5766,
     "productionCodeFiles": 866,
     "testFiles": 148,
@@ -68,7 +68,7 @@
       "界面": 344,
       "记忆": 49
     },
-    "resolvedImportEdges": 2077
+    "resolvedImportEdges": 2079
   },
   "featureFlows": {
     "陪伴聊天主链路": {
@@ -2102,6 +2102,11 @@
       "imports": 15
     },
     {
+      "from": "me.rerere.rikkahub.service",
+      "to": "me.rerere.rikkahub.data.ai.tools",
+      "imports": 15
+    },
+    {
       "from": "me.rerere.rikkahub.ui.components.ui",
       "to": "me.rerere.hugeicons.HugeIcons",
       "imports": 15
@@ -2113,11 +2118,6 @@
     },
     {
       "from": "me.rerere.rikkahub.data.service",
-      "to": "me.rerere.rikkahub.data.ai.tools",
-      "imports": 14
-    },
-    {
-      "from": "me.rerere.rikkahub.service",
       "to": "me.rerere.rikkahub.data.ai.tools",
       "imports": 14
     },
@@ -10741,6 +10741,7 @@
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/service/ChatService.kt",
+        "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
         "app/src/test/java/me/rerere/rikkahub/data/ai/transformers/StudyStateTransformerTest.kt"
       ]
     },
@@ -24104,6 +24105,7 @@
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt",
         "app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt",
         "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
+        "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt",
         "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt"
       ]
@@ -28781,43 +28783,47 @@
       "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 64,
-      "sha256": "9ff3eb22d0fabb07fde270ab171539dffc07e9dc9b490f878d975dabca68827c",
+      "lines": 89,
+      "sha256": "09321d5530776e76c1500d8113cc713d331c9ed07502a52789a13ce82855e56a",
       "package": "me.rerere.rikkahub.service",
       "categories": [],
       "symbols": [
         {
           "name": "companionPassivePerceptionToolNames",
           "kind": "function",
-          "line": 14
+          "line": 19
         },
         {
           "name": "collectCompanionPassivePerceptionFacts",
           "kind": "function",
-          "line": 24
+          "line": 29
         },
         {
           "name": "passivePerceptionArguments",
           "kind": "function",
-          "line": 55
+          "line": 79
         }
       ],
-      "localImportCount": 5,
+      "localImportCount": 7,
       "todoMarkers": 0,
       "isTest": false,
       "isProductionCode": true,
       "localImports": [
         "me.rerere.ai.core.Tool",
         "me.rerere.ai.ui.UIMessagePart",
+        "me.rerere.rikkahub.data.ai.tools.buildTodayStudyPlanPayload",
         "me.rerere.rikkahub.data.ai.tools.passivePerceptionTools",
         "me.rerere.rikkahub.data.companion.CompanionContextFact",
+        "me.rerere.rikkahub.data.study.StudyStore",
         "me.rerere.rikkahub.utils.JsonInstant"
       ],
       "resolvedImports": [
         "ai/src/main/java/me/rerere/ai/core/Tool.kt",
         "ai/src/main/java/me/rerere/ai/ui/Message.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt",
         "app/src/main/java/me/rerere/rikkahub/data/ai/tools/ToolUtils.kt",
-        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt"
+        "app/src/main/java/me/rerere/rikkahub/data/companion/CompanionPerception.kt",
+        "app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt"
       ],
       "importedBy": [
         "app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt"
@@ -87750,7 +87756,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
         "kind": "function",
-        "line": 24
+        "line": 29
       }
     ],
     "me.rerere.rikkahub.service.collectProactiveToolContext": [
@@ -87771,7 +87777,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
         "kind": "function",
-        "line": 14
+        "line": 19
       }
     ],
     "me.rerere.rikkahub.service.compressConversation": [
@@ -88403,7 +88409,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/service/CompanionPassivePerception.kt",
         "kind": "function",
-        "line": 55
+        "line": 79
       }
     ],
     "me.rerere.rikkahub.service.perception": [
