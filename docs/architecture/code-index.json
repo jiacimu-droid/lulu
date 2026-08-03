@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-03T09:22:34.079757+00:00",
-  "commit": "6d5d8dbd1eeaae4fdf262dd2afff19031dae2b1e",
+  "generatedAt": "2026-08-03T09:23:20.783479+00:00",
+  "commit": "493cd0402ab9e3911b4dcb45bd43ee6b80ed629b",
   "branch": "master",
-  "sourceFingerprint": "69fe99ad7178716e172869aaf5a4d6e6b8a26677e91ba61dd13c00fe87db95e5",
+  "sourceFingerprint": "740848ebf281609ece2676eb0ed8c948a239213a0c815069e62f4e01957ad2a6",
   "summary": {
     "files": 1204,
-    "lines": 264227,
+    "lines": 264262,
     "symbols": 5766,
     "productionCodeFiles": 866,
     "testFiles": 148,
@@ -48997,8 +48997,8 @@
       "path": "app/src/test/java/me/rerere/rikkahub/data/ai/tools/ToolUtilsTest.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 48,
-      "sha256": "066eca2e2f9edb7af419b8a9695681603541148c6e052581b228c50de96e8119",
+      "lines": 83,
+      "sha256": "4ebf0d185bb78bde3e53fb1adeaeaef8474906fec0d4c70aa7b0ec8e5cfa534c",
       "package": "me.rerere.rikkahub.data.ai.tools",
       "categories": [
         "AI与上下文"
@@ -49007,12 +49007,12 @@
         {
           "name": "ToolUtilsTest",
           "kind": "class",
-          "line": 11
+          "line": 12
         },
         {
           "name": "tool",
           "kind": "function",
-          "line": 37
+          "line": 72
         }
       ],
       "localImportCount": 3,
@@ -70909,7 +70909,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/ai/tools/ToolUtilsTest.kt",
         "kind": "class",
-        "line": 11
+        "line": 12
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.Tts": [
@@ -71381,7 +71381,7 @@
       {
         "path": "app/src/test/java/me/rerere/rikkahub/data/ai/tools/ToolUtilsTest.kt",
         "kind": "function",
-        "line": 37
+        "line": 72
       }
     ],
     "me.rerere.rikkahub.data.ai.tools.updateAll": [
