@@ -4,12 +4,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import me.rerere.ai.core.Tool
 import me.rerere.ai.ui.UIMessagePart
+import me.rerere.rikkahub.data.ai.tools.buildTodayStudyPlanPayload
 import me.rerere.rikkahub.data.ai.tools.passivePerceptionTools
 import me.rerere.rikkahub.data.companion.CompanionContextFact
+import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.utils.JsonInstant
+import org.koin.core.context.GlobalContext
 
 internal fun companionPassivePerceptionToolNames(): List<String> = listOf(
     "get_time_info",
@@ -26,7 +31,7 @@ internal suspend fun collectCompanionPassivePerceptionFacts(
     observedAt: Long,
 ): List<CompanionContextFact> = coroutineScope {
     val requestedNames = companionPassivePerceptionToolNames().toSet()
-    tools.passivePerceptionTools()
+    val deviceFacts = tools.passivePerceptionTools()
         .filter { it.name in requestedNames }
         .map { tool ->
             async(Dispatchers.IO) {
@@ -50,6 +55,25 @@ internal suspend fun collectCompanionPassivePerceptionFacts(
         }
         .awaitAll()
         .filterNotNull()
+
+    val studyFact = withContext(Dispatchers.IO) {
+        withTimeoutOrNull(STUDY_STATE_TIMEOUT_MILLIS) {
+            runCatching {
+                val store = GlobalContext.get().get<StudyStore>()
+                val state = store.state.first()
+                CompanionContextFact(
+                    key = "perception.study_app_state",
+                    value = buildTodayStudyPlanPayload(state).toString(),
+                    observedAt = observedAt,
+                )
+            }.getOrNull()
+        }
+    }
+
+    buildList {
+        addAll(deviceFacts)
+        studyFact?.let(::add)
+    }
 }
 
 private fun passivePerceptionArguments(toolName: String): String = when (toolName) {
@@ -62,3 +86,4 @@ private fun passivePerceptionArguments(toolName: String): String = when (toolNam
 }
 
 private const val PASSIVE_PERCEPTION_TIMEOUT_MILLIS = 3_000L
+private const val STUDY_STATE_TIMEOUT_MILLIS = 1_500L
