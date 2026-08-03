@@ -87,6 +87,7 @@ internal fun humanLikeToolGuidance(toolName: String): String {
 
         name == "get_weather" || name.contains("weather") ->
             "问天气/温度/雨雪/带伞时使用；自然回答，不提工具名。"
+
         name in setOf("get_location", "explore_nearby") || name.contains("location") || name.contains("nearby") ->
             "问位置/路线/附近时使用；把结果当感知，不提工具名。"
 
@@ -106,7 +107,7 @@ internal fun humanLikeToolGuidance(toolName: String): String {
             "问手机系统时间、日期、日程或日历时使用；学习 App 的今日计划不要用它。"
 
         name == "today_study_plan" ->
-            "问考研计划、待办、番茄钟、作息奖励、夸夸值时使用；作息按个人基线01:30前睡、09:30前起判断，先问具体时间。"
+            "这是考研 App 当前任务、番茄统计和夸夸值余额的唯一权威来源。涉及当前任务、完成状态、学习时长、余额、框框值/夸值/夸夸值时，必须先 action=read，再按返回值回答，绝不能凭记忆猜。用户明确说昨晚早睡、昨天早睡、今天早起或今早早起时，必须在同一轮调用 action=claim_sleep_reward；这种明确自述本身可作为角色判断证据，reported_hour/minute 不知道时可以省略，不要只口头夸奖或承诺发奖。工具返回 granted 后才能说已经到账，返回 already_claimed_today 时要自然说明今天已经领过。"
 
         name == "play_companion_game" ->
             "这是角色可以自主进行的 App 内真实小游戏；只有工具成功返回局次和得分后，才能说自己玩过。"
@@ -137,7 +138,7 @@ private fun conciseToolDescription(tool: Tool): String = when (tool.name.removeP
     "set_alarm" -> "Set a device alarm for a specific hour and minute."
     "set_lulu_expression_state" -> "Update the character's visible state and private first-person thought for this turn."
     "text_to_speech" -> "Create replayable speech audio for supplied text."
-    "today_study_plan" -> "Read or update app-local study tasks, focus progress, and self-reported sleep rewards."
+    "today_study_plan" -> "Read authoritative app-local study tasks, focus totals and kudos balance; update task completion or settle a self-reported early-sleep/early-rise reward."
     "use_skill" -> "Use an enabled skill for a specialized task."
     "write_files" -> "Write requested content to local files."
     "write_lulu_journal" -> "Write a genuine first-person character diary entry when the character chooses to keep one."
@@ -173,15 +174,18 @@ private val ALWAYS_AVAILABLE_COMPANION_TOOLS = listOf(
     "favorite_user_message",
     "write_lulu_journal",
     "play_companion_game",
+    "today_study_plan",
     "set_alarm",
     "ask_user",
 )
 
 private val TOOL_KEYWORD_GROUPS = listOf(
-    setOf("考研", "学习计划", "今日计划", "待办", "番茄", "学习任务") to
+    setOf("考研", "学习计划", "今日计划", "待办", "番茄", "学习任务", "当前任务", "今天任务") to
         listOf("today_study_plan"),
-    setOf("早睡", "早起", "按时睡", "按时起", "作息奖励", "睡眠奖励", "夸夸值") to
-        listOf("today_study_plan"),
+    setOf(
+        "早睡", "早起", "按时睡", "按时起", "作息奖励", "睡眠奖励",
+        "夸夸值", "夸夸币", "夸值", "框框值", "框值", "画纸", "发奖励", "扣奖励",
+    ) to listOf("today_study_plan"),
     setOf("搜索", "查一下", "查查", "最新", "新闻", "网页", "网站", "链接") to
         listOf("search_web", "scrape_web"),
     setOf("闹钟", "提醒", "叫醒", "起床", "几点叫") to
@@ -205,12 +209,19 @@ private val STUDY_PLAN_MARKERS = listOf(
     "今日计划",
     "今日待办",
     "学习待办",
+    "当前任务",
+    "今天任务",
     "番茄钟",
     "夸夸值",
+    "夸夸币",
+    "夸值",
+    "框框值",
+    "框值",
+    "画纸",
     "早睡",
     "早起",
     "作息奖励",
 )
 
-private const val MAX_ACTIVE_TOOL_DESCRIPTION_LENGTH = 180
+private const val MAX_ACTIVE_TOOL_DESCRIPTION_LENGTH = 360
 private const val MAX_GENERATION_TOOLS = 12
