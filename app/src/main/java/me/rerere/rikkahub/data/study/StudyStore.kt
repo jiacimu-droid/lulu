@@ -33,7 +33,6 @@ class StudyStore(
     private val backupStateKey = stringPreferencesKey("state_backup")
 
     init {
-        SummerCourseDeadlinePlan.installIntoLegacyExamPlanViews()
         ThreeRoundRecitationPlan.installIntoLegacyExamPlanViews()
 
         scope.launch {
