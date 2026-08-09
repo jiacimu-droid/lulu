@@ -12,13 +12,3 @@ import androidx.compose.runtime.Composable
 fun GameHubPage() {
     GameHubFeaturePage()
 }
-
-@Composable
-fun SignalHuntGamePage(recordId: String? = null) {
-    SignalHuntFeaturePage(recordId)
-}
-
-@Composable
-fun PerfectManGamePage() {
-    PerfectManGameFeaturePage()
-}

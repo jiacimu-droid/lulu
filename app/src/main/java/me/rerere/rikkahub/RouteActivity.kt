@@ -102,9 +102,7 @@ import me.rerere.rikkahub.ui.pages.extensions.SkillDetailPage
 import me.rerere.rikkahub.ui.pages.extensions.SkillsPage
 import me.rerere.rikkahub.ui.pages.favorite.FavoritePage
 import me.rerere.rikkahub.ui.pages.game.GameHubPage
-import me.rerere.rikkahub.ui.pages.game.PerfectManGamePage
 import me.rerere.rikkahub.ui.pages.game.QuickCompanionGamePage
-import me.rerere.rikkahub.ui.pages.game.SignalHuntGamePage
 import me.rerere.rikkahub.ui.pages.health.HealthPage
 import me.rerere.rikkahub.ui.pages.history.HistoryPage
 import me.rerere.rikkahub.ui.pages.imggen.ImageGenPage
@@ -443,16 +441,8 @@ class RouteActivity : ComponentActivity() {
                                 GameHubPage()
                             }
 
-                            entry<Screen.PerfectManGame> {
-                                PerfectManGamePage()
-                            }
-
                             entry<Screen.QuickCompanionGame> { key ->
                                 QuickCompanionGamePage(gameId = key.gameId)
-                            }
-
-                            entry<Screen.SignalHuntGame> { key ->
-                                SignalHuntGamePage(recordId = key.recordId)
                             }
 
                             entry<Screen.Study> {
@@ -837,13 +827,7 @@ sealed interface Screen : NavKey {
     data object GameHub : Screen
 
     @Serializable
-    data object PerfectManGame : Screen
-
-    @Serializable
     data class QuickCompanionGame(val gameId: String) : Screen
-
-    @Serializable
-    data class SignalHuntGame(val recordId: String? = null) : Screen
 
     @Serializable
     data object UserProfile : Screen

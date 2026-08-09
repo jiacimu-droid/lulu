@@ -58,8 +58,7 @@ fun SettingDonatePage() {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 item(
-                    headlineContent = { Text("谢谢你愿意支持露露小手机") },
-                    supportingContent = { Text("赞助列表已清空，这里只保留佳辞自己的赞助入口。") },
+                    headlineContent = { Text("谢谢你愿意支持 Lulu 项目") },
                 )
             }
         }
@@ -81,7 +80,7 @@ private fun DonateMethodsCardGroup() {
                     contentDescription = null,
                 )
             },
-            supportingContent = { Text("打开佳辞的爱发电主页") },
+            supportingContent = { Text("支持 Lulu 项目开发") },
             headlineContent = { Text("爱发电") },
         )
     }

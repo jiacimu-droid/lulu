@@ -19,7 +19,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import me.rerere.rikkahub.POMODORO_NOTIFICATION_CHANNEL_ID
 import me.rerere.rikkahub.R
-import me.rerere.rikkahub.data.study.StudyRules
+import me.rerere.rikkahub.data.study.StudyDailyRecord
 import me.rerere.rikkahub.data.study.StudyStore
 import org.koin.android.ext.android.inject
 import java.util.concurrent.Executors
@@ -219,7 +219,23 @@ class PomodoroTimerService : android.app.Service() {
         val minutes = (elapsedSeconds.coerceAtLeast(0) / 60).coerceAtLeast(0)
         if (minutes <= 0) return
         serviceScope.launch {
-            studyStore.update { state -> StudyRules.completePomodoro(state, minutes).state }
+            studyStore.update { state ->
+                val date = java.time.LocalDate.now().toString()
+                val record = state.dailyStudyRecords[date] ?: StudyDailyRecord()
+                state.copy(
+                    lastStudyDate = date,
+                    stats = state.stats.copy(
+                        totalPomodoros = state.stats.totalPomodoros + 1,
+                        totalStudyMinutes = state.stats.totalStudyMinutes + minutes,
+                    ),
+                    dailyStudyRecords = state.dailyStudyRecords + (
+                        date to record.copy(
+                            pomodoros = record.pomodoros + 1,
+                            studyMinutes = record.studyMinutes + minutes,
+                        )
+                    ),
+                )
+            }
         }
     }
 

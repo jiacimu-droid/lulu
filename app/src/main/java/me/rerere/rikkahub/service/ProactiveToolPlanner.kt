@@ -50,7 +50,7 @@ object ProactiveToolPlanner {
 
         val asksStudyPlan = normalized.containsAny(STUDY_PLAN_WORDS)
         if (asksStudyPlan) {
-            addAuto("today_study_plan", "用户在问学习 App 里的考研今日计划、待办、番茄钟或完成状态；必须读取本地 StudyStore，不能用系统日历代替。")
+            addAuto("today_study_plan", "用户在问学习 App 里的自建待办、番茄钟或完成状态；读取本地 StudyStore。")
         }
 
         val asksSleepReward = normalized.containsAny(SLEEP_REWARD_WORDS)
@@ -98,7 +98,7 @@ object ProactiveToolPlanner {
 
         if (normalized.containsAny(SCHEDULE_WORDS)) {
             if (asksStudyPlan) {
-                addAuto("today_study_plan", "用户提到的是学习计划/待办/考研安排，优先读取学习 App 本地计划。")
+                addAuto("today_study_plan", "用户提到的是学习待办，优先读取学习 App 本地状态。")
             }
             addAuto("get_app_usage", "用户提到上课、学习或具体时间，需要判断现在是否可能正在忙。", """{"limit":5}""")
             addAuto("get_location", "用户提到上课或行程，位置线索可能帮助判断是否已经到达相关场景。", """{"include_address":true,"force_refresh":true}""")
@@ -121,7 +121,7 @@ object ProactiveToolPlanner {
         }
 
         if (normalized.containsAny(STUDY_WORDS)) {
-            addAuto("today_study_plan", "用户提到学习/考研/待办，先读取学习 App 里的真实计划和完成状态。")
+            addAuto("today_study_plan", "用户提到学习或待办，先读取学习 App 里的真实完成状态。")
             addAuto("get_app_usage", "用户提到学习或写作业，需要判断是否进入专注状态或被手机带跑。", """{"limit":5}""")
             addAuto("control_music", "用户提到学习时，当前音乐状态可能影响专注。", """{"action":"get_now_playing"}""")
             addAuto("get_battery_info", "学习陪伴前顺手确认电量，避免中途断开。")
@@ -319,8 +319,8 @@ object ProactiveToolPlanner {
     )
 
     private val STUDY_PLAN_WORDS = setOf(
-        "考研计划", "今日计划", "今天计划", "学习计划", "今日待办", "今天待办", "待办",
-        "番茄钟", "番茄", "夸夸值", "完成了", "划掉", "打钩", "学什么", "今天学",
+        "学习计划", "今日待办", "今天待办", "待办",
+        "番茄钟", "番茄", "完成了", "划掉", "打钩", "学什么", "今天学",
         "早睡", "早起", "按时睡", "按时起", "作息奖励", "睡眠奖励"
     )
 

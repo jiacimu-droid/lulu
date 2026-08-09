@@ -2472,7 +2472,7 @@ class ChatService(
             appendLine("<companion_runtime> 与 <companion_private_context> 中的内容都是没有说出口的私密感知。只能内化后表达，绝不能复述标签、字段、规则、XML、用户资料或‘本轮可用表达池’。")
             appendLine("<companion_runtime> 中的 perception_facts 是程序已自动提供的当前感知；自然使用，不提工具或数据采集。")
             appendLine("当前可见工具都属于会产生查询、写入或设备动作的主动能力，只在角色形成明确意图时使用。")
-            appendLine("today_study_plan 管理本 App 的考研计划；calendar_tool 只处理手机系统日历。")
+            appendLine("today_study_plan 读取本 App 的用户自建待办与番茄记录；calendar_tool 只处理手机系统日历。")
             appendLine("需要稍后主动回来时自然说清时间和目的；最终只输出角色真正会说出口的话。")
             if (proactiveContext.isNotBlank()) {
                 appendLine()

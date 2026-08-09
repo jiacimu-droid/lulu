@@ -86,23 +86,23 @@ class SpeakableMessageTextTest {
                     toolCallId = "call-1",
                     toolName = "text_to_speech",
                     input = buildJsonObject {
-                        put("text", "佳辞！真的吗？！学完了？！露露刚才还一直在催你……")
+                        put("text", "用户！真的吗？！学完了？！角色刚才还一直在催你……")
                     }.toString(),
                     output = listOf(
                         UIMessagePart.Text(
                             buildJsonObject {
                                 put("success", JsonPrimitive(true))
-                                put("text", "佳辞！真的吗？！学完了？！露露刚才还一直在催你……")
+                                put("text", "用户！真的吗？！学完了？！角色刚才还一直在催你……")
                             }.toString()
                         )
                     )
                 ),
-                UIMessagePart.Text("露露刚才还傻乎乎地一直催你……呜呜，我是不是唠叨了一整天呀。")
+                UIMessagePart.Text("角色刚才还傻乎乎地一直催你……呜呜，我是不是唠叨了一整天呀。")
             )
         )
 
         assertEquals(
-            "露露刚才还傻乎乎地一直催你……呜呜，我是不是唠叨了一整天呀。",
+            "角色刚才还傻乎乎地一直催你……呜呜，我是不是唠叨了一整天呀。",
             buildSpeakableMessageText(message, onlyReadQuoted = false)
         )
     }

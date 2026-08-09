@@ -12,20 +12,20 @@
 
 ## 索引状态
 
-- 基准提交：`4520a065f8e5e612576ec0a56ca4d15b043c9854`
+- 基准提交：`a5f5d974d7ccd9365855b1fbdfd7d30fae5cc5bc`
 - 分支：`master`
-- 源码指纹：`3cff1c77c849a756…`
-- 已索引文件：1202
-- 已索引代码/文本行：264093
-- 已发现类、接口、对象、函数及 Composable：5757
+- 源码指纹：`726dc6c5ec14aaf5…`
+- 已索引文件：1151
+- 已索引代码/文本行：248671
+- 已发现类、接口、对象、函数及 Composable：5271
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 864 |
-| 测试文件 | 148 |
-| ≥800 行生产文件 | 28 |
+| 生产代码文件 | 836 |
+| 测试文件 | 135 |
+| ≥800 行生产文件 | 25 |
 | ≥1500 行生产文件 | 3 |
 | TODO/FIXME/HACK/XXX | 38 |
 
@@ -84,8 +84,6 @@
 考研计划、每日任务、番茄钟、完成反馈与角色监督。
 
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt`
 
 ## 瘦身与耦合热点
@@ -95,52 +93,52 @@
 | 文件 | 行数 | 符号 | 本地导入 |
 |---|---:|---:|---:|
 | `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 3143 | 90 | 126 |
-| `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 2295 | 57 | 90 |
+| `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 2290 | 57 | 89 |
 | `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt` | 1874 | 94 | 17 |
-| `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt` | 1187 | 60 | 0 |
-| `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt` | 1185 | 30 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 1166 | 14 | 44 |
 | `web-ui/app/routes/conversations.tsx` | 1132 | 3 | 0 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Markdown.kt` | 1124 | 23 | 6 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt` | 1117 | 12 | 37 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt` | 1064 | 11 | 33 |
-| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 1032 | 77 | 89 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/components/TTSProviderConfigure.kt` | 1031 | 11 | 4 |
+| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 1016 | 75 | 87 |
 | `app/src/main/java/me/rerere/rikkahub/plugin/ui/PluginUIDeclarativePage.kt` | 985 | 19 | 10 |
 | `web-ui/app/components/conversation-sidebar.tsx` | 983 | 1 | 0 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt` | 974 | 21 | 23 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingSearchDetailPage.kt` | 972 | 20 | 18 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/cihai/CihaiPage.kt` | 949 | 21 | 22 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantBasicPage.kt` | 942 | 2 | 17 |
 
 ### 本地导入最多的生产文件
 
 | 文件 | 本地导入 | 行数 |
 |---|---:|---:|
 | `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | 126 | 3143 |
-| `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 90 | 2295 |
-| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 89 | 1032 |
+| `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | 89 | 2290 |
+| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 87 | 1016 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageTools.kt` | 44 | 1166 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/setting/SettingPage.kt` | 39 | 416 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/Export.kt` | 39 | 784 |
 | `app/src/main/java/me/rerere/rikkahub/di/DataSourceModule.kt` | 38 | 280 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessage.kt` | 37 | 1117 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/starwish/StarWishVM.kt` | 34 | 484 |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/assistant/detail/AssistantPromptPage.kt` | 33 | 732 |
 | `app/src/main/java/me/rerere/rikkahub/ui/components/ai/ChatInput.kt` | 33 | 1064 |
-| `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt` | 32 | 427 |
-| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 32 | 953 |
+| `app/src/main/java/me/rerere/rikkahub/ui/pages/chat/ChatPage.kt` | 32 | 434 |
+| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 32 | 933 |
 | `ai/src/main/java/me/rerere/ai/provider/providers/GoogleProvider.kt` | 32 | 897 |
 | `app/src/main/java/me/rerere/rikkahub/data/ai/GenerationHandler.kt` | 30 | 902 |
+| `app/src/main/java/me/rerere/rikkahub/ui/components/richtext/HighlightCodeBlock.kt` | 29 | 696 |
 
 ## 模块概览
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 747 |
+| `app` | 706 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
 | `speech` | 38 |
 | `search` | 30 |
-| `docs` | 25 |
+| `docs` | 24 |
 | `common` | 21 |
 | `plugins` | 17 |
 | `.agents` | 10 |
@@ -148,22 +146,20 @@
 | `website` | 10 |
 | `highlight` | 9 |
 | `web` | 7 |
-| `.claude` | 5 |
 | `.github` | 5 |
-| `study-plans` | 5 |
+| `.claude` | 4 |
 | `locale-tui` | 4 |
-| `money-lab` | 3 |
 | `gradle` | 2 |
 
 ## 文件类型
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 815 |
+| `.kt` | 774 |
 | `.tsx` | 74 |
 | `.java` | 64 |
-| `.md` | 60 |
-| `.json` | 55 |
+| `.json` | 54 |
+| `.md` | 51 |
 | `.ts` | 42 |
 | `.xml` | 37 |
 | `.pro` | 15 |
@@ -211,7 +207,7 @@
 - `ai/src/main/java/me/rerere/ai/util/ErrorParser.kt`
 - `ai/src/main/java/me/rerere/ai/util/FileEncoder.kt`
 - `ai/src/main/java/me/rerere/ai/util/Json.kt`
-- ……另有 118 个文件，见 `code-index.json`
+- ……另有 116 个文件，见 `code-index.json`
 
 ### 主动代理
 
@@ -300,36 +296,15 @@
 ### 学习监督
 
 - `app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/StudyExecutionPolicy.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/StudyGachaRewardPolicy.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyModels.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanCatalog.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/StudyPlanTaskSync.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/MoonlightGachaCard.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/PomodoroInAppOverlayController.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyCompactPanels.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyConversationFactoryCompat.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyDrawDialogs.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyMainPanels.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPaddingValues.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPage.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt`
-- `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt`
-- `app/src/test/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlanTest.kt`
-- ……另有 8 个文件，见 `code-index.json`
+- `app/src/test/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlowTest.kt`
 
 ### 工具
 
@@ -490,7 +465,7 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageActions.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageAvatar.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/components/message/ChatMessageBranch.kt`
-- ……另有 314 个文件，见 `code-index.json`
+- ……另有 297 个文件，见 `code-index.json`
 
 ### 记忆
 
@@ -539,37 +514,9 @@
 | `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | `Conversation` |
 | `app/src/main/java/me/rerere/rikkahub/data/service/MemoryBankService.kt` | `MemoryBankService` |
 | `app/src/main/java/me/rerere/rikkahub/data/service/ProactiveMessageService.kt` | `ProactiveMessageService` |
-| `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt` | `StudyRules` |
 | `app/src/main/java/me/rerere/rikkahub/service/ChatService.kt` | `ChatService` |
 | `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt` | `StudyVM` |
 | `app/src/main/java/me/rerere/rikkahub/web/routes/ConversationRoutes.kt` | `Conversation` |
-
-<!-- reverse-index:start -->
-## 反向依赖热点
-
-> 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
-
-- 已解析本地导入边：2079
-- 可检索完整符号：5144
-
-| 文件 | 被本地文件导入 | 行数 |
-|---|---:|---:|
-| `ai/src/main/java/me/rerere/ai/ui/Message.kt` | 131 | 812 |
-| `app/src/main/java/me/rerere/rikkahub/data/datastore/PreferencesStore.kt` | 114 | 953 |
-| `ai/src/main/java/me/rerere/ai/core/MessageRole.kt` | 62 | 19 |
-| `ai/src/main/java/me/rerere/ai/provider/Model.kt` | 61 | 62 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt` | 57 | 296 |
-| `app/src/main/java/me/rerere/rikkahub/ui/theme/Color.kt` | 54 | 191 |
-| `ai/src/main/java/me/rerere/ai/core/Tool.kt` | 51 | 29 |
-| `app/src/main/java/me/rerere/rikkahub/ui/components/nav/BackButton.kt` | 43 | 31 |
-| `app/src/main/java/me/rerere/rikkahub/data/companion/CompanionModels.kt` | 40 | 529 |
-| `app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt` | 35 | 148 |
-| `app/src/main/java/me/rerere/rikkahub/RouteActivity.kt` | 34 | 1032 |
-| `ai/src/main/java/me/rerere/ai/provider/ProviderSetting.kt` | 34 | 248 |
-| `app/src/main/java/me/rerere/rikkahub/utils/ComposeExt.kt` | 34 | 50 |
-| `ai/src/main/java/me/rerere/ai/provider/Provider.kt` | 31 | 141 |
-| `app/src/main/java/me/rerere/rikkahub/data/files/FilesManager.kt` | 27 | 676 |
-<!-- reverse-index:end -->
 
 ## 索引边界
 

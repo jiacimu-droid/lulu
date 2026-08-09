@@ -584,7 +584,7 @@ data class Settings(
     val compressPrompt: String = DEFAULT_COMPRESS_PROMPT,
     val assistantId: Uuid = DEFAULT_ASSISTANT_ID,
     val providers: List<ProviderSetting> = DEFAULT_PROVIDERS,
-    val assistants: List<Assistant> = DEFAULT_ASSISTANTS,
+    val assistants: List<Assistant> = emptyList(),
     val assistantTags: List<Tag> = emptyList(),
     val searchServices: List<SearchServiceOptions> = listOf(SearchServiceOptions.DEFAULT),
     val searchCommonOptions: SearchCommonOptions = SearchCommonOptions(),
@@ -768,7 +768,7 @@ fun Settings.getCurrentChatModel(): Model? {
 fun Settings.getCurrentAssistant(): Assistant {
     return this.assistants.find { it.id == assistantId }
         ?: this.assistants.firstOrNull()
-        ?: DEFAULT_ASSISTANTS.first()
+        ?: Assistant(id = DEFAULT_ASSISTANT_ID)
 }
 
 fun Settings.getAssistantById(id: Uuid): Assistant? {
@@ -837,27 +837,7 @@ private fun Model.findModelProviderFromList(providers: List<ProviderSetting>): P
 }
 
 internal val DEFAULT_ASSISTANT_ID = Uuid.parse("0950e2dc-9bd5-4801-afa3-aa887aa36b4e")
-internal val DEFAULT_ASSISTANTS = listOf(
-    Assistant(
-        id = DEFAULT_ASSISTANT_ID,
-        name = "露露",
-        systemPrompt = """
-            You are {{char}}, based on model {{model_name}}.
-
-            ## Info
-            - Time: {{cur_datetime}}
-            - Locale: {{locale}}
-            - Timezone: {{timezone}}
-            - Device Info: {{device_info}}
-            - System Version: {{system_version}}
-            - User Nickname: {{user}}
-
-            ## Hint
-            - If the user does not specify a language, reply in the user's primary language.
-            - Remember to use Markdown syntax for formatting, and use latex for mathematical expressions.
-        """.trimIndent()
-    ),
-)
+internal val DEFAULT_ASSISTANTS: List<Assistant> = emptyList()
 
 val DEFAULT_SYSTEM_TTS_ID = Uuid.parse("026a01a2-c3a0-4fd5-8075-80e03bdef200")
 private val DEFAULT_TTS_PROVIDERS = listOf(

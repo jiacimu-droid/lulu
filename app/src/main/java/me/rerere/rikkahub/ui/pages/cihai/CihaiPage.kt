@@ -62,7 +62,6 @@ import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.service.MemoryBankService
 import me.rerere.rikkahub.data.service.ProactiveMessageService
 import me.rerere.rikkahub.data.service.syncCompanionPrivateImpression
-import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
 import org.koin.compose.koinInject
@@ -74,6 +73,18 @@ import java.util.Locale
 fun CihaiPage(onBack: () -> Unit) {
     val context = LocalContext.current
     val settings = LocalSettings.current
+    if (settings.assistants.isEmpty()) {
+        Scaffold(containerColor = CustomColors.topBarColors.containerColor) { padding ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(padding).padding(18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("辞海", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
+                TextButton(onClick = onBack) { Text("返回") }
+            }
+        }
+        return
+    }
     val store = koinInject<CihaiStore>()
     val companionStore = koinInject<CompanionStore>()
     val companionRuntime = koinInject<CompanionRuntime>()
@@ -85,8 +96,6 @@ fun CihaiPage(onBack: () -> Unit) {
     val selectedAssistantId = state.selectedAssistantId
         .takeIf { id -> settings.assistants.any { it.id.toString() == id } }
         ?: fallbackAssistant.id.toString()
-    val selectedAssistant = settings.assistants.firstOrNull { it.id.toString() == selectedAssistantId }
-        ?: fallbackAssistant
     var selectedTab by remember { mutableIntStateOf(0) }
     val sections = visibleCihaiSections()
     val selectedSnapshot = companionState.snapshots
@@ -161,39 +170,10 @@ fun CihaiPage(onBack: () -> Unit) {
                     modifier = Modifier.clickable(onClick = onBack).padding(8.dp),
                 )
             }
-            Text(
-                text = "挂心、约定、日记与真实生活，都各自留在这里。",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
             AssistantSelector(
                 selectedAssistantId = selectedAssistantId,
                 onSelect = { id -> scope.launch { store.selectAssistant(id) } },
             )
-            Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    UIAvatar(
-                        name = selectedAssistant.name,
-                        value = selectedAssistant.avatar,
-                        modifier = Modifier.size(48.dp),
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            selectedAssistant.name.ifBlank { "当前角色" },
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            text = "当前查看这个角色的辞海：她在挂心什么、答应了什么，以及真实留下了哪些生活记录。",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
             TabRow(selectedTabIndex = selectedTab) {
                 sections.forEachIndexed { index, section ->
                     Tab(
@@ -822,7 +802,7 @@ private fun me.rerere.rikkahub.data.companion.CompanionLifeEventType.lifeEventLa
 @Composable
 private fun EmptyCihaiSection(
     title: String,
-    body: String,
+    @Suppress("UNUSED_PARAMETER") body: String,
 ) {
     Surface(
         shape = RoundedCornerShape(16.dp),
@@ -837,11 +817,6 @@ private fun EmptyCihaiSection(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

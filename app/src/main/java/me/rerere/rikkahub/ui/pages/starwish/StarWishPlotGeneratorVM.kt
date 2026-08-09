@@ -118,7 +118,6 @@ class StarWishPlotGeneratorVM(
                 current.copy(
                     customTheaters = current.customTheaters + seed,
                     theaterGuides = current.theaterGuides + (cleanTitle to candidate.toGuide()),
-                    hiddenTheaterTitles = current.hiddenTheaterTitles - cleanTitle,
                 )
             }
         }

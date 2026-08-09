@@ -94,7 +94,7 @@ fun DesktopPage() {
     val storedAppOrder by desktopStore.appOrder.collectAsState()
     val scope = rememberCoroutineScope()
     val currentAssistant = settings.getCurrentAssistant()
-    var note by remember { mutableStateOf("今天也想被好好陪着。") }
+    var note by remember { mutableStateOf("") }
 
     fun openAssistantChat(assistant: Assistant) {
         scope.launch {
@@ -116,7 +116,7 @@ fun DesktopPage() {
             DesktopApp("辞海", HugeIcons.BookOpen02, "cihai") { navController.navigate(Screen.Cihai) },
             DesktopApp("阅读", HugeIcons.Bookshelf02, "reading") { navController.navigate(Screen.CihaiReading) },
             DesktopApp("世界书", HugeIcons.Bookshelf02, "worldbooks") { navController.navigate(Screen.WorldBooks) },
-            DesktopApp("考研", HugeIcons.BookOpen02, "study") { navController.navigate(Screen.Study) },
+            DesktopApp("学习", HugeIcons.BookOpen02, "study") { navController.navigate(Screen.Study) },
             DesktopApp("星愿馆", HugeIcons.Bookshelf02, "starwish") { navController.navigate(Screen.StarWish) },
             DesktopApp("游戏", HugeIcons.Puzzle, "game") { navController.navigate(Screen.GameHub) },
             DesktopApp("聊天", HugeIcons.BubbleChat, "chat") { navController.navigate(Screen.ChatRooms) },
@@ -149,12 +149,26 @@ fun DesktopPage() {
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
             Spacer(Modifier.height(22.dp))
-            DesktopHero(
-                assistant = currentAssistant,
-                note = note,
-                onNoteChange = { note = it },
-                onOpenChat = { openAssistantChat(currentAssistant) },
-            )
+            if (settings.assistants.isEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().clickable { navController.navigate(Screen.Assistant) },
+                    colors = CustomColors.cardColorsOnSurfaceContainer,
+                ) {
+                    Text(
+                        "创建第一个角色",
+                        modifier = Modifier.fillMaxWidth().padding(20.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            } else {
+                DesktopHero(
+                    assistant = currentAssistant,
+                    note = note,
+                    onNoteChange = { note = it },
+                    onOpenChat = { openAssistantChat(currentAssistant) },
+                )
+            }
             LazyVerticalGrid(
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 state = appGridState,

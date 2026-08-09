@@ -548,83 +548,40 @@ fun VoiceCallPage(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Surface(
-                modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
-                shape = RoundedCornerShape(32.dp),
-                color = Color.White.copy(alpha = 0.72f),
-                shadowElevation = 5.dp,
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(18.dp),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(18.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(18.dp),
+                UIAvatar(
+                    name = assistantName,
+                    value = assistant?.avatar ?: Avatar.Dummy,
+                    modifier = Modifier.size(96.dp).clip(CircleShape),
+                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Box(
-                        modifier = Modifier.size(122.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                                .background(
-                                    Brush.radialGradient(
-                                        listOf(Color(0x66C7AEDF), Color(0x33AFC9DC), Color.Transparent),
-                                    ),
-                                ),
-                        )
-                        Surface(
-                            modifier = Modifier.size(108.dp),
-                            shape = CircleShape,
-                            color = Color.White.copy(alpha = 0.92f),
-                            shadowElevation = 3.dp,
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                UIAvatar(
-                                    name = assistantName,
-                                    value = assistant?.avatar ?: Avatar.Dummy,
-                                    modifier = Modifier.size(100.dp).clip(CircleShape),
-                                )
-                            }
-                        }
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            text = "语音通话",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Color(0xFF7B6D89),
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            text = assistantName,
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF303744),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Surface(
-                            shape = RoundedCornerShape(999.dp),
-                            color = Color(0xFFE9E3F2),
-                        ) {
-                            Text(
-                                text = statusText(
-                                    stage = stage,
-                                    asrStatus = asrState.status,
-                                    isSpeaking = isSpeaking,
-                                    assistantTurnInProgress = assistantTurnInProgress,
-                                    sleepMode = sleepMode,
-                                    isHistoryOnly = isHistoryOnly,
-                                ),
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = Color(0xFF625B70),
-                            )
-                        }
-                    }
+                    Text(
+                        text = assistantName,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF303744),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = statusText(
+                            stage = stage,
+                            asrStatus = asrState.status,
+                            isSpeaking = isSpeaking,
+                            assistantTurnInProgress = assistantTurnInProgress,
+                            sleepMode = sleepMode,
+                            isHistoryOnly = isHistoryOnly,
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color(0xFF625B70),
+                    )
                 }
             }
             if (stage == CallStage.Ringing) {
@@ -644,11 +601,6 @@ fun VoiceCallPage(
                                 color = Color(0xFF303744),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.SemiBold,
-                            )
-                            Text(
-                                "接听后会从最近的聊天和共同经历自然继续。",
-                                color = Color(0xFF747D8E),
-                                style = MaterialTheme.typography.bodyMedium,
                             )
                         }
                     }

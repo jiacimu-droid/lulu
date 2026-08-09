@@ -104,6 +104,13 @@ fun ChatPage(id: Uuid, text: String?, files: List<Uri>, nodeId: Uuid? = null, au
                         contentTypes.getOrNull(index)?.startsWith("image/") == true -> add(UIMessagePart.Image(file.toString()))
                         contentTypes.getOrNull(index)?.startsWith("video/") == true -> add(UIMessagePart.Video(file.toString()))
                         contentTypes.getOrNull(index)?.startsWith("audio/") == true -> add(UIMessagePart.Audio(file.toString()))
+                        else -> add(
+                            UIMessagePart.Document(
+                                url = file.toString(),
+                                fileName = files.getOrNull(index)?.lastPathSegment?.substringAfterLast('/') ?: "文档",
+                                mime = contentTypes.getOrNull(index) ?: "application/octet-stream",
+                            ),
+                        )
                     }
                 }
             }

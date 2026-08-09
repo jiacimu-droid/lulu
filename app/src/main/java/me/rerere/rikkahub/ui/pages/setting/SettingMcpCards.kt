@@ -78,7 +78,7 @@ internal fun McDonaldsMcpShortcutCard(
                 Column(Modifier.weight(1f)) {
                     Text("麦当劳 MCP 快捷接入", style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "普通 MCP 工具，不再出现在考研 App 或星愿馆奖励区。",
+                        "普通 MCP 工具。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

@@ -24,12 +24,13 @@ class StarWishStore(
     scope: AppScope,
     private val json: Json = JsonInstant,
 ) {
+    private val tolerantJson = Json(json) { ignoreUnknownKeys = true }
     private val stateKey = stringPreferencesKey("state")
 
     val state: StateFlow<StarWishState> = context.starWishDataStore.data
         .map { prefs ->
             prefs[stateKey]?.let { raw ->
-                runCatching { json.decodeFromString<StarWishState>(raw) }.getOrNull()
+                runCatching { tolerantJson.decodeFromString<StarWishState>(raw) }.getOrNull()
             } ?: StarWishState()
         }
         .catch { emit(StarWishState()) }
@@ -38,7 +39,7 @@ class StarWishStore(
     suspend fun update(transform: (StarWishState) -> StarWishState) {
         context.starWishDataStore.edit { prefs ->
             val current = prefs[stateKey]?.let { raw ->
-                runCatching { json.decodeFromString<StarWishState>(raw) }.getOrNull()
+                runCatching { tolerantJson.decodeFromString<StarWishState>(raw) }.getOrNull()
             } ?: StarWishState()
             prefs[stateKey] = json.encodeToString(transform(current))
         }

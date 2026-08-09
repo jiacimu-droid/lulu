@@ -145,7 +145,7 @@ internal fun AssistantBasicContent(
         },
         onDismiss = { showClearHistoryDialog = false },
         text = {
-            Text("会不可撤销地清除这个角色的聊天与电话、收藏、长期记忆、辞海日记、挂心、承诺和未触发的主动提醒。人设、互动设定、头像、模型设置、世界书及考研计划会保留。")
+            Text("会不可撤销地清除这个角色的聊天与电话、收藏、长期记忆、辞海日记、挂心、承诺和未触发的主动提醒。人设、互动设定、头像、模型设置与世界书会保留。")
         },
     )
 
@@ -868,9 +868,9 @@ internal fun AssistantBasicContent(
                 description = {
                     Text(
                         when (val state = historyClearState) {
-                            HistoryClearState.Idle -> "清除这个角色产生的全部交互记录，保留人设、互动设定、世界书与考研计划。"
+                            HistoryClearState.Idle -> "清除这个角色产生的全部交互记录，保留人设、互动设定与世界书。"
                             HistoryClearState.Running -> "正在清除角色记录…"
-                            HistoryClearState.Success -> "角色记录已清除，人设、互动设定、世界书与考研计划均已保留。"
+                            HistoryClearState.Success -> "角色记录已清除，人设、互动设定与世界书均已保留。"
                             is HistoryClearState.Failed -> state.message
                         }
                     )

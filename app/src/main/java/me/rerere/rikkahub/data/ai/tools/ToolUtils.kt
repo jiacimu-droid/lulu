@@ -107,7 +107,7 @@ internal fun humanLikeToolGuidance(toolName: String): String {
             "问手机系统时间、日期、日程或日历时使用；学习 App 的今日计划不要用它。"
 
         name == "today_study_plan" ->
-            "这是考研 App 当前任务、番茄统计和夸夸值余额的唯一权威来源。涉及当前任务、完成状态、学习时长、余额、框框值/夸值/夸夸值时，必须先 action=read，再按返回值回答，绝不能凭记忆猜。用户明确说昨晚早睡、昨天早睡、今天早起或今早早起时，必须在同一轮调用 action=claim_sleep_reward；这种明确自述本身可作为角色判断证据，reported_hour/minute 不知道时可以省略，不要只口头夸奖或承诺发奖。工具返回 granted 后才能说已经到账，返回 already_claimed_today 时要自然说明今天已经领过。"
+            "这是学习 App 中用户自建待办和番茄统计的权威来源；回答完成状态或学习时长前先读取，不得虚构计划或奖励。"
 
         name == "play_companion_game" ->
             "这是角色可以自主进行的 App 内真实小游戏；只有工具成功返回局次和得分后，才能说自己玩过。"
@@ -180,12 +180,8 @@ private val ALWAYS_AVAILABLE_COMPANION_TOOLS = listOf(
 )
 
 private val TOOL_KEYWORD_GROUPS = listOf(
-    setOf("考研", "学习计划", "今日计划", "待办", "番茄", "学习任务", "当前任务", "今天任务") to
+    setOf("学习", "今日待办", "待办", "番茄", "学习任务", "当前任务", "今天任务") to
         listOf("today_study_plan"),
-    setOf(
-        "早睡", "早起", "按时睡", "按时起", "作息奖励", "睡眠奖励",
-        "夸夸值", "夸夸币", "夸值", "框框值", "框值", "画纸", "发奖励", "扣奖励",
-    ) to listOf("today_study_plan"),
     setOf("搜索", "查一下", "查查", "最新", "新闻", "网页", "网站", "链接") to
         listOf("search_web", "scrape_web"),
     setOf("闹钟", "提醒", "叫醒", "起床", "几点叫") to
@@ -204,20 +200,12 @@ private val TOOL_KEYWORD_GROUPS = listOf(
 )
 
 private val STUDY_PLAN_MARKERS = listOf(
-    "考研",
     "学习计划",
-    "今日计划",
     "今日待办",
     "学习待办",
     "当前任务",
     "今天任务",
     "番茄钟",
-    "夸夸值",
-    "夸夸币",
-    "夸值",
-    "框框值",
-    "框值",
-    "画纸",
     "早睡",
     "早起",
     "作息奖励",

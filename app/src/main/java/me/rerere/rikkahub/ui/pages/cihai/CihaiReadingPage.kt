@@ -1,5 +1,9 @@
 package me.rerere.rikkahub.ui.pages.cihai
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,63 +17,73 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlin.random.Random
-import me.rerere.rikkahub.data.starwish.StarWishRules
-import me.rerere.rikkahub.data.starwish.StarWishStore
-import me.rerere.rikkahub.data.starwish.StarWishTheaterChapter
-import me.rerere.rikkahub.data.starwish.StarWishTheaterSeed
+import kotlinx.coroutines.launch
+import me.rerere.rikkahub.Screen
+import me.rerere.rikkahub.data.datastore.SettingsStore
+import me.rerere.rikkahub.data.model.Conversation
+import me.rerere.rikkahub.ui.context.LocalNavController
+import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.theme.CustomColors
 import org.koin.compose.koinInject
+import kotlin.uuid.Uuid
+
+private const val READING_PREFS = "reading_documents"
+private const val READING_DOCUMENT_SET = "documents"
 
 @Composable
 fun CihaiReadingPage(onBack: () -> Unit) {
-    val starWishStore = koinInject<StarWishStore>()
-    val state by starWishStore.state.collectAsState()
-    val readableTheaters = remember(state) {
-        StarWishRules.allTheaters(state.customTheaters).mapNotNull { seed ->
-            val chapters = state.theaterChapters[seed.title].orEmpty()
-                .filter { it.content.isNotBlank() }
-                .sortedBy { it.chapter }
-            if (chapters.isEmpty()) null else TheaterReading(seed, chapters)
-        }
+    val context = LocalContext.current
+    val settings = LocalSettings.current
+    val settingsStore = koinInject<SettingsStore>()
+    val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
+    val prefs = remember { context.getSharedPreferences(READING_PREFS, 0) }
+    var documents by remember { mutableStateOf(loadReadingDocuments(prefs.getStringSet(READING_DOCUMENT_SET, emptySet()).orEmpty())) }
+    var selectedAssistantId by remember(settings.assistantId, settings.assistants) {
+        mutableStateOf(settings.assistantId.takeIf { id -> settings.assistants.any { it.id == id } })
     }
-    var selectedTitle by remember(readableTheaters.map { it.seed.title }) { mutableStateOf<String?>(null) }
-    val selected = readableTheaters.firstOrNull { it.seed.title == selectedTitle }
-        ?: readableTheaters.firstOrNull()
 
-    LaunchedEffect(readableTheaters.map { it.seed.title }) {
-        if (selectedTitle == null || readableTheaters.none { it.seed.title == selectedTitle }) {
-            selectedTitle = readableTheaters.randomOrNull()?.seed?.title
+    fun persist(next: List<ReadingDocument>) {
+        documents = next
+        prefs.edit().putStringSet(
+            READING_DOCUMENT_SET,
+            next.map { "${Uri.encode(it.name)}|${Uri.encode(it.uri)}" }.toSet(),
+        ).apply()
+    }
+
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        runCatching {
+            context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        val name = uri.lastPathSegment?.substringAfterLast('/')?.ifBlank { null } ?: "文档"
+        if (documents.none { it.uri == uri.toString() }) {
+            persist(documents + ReadingDocument(name, uri.toString()))
         }
     }
 
     Scaffold(containerColor = CustomColors.topBarColors.containerColor) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 18.dp),
+            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 18.dp),
             contentPadding = PaddingValues(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
@@ -80,109 +94,55 @@ fun CihaiReadingPage(onBack: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "阅读小剧场",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            text = "女主角是我；名字含露的角色是他。",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Text(
-                        text = "返回",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable(onClick = onBack).padding(8.dp),
-                    )
+                    Text("阅读", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Text("返回", color = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable(onClick = onBack).padding(8.dp))
                 }
             }
-
-            if (readableTheaters.isEmpty()) {
+            item {
+                Button(onClick = { picker.launch(arrayOf("text/*", "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) }) {
+                    Text("上传文档")
+                }
+            }
+            if (settings.assistants.isNotEmpty()) {
                 item {
-                    Card(colors = CustomColors.cardColorsOnSurfaceContainer) {
-                        Text(
-                            text = "还没有可阅读的小剧场。先去星愿馆生成至少一章正文，这里就会随机挑一部给你读。",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.fillMaxWidth().padding(18.dp),
-                        )
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(settings.assistants, key = { it.id }) { assistant ->
+                            FilterChip(
+                                selected = assistant.id == selectedAssistantId,
+                                onClick = {
+                                    selectedAssistantId = assistant.id
+                                    scope.launch { settingsStore.updateAssistant(assistant.id) }
+                                },
+                                label = { Text(assistant.name.ifBlank { "未命名角色" }) },
+                            )
+                        }
                     }
                 }
-            } else {
-                item {
+            }
+            items(documents, key = { it.uri }) { document ->
+                Card(modifier = Modifier.fillMaxWidth()) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = selected?.seed?.title.orEmpty(),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(
-                                text = "已生成 ${selected?.chapters?.size ?: 0} 章",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Button(
+                        Text(document.name, modifier = Modifier.weight(1f), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        TextButton(
+                            enabled = selectedAssistantId != null,
                             onClick = {
-                                selectedTitle = readableTheaters
-                                    .filterNot { it.seed.title == selectedTitle }
-                                    .ifEmpty { readableTheaters }
-                                    .random(Random(System.currentTimeMillis()))
-                                    .seed
-                                    .title
+                                val assistantId = selectedAssistantId ?: return@TextButton
+                                scope.launch {
+                                    settingsStore.updateAssistant(assistantId)
+                                    val conversation = Conversation.ofId(
+                                        id = Uuid.random(),
+                                        assistantId = assistantId,
+                                        newConversation = true,
+                                    )
+                                    navController.navigate(Screen.Chat(conversation.id.toString(), files = listOf(document.uri)))
+                                }
                             },
-                        ) {
-                            Text("随机换一本")
-                        }
-                    }
-                }
-
-                item {
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(readableTheaters, key = { it.seed.title }) { theater ->
-                            FilterChip(
-                                selected = theater.seed.title == selected?.seed?.title,
-                                onClick = { selectedTitle = theater.seed.title },
-                                label = {
-                                    Text(theater.seed.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                },
-                            )
-                        }
-                    }
-                }
-
-                selected?.let { theater ->
-                    items(theater.chapters, key = { it.id }) { chapter ->
-                        Surface(
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.84f),
-                            shape = RoundedCornerShape(14.dp),
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(10.dp),
-                            ) {
-                                Text(
-                                    text = chapter.title.ifBlank { "第 ${chapter.chapter} 章" },
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                                Text(
-                                    text = chapter.content,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
+                        ) { Text("一起阅读") }
+                        TextButton(onClick = { persist(documents.filterNot { it.uri == document.uri }) }) { Text("删除") }
                     }
                 }
             }
@@ -190,7 +150,9 @@ fun CihaiReadingPage(onBack: () -> Unit) {
     }
 }
 
-private data class TheaterReading(
-    val seed: StarWishTheaterSeed,
-    val chapters: List<StarWishTheaterChapter>,
-)
+private data class ReadingDocument(val name: String, val uri: String)
+
+private fun loadReadingDocuments(values: Set<String>): List<ReadingDocument> = values.mapNotNull { value ->
+    val parts = value.split('|', limit = 2)
+    if (parts.size != 2) null else ReadingDocument(Uri.decode(parts[0]), Uri.decode(parts[1]))
+}.sortedBy(ReadingDocument::name)

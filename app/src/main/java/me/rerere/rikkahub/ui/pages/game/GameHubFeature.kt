@@ -41,10 +41,6 @@ internal fun GameHubFeaturePage() {
     val navController = LocalNavController.current
     val games = remember {
         listOf(
-            GameHubTile("满分男", "轮流描述和猜分") { navController.navigate(Screen.PerfectManGame) },
-            GameHubTile("跑团", "组建主角小队，进入不同世界冒险") { navController.navigate(Screen.QuickCompanionGame("roleplay_adventure")) },
-            GameHubTile("海龟汤", "自由提问，还原真相") { navController.navigate(Screen.QuickCompanionGame("turtle_soup")) },
-            GameHubTile("默契问答", "看看彼此有多了解") { navController.navigate(Screen.QuickCompanionGame("rapport_quiz")) },
             GameHubTile("快艇骰子", "掷骰与计分") { navController.navigate(Screen.QuickCompanionGame("yacht_dice")) },
             GameHubTile("五子棋", "和角色下一局") { navController.navigate(Screen.QuickCompanionGame("gomoku")) },
         )

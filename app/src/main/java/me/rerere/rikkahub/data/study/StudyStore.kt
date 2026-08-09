@@ -20,7 +20,6 @@ import kotlinx.serialization.json.Json
 import me.rerere.rikkahub.AppScope
 import me.rerere.rikkahub.utils.JsonInstant
 import java.time.LocalDate
-import kotlin.random.Random
 
 private val Context.studyDataStore: DataStore<Preferences> by preferencesDataStore(name = "study_reward")
 
@@ -33,8 +32,6 @@ class StudyStore(
     private val backupStateKey = stringPreferencesKey("state_backup")
 
     init {
-        ThreeRoundRecitationPlan.installIntoLegacyExamPlanViews()
-
         scope.launch {
             context.studyDataStore.edit { prefs ->
                 val current = readState(prefs) ?: return@edit
@@ -96,52 +93,12 @@ private val studyJson = Json(JsonInstant) {
     coerceInputValues = true
 }
 
-private fun StudyState.prepareForCurrentStudySystem(): StudyState =
-    ensureToday()
-        .migrateLegacyEntertainmentFragments()
-        .retireLegacyProgressionResources()
-        .preserveOfficialEconomy()
-        .grantDataLossCompensation()
-        .grantPomodoroInterruptionCompensation()
-        .grantGachaBadLuckCompensation()
-        .let { StudyRules.refreshShopIfNeeded(it, LocalDate.now(), Random.Default) }
+private fun StudyState.prepareForCurrentStudySystem(): StudyState = ensureToday()
 
-private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState =
-    StudyPlanTaskSync.sync(this, date)
-
-/**
- * Level rewards and universal fragments are retired product concepts. Their
- * serialized fields stay readable only so older private-build saves can still
- * be decoded; every live read and write removes their value and reward payload.
- */
-private fun StudyState.retireLegacyProgressionResources(): StudyState {
-    val cleanedBoxes = inventory.unopenedMysteryBoxes.map { box ->
-        if (box.universalNormalFragments == 0) box else box.copy(universalNormalFragments = 0)
-    }
+private fun StudyState.ensureToday(date: LocalDate = LocalDate.now()): StudyState {
+    val dateText = date.toString()
     return copy(
-        claimedLevelRewards = emptySet(),
-        inventory = inventory.copy(
-            universalNormalFragments = 0,
-            universalRareFragments = 0,
-            universalEpicFragments = 0,
-            unopenedMysteryBoxes = cleanedBoxes,
-        ),
+        today = dateText,
+        tasks = if (today == dateText) tasks else emptyList(),
     )
 }
-
-private fun StudyState.preserveOfficialEconomy(): StudyState {
-    return if (internalTestGrantVersion >= StudyRules.OFFICIAL_ECONOMY_RESET_VERSION) {
-        this
-    } else {
-        copy(internalTestGrantVersion = StudyRules.OFFICIAL_ECONOMY_RESET_VERSION)
-    }
-}
-
-private fun StudyState.grantDataLossCompensation(): StudyState =
-    StudyRules.grantDataLossCompensation(this)
-
-private fun StudyState.grantPomodoroInterruptionCompensation(): StudyState =
-    StudyRules.grantPomodoroInterruptionCompensation(this)
-
-private fun StudyState.grantGachaBadLuckCompensation(): StudyState =
-    StudyRules.grantGachaBadLuckCompensation(this)

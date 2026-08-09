@@ -45,10 +45,8 @@ import me.rerere.rikkahub.data.starwish.StarWishTheaterSeed
 internal fun StarWishImmersiveTheaterContent(
     theater: StarWishTheaterSeed,
     chapters: List<StarWishTheaterChapter>,
-    rareFragments: Int,
     isGenerating: Boolean,
     error: String?,
-    costPerChapter: Int,
     showChapterNavigation: Boolean,
     onDismissChapterNavigation: () -> Unit,
     onCreateChapter: (String) -> Unit,
@@ -85,7 +83,7 @@ internal fun StarWishImmersiveTheaterContent(
 
     val selectedChapter = readableChapters.firstOrNull { it.id == selectedChapterId }
         ?: readableChapters.lastOrNull()
-    val canGenerate = rareFragments >= costPerChapter && !isGenerating
+    val canGenerate = !isGenerating
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -190,11 +188,6 @@ internal fun StarWishImmersiveTheaterContent(
                     error?.isNotBlank() == true -> Text(
                         error,
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                    !canGenerate && !isGenerating -> Text(
-                        "需要 $costPerChapter 枚剧场碎片，当前 $rareFragments 枚",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }

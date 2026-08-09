@@ -105,7 +105,6 @@ import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.toMessageNode
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.study.StudyStore
-import me.rerere.rikkahub.data.study.StudyTaskSource
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.service.CompanionDecisionMode
 import me.rerere.rikkahub.service.CompanionIntent
@@ -286,15 +285,11 @@ class ProactiveMessageService : KoinComponent {
             val studyState = studyStore.state.first()
             val selectedStudyAssistant = studyState.selectedAssistantId
             if (selectedStudyAssistant == assistant.id.toString()) {
-                val planTasks = studyState.tasks.filter { it.source == StudyTaskSource.Plan }
-                val manualTasks = studyState.tasks.filter { it.source == StudyTaskSource.Manual }
                 val undoneTasks = studyState.tasks.filterNot { it.done }
-                if (planTasks.isNotEmpty() || manualTasks.isNotEmpty() || studyState.stats.totalPomodoros > 0) {
-                val donePlan = planTasks.count { it.done }
-                sb.appendLine("今日考研计划:")
+                if (studyState.tasks.isNotEmpty() || studyState.stats.totalPomodoros > 0) {
+                sb.appendLine("今日学习状态:")
                 sb.appendLine("  - 日期: ${studyState.today}")
-                sb.appendLine("  - 计划待办完成: $donePlan/${planTasks.size}")
-                sb.appendLine("  - 手动待办: ${manualTasks.count { it.done }}/${manualTasks.size}")
+                sb.appendLine("  - 待办: ${studyState.tasks.count { it.done }}/${studyState.tasks.size}")
                 sb.appendLine("  - 累计番茄钟: ${studyState.stats.totalPomodoros} 个，累计学习 ${studyState.stats.totalStudyMinutes} 分钟")
                 if (undoneTasks.isNotEmpty()) {
                     sb.appendLine("  - 未完成待办:")

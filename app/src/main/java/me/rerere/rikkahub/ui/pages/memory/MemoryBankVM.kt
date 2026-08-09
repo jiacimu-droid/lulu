@@ -44,6 +44,15 @@ data class MemoryBatchOverview(
     val batches: List<MemoryExtractionBatchEntity>,
 )
 
+data class RawTimelineEntry(
+    val id: String,
+    val conversationId: String,
+    val nodeId: String,
+    val role: String,
+    val content: String,
+    val createdAt: String,
+)
+
 class MemoryBankVM(
     private val memoryBankService: MemoryBankService,
     private val settingsStore: SettingsStore,
@@ -59,6 +68,9 @@ class MemoryBankVM(
 
     private val _archiveSources = MutableStateFlow<Map<Int, List<MemoryBankEntity>>>(emptyMap())
     val archiveSources: StateFlow<Map<Int, List<MemoryBankEntity>>> = _archiveSources.asStateFlow()
+
+    private val _rawTimeline = MutableStateFlow<List<RawTimelineEntry>>(emptyList())
+    val rawTimeline: StateFlow<List<RawTimelineEntry>> = _rawTimeline.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -118,7 +130,10 @@ class MemoryBankVM(
 
     private suspend fun refreshMemoryData(currentSettings: Settings) {
         if (!initializedAssistantFilter) {
-            _selectedAssistantId.value = currentSettings.getCurrentAssistant().id.toString()
+            _selectedAssistantId.value = currentSettings.assistants
+                .firstOrNull { it.id == currentSettings.assistantId }
+                ?.id
+                ?.toString()
             initializedAssistantFilter = true
         }
         val configuredAssistantIds = currentSettings.assistants.map { it.id.toString() }
@@ -139,6 +154,32 @@ class MemoryBankVM(
         _memories.value = collapseArchiveSources(visible)
         _archiveSources.value = loadArchiveSources(assistantId, visible)
         _batchOverviews.value = buildBatchOverviews(currentSettings, assistantId)
+        _rawTimeline.value = loadRawTimeline(currentSettings, assistantId)
+    }
+
+    private suspend fun loadRawTimeline(
+        currentSettings: Settings,
+        assistantId: String?,
+    ): List<RawTimelineEntry> {
+        val assistant = currentSettings.assistants.firstOrNull { it.id.toString() == assistantId }
+            ?: return emptyList()
+        return conversationRepository.getRecentConversations(assistant.id, limit = 100)
+            .flatMap { conversation ->
+                conversation.messageNodes.mapNotNull { node ->
+                    val message = runCatching { node.currentMessage }.getOrNull() ?: return@mapNotNull null
+                    val content = message.toText().trim()
+                    if (content.isEmpty()) return@mapNotNull null
+                    RawTimelineEntry(
+                        id = message.id.toString(),
+                        conversationId = conversation.id.toString(),
+                        nodeId = node.id.toString(),
+                        role = message.role.name,
+                        content = content,
+                        createdAt = message.createdAt.toString(),
+                    )
+                }
+            }
+            .sortedByDescending(RawTimelineEntry::createdAt)
     }
 
     private suspend fun loadArchiveSources(

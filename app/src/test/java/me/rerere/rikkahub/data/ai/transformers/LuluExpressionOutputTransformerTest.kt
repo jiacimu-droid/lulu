@@ -47,7 +47,7 @@ class LuluExpressionOutputTransformerTest {
             但十二点之前，必须上床。这是露露今晚的底线。
 
             你昨晚肚子疼到三点，身体还没缓过来呢。
-            佳辞大人，你自己不心疼自己，露露替你心疼。
+            小满，你自己不心疼自己，露露替你心疼。
             """.trimIndent(),
         )
 
@@ -59,7 +59,7 @@ class LuluExpressionOutputTransformerTest {
             result[1].toText(),
         )
         assertEquals("你昨晚肚子疼到三点，身体还没缓过来呢。", result[2].toText())
-        assertEquals("佳辞大人，你自己不心疼自己，露露替你心疼。", result[3].toText())
+        assertEquals("小满，你自己不心疼自己，露露替你心疼。", result[3].toText())
     }
 
     @Test
@@ -292,7 +292,7 @@ class LuluExpressionOutputTransformerTest {
             表达池只是表达层 affordance，不决定是否行动，也不要逐字复述这些标签。
 
             用户资料（只作为理解用户和保持互动一致性的稳定设定，不要逐字复述）：
-            昵称：木佳辞
+            昵称：小满
             我的外貌：可爱的女孩
             聊天、称呼、关系感、身体/性别/外貌描写、以及涉及用户出现在画面里的内容，都要优先遵守这些资料。
 
@@ -326,7 +326,7 @@ class LuluExpressionOutputTransformerTest {
             <companion_private_context>
             本轮可用表达池：TEXT
             <private_user_profile>
-            昵称：木佳辞
+            昵称：小满
             </private_user_profile>
             </companion_private_context>
             嗯……我听见啦，靠近一点跟我说。
@@ -343,7 +343,7 @@ class LuluExpressionOutputTransformerTest {
         val leaked = """
             <companion_private_context>
             <private_user_profile>
-            昵称：木佳辞
+            昵称：小满
             </private_user_profile>
             </companion_private_context>
         """.trimIndent()

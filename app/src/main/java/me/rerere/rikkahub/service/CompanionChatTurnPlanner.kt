@@ -75,7 +75,7 @@ object CompanionChatTurnModelPlanner {
         appendLine("只有用户明确交托长期/循环职责，或用户长期健康情况明确要求角色持续调整照顾方式时，才新增 responsibilityAnchorUpserts。普通事实、喜好、一次性请求、角色对用户的看法都不能写成责任锚点。")
         appendLine("每个 responsibilityAnchorUpsert 包含 stableKey、kind、statement、responsibility、triggers、actions、avoid、importance。kind 只能是 HEALTH 或 RESPONSIBILITY；actions 至少一项，必须写角色今后具体要做什么。stableKey 要短而稳定，同一责任的修改继续使用同一个 key。")
         appendLine("cancelResponsibilityAnchorIds 只能填写现有 responsibility_anchors 中的 id；当用户明确取消、纠正或收回职责时填写。不要修改 private_impression 来代替责任新增、执行或取消。")
-        appendLine("情境感知包括当前时间、上下文、考研 App 计划、被动感知事实、排序后的向量记忆召回、最近状态栏/辞海/历史挂心记录；不要为重复读取已提供事实而调用工具。")
+        appendLine("情境感知包括当前时间、上下文、学习 App 状态、被动感知事实、排序后的向量记忆召回、最近状态栏/辞海/历史挂心记录；不要为重复读取已提供事实而调用工具。")
         appendLine("意义评估只评估重要性、威胁、机会、身体/精神安全、时间压力、成本、收益、不行动后果和资源；它不直接选择行动。")
         appendLine("动态判断负责决定 intention、工具需求、是否行动、行动池选择和下一次感知时间；工具结果如果能同步得到，就补回本轮再决定行动。")
         appendLine("状态生成放在行动后，只生成心情、身体状况、精神状况、关系状态和第一人称没说出口；belief/motive/intention 不作为状态栏字段。")
@@ -324,8 +324,7 @@ private fun String.sanitizePlanReason(): String =
         .map { it.trim() }
         .filter { it.isNotBlank() }
         .filterNot { line ->
-            line.contains("佳辞") ||
-                line.contains("～") ||
+            line.contains("～") ||
                 line.contains("呀") ||
                 line.contains("哦") ||
                 line.contains("吗") ||

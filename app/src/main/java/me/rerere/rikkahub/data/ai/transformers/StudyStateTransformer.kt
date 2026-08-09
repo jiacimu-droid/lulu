@@ -2,16 +2,11 @@ package me.rerere.rikkahub.data.ai.transformers
 
 import kotlinx.coroutines.flow.first
 import me.rerere.ai.ui.UIMessage
-import me.rerere.rikkahub.data.study.ExamStudyPlan
-import me.rerere.rikkahub.data.study.StudyRules
-import me.rerere.rikkahub.data.study.StudySleepHabit
 import me.rerere.rikkahub.data.study.StudyState
 import me.rerere.rikkahub.data.study.StudyStore
-import me.rerere.rikkahub.data.study.StudyTaskSource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.time.LocalDate
-import java.time.format.DateTimeParseException
 
 object StudyStateTransformer : InputMessageTransformer, KoinComponent {
     private val studyStore: StudyStore by inject()
@@ -22,88 +17,29 @@ object StudyStateTransformer : InputMessageTransformer, KoinComponent {
     ): List<UIMessage> {
         val state = studyStore.state.first()
         if (state.selectedAssistantId != ctx.assistant.id.toString()) return messages
-
-        val today = state.today.toLocalDateOrToday()
-        val schedule = state.generatedSchedules[state.today] ?: ExamStudyPlan.todaySchedule(today)
-        if (
-            state.tasks.isEmpty() &&
-            state.stats.totalPomodoros <= 0 &&
-            state.stats.totalStudyMinutes <= 0 &&
-            schedule.isEmpty()
-        ) {
-            return messages
-        }
-
-        return messages + UIMessage.system(buildStudyCompanionContext(state, today))
+        if (state.tasks.isEmpty() && state.stats.totalStudyMinutes <= 0) return messages
+        return messages + UIMessage.system(buildStudyCompanionContext(state))
     }
 }
 
-internal fun buildStudyCompanionContext(
-    state: StudyState,
-    today: LocalDate = state.today.toLocalDateOrToday(),
-): String {
-    val planTasks = state.tasks.filter { it.source == StudyTaskSource.Plan }
-    val manualTasks = state.tasks.filter { it.source == StudyTaskSource.Manual }
-    val completedTasks = state.tasks.filter { it.done }
-    val undoneTasks = state.tasks.filterNot { it.done }
-    val schedule = state.generatedSchedules[state.today] ?: ExamStudyPlan.todaySchedule(today)
-    val level = StudyRules.currentLevel(state)
-    val timeOverview = StudyRules.studyTimeOverview(state, today)
-
+internal fun buildStudyCompanionContext(state: StudyState): String {
+    val date = state.today.ifBlank { LocalDate.now().toString() }
+    val record = state.dailyStudyRecords[date]
     return buildString {
-        appendLine("<study_companion_state>")
-        appendLine("你是用户在考研 App 今日页选择的学习陪伴角色。下面是固定学习状态板块，不是聊天记录；不要说你查了日历、工具或系统。")
-        appendLine("日期：${state.today.ifBlank { today.toString() }}")
-        appendLine("计划待办：${planTasks.count { it.done }}/${planTasks.size}")
-        appendLine("手动待办：${manualTasks.count { it.done }}/${manualTasks.size}")
-        appendLine("今日学习：${timeOverview.todayPomodoros} 个番茄，${timeOverview.todayMinutes} 分钟")
-        appendLine("本周学习：${timeOverview.weekPomodoros} 个番茄，${timeOverview.weekMinutes} 分钟")
-        appendLine("累计番茄钟：${state.stats.totalPomodoros} 个；累计学习：${state.stats.totalStudyMinutes} 分钟")
-        appendLine("夸夸值：当前 ${state.wallet.kudos}；累计 ${state.wallet.totalKudosEarned}；等级 Lv${level.level} ${level.title}")
-        appendLine(
-            "今日作息奖励：早睡 ${if (StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlySleep, today)) "已发放" else "未发放"}；" +
-                "早起 ${if (StudyRules.hasClaimedSleepHabitReward(state, StudySleepHabit.EarlyRise, today)) "已发放" else "未发放"}",
-        )
-        appendLine("作息奖励判断规则：")
-        appendLine("- 01:30 入睡、09:30 起床只是用户目前的参考基线，不是系统硬门槛。")
-        appendLine("- 用户提到早睡或早起时，先获得实际时间；没有具体时间就追问，不得猜测发奖。")
-        appendLine("- 结合实际时间、参考时间、近期趋势、当前对话或设备证据，以及生病、赶路、考试压力、恢复期等特殊情况，由你作出最终批准或拒绝。")
-        appendLine("- 实际时间晚于参考值时，你仍可以基于近期改善或特殊情况批准；一旦你明确批准，奖励结算层不会再用固定时间二次否决。")
-        appendLine("- 不要因为用户索要就批准；明显矛盾、证据不足或不可信时明确拒绝。模型或证据异常时设置 model_error=true，不占用当天领取机会。")
-        appendLine("- 调用 today_study_plan 的 claim_sleep_reward 时必须提供 approved 布尔值、decision_reason、reported_hour、reported_minute；尽量同时提供 recent_trend、special_circumstances 和 current_context。")
-        appendLine("- 如果可用，结合 get_gadgetbridge_data 的睡眠记录、get_app_usage 的夜间使用和 get_battery_info 的充电线索，但不要向用户暴露工具细节。")
-        appendLine("- 早睡批准后发 ${StudyRules.EARLY_SLEEP_KUDOS} 夸夸值；早起批准后发十连抽券 x${StudyRules.EARLY_RISE_TEN_DRAW_TICKETS}；每项每天最多一次。")
-        if (completedTasks.isNotEmpty()) {
-            appendLine("已完成/已划掉待办：")
-            completedTasks.take(8).forEach { task ->
-                appendLine("- ${task.title}")
-            }
-            appendLine("这些任务代表用户已经点了打钩并划掉了；不要再把已完成/已划掉的任务当作未完成任务提醒。")
+        appendLine("<learning_state>")
+        appendLine("日期：$date")
+        appendLine("今日番茄钟：${record?.pomodoros ?: 0} 个，${record?.studyMinutes ?: 0} 分钟")
+        appendLine("累计学习：${state.stats.totalPomodoros} 个番茄钟，${state.stats.totalStudyMinutes} 分钟")
+        val completed = state.tasks.filter { it.done }
+        val pending = state.tasks.filterNot { it.done }
+        if (completed.isNotEmpty()) {
+            appendLine("已完成待办：")
+            completed.take(12).forEach { appendLine("- ${it.title}") }
         }
-        if (undoneTasks.isNotEmpty()) {
+        if (pending.isNotEmpty()) {
             appendLine("未完成待办：")
-            undoneTasks.take(8).forEach { task ->
-                appendLine("- ${task.title}")
-            }
-            appendLine("如果用户问今天还有什么没做，直接根据这里回答；如果主动提醒，要像陪伴而不是系统催办。")
-        } else if (state.tasks.isNotEmpty()) {
-            appendLine("今日待办已全部完成。")
+            pending.take(12).forEach { appendLine("- ${it.title}") }
         }
-        if (schedule.isNotEmpty()) {
-            appendLine("今日时间表：")
-            schedule.take(12).forEach { block ->
-                appendLine("${block.time}｜${block.title}｜${block.detail}")
-            }
-            appendLine("如果用户问今天怎么安排、现在该学什么或计划表是什么，直接参考这张时间表回答。")
-        }
-        append("</study_companion_state>")
-    }
-}
-
-private fun String.toLocalDateOrToday(): LocalDate {
-    return try {
-        takeIf { it.isNotBlank() }?.let(LocalDate::parse) ?: LocalDate.now()
-    } catch (_: DateTimeParseException) {
-        LocalDate.now()
+        append("</learning_state>")
     }
 }

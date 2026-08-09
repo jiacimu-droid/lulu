@@ -75,7 +75,6 @@ import me.rerere.rikkahub.data.datastore.getCurrentAssistant
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.repository.ConversationRepository
-import me.rerere.rikkahub.data.study.StudyRules
 import me.rerere.rikkahub.plugin.webview.PomodoroTimerService
 import me.rerere.rikkahub.service.ChatService
 import me.rerere.rikkahub.ui.components.nav.BackButton
@@ -93,7 +92,10 @@ internal fun StudyPomodoroPageContent() {
     val settings = LocalSettings.current
     val settingsStore = koinInject<SettingsStore>()
     val scope = rememberCoroutineScope()
-    val assistant = settings.getCurrentAssistant()
+    var selectedAssistantId by remember(settings.assistantId) { mutableStateOf(settings.assistantId) }
+    val assistant = settings.assistants.firstOrNull { it.id == selectedAssistantId }
+        ?: settings.assistants.firstOrNull()
+        ?: Assistant()
     var minutes by remember { mutableIntStateOf(25) }
     var customMinutes by remember { mutableStateOf("") }
     var taskText by remember { mutableStateOf("") }
@@ -122,6 +124,11 @@ internal fun StudyPomodoroPageContent() {
             item {
                 CompanionPrepCard(
                     assistant = assistant,
+                    assistants = settings.assistants,
+                    onAssistantSelected = { selected ->
+                        selectedAssistantId = selected.id
+                        scope.launch { settingsStore.updateAssistant(selected.id) }
+                    },
                     voiceEnabled = voiceEnabled,
                     onVoiceToggle = { enabled ->
                         scope.launch { settingsStore.update { it.copy(pomodoroVoiceEnabled = enabled) } }
@@ -167,7 +174,7 @@ internal fun StudyPomodoroPageContent() {
                 ) {
                     Icon(HugeIcons.Play, null)
                     Spacer(Modifier.width(8.dp))
-                    Text("开始陪学")
+                    Text(if (settings.assistants.isEmpty()) "开始计时" else "开始陪学")
                 }
             }
         }
@@ -194,6 +201,7 @@ internal fun StudyPomodoroFocusPageContent(
     val activity = remember(context) { context.findActivity() }
     val navController = LocalNavController.current
     val settings = LocalSettings.current
+    val hasAssistant = settings.assistants.isNotEmpty()
     val assistant = settings.getCurrentAssistant()
     val chatService: ChatService = koinInject()
     val conversationRepository = koinInject<ConversationRepository>()
@@ -281,7 +289,7 @@ internal fun StudyPomodoroFocusPageContent(
     }
 
     LaunchedEffect(wasAlreadyRunning) {
-        if (wasAlreadyRunning) return@LaunchedEffect
+        if (wasAlreadyRunning || !hasAssistant) return@LaunchedEffect
         val target = conversationRepository.getRecentConversations(assistant.id, limit = 1)
             .firstOrNull()
             ?: Conversation.ofId(Uuid.random(), assistant.id, true)
@@ -297,7 +305,7 @@ internal fun StudyPomodoroFocusPageContent(
         }.getOrNull() ?: buildEncourageLine(activeTask, assistant)
         coachReply = line
         waitingReply = false
-        if (voiceEnabled) {
+        if (voiceEnabled && hasAssistant) {
             tts.speak(
                 text = line,
                 flushCalled = true,
@@ -372,7 +380,7 @@ internal fun StudyPomodoroFocusPageContent(
                 )
             }
             Spacer(Modifier.weight(1f))
-            FocusChatPanel(
+            if (hasAssistant) FocusChatPanel(
                 userLine = userLine,
                 chatText = chatText,
                 assistantName = assistant.name.ifBlank { "当前角色" },
@@ -394,7 +402,7 @@ internal fun StudyPomodoroFocusPageContent(
                         } ?: buildEncourageLine(activeTask, assistant)
                         coachReply = line ?: buildEncourageLine(activeTask, assistant)
                         waitingReply = false
-                        if (voiceEnabled) {
+                        if (voiceEnabled && hasAssistant) {
                             tts.speak(
                                 text = coachReply,
                                 flushCalled = true,
@@ -417,13 +425,65 @@ internal fun StudyPomodoroFocusPageContent(
 }
 
 @Composable
-private fun CompanionPrepCard(assistant: Assistant, voiceEnabled: Boolean, onVoiceToggle: (Boolean) -> Unit) {
+private fun CompanionPrepCard(
+    assistant: Assistant,
+    assistants: List<Assistant>,
+    onAssistantSelected: (Assistant) -> Unit,
+    voiceEnabled: Boolean,
+    onVoiceToggle: (Boolean) -> Unit,
+) {
+    var showAssistantPicker by remember { mutableStateOf(false) }
     PomodoroCard {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("开始一轮番茄钟", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text("${assistant.name}会在倒计时里陪你轻声聊天。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("陪学角色", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(assistant.name.ifBlank { "未选择角色" }, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            TextButton(onClick = { showAssistantPicker = true }, enabled = assistants.isNotEmpty()) {
+                Text(if (assistants.isEmpty()) "暂无角色" else "选择")
+            }
         }
-        FilterChip(selected = voiceEnabled, onClick = { onVoiceToggle(!voiceEnabled) }, label = { Text("语音鼓励") })
+        FilterChip(
+            selected = voiceEnabled,
+            onClick = { onVoiceToggle(!voiceEnabled) },
+            enabled = assistants.isNotEmpty(),
+            label = { Text("语音鼓励") },
+        )
+    }
+    if (showAssistantPicker) {
+        AlertDialog(
+            onDismissRequest = { showAssistantPicker = false },
+            title = { Text("选择角色") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    assistants.forEach { item ->
+                        Surface(
+                            modifier = Modifier.fillMaxWidth().clickable {
+                                onAssistantSelected(item)
+                                showAssistantPicker = false
+                            },
+                            shape = RoundedCornerShape(14.dp),
+                            color = if (item.id == assistant.id) {
+                                MaterialTheme.colorScheme.secondaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.surfaceContainerLow
+                            },
+                        ) {
+                            Text(
+                                item.name.ifBlank { "未命名角色" },
+                                modifier = Modifier.padding(14.dp),
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showAssistantPicker = false }) { Text("关闭") } },
+        )
     }
 }
 
@@ -432,7 +492,7 @@ private fun DurationCard(selectedMinutes: Int, customMinutes: String, onSelect: 
     PomodoroCard {
         Text("选择时长", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(25, 40, 50, 90).forEach { item ->
+            listOf(25, 40, 60).forEach { item ->
                 FilterChip(selected = selectedMinutes == item, onClick = { onSelect(item) }, label = { Text("${item}分钟") })
             }
         }
@@ -442,12 +502,6 @@ private fun DurationCard(selectedMinutes: Int, customMinutes: String, onSelect: 
             label = { Text("自定义分钟") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-        )
-        val blocks = selectedMinutes.coerceAtLeast(0) / StudyRules.STUDY_REWARD_INTERVAL_MINUTES
-        Text(
-            "本轮预计 +${blocks * StudyRules.STUDY_REWARD_KUDOS} 夸夸值 · $blocks 次单抽进度",
-            color = Color(0xFF8067B7),
-            fontWeight = FontWeight.SemiBold,
         )
     }
 }

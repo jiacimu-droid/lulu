@@ -17,6 +17,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
@@ -58,6 +59,7 @@ fun MemoryBankPage(
     val vm: MemoryBankVM = koinViewModel()
     val memories by vm.memories.collectAsStateWithLifecycle()
     val archiveSources by vm.archiveSources.collectAsStateWithLifecycle()
+    val rawTimeline by vm.rawTimeline.collectAsStateWithLifecycle()
     val searchQuery by vm.searchQuery.collectAsStateWithLifecycle()
     val selectedType by vm.selectedType.collectAsStateWithLifecycle()
     val selectedAssistantId by vm.selectedAssistantId.collectAsStateWithLifecycle()
@@ -83,6 +85,7 @@ fun MemoryBankPage(
     var editMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
     var correctionMemory by remember { mutableStateOf<MemoryBankEntity?>(null) }
     var expandedArchiveIds by remember { mutableStateOf<Set<Int>>(emptySet()) }
+    var showRawTimeline by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -125,6 +128,55 @@ fun MemoryBankPage(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item { StatsRow(stats) }
+
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = !showRawTimeline,
+                        onClick = { showRawTimeline = false },
+                        label = { Text("长期记忆") },
+                    )
+                    FilterChip(
+                        selected = showRawTimeline,
+                        onClick = { showRawTimeline = true },
+                        label = { Text("原始时间线") },
+                    )
+                }
+            }
+
+            if (showRawTimeline) {
+                items(rawTimeline, key = { it.id }) { entry ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { onOpenSource(entry.conversationId, entry.nodeId) },
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                text = when (entry.role) {
+                                    "USER" -> "用户"
+                                    "ASSISTANT" -> "角色"
+                                    else -> entry.role
+                                },
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            Text(entry.content, style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                entry.createdAt,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+                if (rawTimeline.isEmpty()) {
+                    item { Spacer(Modifier.height(1.dp)) }
+                }
+                return@LazyColumn
+            }
 
             maintenanceMessage?.let { message ->
                 item {
