@@ -12,18 +12,18 @@
 
 ## 索引状态
 
-- 基准提交：`493cd0402ab9e3911b4dcb45bd43ee6b80ed629b`
+- 基准提交：`bc4abdd5ac70ace6225300c9bdaf1fad0e27834a`
 - 分支：`master`
-- 源码指纹：`740848ebf281609e…`
-- 已索引文件：1204
-- 已索引代码/文本行：264262
-- 已发现类、接口、对象、函数及 Composable：5766
+- 源码指纹：`88d6be0064693b5a…`
+- 已索引文件：1202
+- 已索引代码/文本行：263746
+- 已发现类、接口、对象、函数及 Composable：5751
 
 ## 仓库健康信号
 
 | 指标 | 数量 |
 |---|---:|
-| 生产代码文件 | 866 |
+| 生产代码文件 | 864 |
 | 测试文件 | 148 |
 | ≥800 行生产文件 | 28 |
 | ≥1500 行生产文件 | 3 |
@@ -134,7 +134,7 @@
 
 | 模块 | 文件数 |
 |---|---:|
-| `app` | 749 |
+| `app` | 747 |
 | `web-ui` | 131 |
 | `document` | 76 |
 | `ai` | 47 |
@@ -159,7 +159,7 @@
 
 | 扩展名 | 文件数 |
 |---|---:|
-| `.kt` | 817 |
+| `.kt` | 815 |
 | `.tsx` | 74 |
 | `.java` | 64 |
 | `.md` | 60 |
@@ -301,7 +301,6 @@
 
 - `app/src/main/java/me/rerere/rikkahub/data/ai/tools/StudyPlanTool.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/ExamStudyPlan.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/July26StudyDayCorrection.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicy.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyAchievementRewards.kt`
@@ -313,7 +312,6 @@
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyRules.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyStore.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/StudyVocabularyPolicy.kt`
-- `app/src/main/java/me/rerere/rikkahub/data/study/SummerCourseDeadlinePlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/data/study/ThreeRoundRecitationPlan.kt`
 - `app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/DrawRevealFlow.kt`
@@ -329,7 +327,9 @@
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyRewardPanels.kt`
 - `app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyVM.kt`
 - `app/src/test/java/me/rerere/rikkahub/data/study/ExamStudyPlanTest.kt`
-- ……另有 10 个文件，见 `code-index.json`
+- `app/src/test/java/me/rerere/rikkahub/data/study/RoleJudgedSleepRewardPolicyTest.kt`
+- `app/src/test/java/me/rerere/rikkahub/data/study/SelfDirectedStudyPlanTest.kt`
+- ……另有 8 个文件，见 `code-index.json`
 
 ### 工具
 
@@ -550,7 +550,7 @@
 > 这里统计能由明确本地 import 唯一解析出的静态依赖；反射、同包引用、通配导入和运行时注册不会被计入。
 
 - 已解析本地导入边：2079
-- 可检索完整符号：5149
+- 可检索完整符号：5138
 
 | 文件 | 被本地文件导入 | 行数 |
 |---|---:|---:|
