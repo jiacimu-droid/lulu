@@ -84,11 +84,7 @@ fun QuickCompanionGamePage(gameId: String) {
     var reactionRequestId by remember { mutableIntStateOf(0) }
 
     suspend fun recordSharedGame(title: String, summary: String, detailsJson: String) {
-        val assistantIds = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) {
-            currentSettings.assistants.map { it.id.toString() }
-        } else {
-            listOf(selectedAssistant.id.toString())
-        }
+        val assistantIds = listOf(selectedAssistant.id.toString())
         val nowMillis = System.currentTimeMillis()
         assistantIds.forEach { assistantId ->
             companionRuntime.applyTurn(
@@ -105,7 +101,7 @@ fun QuickCompanionGamePage(gameId: String) {
                             source = CompanionLifeEventSource.CHAT,
                             evidenceReference = "shared-game:${game.wireName}:$nowMillis",
                             detailsJson = detailsJson,
-                            importance = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 4 else 3,
+                            importance = 3,
                             startedAt = nowMillis,
                             endedAt = nowMillis,
                             createdAt = nowMillis,
@@ -128,27 +124,83 @@ fun QuickCompanionGamePage(gameId: String) {
                 ?: return@runCatching fallback
             val providerSetting = model.findProvider(settings.providers) ?: return@runCatching fallback
             val provider = providerManager.getProviderByType(providerSetting)
-            val companionContext = companionRuntime.perception(
-                CompanionPerceptionInput(
-                    assistantId = player.id.toString(),
-                    assistantName = player.name,
-                    persona = player.systemPrompt,
-                    nowMillis = System.currentTimeMillis(),
-                ),
-            ).toPromptContext()
-            val messages = buildList {
-                add(UIMessage.system("你正在以‘${player.name.ifBlank { "角色" }}’的身份和用户一起玩游戏。保持人设和关系连续性，严格接受程序给出的真实结果。"))
-                if (player.systemPrompt.isNotBlank()) add(UIMessage.system(player.systemPrompt))
-                if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) {
-                    val partyProfiles = settings.assistants.joinToString("\n\n") { assistant ->
-                        "同行角色【${assistant.name.ifBlank { "未命名角色" }}】的人设：\n${assistant.systemPrompt.ifBlank { "遵循该角色当前设定与关系状态。" }}"
+            val isIsolatedRoleplay = game == QuickCompanionGame.ROLEPLAY_ADVENTURE
+            val companionContext = if (isIsolatedRoleplay) {
+                ""
+            } else {
+                companionRuntime.perception(
+                    CompanionPerceptionInput(
+                        assistantId = player.id.toString(),
+                        assistantName = player.name,
+                        persona = player.systemPrompt,
+                        nowMillis = System.currentTimeMillis(),
+                    ),
+                ).toPromptContext()
+            }
+            val roleplayAssistantIds = if (isIsolatedRoleplay) {
+                Regex("""同行角色ID：([^\n]*)""")
+                    .find(facts)
+                    ?.groupValues
+                    ?.getOrNull(1)
+                    ?.split(",")
+                    ?.map { it.trim() }
+                    ?.filter { it.isNotBlank() }
+                    ?.toSet()
+                    .orEmpty()
+            } else {
+                emptySet()
+            }
+            val baseMessages = buildList {
+                if (isIsolatedRoleplay) {
+                    add(
+                        UIMessage.system(
+                            """
+                                你正在参加一个与主聊天/主时间线完全隔离的跑团世界。
+                                只继承角色的性格、说话方式、外貌特征、习惯、情绪表达和行为风格。
+                                角色原本的身份、职业、世界背景、关系史、聊天经历、共同事件、承诺、挂心、记忆、主时间线状态都不是本世界事实，禁止带入或暗示。
+                                不得因为角色设定里出现了原世界身份信息，就把它当成本局身份；本局身份只能由跑团世界和当前存档建立。
+                            """.trimIndent(),
+                        ),
+                    )
+                    if (player.systemPrompt.isNotBlank()) {
+                        add(
+                            UIMessage.system(
+                                """
+                                    【角色风格参考资料】
+                                    ${player.systemPrompt}
+
+                                    上述资料只用于提取人格、语言风格、外貌、习惯和行为倾向；其中任何原世界身份、经历、关系、地点、职业或既有剧情都必须舍弃，不得作为故事事实。
+                                """.trimIndent(),
+                            ),
+                        )
                     }
-                    add(UIMessage.system("跑团中的同行角色资料如下。只让事实中明确列入队伍的角色出场，并保持每个人说话和行动方式不同：\n$partyProfiles"))
+                    val partyProfiles = settings.assistants
+                        .filter { it.id.toString() in roleplayAssistantIds }
+                        .joinToString("\n\n") { assistant ->
+                            """
+                                同行角色【${assistant.name.ifBlank { "未命名角色" }}】的风格参考：
+                                ${assistant.systemPrompt.ifBlank { "仅保持该角色当前的说话风格与性格倾向。" }}
+                                只抽取性格、说话方式、外貌、习惯和行为风格；忽略原身份、原经历、原关系与主时间线事实。
+                            """.trimIndent()
+                        }
+                    if (partyProfiles.isNotBlank()) {
+                        add(
+                            UIMessage.system(
+                                "本局明确入队的同行角色资料如下。没有列在这里的其他角色资料不得进入上下文：\n$partyProfiles",
+                            ),
+                        )
+                    }
+                } else {
+                    add(UIMessage.system("你正在以‘${player.name.ifBlank { "角色" }}’的身份和用户一起玩游戏。保持人设和关系连续性，严格接受程序给出的真实结果。"))
+                    if (player.systemPrompt.isNotBlank()) add(UIMessage.system(player.systemPrompt))
+                    if (companionContext.isNotBlank()) add(UIMessage.system(companionContext))
                 }
-                if (companionContext.isNotBlank()) add(UIMessage.system(companionContext))
                 add(UIMessage.system(instruction))
                 add(UIMessage.user(facts))
-            }.let { baseMessages ->
+            }
+            val messages = if (isIsolatedRoleplay) {
+                baseMessages
+            } else {
                 transformMessages(
                     messages = baseMessages,
                     assistant = player,
@@ -161,9 +213,9 @@ fun QuickCompanionGamePage(gameId: String) {
                 messages = messages,
                 params = TextGenerationParams(
                     model = model,
-                    temperature = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 0.96f else 0.82f,
-                    topP = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 0.97f else 0.9f,
-                    maxTokens = if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) 1700 else 260,
+                    temperature = if (isIsolatedRoleplay) 0.96f else 0.82f,
+                    topP = if (isIsolatedRoleplay) 0.97f else 0.9f,
+                    maxTokens = if (isIsolatedRoleplay) 1700 else 260,
                     reasoningLevel = ReasoningLevel.OFF,
                 ),
             )
@@ -199,6 +251,7 @@ fun QuickCompanionGamePage(gameId: String) {
     }
 
     fun saveCheckpoint(title: String, summary: String, detailsJson: String) {
+        if (game == QuickCompanionGame.ROLEPLAY_ADVENTURE) return
         scope.launch { runCatching { recordSharedGame(title, summary, detailsJson) } }
     }
 
