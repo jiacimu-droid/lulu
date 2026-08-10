@@ -63,7 +63,7 @@ jobs:
           mkdir -p ci-logs
           chmod +x ./gradlew
           set -o pipefail
-          ./gradlew --no-daemon --no-build-cache assembleRelease -x uploadCrashlyticsMappingFileRelease 2>&1 | tee ci-logs/build.log
+          ./gradlew --no-daemon --no-build-cache assembleRelease 2>&1 | tee ci-logs/build.log
 
       - name: Collect APK
         run: |
