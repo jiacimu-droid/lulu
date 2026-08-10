@@ -117,7 +117,6 @@ internal fun StudyPomodoroPageContent() {
     var selectedAssistantId by remember(settings.assistantId) { mutableStateOf(settings.assistantId) }
     val assistant = settings.assistants.firstOrNull { it.id == selectedAssistantId }
         ?: settings.assistants.firstOrNull()
-        ?: Assistant()
     var minutes by remember { mutableIntStateOf(25) }
     var customMinutes by remember { mutableStateOf("") }
     var taskText by remember { mutableStateOf("") }
@@ -452,7 +451,7 @@ internal fun StudyPomodoroFocusPageContent(
 
 @Composable
 private fun CompanionPrepCard(
-    assistant: Assistant,
+    assistant: Assistant?,
     assistants: List<Assistant>,
     onAssistantSelected: (Assistant) -> Unit,
     voiceEnabled: Boolean,
@@ -467,7 +466,10 @@ private fun CompanionPrepCard(
         ) {
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text("陪学角色", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text(assistant.name.ifBlank { "未选择角色" }, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    assistant?.name?.ifBlank { "未命名角色" } ?: "未选择角色",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             TextButton(onClick = { showAssistantPicker = true }, enabled = assistants.isNotEmpty()) {
                 Text(if (assistants.isEmpty()) "暂无角色" else "选择")
@@ -493,7 +495,7 @@ private fun CompanionPrepCard(
                                 showAssistantPicker = false
                             },
                             shape = RoundedCornerShape(14.dp),
-                            color = if (item.id == assistant.id) {
+                            color = if (item.id == assistant?.id) {
                                 MaterialTheme.colorScheme.secondaryContainer
                             } else {
                                 MaterialTheme.colorScheme.surfaceContainerLow
