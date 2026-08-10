@@ -1,12 +1,12 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-10T07:10:08.967334+00:00",
-  "commit": "3f8b3bade11988a3fa29e6a1a1b1b25fec696efd",
+  "generatedAt": "2026-08-10T07:13:50.379639+00:00",
+  "commit": "aec76622de3d6cf714731f9d2a413e9ccc106639",
   "branch": "master",
-  "sourceFingerprint": "89574ae068768bfafe05318d4f399242a3ed6affa416f39fd00d01b8d9a6fae0",
+  "sourceFingerprint": "731cbb0b2c9ee501eaf0fb4465094506b27f903a8bf3a6007011d6be6be97aa9",
   "summary": {
     "files": 1147,
-    "lines": 247276,
+    "lines": 247278,
     "symbols": 5262,
     "productionCodeFiles": 834,
     "testFiles": 134,
@@ -3264,7 +3264,7 @@
       "module": ".github",
       "extension": ".yml",
       "lines": 132,
-      "sha256": "3be59c21fd987659c472badb718afd4a1bfc0957a5dd2d23213b0e3e176bbc6d",
+      "sha256": "24e4a2b1913cf43952820a119f888008a961c5779f01c1165c2b6e6d2d8f4b54",
       "package": null,
       "categories": [
         "构建与发布"
@@ -42194,8 +42194,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 694,
-      "sha256": "37d029d626baa7f45ba3a394c7a3334cdf91f8ae22f24f625df4d82a089316ae",
+      "lines": 696,
+      "sha256": "43740676c74fc3f7b0a8054465e84891210980c573ea1217a8effc4b36b98482",
       "package": "me.rerere.rikkahub.ui.pages.study",
       "categories": [
         "学习监督",
@@ -42220,92 +42220,92 @@
         {
           "name": "StudyPomodoroFocusPageContent",
           "kind": "composable",
-          "line": 215
+          "line": 214
         },
         {
           "name": "openFocusAgain",
           "kind": "function",
-          "line": 263
+          "line": 262
         },
         {
           "name": "showMiniBar",
           "kind": "function",
-          "line": 274
+          "line": 273
         },
         {
           "name": "CompanionPrepCard",
           "kind": "composable",
-          "line": 454
+          "line": 453
         },
         {
           "name": "DurationCard",
           "kind": "composable",
-          "line": 517
+          "line": 519
         },
         {
           "name": "PomodoroTimerCircle",
           "kind": "composable",
-          "line": 536
+          "line": 538
         },
         {
           "name": "FocusChatPanel",
           "kind": "composable",
-          "line": 563
+          "line": 565
         },
         {
           "name": "PomodoroCard",
           "kind": "composable",
-          "line": 600
+          "line": 602
         },
         {
           "name": "PomodoroFocusPalette",
           "kind": "class",
-          "line": 606
+          "line": 608
         },
         {
           "name": "focusPalette",
           "kind": "function",
-          "line": 620
+          "line": 622
         },
         {
           "name": "PomodoroThemePickerDialog",
           "kind": "composable",
-          "line": 638
+          "line": 640
         },
         {
           "name": "focusBrush",
           "kind": "function",
-          "line": 671
+          "line": 673
         },
         {
           "name": "secondsText",
           "kind": "function",
-          "line": 672
+          "line": 674
         },
         {
           "name": "studyDurationText",
           "kind": "function",
-          "line": 673
+          "line": 675
         },
         {
           "name": "buildEncourageLine",
           "kind": "function",
-          "line": 683
+          "line": 685
         },
         {
           "name": "buildStudyChatPrompt",
           "kind": "function",
-          "line": 685
+          "line": 687
         },
         {
           "name": "buildPomodoroOpeningPrompt",
           "kind": "function",
-          "line": 687
+          "line": 689
         },
         {
           "name": "findActivity",
           "kind": "function",
-          "line": 689
+          "line": 691
         }
       ],
       "localImportCount": 19,
@@ -91373,35 +91373,35 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "composable",
-        "line": 454
+        "line": 453
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.DurationCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "composable",
-        "line": 517
+        "line": 519
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.FocusChatPanel": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "composable",
-        "line": 563
+        "line": 565
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroCard": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "composable",
-        "line": 600
+        "line": 602
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroFocusPalette": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "class",
-        "line": 606
+        "line": 608
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroInAppOverlayController": [
@@ -91415,14 +91415,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "composable",
-        "line": 638
+        "line": 640
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.PomodoroTimerCircle": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "composable",
-        "line": 536
+        "line": 538
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPage": [
@@ -91443,7 +91443,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "composable",
-        "line": 215
+        "line": 214
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.StudyPomodoroPage": [
@@ -91485,21 +91485,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 683
+        "line": 685
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.buildPomodoroOpeningPrompt": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 687
+        "line": 689
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.buildStudyChatPrompt": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 685
+        "line": 687
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.calculateBottomPadding": [
@@ -91555,21 +91555,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 689
+        "line": 691
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.focusBrush": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 671
+        "line": 673
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.focusPalette": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 620
+        "line": 622
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.hide": [
@@ -91583,7 +91583,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 263
+        "line": 262
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.plus": [
@@ -91611,7 +91611,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 672
+        "line": 674
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.selectCompanion": [
@@ -91632,14 +91632,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 274
+        "line": 273
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.studyDurationText": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/pages/study/StudyPomodoroPages.kt",
         "kind": "function",
-        "line": 673
+        "line": 675
       }
     ],
     "me.rerere.rikkahub.ui.pages.study.toggleTask": [
