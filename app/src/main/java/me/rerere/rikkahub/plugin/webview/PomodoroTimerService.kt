@@ -2,17 +2,14 @@ package me.rerere.rikkahub.plugin.webview
 
 import android.app.Notification
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -103,19 +100,7 @@ class PomodoroTimerService : android.app.Service() {
     private var endTimestamp: Long = 0L
     private var recordStudy: Boolean = false
 
-    private val timerEndReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) = Unit
-    }
-
     override fun onBind(intent: Intent?): IBinder? = null
-
-    override fun onCreate() {
-        super.onCreate()
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            timerEndReceiver,
-            IntentFilter(ACTION_TIMER_END),
-        )
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -123,8 +108,6 @@ class PomodoroTimerService : android.app.Service() {
         scheduler = null
         running = false
         remainingSeconds = 0
-        runCatching { LocalBroadcastManager.getInstance(this).unregisterReceiver(timerEndReceiver) }
-            .onFailure { Log.w(TAG, "Error unregistering receiver", it) }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -240,7 +223,7 @@ class PomodoroTimerService : android.app.Service() {
     }
 
     private fun onTimerEnd() {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(ACTION_TIMER_END))
+        sendBroadcast(Intent(ACTION_TIMER_END).setPackage(packageName))
         clearPrefs()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()

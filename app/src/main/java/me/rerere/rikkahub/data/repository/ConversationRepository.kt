@@ -231,7 +231,7 @@ class ConversationRepository(
     /** Includes group conversations where the assistant is a member, not only the stored host assistant. */
     suspend fun getRecentConversationsForTimeline(assistantId: Uuid, limit: Int = 100): List<Conversation> {
         val assistantIdText = assistantId.toString()
-        return conversationDAO.getAll().first()
+        val summaries = conversationDAO.getAll().first()
             .asSequence()
             .map { entity -> conversationEntityToConversation(entity, emptyList()) }
             .filter { conversation ->
@@ -239,10 +239,10 @@ class ConversationRepository(
                     conversation.groupChatSpec?.members?.any { it.assistantId == assistantIdText } == true
             }
             .take(limit)
-            .map { summary ->
-                summary.copy(messageNodes = loadMessageNodes(summary.id.toString()))
-            }
             .toList()
+        return summaries.map { summary ->
+            summary.copy(messageNodes = loadMessageNodes(summary.id.toString()))
+        }
     }
 
     /** Web-safe conversation mutations live here so web routes do not depend on ChatService internals. */

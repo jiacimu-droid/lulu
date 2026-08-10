@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.io.File
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.ArrowLeft01
@@ -88,12 +87,14 @@ fun PluginWebViewPage(
         }
     }
     DisposableEffect(timerEndReceiver) {
-        LocalBroadcastManager.getInstance(context).registerReceiver(
+        ContextCompat.registerReceiver(
+            context,
             timerEndReceiver,
             IntentFilter(PomodoroTimerService.ACTION_TIMER_END),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
         )
         onDispose {
-            LocalBroadcastManager.getInstance(context).unregisterReceiver(timerEndReceiver)
+            runCatching { context.unregisterReceiver(timerEndReceiver) }
         }
     }
 

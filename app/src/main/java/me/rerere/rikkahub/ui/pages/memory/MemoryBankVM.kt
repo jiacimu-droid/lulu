@@ -235,7 +235,7 @@ class MemoryBankVM(
                 )
             }
 
-        val lifeEventEntries = companionRuntime.snapshot(assistantId).lifeEvents
+        val lifeEventEntries = companionRuntime.snapshot(assistant.id.toString()).lifeEvents
             .filterNot { it.type == CompanionLifeEventType.JOURNAL }
             .map { event ->
                 RawTimelineEntry(
