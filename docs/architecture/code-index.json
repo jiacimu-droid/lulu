@@ -1,13 +1,13 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-10T07:13:50.379639+00:00",
-  "commit": "aec76622de3d6cf714731f9d2a413e9ccc106639",
+  "generatedAt": "2026-08-10T07:21:52.145798+00:00",
+  "commit": "091caaacd613f9d48aeef091813b8848fc4cd635",
   "branch": "master",
-  "sourceFingerprint": "731cbb0b2c9ee501eaf0fb4465094506b27f903a8bf3a6007011d6be6be97aa9",
+  "sourceFingerprint": "b63a8dfcb54bd8ed9c97531c07d16a0eaee7b72eebf13b5aafa3f028b9a8a9c6",
   "summary": {
     "files": 1147,
-    "lines": 247278,
-    "symbols": 5262,
+    "lines": 247260,
+    "symbols": 5260,
     "productionCodeFiles": 834,
     "testFiles": 134,
     "largeProductionFiles": 25,
@@ -543,10 +543,10 @@
         "todoMarkers": 0
       },
       {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
-        "lines": 306,
+        "path": "app/src/main/java/me/rerere/rikkahub/data/gadgetbridge/GadgetbridgeReader.kt",
+        "lines": 738,
         "symbols": 23,
-        "localImportCount": 4,
+        "localImportCount": 0,
         "todoMarkers": 0
       }
     ],
@@ -18923,7 +18923,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 537,
-      "sha256": "e33058bb6cfa37d38b19bdea7987f4495f51d412e10256f5fb7b46a6f629a722",
+      "sha256": "0cc9bd8afbc31aaa8f05ebc74dc36625285e21ae69ea1f51cdb90f37a6ca8c7a",
       "package": "me.rerere.rikkahub.data.repository",
       "categories": [],
       "symbols": [
@@ -25621,8 +25621,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 215,
-      "sha256": "464037586ec9aae3b5b1cfaba4835129a95edcb8961d9a58eb26fa1111837974",
+      "lines": 216,
+      "sha256": "6d9d43463df2a58d1b29b47b57f52d7cb831783af7de9d491cb1b32e8b951578",
       "package": "me.rerere.rikkahub.plugin.webview",
       "categories": [
         "界面",
@@ -25632,17 +25632,17 @@
         {
           "name": "PluginWebViewPage",
           "kind": "composable",
-          "line": 49
+          "line": 48
         },
         {
           "name": "onReceive",
           "kind": "function",
-          "line": 78
+          "line": 77
         },
         {
           "name": "onShowFileChooser",
           "kind": "function",
-          "line": 176
+          "line": 177
         }
       ],
       "localImportCount": 6,
@@ -25690,8 +25690,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 306,
-      "sha256": "961e218f383b6f1f3970bf2f9fbf14c7b43a6eaef518f211cee46b79d29ed664",
+      "lines": 289,
+      "sha256": "2c007eee34a97358ea0f27b98b3198e2d0b44be4073f67e1cd32c9e37c47f572",
       "package": "me.rerere.rikkahub.plugin.webview",
       "categories": [
         "学习监督",
@@ -25701,117 +25701,107 @@
         {
           "name": "PomodoroTimerService",
           "kind": "class",
-          "line": 31
+          "line": 28
         },
         {
           "name": "getRemainingSeconds",
           "kind": "function",
-          "line": 55
+          "line": 52
         },
         {
           "name": "getTotalSeconds",
           "kind": "function",
-          "line": 56
+          "line": 53
         },
         {
           "name": "getTask",
           "kind": "function",
-          "line": 57
+          "line": 54
         },
         {
           "name": "isRunning",
           "kind": "function",
-          "line": 58
+          "line": 55
         },
         {
           "name": "start",
           "kind": "function",
-          "line": 60
+          "line": 57
         },
         {
           "name": "stop",
           "kind": "function",
-          "line": 94
-        },
-        {
-          "name": "onReceive",
-          "kind": "function",
-          "line": 107
+          "line": 91
         },
         {
           "name": "onBind",
           "kind": "function",
-          "line": 110
-        },
-        {
-          "name": "onCreate",
-          "kind": "function",
-          "line": 112
+          "line": 103
         },
         {
           "name": "onDestroy",
           "kind": "function",
-          "line": 120
+          "line": 105
         },
         {
           "name": "onStartCommand",
           "kind": "function",
-          "line": 130
+          "line": 113
         },
         {
           "name": "startCountdown",
           "kind": "function",
-          "line": 143
+          "line": 126
         },
         {
           "name": "startScheduler",
           "kind": "function",
-          "line": 156
+          "line": 139
         },
         {
           "name": "stopCountdown",
           "kind": "function",
-          "line": 177
+          "line": 160
         },
         {
           "name": "restoreFromPrefs",
           "kind": "function",
-          "line": 189
+          "line": 172
         },
         {
           "name": "recordStudyCompletion",
           "kind": "function",
-          "line": 214
+          "line": 197
         },
         {
           "name": "onTimerEnd",
           "kind": "function",
-          "line": 242
+          "line": 225
         },
         {
           "name": "saveToPrefs",
           "kind": "function",
-          "line": 249
+          "line": 232
         },
         {
           "name": "clearPrefs",
           "kind": "function",
-          "line": 259
+          "line": 242
         },
         {
           "name": "startForegroundCompat",
           "kind": "function",
-          "line": 263
+          "line": 246
         },
         {
           "name": "updateNotification",
           "kind": "function",
-          "line": 276
+          "line": 259
         },
         {
           "name": "buildNotification",
           "kind": "function",
-          "line": 281
+          "line": 264
         }
       ],
       "localImportCount": 4,
@@ -30296,8 +30286,8 @@
       "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Mermaid.kt",
       "module": "app",
       "extension": ".kt",
-      "lines": 450,
-      "sha256": "6bda0bc2a258d2002f77effbce50eef03a33cc1d8c3c6d2f82394768135802d4",
+      "lines": 448,
+      "sha256": "33b4c45e61a1029694b96d8cab78671102342d6e36d7063626a4ace298b6ea8a",
       "package": "me.rerere.rikkahub.ui.components.richtext",
       "categories": [
         "界面"
@@ -30306,32 +30296,32 @@
         {
           "name": "Mermaid",
           "kind": "composable",
-          "line": 61
+          "line": 59
         },
         {
           "name": "MermaidInterface",
           "kind": "class",
-          "line": 243
+          "line": 241
         },
         {
           "name": "updateHeight",
           "kind": "function",
-          "line": 248
+          "line": 246
         },
         {
           "name": "exportImage",
           "kind": "function",
-          "line": 253
+          "line": 251
         },
         {
           "name": "buildMermaidHtml",
           "kind": "function",
-          "line": 261
+          "line": 259
         },
         {
           "name": "MermaidTheme",
           "kind": "class",
-          "line": 447
+          "line": 445
         }
       ],
       "localImportCount": 12,
@@ -38671,7 +38661,7 @@
       "module": "app",
       "extension": ".kt",
       "lines": 718,
-      "sha256": "b925752d74ad0f3f3a5cff3c8c6cdbb4f3daff61e1c718b8fe0f692ee77e8348",
+      "sha256": "43933920415e419402934b0c60f7e6a6cbfd2c1b0e7eb96ffd91b0a146dd1b11",
       "package": "me.rerere.rikkahub.ui.pages.memory",
       "categories": [
         "记忆",
@@ -80327,14 +80317,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "kind": "composable",
-        "line": 49
+        "line": 48
       }
     ],
     "me.rerere.rikkahub.plugin.webview.PomodoroTimerService": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "class",
-        "line": 31
+        "line": 28
       }
     ],
     "me.rerere.rikkahub.plugin.webview.buildNotification": [
@@ -80346,7 +80336,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 281
+        "line": 264
       }
     ],
     "me.rerere.rikkahub.plugin.webview.callAI": [
@@ -80388,7 +80378,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 259
+        "line": 242
       }
     ],
     "me.rerere.rikkahub.plugin.webview.destroy": [
@@ -80442,7 +80432,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 55
+        "line": 52
       }
     ],
     "me.rerere.rikkahub.plugin.webview.getState": [
@@ -80456,14 +80446,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 57
+        "line": 54
       }
     ],
     "me.rerere.rikkahub.plugin.webview.getTotalSeconds": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 56
+        "line": 53
       }
     ],
     "me.rerere.rikkahub.plugin.webview.handleBridgeCall": [
@@ -80498,7 +80488,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 58
+        "line": 55
       }
     ],
     "me.rerere.rikkahub.plugin.webview.jsonEscape": [
@@ -80550,14 +80540,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 110
-      }
-    ],
-    "me.rerere.rikkahub.plugin.webview.onCreate": [
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
-        "kind": "function",
-        "line": 112
+        "line": 103
       }
     ],
     "me.rerere.rikkahub.plugin.webview.onDestroy": [
@@ -80569,7 +80552,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 120
+        "line": 105
       }
     ],
     "me.rerere.rikkahub.plugin.webview.onPageFinished": [
@@ -80588,19 +80571,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "kind": "function",
-        "line": 78
-      },
-      {
-        "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
-        "kind": "function",
-        "line": 107
+        "line": 77
       }
     ],
     "me.rerere.rikkahub.plugin.webview.onShowFileChooser": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PluginWebViewPage.kt",
         "kind": "function",
-        "line": 176
+        "line": 177
       }
     ],
     "me.rerere.rikkahub.plugin.webview.onStartCommand": [
@@ -80612,14 +80590,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 130
+        "line": 113
       }
     ],
     "me.rerere.rikkahub.plugin.webview.onTimerEnd": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 242
+        "line": 225
       }
     ],
     "me.rerere.rikkahub.plugin.webview.overlayClient": [
@@ -80661,7 +80639,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 214
+        "line": 197
       }
     ],
     "me.rerere.rikkahub.plugin.webview.rememberPluginWebViewFileLaunchers": [
@@ -80701,7 +80679,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 189
+        "line": 172
       }
     ],
     "me.rerere.rikkahub.plugin.webview.resume": [
@@ -80729,7 +80707,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 249
+        "line": 232
       }
     ],
     "me.rerere.rikkahub.plugin.webview.shouldOverrideUrlLoading": [
@@ -80762,21 +80740,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 60
+        "line": 57
       }
     ],
     "me.rerere.rikkahub.plugin.webview.startCountdown": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 143
+        "line": 126
       }
     ],
     "me.rerere.rikkahub.plugin.webview.startForegroundCompat": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 263
+        "line": 246
       }
     ],
     "me.rerere.rikkahub.plugin.webview.startPlayback": [
@@ -80790,7 +80768,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 156
+        "line": 139
       }
     ],
     "me.rerere.rikkahub.plugin.webview.stop": [
@@ -80802,14 +80780,14 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 94
+        "line": 91
       }
     ],
     "me.rerere.rikkahub.plugin.webview.stopCountdown": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 177
+        "line": 160
       }
     ],
     "me.rerere.rikkahub.plugin.webview.stopPlayback": [
@@ -80830,7 +80808,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/plugin/webview/PomodoroTimerService.kt",
         "kind": "function",
-        "line": 276
+        "line": 259
       }
     ],
     "me.rerere.rikkahub.plugin.webview.uriToBase64": [
@@ -83956,21 +83934,21 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Mermaid.kt",
         "kind": "composable",
-        "line": 61
+        "line": 59
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.MermaidInterface": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Mermaid.kt",
         "kind": "class",
-        "line": 243
+        "line": 241
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.MermaidTheme": [
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Mermaid.kt",
         "kind": "class",
-        "line": 447
+        "line": 445
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.OrderedListNode": [
@@ -84138,7 +84116,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Mermaid.kt",
         "kind": "function",
-        "line": 261
+        "line": 259
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.containsHtml": [
@@ -84159,7 +84137,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Mermaid.kt",
         "kind": "function",
-        "line": 253
+        "line": 251
       }
     ],
     "me.rerere.rikkahub.ui.components.richtext.filter": [
@@ -84417,7 +84395,7 @@
       {
         "path": "app/src/main/java/me/rerere/rikkahub/ui/components/richtext/Mermaid.kt",
         "kind": "function",
-        "line": 248
+        "line": 246
       }
     ],
     "me.rerere.rikkahub.ui.components.table.CellBox": [
