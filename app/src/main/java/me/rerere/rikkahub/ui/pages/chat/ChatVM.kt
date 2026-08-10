@@ -11,7 +11,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -70,7 +69,6 @@ class ChatVM(
     private val settingsStore: SettingsStore,
     private val conversationRepo: ConversationRepository,
     private val chatService: CompanionChatPort,
-    private val analytics: FirebaseAnalytics,
     private val filesManager: FilesManager,
     private val favoriteRepository: FavoriteRepository,
 ) : ViewModel() {
@@ -196,7 +194,6 @@ class ChatVM(
 
     fun handleMessageSend(content: List<UIMessagePart>, answer: Boolean = true) {
         if (content.isEmptyInputMessage()) return
-        analytics.logEvent("ai_send_message", null)
 
         val spec = conversation.value.groupChatSpec
         if (answer && spec != null) {
@@ -209,7 +206,6 @@ class ChatVM(
     }
 
     fun handleReplyRequest() {
-        analytics.logEvent("ai_request_reply", null)
         val spec = conversation.value.groupChatSpec
         if (spec != null) {
             startGroupConversation(content = emptyList(), includeUserMessage = false, spec = spec)
@@ -400,7 +396,6 @@ class ChatVM(
 
     fun handleMessageEdit(parts: List<UIMessagePart>, messageId: Uuid) {
         if (parts.isEmptyInputMessage()) return
-        analytics.logEvent("ai_edit_message", null)
         launchAfterInitialization {
             chatService.editMessage(_conversationId, messageId, parts)
         }
@@ -443,7 +438,6 @@ class ChatVM(
         message: UIMessage,
         regenerateAssistantMsg: Boolean = true,
     ) {
-        analytics.logEvent("ai_regenerate_at_message", null)
         launchAfterInitialization(context.getString(R.string.error_title_generation)) {
             chatService.regenerateAtMessage(_conversationId, message, regenerateAssistantMsg)
         }
@@ -454,14 +448,12 @@ class ChatVM(
         approved: Boolean,
         reason: String = "",
     ) {
-        analytics.logEvent("ai_tool_approval", null)
         launchAfterInitialization {
             chatService.handleToolApproval(_conversationId, toolCallId, approved, reason)
         }
     }
 
     fun handleToolAnswer(toolCallId: String, answer: String) {
-        analytics.logEvent("ai_tool_answer", null)
         launchAfterInitialization {
             chatService.handleToolApproval(_conversationId, toolCallId, approved = true, answer = answer)
         }
@@ -589,7 +581,6 @@ private fun String.shouldReturnGroupFloorToUser(): Boolean {
         "你来说",
         "轮到你",
         "等你回复",
-        "主人呢",
         "问问你",
     ).any(normalized::contains)
 }

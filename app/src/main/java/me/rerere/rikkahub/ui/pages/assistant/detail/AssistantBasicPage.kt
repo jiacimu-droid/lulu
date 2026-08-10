@@ -239,7 +239,7 @@ internal fun AssistantBasicContent(
                     Text("角色外貌 / 生图参考")
                 },
                 description = {
-                    Text("写这个角色稳定的外貌、发色、瞳色、体型、气质和标志物。考研奖励生图会优先使用这里。")
+                    Text("填写角色稳定的外貌、发色、瞳色、体型、气质和标志物，供用户主动生图时参考。")
                 },
                 modifier = Modifier.padding(8.dp),
             ) {

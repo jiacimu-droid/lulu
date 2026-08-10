@@ -1,9 +1,5 @@
 package me.rerere.rikkahub.di
 
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.analytics
-import com.google.firebase.crashlytics.crashlytics
-import com.google.firebase.remoteconfig.remoteConfig
 import kotlinx.serialization.json.Json
 import me.rerere.highlight.Highlighter
 import me.rerere.rikkahub.AppScope
@@ -53,18 +49,6 @@ val appModule = module {
 
     single {
         TTSManager(get())
-    }
-
-    single {
-        Firebase.crashlytics
-    }
-
-    single {
-        Firebase.remoteConfig
-    }
-
-    single {
-        Firebase.analytics
     }
 
     single {

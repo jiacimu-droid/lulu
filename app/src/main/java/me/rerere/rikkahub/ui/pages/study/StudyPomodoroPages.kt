@@ -87,6 +87,28 @@ import org.koin.compose.koinInject
 import kotlin.uuid.Uuid
 
 @Composable
+fun StudyPomodoroPage() {
+    StudyPomodoroPageContent()
+}
+
+@Composable
+fun StudyPomodoroFocusPage(
+    minutes: Int,
+    task: String,
+    imageEnabled: Boolean,
+    voiceEnabled: Boolean,
+    vm: StudyVM = koinViewModel(),
+) {
+    StudyPomodoroFocusPageContent(
+        minutes = minutes,
+        task = task,
+        imageEnabled = imageEnabled,
+        voiceEnabled = voiceEnabled,
+        vm = vm,
+    )
+}
+
+@Composable
 internal fun StudyPomodoroPageContent() {
     val navController = LocalNavController.current
     val settings = LocalSettings.current
@@ -292,7 +314,11 @@ internal fun StudyPomodoroFocusPageContent(
         if (wasAlreadyRunning || !hasAssistant) return@LaunchedEffect
         val target = conversationRepository.getRecentConversations(assistant.id, limit = 1)
             .firstOrNull()
-            ?: Conversation.ofId(Uuid.random(), assistant.id, true)
+            ?: Conversation.ofId(
+                id = Uuid.random(),
+                assistantId = assistant.id,
+                newConversation = true,
+            )
         studyConversationId = target.id
         chatService.initializeConversation(target.id)
         waitingReply = true

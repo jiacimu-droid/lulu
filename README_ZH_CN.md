@@ -1,210 +1,52 @@
-<div align="center">
-  <img src="docs/icon.png" alt="橘瓣" width="120" />
-  <h1>橘瓣</h1>
-  <p><strong>基于 RikkaHub 的增强版 Android AI 聊天客户端</strong></p>
-  <p>在 RikkaHub 的基础上，加入更多实用工具与个性化能力 🍊💬</p>
+# Lulu（露露）
 
-  <p>
-    简体中文 ·
-    <a href="README_ZH_TW.md">繁體中文</a> ·
-    <a href="README.md">English</a>
-  </p>
-</div>
+Lulu 是一款开源 Android AI 陪伴应用，核心是用户自行创建的角色、连续记忆，以及聊天之外可以真实执行和留档的数字生活。
 
----
+[English](README.md) · [繁體中文](README_ZH_TW.md)
 
-<div align="center">
-  <img src="docs/img/chat.png" alt="聊天界面" width="140" />
-  <img src="docs/img/desktop.png" alt="模型选择" width="440" />
-  <img src="docs/img/assistants.png" alt="智能体" width="140" />
-</div>
+## 主要功能
 
----
+- 基于角色卡、世界书和用户自选模型的私聊与群聊
+- 长期记忆、原始时间线、关系上下文、承诺和来源回查
+- 电话、主动消息、日记、朋友圈、文档共读和用户自建小剧场
+- 精简学习 App：番茄钟和用户自行添加的今日待办
+- 五子棋与快艇骰子，角色可参与并记录共同经历
+- 本地优先存储、备份、可选 WebDAV／Supabase 同步和内嵌网页端
 
-## 🍊 橘瓣独有功能
+首次安装不会预置角色、关系、性格、考研计划或共享 API Key。用户需要创建自己的角色，并配置自己选择的模型或语音服务。
 
-> 以下为橘瓣在 RikkaHub 基础上新增或增强的功能
+## 下载
 
-### 🎨 个性化定制
-- **头像框** — 为 AI 助手头像添加装饰边框，打造独特视觉风格
-- **气泡透明度** — 自由调节聊天气泡透明度，营造沉浸式对话体验
-- **思维链样式** — 自定义思维链（Chain of Thought）的显示样式
-- **输入框换背景** — 自定义聊天输入框背景，告别单调默认样式
-- **字体包导入** — 导入自定义字体包，让对话界面更具个性
+请从 [GitHub Releases](https://github.com/jiacimu-droid/lulu/releases) 下载最新 APK。
 
-### 📍 位置与生活
-- **获取定位** — AI 可获取用户当前位置信息，提供基于位置的服务
-- **附近搜索** — 基于高德地图 API，搜索附近的兴趣点（餐饮、商店等）
-- **App 使用情况与轨迹** — AI 可读取应用使用统计和活动轨迹，了解你的数字生活习惯
+## 隐私
 
-### 📸 硬件交互
-- **拍照** — AI 可调用设备摄像头拍照，实现视觉交互
+数据默认保存在本机。只有用户主动配置并使用模型、语音、搜索或同步服务时，完成对应功能所需的数据才会发送给该第三方。公开构建不包含 Firebase Analytics、Crashlytics、项目方远程配置或共享 API Key。
 
-### ⌚ 健康数据
-- **Gadgetbridge 同步** — 从 Gadgetbridge 读取智能手环/手表的健康数据（步数、心率、睡眠等），让 AI 了解你的身体状况
+完整内容见 [隐私说明](docs/PRIVACY.md)。
 
-### ☁️ 数据同步
-- **Supabase 同步** — 基础数据通过 Supabase 云端同步，多设备无缝切换
+## 构建
 
-### 🔍 搜索增强
-- **Custom JS 搜索** — 通过 QuickJS 引擎支持自定义 JavaScript 脚本编写搜索服务，灵活扩展搜索能力
-
----
-
-## ✨ 继承自 RikkaHub 的功能
-
-### 🎨 精致体验
-- **Material You 设计** — 动态取色，跟随系统主题
-- **暗色模式** — 护眼夜间体验
-- **预测性返回** — Android 14+ 原生返回动画
-
-### 🔄 多供应商支持
-- 兼容 OpenAI / Google / Anthropic 等主流 API
-- 自定义 API 地址、模型、请求头与请求体
-- 二维码快速导入/导出供应商配置
-
-### 🖼️ 多模态输入
-- 图片识别与理解
-- 文档解析（PDF、DOCX、PPTX）
-- OCR 图片文字提取
-
-### 🛠️ 扩展能力
-- **MCP 协议支持** — 连接外部工具与服务
-- **搜索集成** — Exa / Tavily / 智谱 / LinkUp / Brave / Perplexity 等
-- **Prompt 变量** — 模型名称、时间等动态注入
-- **消息分支** — 对话分叉，探索不同回复方向
-- **智能体定制** — 独立系统提示词、参数与对话隔离
-- **类 ChatGPT 记忆** — 跨对话上下文记忆
-- **AI 翻译** — 一键翻译消息内容
-- **会话独立系统提示词** — 每个会话可单独定义系统提示词
-- **Chatbox 聊天记录导入** — 从 Chatbox 导入历史对话
-
-### 📝 富文本渲染
-- Markdown 完整支持
-- 代码语法高亮
-- LaTeX 数学公式
-- Mermaid 流程图
-- 表格渲染
-
-### 🖥️ 多端访问
-- Android 原生客户端
-- 内置 Web 服务，支持浏览器访问
-
-### 💌 角色导入
-- Silly Tavern 角色卡导入
-
----
-
-## 🚀 下载安装
-
-| 渠道 | 链接 |
-|------|------|
-| 官网 | [rikka-ai.com/download](https://rikka-ai.com/download) |
-| Google Play | [Play Store](https://play.google.com/store/apps/details?id=me.rerere.rikkahub) |
-
----
-
-## 💖 赞助商
-
-<div align="center">
-  <img src="app/src/main/assets/icons/aihubmix-color.svg" alt="Aihubmix" width="50" />
-  <p><strong>Aihubmix</strong></p>
-  <p>感谢 <a href="https://aihubmix.com?aff=pG7r">aihubmix.com</a> 的资金支持。一站式全球主流模型服务平台（OpenAI、Claude、Gemini、DeepSeek、Qwen 等数百种模型）。</p>
-</div>
-
----
-
-## 🏗️ 项目架构
-
-```
-橘瓣/
-├── app/          # 主应用模块（UI、ViewModel、核心逻辑）
-├── ai/           # AI SDK 抽象层（OpenAI / Google / Anthropic）
-├── common/       # 通用工具与扩展
-├── document/     # 文档解析（PDF / DOCX / PPTX）
-├── highlight/    # 代码语法高亮
-├── search/       # 搜索功能 SDK（Exa / Tavily / 智谱 / Custom JS）
-├── speech/       # 语音识别
-├── tts/          # 文本转语音
-├── web/          # 内嵌 Web 服务器（Ktor）
-├── web-ui/       # Web 前端（React）
-└── locale-tui/   # 国际化工具
-```
-
----
-
-## 🛠️ 开发构建
-
-### 环境要求
-
-- [Android Studio](https://developer.android.com/studio)
-- JDK 17+
-- Android SDK（compileSdk 37, minSdk 26）
-
-### 构建命令
+需要 JDK 17+、Android Studio 或 Android SDK，并准备与 compileSdk 37 兼容的 SDK：
 
 ```bash
-./gradlew assembleDebug                # 构建 Debug APK
-./gradlew assembleRelease              # 构建 Release APK
-./gradlew test                         # 运行单元测试
-./gradlew connectedDebugAndroidTest    # 运行仪器测试
-./gradlew lint                         # Android Lint 检查
+./gradlew assembleDebug
+./gradlew assembleRelease
 ```
 
-> [!TIP]
-> 构建应用需要在 `app/` 目录下放置 `google-services.json`（Firebase 配置文件）。
+构建不再需要 `google-services.json`。Release 签名可通过未纳入版本控制的 `local.properties` 或仓库现有发布环境注入。
 
-### 技术栈
+## 目录
 
-| 技术 | 用途 |
-|------|------|
-| [Kotlin](https://kotlinlang.org/) | 开发语言 |
-| [Jetpack Compose](https://developer.android.com/jetpack/compose) | UI 框架 |
-| [Material You](https://m3.material.io/) | 设计系统 |
-| [Koin](https://insert-koin.io/) | 依赖注入 |
-| [Room](https://developer.android.com/training/data-storage/room) | 本地数据库 |
-| [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) | 偏好存储 |
-| [OkHttp](https://square.github.io/okhttp/) | HTTP 客户端 |
-| [Ktor](https://ktor.io/) | 内嵌 Web 服务器 |
-| [Coil](https://coil-kt.github.io/coil/) | 图片加载 |
-| [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) | JSON 序列化 |
-| [Navigation Compose](https://developer.android.com/develop/ui/compose/navigation) | 页面导航 |
-| [Lucide Icons](https://composeicons.com/icon-libraries/lucide) | 图标库 |
-| [QuickJS](https://github.com/nicholasgasior/quickjs-java) | 自定义 JS 搜索引擎 |
-| [Supabase](https://supabase.com/) | 云端数据同步 |
-| [高德地图 SDK](https://lbs.amap.com/) | 定位与附近搜索 |
+- `app`：Android 界面、应用服务、记忆、陪伴运行时和持久化
+- `ai`：模型供应商抽象
+- `speech`：语音识别与合成
+- `document`：文档解析
+- `web`、`web-ui`：内嵌网页端
+- `plugins`：可选本地插件功能
 
----
+## 上游与许可证
 
-## 🤝 贡献指南
+Lulu 基于 [RikkaHub](https://github.com/rikkahub/rikkahub) 修改，是独立社区项目，并非 RikkaHub 官方版本。上游归属和修改声明见 [NOTICE](NOTICE)。
 
-欢迎提交 Pull Request！
-
-> [!IMPORTANT]
-> 以下 PR 将被拒绝：
-> 1. 翻译相关变更（新增语言或更新翻译会增加后续维护负担）
-> 2. 新增功能（本项目有自己的设计理念，不随意接受功能 PR）
-> 3. AI 生成的大规模重构与变更
-
----
-
-## 💰 支持项目
-
-如果橘瓣对你有帮助，欢迎支持开发者：
-
-- [Patreon](https://patreon.com/rikkahub)
-- [爱发电](https://afdian.com/a/reovo)
-
----
-
-## ⭐ Star History
-
-喜欢这个项目？给个 Star ⭐
-
-[![Star History Chart](https://api.star-history.com/svg?repos=re-ovo/rikkahub&type=Date)](https://star-history.com/#re-ovo/rikkahub&Date)
-
----
-
-## 📄 许可证
-
-本项目基于 [Apache License 2.0](LICENSE) 开源。
+本项目按 [GNU Affero General Public License v3.0](LICENSE) 发布。仓库不再附加“用户超过 10 人需商业授权”等额外限制。

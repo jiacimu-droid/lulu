@@ -146,7 +146,7 @@
 ./gradlew lint                                   # Android Lint，阶段验收使用
 ```
 
-构建应用需要在 `app/` 下提供 `google-services.json`（用于 Firebase）。
+公开构建不依赖 Firebase，也不需要 `google-services.json`。
 
 ## 6. 编码与测试规范
 

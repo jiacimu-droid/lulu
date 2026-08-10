@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -147,15 +148,24 @@ fun MemoryBankPage(
             if (showRawTimeline) {
                 items(rawTimeline, key = { it.id }) { entry ->
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { onOpenSource(entry.conversationId, entry.nodeId) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .then(
+                                if (entry.conversationId != null) {
+                                    Modifier.clickable {
+                                        onOpenSource(entry.conversationId, entry.nodeId)
+                                    }
+                                } else {
+                                    Modifier
+                                }
+                            ),
                     ) {
                         Column(
                             modifier = Modifier.padding(14.dp),
                             verticalArrangement = Arrangement.spacedBy(6.dp),
                         ) {
                             Text(
-                                text = when (entry.role) {
+                                text = "${entry.channel} · " + when (entry.role) {
                                     "USER" -> "用户"
                                     "ASSISTANT" -> "角色"
                                     else -> entry.role

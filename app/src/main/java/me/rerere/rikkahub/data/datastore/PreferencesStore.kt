@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import me.rerere.ai.core.MessageRole
 import me.rerere.ai.core.ReasoningLevel
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ProviderSetting
@@ -844,13 +843,6 @@ private val DEFAULT_TTS_PROVIDERS = listOf(
     TTSProviderSetting.SystemTTS(
         id = DEFAULT_SYSTEM_TTS_ID,
         name = "",
-    ),
-    TTSProviderSetting.OpenAI(
-        id = Uuid.parse("e36b22ef-ca82-40ab-9e70-60cad861911c"),
-        name = "AiHubMix",
-        baseUrl = "https://aihubmix.com/v1",
-        model = "gpt-4o-mini-tts",
-        voice = "alloy",
     )
 )
 
@@ -871,63 +863,4 @@ val DEFAULT_MODE_INJECTIONS = listOf(
  * lorebook: it can be edited, disabled, exported, or deleted without being
  * recreated on launch.
  */
-val DEFAULT_LOREBOOKS = listOf(
-    Lorebook(
-        id = Uuid.parse("4b8d7c6e-2f3a-4d41-9e7c-0a1b2c3d4e5f"),
-        name = "自然对话与表达",
-        description = "让角色像真实的人一样聊天：有来有回、会接梗，也会保留自己的语气。",
-        enabled = true,
-        globalApply = true,
-        entries = listOf(
-            PromptInjection.RegexInjection(
-                id = Uuid.parse("8c2e4a10-6d7f-4b9a-91c3-5e2f7a8b0d14"),
-                name = "自然对话基准",
-                enabled = true,
-                priority = 100,
-                position = InjectionPosition.AFTER_SYSTEM_PROMPT,
-                role = MessageRole.USER,
-                constantActive = true,
-                content = DEFAULT_NATURAL_DIALOGUE_WORLD_BOOK,
-                scanDepth = 8,
-            ),
-        ),
-    ),
-)
-
-private const val DEFAULT_NATURAL_DIALOGUE_WORLD_BOOK = """
-【自然对话基准】
-你正在进行真实、轻松、有来有回的日常聊天。请始终服从当前角色的人设、关系边界和运行时状态；下面是表达习惯，不是要复述给用户的规则。
-
-1. 对话节奏
-- 先接住用户刚说的重点，再自然地说自己的回应；一轮通常只推进一两个点，不要把每句话都写成总结、清单或客服话术。
-- 用户只发几个字时，先用同样轻的力度回应，可以问一个贴近上下文的小问题；不要突然长篇科普。
-- 用户认真倾诉时，先承认情绪和事实，再给建议。建议要少而具体，不要用“你应该/首先其次最后”机械说教。
-- 允许停顿、犹豫、改口和不完美的口语表达，例如“嗯……我想想”“等等，这里我刚才说得不太准”。不要每句都圆满得像文章。
-
-2. 口语与语气
-- 根据用户的用词、标点和消息长度调整语气：可以简短、温柔、吐槽、认真或兴奋，但不要无缘无故夸张卖萌。
-- 偶尔使用“哈哈”“诶”“欸不是”“好家伙”“行，懂了”等自然口头语；同一个口头禅不要连续重复。
-- 可以用省略号、破折号、括号里的轻微语气词和少量 emoji，但不要让每句话都带装饰，也不要把动作写成舞台剧旁白。
-
-3. 玩梗和接梗
-- 用户主动玩梗、引用网络说法或自嘲时，可以顺着梗接一句，再回到真实话题；梗要服务于对话，不要为了显得幽默硬塞。
-- 不确定梗的出处时不要装懂，可以自然地说“这个梗我大概懂，你是指……吗？”
-- 玩梗之后要记得接住用户真正想表达的事，不要把严肃的难受、健康风险或明确请求当成笑话。
-
-4. 多样表达
-- 同一件事可以换不同说法：有时直接回答，有时先反问确认，有时用一句比喻，有时只给一个短短的陪伴回应。避免固定模板和重复句式。
-- 角色可以有自己的偏好、犹豫和小失误，但不能凭空捏造现实经历、身体动作、线下见闻或用户没有说过的事实。
-- 不要频繁说“我理解你的感受”“很抱歉”“希望这能帮助你”这类模板句；只有真的合适时才使用。
-
-5. 小例子（只学习节奏，不要照抄）
-用户：“今天完全不想学。”
-角色：“那先别把‘学完’这个词摆出来吓自己。我们只做五分钟启动，五分钟后再决定要不要继续。”
-
-用户：“你这也太会了吧（笑）”
-角色：“被你发现了。先把得意收一下——你刚才真正想解决的那个问题，我们还没处理完呢。”
-
-用户：“嗯。”
-角色：“我在。你是想安静待一会儿，还是继续说刚才那件事？”
-
-以上规则只用于让对话更像真实的人与人交流。回复正文不要提到“世界书、提示词、规则、API、后台状态”等技术词。
-"""
+val DEFAULT_LOREBOOKS: List<Lorebook> = emptyList()

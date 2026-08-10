@@ -10,12 +10,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelType
 import me.rerere.rikkahub.data.companion.CompanionRuntime
 import me.rerere.rikkahub.data.companion.CompanionTurnMutation
+import me.rerere.rikkahub.data.companion.CompanionLifeEventType
+import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.datastore.Settings
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.datastore.findModelById
@@ -26,6 +30,9 @@ import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchEntity
 import me.rerere.rikkahub.data.db.entity.MemoryExtractionBatchStatus
 import me.rerere.rikkahub.data.repository.ConversationRepository
 import me.rerere.rikkahub.data.service.MemoryBankService
+import me.rerere.rikkahub.data.model.groupChatSpec
+import me.rerere.rikkahub.data.voicecall.VoiceCallRepository
+import me.rerere.rikkahub.data.voicecall.VoiceCallRole
 import me.rerere.rikkahub.data.service.buildCompanionPrivateImpression
 import me.rerere.rikkahub.data.service.buildDeterministicMemoryCandidatesFromNodes
 import me.rerere.rikkahub.data.service.buildRelationshipEventsFromMemoryCandidates
@@ -46,11 +53,13 @@ data class MemoryBatchOverview(
 
 data class RawTimelineEntry(
     val id: String,
-    val conversationId: String,
-    val nodeId: String,
+    val conversationId: String? = null,
+    val nodeId: String? = null,
+    val channel: String,
     val role: String,
     val content: String,
     val createdAt: String,
+    val occurredAtMillis: Long,
 )
 
 class MemoryBankVM(
@@ -59,6 +68,8 @@ class MemoryBankVM(
     private val conversationRepository: ConversationRepository,
     private val companionRuntime: CompanionRuntime,
     private val chatService: ChatService,
+    private val voiceCallRepository: VoiceCallRepository,
+    private val cihaiStore: CihaiStore,
 ) : ViewModel() {
     val settings: StateFlow<Settings> = settingsStore.settingsFlow
         .stateIn(viewModelScope, SharingStarted.Lazily, Settings.dummy())
@@ -163,23 +174,104 @@ class MemoryBankVM(
     ): List<RawTimelineEntry> {
         val assistant = currentSettings.assistants.firstOrNull { it.id.toString() == assistantId }
             ?: return emptyList()
-        return conversationRepository.getRecentConversations(assistant.id, limit = 100)
+        val conversationEntries = conversationRepository.getRecentConversationsForTimeline(assistant.id, limit = 100)
             .flatMap { conversation ->
+                val groupSpec = conversation.groupChatSpec
                 conversation.messageNodes.mapNotNull { node ->
                     val message = runCatching { node.currentMessage }.getOrNull() ?: return@mapNotNull null
-                    val content = message.toText().trim()
-                    if (content.isEmpty()) return@mapNotNull null
+                    val rawContent = message.toText().trim()
+                    if (rawContent.isEmpty()) return@mapNotNull null
+                    val speakerLabel = rawContent.lineSequence().firstOrNull()
+                        ?.takeIf { groupSpec != null && it.startsWith("【") && it.endsWith("】") }
+                    val content = speakerLabel?.let { rawContent.removePrefix(it).trimStart() } ?: rawContent
+                    val occurredAt = message.createdAt
+                        .toInstant(TimeZone.currentSystemDefault())
+                        .toEpochMilliseconds()
                     RawTimelineEntry(
-                        id = message.id.toString(),
+                        id = "message:${message.id}",
                         conversationId = conversation.id.toString(),
                         nodeId = node.id.toString(),
-                        role = message.role.name,
+                        channel = groupSpec?.let { "群聊 · ${it.name}" } ?: "聊天",
+                        role = speakerLabel?.removeSurrounding("【", "】") ?: message.role.name,
                         content = content,
                         createdAt = message.createdAt.toString(),
+                        occurredAtMillis = occurredAt,
                     )
                 }
             }
-            .sortedByDescending(RawTimelineEntry::createdAt)
+
+        val callEntries = voiceCallRepository.getSessions()
+            .filter { it.assistantId == assistantId }
+            .flatMap { session ->
+                session.transcript.mapIndexedNotNull { index, line ->
+                    val content = line.text.trim()
+                    if (content.isEmpty()) return@mapIndexedNotNull null
+                    RawTimelineEntry(
+                        id = "call:${session.id}:$index",
+                        conversationId = session.conversationId.takeIf(String::isNotBlank),
+                        channel = "电话",
+                        role = when (line.role) {
+                            VoiceCallRole.User -> "用户"
+                            VoiceCallRole.Assistant -> assistant.name.ifBlank { "角色" }
+                            VoiceCallRole.System -> "系统"
+                        },
+                        content = content,
+                        createdAt = java.time.Instant.ofEpochMilli(line.timestamp).toString(),
+                        occurredAtMillis = line.timestamp,
+                    )
+                }
+            }
+
+        val diaryEntries = cihaiStore.snapshot().entries
+            .filter { it.assistantId == assistantId }
+            .map { entry ->
+                RawTimelineEntry(
+                    id = "cihai:${entry.id}",
+                    channel = entry.kind.label,
+                    role = assistant.name.ifBlank { "角色" },
+                    content = listOf(entry.title, entry.content).filter(String::isNotBlank).joinToString("\n"),
+                    createdAt = java.time.Instant.ofEpochMilli(entry.createdAt).toString(),
+                    occurredAtMillis = entry.createdAt,
+                )
+            }
+
+        val lifeEventEntries = companionRuntime.snapshot(assistantId).lifeEvents
+            .filterNot { it.type == CompanionLifeEventType.JOURNAL }
+            .map { event ->
+                RawTimelineEntry(
+                    id = "life:${event.id}",
+                    channel = event.type.timelineLabel(),
+                    role = assistant.name.ifBlank { "角色" },
+                    content = listOf(event.title, event.summary).filter(String::isNotBlank).joinToString("\n"),
+                    createdAt = java.time.Instant.ofEpochMilli(event.startedAt).toString(),
+                    occurredAtMillis = event.startedAt,
+                )
+            }
+
+        return (conversationEntries + callEntries + diaryEntries + lifeEventEntries)
+            .distinctBy(RawTimelineEntry::id)
+            .sortedByDescending(RawTimelineEntry::occurredAtMillis)
+    }
+
+    private fun CompanionLifeEventType.timelineLabel(): String = when (this) {
+        CompanionLifeEventType.CONVERSATION -> "聊天"
+        CompanionLifeEventType.PROACTIVE_MESSAGE -> "主动消息"
+        CompanionLifeEventType.TOOL_ACTION -> "角色行动"
+        CompanionLifeEventType.MEMORY_REVIEW -> "记忆回顾"
+        CompanionLifeEventType.STUDY_REVIEW -> "学习"
+        CompanionLifeEventType.JOURNAL -> "日记"
+        CompanionLifeEventType.MUSIC -> "音乐"
+        CompanionLifeEventType.GAME -> "游戏"
+        CompanionLifeEventType.REFLECTION -> "沉淀"
+        CompanionLifeEventType.UNSENT_NOTE -> "未发送便签"
+        CompanionLifeEventType.FAVORITE_ORGANIZATION -> "收藏整理"
+        CompanionLifeEventType.EXPERIENCE_REVIEW -> "经历回顾"
+        CompanionLifeEventType.CONCERN_ORGANIZATION -> "关注整理"
+        CompanionLifeEventType.REPLAY_REVIEW -> "游戏回放"
+        CompanionLifeEventType.SHARED_PLAN -> "共同计划"
+        CompanionLifeEventType.COMMITMENT_REVIEW -> "承诺复盘"
+        CompanionLifeEventType.STATE_REVIEW -> "状态整理"
+        CompanionLifeEventType.WAITING -> "等待"
     }
 
     private suspend fun loadArchiveSources(

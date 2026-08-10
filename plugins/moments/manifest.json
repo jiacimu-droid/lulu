@@ -3,7 +3,7 @@
   "name": "朋友圈",
   "description": "基于 Supabase 的朋友圈功能，可以发布动态、点赞、评论，查看朋友圈流",
   "version": "1.0.0",
-  "author": "OrangeChat",
+  "author": "Lulu contributors",
   "icon": "📸",
   "entry": "main.js",
   "customPageWebView": {

@@ -258,7 +258,7 @@ internal class PluginBridgeWebViewClient(
             ?: return """{"success":false,"error":"Provider not found for model"}"""
         val providerImpl = providerManager.getProviderByType(providerSetting)
         val systemPrompt = buildString {
-            append("你是一个阅读助手。请根据用户的问题给出有深度的、温柔的回答。")
+            append("你是阅读助手。准确依据用户提供的文档和问题回答；语气服从当前角色设定，不预设亲密程度或性格。")
             if (contextJson.isNotBlank() && contextJson != "{}") {
                 try {
                     val context = JSONObject(contextJson)

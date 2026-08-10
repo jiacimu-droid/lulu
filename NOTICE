@@ -1,0 +1,16 @@
+Lulu
+Copyright (C) 2026 Lulu contributors
+
+This project is a modified distribution based on RikkaHub:
+https://github.com/rikkahub/rikkahub
+
+RikkaHub and this modified work are distributed under the GNU Affero
+General Public License, version 3. The complete license text is included
+in the LICENSE file.
+
+Lulu is an independent community project. It is not an official RikkaHub
+release and is not endorsed by the upstream maintainers.
+
+The repository contains additional third-party libraries and assets. Their
+respective copyright and license notices remain in their source files,
+dependency metadata, or bundled license material.

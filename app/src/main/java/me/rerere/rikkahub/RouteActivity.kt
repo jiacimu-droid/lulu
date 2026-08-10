@@ -109,8 +109,8 @@ import me.rerere.rikkahub.ui.pages.imggen.ImageGenPage
 import me.rerere.rikkahub.ui.pages.log.LogPage
 import me.rerere.rikkahub.ui.pages.search.SearchPage
 import me.rerere.rikkahub.ui.pages.setting.SettingAboutPage
+import me.rerere.rikkahub.ui.pages.setting.SettingPrivacyPage
 import me.rerere.rikkahub.ui.pages.setting.SettingDisplayPage
-import me.rerere.rikkahub.ui.pages.setting.SettingDonatePage
 import me.rerere.rikkahub.ui.pages.setting.SettingFilesPage
 import me.rerere.rikkahub.ui.pages.setting.SettingMcpPage
 import me.rerere.rikkahub.ui.pages.setting.SettingModelPage
@@ -613,6 +613,10 @@ class RouteActivity : ComponentActivity() {
                                 SettingAboutPage()
                             }
 
+                            entry<Screen.SettingPrivacy> {
+                                SettingPrivacyPage()
+                            }
+
                             entry<Screen.SettingSearch> {
                                 SettingSearchPage()
                             }
@@ -628,10 +632,6 @@ class RouteActivity : ComponentActivity() {
 
                             entry<Screen.SettingMcp> {
                                 SettingMcpPage()
-                            }
-
-                            entry<Screen.SettingDonate> {
-                                SettingDonatePage()
                             }
 
                             entry<Screen.SettingFiles> {
@@ -937,6 +937,9 @@ sealed interface Screen : NavKey {
     data object SettingAbout : Screen
 
     @Serializable
+    data object SettingPrivacy : Screen
+
+    @Serializable
     data object SettingSearch : Screen
 
     @Serializable
@@ -947,9 +950,6 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data object SettingMcp : Screen
-
-    @Serializable
-    data object SettingDonate : Screen
 
     @Serializable
     data object SettingFiles : Screen

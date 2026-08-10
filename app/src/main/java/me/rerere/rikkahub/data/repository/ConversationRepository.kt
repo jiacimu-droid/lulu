@@ -23,6 +23,7 @@ import me.rerere.rikkahub.data.db.entity.ConversationEntity
 import me.rerere.rikkahub.data.db.entity.MessageNodeEntity
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.model.Conversation
+import me.rerere.rikkahub.data.model.groupChatSpec
 import me.rerere.rikkahub.data.model.MessageNode
 import me.rerere.rikkahub.utils.JsonInstant
 import java.time.Instant
@@ -225,6 +226,23 @@ class ConversationRepository(
             saveMessageNodes(conversation.id.toString(), conversation.messageNodes)
         }
         messageFtsManager.indexConversation(conversation)
+    }
+
+    /** Includes group conversations where the assistant is a member, not only the stored host assistant. */
+    suspend fun getRecentConversationsForTimeline(assistantId: Uuid, limit: Int = 100): List<Conversation> {
+        val assistantIdText = assistantId.toString()
+        return conversationDAO.getAll().first()
+            .asSequence()
+            .map { entity -> conversationEntityToConversation(entity, emptyList()) }
+            .filter { conversation ->
+                conversation.assistantId == assistantId ||
+                    conversation.groupChatSpec?.members?.any { it.assistantId == assistantIdText } == true
+            }
+            .take(limit)
+            .map { summary ->
+                summary.copy(messageNodes = loadMessageNodes(summary.id.toString()))
+            }
+            .toList()
     }
 
     /** Web-safe conversation mutations live here so web routes do not depend on ChatService internals. */

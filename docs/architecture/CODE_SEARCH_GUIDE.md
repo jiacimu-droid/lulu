@@ -83,4 +83,4 @@
 ./gradlew connectedDebugAndroidTest
 ```
 
-设备测试依赖模拟器/真机；构建还可能依赖 `app/google-services.json`。无法运行时应记录具体原因，不得标记为通过。
+设备测试依赖模拟器/真机。公开构建不依赖 Firebase；无法运行时应记录具体原因，不得标记为通过。

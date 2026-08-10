@@ -12,13 +12,10 @@ import kotlinx.serialization.json.Json
 import me.rerere.ai.provider.ProviderManager
 import me.rerere.common.http.AcceptLanguageBuilder
 import me.rerere.rikkahub.BuildConfig
-import me.rerere.rikkahub.data.ai.AIRequestInterceptor
 import me.rerere.rikkahub.data.ai.RequestLoggingInterceptor
 import me.rerere.rikkahub.data.ai.transformers.AssistantTemplateLoader
 import me.rerere.rikkahub.data.ai.GenerationHandler
 import me.rerere.rikkahub.data.ai.transformers.TemplateTransformer
-import me.rerere.rikkahub.data.api.RikkaHubAPI
-import me.rerere.rikkahub.data.api.SponsorAPI
 import me.rerere.rikkahub.data.datastore.SettingsStore
 import me.rerere.rikkahub.data.cihai.CihaiStore
 import me.rerere.rikkahub.data.companion.CompanionStore
@@ -47,12 +44,9 @@ import me.rerere.rikkahub.data.study.StudyStore
 import me.rerere.rikkahub.data.starwish.StarWishStore
 import me.rerere.search.SearchService
 import me.rerere.rikkahub.data.sync.S3Sync
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -196,7 +190,7 @@ val dataSourceModule = module {
                     .addHeader(HttpHeaders.AcceptLanguage, acceptLang)
 
                 if (originalRequest.header(HttpHeaders.UserAgent) == null) {
-                    requestBuilder.addHeader(HttpHeaders.UserAgent, "RikkaHub-Android/${BuildConfig.VERSION_NAME}")
+                    requestBuilder.addHeader(HttpHeaders.UserAgent, "Lulu-Android/${BuildConfig.VERSION_NAME}")
                 }
 
                 chain.proceed(requestBuilder.build())
@@ -219,15 +213,10 @@ val dataSourceModule = module {
                 }
             }
             .addNetworkInterceptor(RequestLoggingInterceptor())
-            .addInterceptor(AIRequestInterceptor(remoteConfig = get()))
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.HEADERS
             })
             .build().also { SearchService.init(it, get()) }
-    }
-
-    single {
-        SponsorAPI.create(get())
     }
 
     single {
@@ -267,14 +256,4 @@ val dataSourceModule = module {
         )
     }
 
-    single<Retrofit> {
-        Retrofit.Builder()
-            .baseUrl("https://api.rikka-ai.com")
-            .addConverterFactory(get<Json>().asConverterFactory("application/json; charset=UTF8".toMediaType()))
-            .build()
-    }
-
-    single<RikkaHubAPI> {
-        get<Retrofit>().create(RikkaHubAPI::class.java)
-    }
 }

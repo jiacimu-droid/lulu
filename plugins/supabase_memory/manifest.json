@@ -3,7 +3,7 @@
   "name": "Supabase 外置记忆库",
   "description": "基于 Supabase 的外置记忆库，自动同步聊天记录",
   "version": "1.0.0",
-  "author": "OrangeChat",
+  "author": "Lulu contributors",
   "icon": "🗄️",
   "entry": "main.js",
   "config": [

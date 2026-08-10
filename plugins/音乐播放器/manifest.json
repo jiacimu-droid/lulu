@@ -3,7 +3,7 @@
   "name": "音乐播放器",
   "version": "1.0.0",
   "description": "导入音乐文件，AI可自由播放控制，支持后台播放",
-  "author": "橘瓣",
+  "author": "Lulu contributors",
   "icon": "🎵",
   "entry": "main.js",
   "permissions": ["ai_chat"],

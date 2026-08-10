@@ -24,3 +24,5 @@ release-signing/
 !gradle-wrapper.jar
 .aider*
 .claude/settings.local.json
+# Firebase project configuration must never be committed.
+**/google-services.json
